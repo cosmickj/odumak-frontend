@@ -1,24 +1,5 @@
 # youngeun-attendance
 
-## Project setup
 ```
-npm install
+초등부 출석부 제작하기
 ```
-
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
