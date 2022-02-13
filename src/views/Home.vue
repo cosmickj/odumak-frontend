@@ -1,16 +1,16 @@
 <template>
   <div>
     <Navbar></Navbar>
-    <AttendanceList></AttendanceList>
+    <AttendanceSheet></AttendanceSheet>
   </div>
 </template>
 
 <script>
 import Navbar from "@/components/Navbar.vue";
-import AttendanceList from "../components/AttendanceList.vue";
+import AttendanceSheet from "../components/AttendanceSheet.vue";
 
 export default {
-  components: { Navbar, AttendanceList },
+  components: { Navbar, AttendanceSheet },
 };
 </script>
 
