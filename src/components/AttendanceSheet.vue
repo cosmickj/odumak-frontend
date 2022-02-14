@@ -37,7 +37,8 @@
 
     <div class="table-container">
       <b-table
-        sticky-header="calc(100vh - 175px)"
+        class="table-main shadow-sm"
+        sticky-header="calc(100vh - 223px)"
         :items="items"
         :fields="fields"
         :filter="filter"
@@ -48,6 +49,12 @@
 
 <script>
 export default {
+  props: {
+    items: {
+      type: Array,
+      required: true,
+    },
+  },
   data() {
     return {
       selectedDate: "",
@@ -56,31 +63,6 @@ export default {
         { value: "online", text: "온라인 예배" },
         { value: "offline", text: "현장 예배" },
         { value: "dabsence", text: "미참여" },
-      ],
-      // prettier-ignore
-      items: [
-        { "class": "3-1", "teacher": "강경환", "student": "박주하", "attendance": "온라인" },
-        { "class": "3-1", "teacher": "강경환", "student": "전지훈", "attendance": "미참여" },
-        { "class": "3-1", "teacher": "강경환", "student": "윤서후", "attendance": "현장예배" },
-        { "class": "3-1", "teacher": "강경환", "student": "김동률", "attendance": "현장예배" },
-        { "class": "3-1", "teacher": "안정임", "student": "신윤솔", "attendance": "온라인" },
-        { "class": "3-1", "teacher": "안정임", "student": "오한율", "attendance": "온라인" },
-        { "class": "3-1", "teacher": "안정임", "student": "이초은", "attendance": "온라인" },
-        { "class": "3-1", "teacher": "안정임", "student": "전예은", "attendance": "온라인" },
-        { "class": "3-1", "teacher": "안정임", "student": "전주은", "attendance": "온라인" },
-        { "class": "3-1", "teacher": "이유빈", "student": "이아인", "attendance": "온라인" },
-        { "class": "3-1", "teacher": "이유빈", "student": "손지호", "attendance": "온라인" },
-        { "class": "3-1", "teacher": "강경환", "student": "박주하", "attendance": "온라인" },
-        { "class": "3-1", "teacher": "강경환", "student": "전지훈", "attendance": "미참여" },
-        { "class": "3-1", "teacher": "강경환", "student": "윤서후", "attendance": "현장예배" },
-        { "class": "3-1", "teacher": "강경환", "student": "김동률", "attendance": "현장예배" },
-        { "class": "3-1", "teacher": "안정임", "student": "신윤솔", "attendance": "온라인" },
-        { "class": "3-1", "teacher": "안정임", "student": "오한율", "attendance": "온라인" },
-        { "class": "3-1", "teacher": "안정임", "student": "이초은", "attendance": "온라인" },
-        { "class": "3-1", "teacher": "안정임", "student": "전예은", "attendance": "온라인" },
-        { "class": "3-1", "teacher": "안정임", "student": "전주은", "attendance": "온라인" },
-        { "class": "3-1", "teacher": "이유빈", "student": "이아인", "attendance": "온라인" },
-        { "class": "3-1", "teacher": "이유빈", "student": "손지호", "attendance": "온라인" },
       ],
       fields: [
         { key: "class", label: "학년(반)", sortable: true },
@@ -98,7 +80,7 @@ export default {
     this.selectedDate = today;
   },
   methods: {
-    dateDisabled(ymd, date) {
+    dateDisabled(_ymd, date) {
       const sunday = date.getDay();
       return sunday !== 0;
     },
@@ -108,15 +90,23 @@ export default {
 
 <style scoped>
 .date-wrapper {
-  margin-left: 8px;
-  margin-right: 8px;
-  margin-top: 8px;
-  padding-top: 10px;
-  padding-bottom: 10px;
+  margin: 8px 8px 0px 8px;
+  padding: 10px 0px 10px 0px;
   border: 1px #dde1e5 solid;
   border-radius: 5px;
 }
 .date {
   font-weight: bold;
+}
+
+/* TABLE */
+.table-container {
+  padding: 5px;
+}
+.table-main {
+  border-radius: 5px;
+}
+.table-main::-webkit-scrollbar {
+  display: none;
 }
 </style>
