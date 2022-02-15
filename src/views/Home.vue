@@ -69,12 +69,12 @@ export default {
   cursor: pointer;
   padding: 10px;
   border-radius: 5px;
-  box-shadow: 1px 1px 3px #333;
+  /* box-shadow: 1px 1px 3px #333; */
 }
 .button-wrapper button:active {
-  margin-left: 3px;
-  margin-right: 3px;
-  box-shadow: none;
+  background-color: #1abc9c99;
+  border: 1px solid #1abc9c99;
+  color: #333;
 }
 .button-wrapper button a {
   text-decoration: none;
