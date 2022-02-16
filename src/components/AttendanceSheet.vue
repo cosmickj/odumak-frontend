@@ -41,6 +41,7 @@
         sticky-header="calc(100vh - 223px)"
         :items="items"
         :fields="fields"
+        primary-key="student"
         :filter="filter"
       ></b-table>
     </div>
@@ -54,6 +55,10 @@ export default {
       type: Array,
       required: true,
     },
+    fields: {
+      type: Array,
+      required: true,
+    },
   },
   data() {
     return {
@@ -64,12 +69,12 @@ export default {
         { value: "offline", text: "현장 예배" },
         { value: "dabsence", text: "미참여" },
       ],
-      fields: [
-        { key: "class", label: "학년(반)", sortable: true },
-        { key: "teacher", label: "담임교사", sortable: true },
-        { key: "student", label: "학생명", sortable: true },
-        { key: "attendance", label: "출석여부", sortable: true },
-      ],
+      // fields: [
+      //   { key: "class", label: "학년(반)", sortable: true },
+      //   { key: "teacher", label: "담임교사", sortable: true },
+      //   { key: "student", label: "학생명", sortable: true },
+      //   { key: "attendance", label: "출석여부", sortable: true },
+      // ],
       filter: null,
     };
   },

@@ -133,6 +133,7 @@ table {
   border-spacing: 0;
 }
 
+/* CUSTOME BOOTSTRAP-VUE */
 .bg-default {
   background: #1abc9c !important;
 }
