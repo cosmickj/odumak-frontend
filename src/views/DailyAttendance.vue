@@ -1,6 +1,9 @@
 <template>
   <div>
-    <AttendanceSheet :items="items" :fields="fields"></AttendanceSheet>
+    <AttendanceSheet
+      :items="dailyAttendaces"
+      :fields="dailyAttendaceFields"
+    ></AttendanceSheet>
 
     <div class="button-wrapper">
       <button @click="filpShow">
@@ -15,35 +18,11 @@ import AttendanceSheet from "../components/AttendanceSheet.vue";
 
 export default {
   components: { AttendanceSheet },
-  methods: {
-    filpShow() {
-      // this.show = !this.show;
-      // NOTE: 누적 합계 계산 함수
-      // const result = {};
-      // for (let item of this.items) {
-      //   if (!(item.class in result)) {
-      //     result[item.class] = { online: 0, offline: 0 };
-      //     if (item.attendance === "온라인") result[item.class].online++;
-      //     else result[item.class].offline++;
-      //   } else {
-      //     if (item.attendance === "온라인") result[item.class].online++;
-      //     else result[item.class].offline++;
-      //   }
-      // }
-      // for (const [key, value] of Object.entries(result)) {
-      //   // console.log(key, Object.values(value));
-      //   const reducer = (accumulator, curr) => accumulator + curr;
-      //   const total = Object.values(value).reduce(reducer);
-      //   result[key]["total"] = total;
-      // }
-      // console.log(result);
-    },
-  },
   computed: {
-    items() {
-      return this.$store.state.items;
+    dailyAttendaces() {
+      return this.$store.state.dailyAttendaces;
     },
-    fields() {
+    dailyAttendaceFields() {
       return this.$store.state.dailyAttendaceFields;
     },
   },

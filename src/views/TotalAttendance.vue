@@ -1,6 +1,9 @@
 <template>
   <div>
-    <AttendanceSheet :items="items" :fields="fields"></AttendanceSheet>
+    <AttendanceSheet
+      :items="totalAttendaces"
+      :fields="totalAttendaceFields"
+    ></AttendanceSheet>
 
     <div class="button-wrapper">
       <button>
@@ -15,10 +18,10 @@ import AttendanceSheet from "../components/AttendanceSheet.vue";
 export default {
   components: { AttendanceSheet },
   computed: {
-    items() {
-      return this.$store.state.totalAttendace;
+    totalAttendaces() {
+      return this.$store.state.totalAttendaces;
     },
-    fields() {
+    totalAttendaceFields() {
       return this.$store.state.totalAttendaceFields;
     },
   },

@@ -5,7 +5,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    items: [
+    dailyAttendaces: [
       // 서버에서 값을 넘겨줄 때 색깔 값을 계산해서 넣어서 넘겨주자.
       {
         class: "3-1",
@@ -49,7 +49,7 @@ export default new Vuex.Store({
     ],
 
     // Total Attendace Data
-    totalAttendace: [
+    totalAttendaces: [
       {
         class: "3-1",
         online: 3,
