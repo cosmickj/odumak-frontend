@@ -5,6 +5,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
+    // Daily Attendace Data
     dailyAttendaces: [
       // 서버에서 값을 넘겨줄 때 색깔 값을 계산해서 넣어서 넘겨주자.
       {
@@ -87,7 +88,7 @@ export default new Vuex.Store({
       },
     ],
     totalAttendaceFields: [
-      { key: "class", label: "학년(반)", sortable: true },
+      { key: "class", label: "학년(반)", sortable: true, stickyColumn: true },
       { key: "online", label: "온라인", sortable: true },
       { key: "offline", label: "현장", sortable: true },
       { key: "absence", label: "미참여", sortable: true },

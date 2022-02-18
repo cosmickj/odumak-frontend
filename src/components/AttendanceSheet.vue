@@ -39,10 +39,11 @@
       <b-table
         class="table-main shadow-sm"
         sticky-header="calc(100vh - 223px)"
+        primary-key="student"
         :items="items"
         :fields="fields"
-        primary-key="student"
         :filter="filter"
+        :responsive="true"
       ></b-table>
     </div>
   </div>
@@ -69,12 +70,6 @@ export default {
         { value: "offline", text: "현장 예배" },
         { value: "dabsence", text: "미참여" },
       ],
-      // fields: [
-      //   { key: "class", label: "학년(반)", sortable: true },
-      //   { key: "teacher", label: "담임교사", sortable: true },
-      //   { key: "student", label: "학생명", sortable: true },
-      //   { key: "attendance", label: "출석여부", sortable: true },
-      // ],
       filter: null,
     };
   },
@@ -113,5 +108,12 @@ export default {
 }
 .table-main::-webkit-scrollbar {
   display: none;
+}
+</style>
+
+<style>
+.table-b-table-default {
+  min-width: 90px;
+  font-size: 0.9rem;
 }
 </style>
