@@ -44,7 +44,7 @@ export default {
       return this.$store.state.items;
     },
     fields() {
-      return this.$store.state.fields;
+      return this.$store.state.dailyAttendaceFields;
     },
   },
 };

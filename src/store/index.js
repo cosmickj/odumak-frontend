@@ -41,7 +41,7 @@ export default new Vuex.Store({
         attendance: "온라인",
       },
     ],
-    fields: [
+    dailyAttendaceFields: [
       { key: "class", label: "학년(반)", sortable: true },
       { key: "teacher", label: "담임교사", sortable: true },
       { key: "student", label: "학생명", sortable: true },
