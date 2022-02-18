@@ -37,7 +37,7 @@
 
     <div class="table-container">
       <b-table
-        class="table-main shadow-sm"
+        class="table-main shadow-sm text-center"
         sticky-header="calc(100vh - 223px)"
         primary-key="student"
         :items="items"
