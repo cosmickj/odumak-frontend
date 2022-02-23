@@ -6,7 +6,7 @@
     ></AttendanceSheet>
 
     <div class="button-wrapper">
-      <button @click="filpShow">
+      <button>
         <router-link to="/total-attendance">누적 출석현황 보기</router-link>
       </button>
     </div>

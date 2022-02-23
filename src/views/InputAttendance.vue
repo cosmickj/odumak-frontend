@@ -39,10 +39,11 @@
         </b-col>
         <b-col cols="7" class="p-0">
           <div class="d-flex justify-content-center align-items-center">
+            <!-- 입력 버튼 -->
             <template v-for="(option, idx) in options">
               <input
-                :key="'input' + idx"
                 type="radio"
+                :key="'input' + idx"
                 :name="student.name"
                 :id="student.name + idx"
                 :value="option.value"
@@ -51,7 +52,7 @@
               <label
                 :key="'label' + idx"
                 :for="student.name + idx"
-                :style="{ background: option.background }"
+                :style="{ background: option.background, color: option.color }"
               >
                 {{ option.text }}
               </label>
@@ -70,9 +71,24 @@ export default {
       selectedDate: "",
       selected: "",
       options: [
-        { text: "온라인", value: "online", background: "green" },
-        { text: "현장예배", value: "offline", background: "yellow" },
-        { text: "미참여", value: "absence", background: "red" },
+        {
+          text: "미참여",
+          value: "absence",
+          background: "#f65058ff",
+          color: "#28334aff",
+        },
+        {
+          text: "온라인",
+          value: "online",
+          background: "#fbde44ff",
+          color: "#f65058ff",
+        },
+        {
+          text: "현장예배",
+          value: "offline",
+          background: "#28334aff",
+          color: "#fbde44ff",
+        },
       ],
 
       students: [
@@ -111,10 +127,36 @@ input[type="radio"] ~ label {
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 1px solid black;
+  box-shadow: 0px 2px 4px #00000029;
   border-radius: 5px;
+  cursor: pointer;
+  opacity: 0.5;
 }
 input[type="radio"]:checked + label {
-  background: orange !important;
+  opacity: 1;
+  animation: jelly 0.6s ease;
+}
+@keyframes jelly {
+  from {
+    transform: scale(1, 1);
+  }
+  30% {
+    transform: scale(1.25, 0.75);
+  }
+  40% {
+    transform: scale(0.75, 1.25);
+  }
+  50% {
+    transform: scale(1.15, 0.85);
+  }
+  65% {
+    transform: scale(0.95, 1.05);
+  }
+  75% {
+    transform: scale(1.05, 0.95);
+  }
+  to {
+    transform: scale(1, 1);
+  }
 }
 </style>
