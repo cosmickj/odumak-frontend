@@ -6,17 +6,26 @@ Vue.use(VueRouter);
 const routes = [
   {
     path: "/",
-    name: "Daily Attendance",
+    redirect: "/login",
+  },
+  {
+    path: "/login",
+    name: "LoginPage",
+    component: () => import("@/views/LoginPage"),
+  },
+  {
+    path: "/daily-attendance",
+    name: "DailyAttendance",
     component: () => import("@/views/DailyAttendance.vue"),
   },
   {
     path: "/total-attendance",
-    name: "Total Attendance",
+    name: "TotalAttendance",
     component: () => import("@/views/TotalAttendance.vue"),
   },
   {
     path: "/input-attendance",
-    name: "Input Attendance",
+    name: "InputAttendance",
     component: () => import("@/views/InputAttendance.vue"),
   },
 ];
