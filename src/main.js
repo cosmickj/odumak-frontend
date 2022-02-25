@@ -8,10 +8,12 @@ import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 import "@/css/reset.css";
 import "@/css/global.css";
+import VueCompositionAPI from "@vue/composition-api";
 
 Vue.config.productionTip = false;
 Vue.use(BootstrapVue);
 Vue.use(BootstrapVueIcons);
+Vue.use(VueCompositionAPI);
 
 new Vue({
   router,
