@@ -2,29 +2,33 @@
   <div id="login">
     <div class="login__wrapper">
       <div class="login__container">
+        <h1 class="title">당신의 섬김에 감사합니다.</h1>
         <b-form @submit="onSubmit">
-          <div class="input__field">
+          <div class="input__field shadow">
             <b-form-input
               class="input__name"
               v-model="form.name"
-              type="text"
               placeholder="이름을 입력하세요"
+              type="text"
             ></b-form-input>
           </div>
 
-          <div class="input__field">
+          <div class="input__field shadow">
             <b-form-input
               class="input__password"
               v-model="form.password"
-              type="text"
               placeholder="비밀번호를 입력하세요"
+              type="text"
             ></b-form-input>
           </div>
 
-          <b-button class="button__submit" type="submit" size="lg" block>
+          <b-button class="button__submit shadow" type="submit" block>
             <span>로그인</span>
           </b-button>
         </b-form>
+        <div class="tree__wrapper">
+          <span>Tree will be in here</span>
+        </div>
       </div>
     </div>
   </div>
@@ -43,7 +47,7 @@ export default {
   methods: {
     onSubmit(event) {
       event.preventDefault();
-      alert("submit");
+      this.$router.push("/main");
     },
   },
 };
@@ -51,7 +55,6 @@ export default {
 
 <style scoped>
 #login {
-  background: var(--color-login);
   height: 100%;
 }
 .login__wrapper {
@@ -62,34 +65,56 @@ export default {
 }
 .login__container {
   max-width: 500px;
-  /* border: 1px solid black; */
-  border-radius: 15px;
-  padding: 40px 30px 30px 30px;
-  margin-top: 100px;
-  box-shadow: 13px 13px 20px #cbced1, -13px -13px 20px #fff;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: var(--container-padding);
+}
+.title {
+  color: var(--color-text-white);
+  margin-bottom: 5px;
 }
 .input__field {
-  padding-left: 10px;
-  margin-bottom: 20px;
-  border-radius: 50px;
-  box-shadow: inset 8px 8px 8px #cbced1, inset -8px -8px 8px #fff;
+  padding: 8px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  background-color: var(--color-text-white);
+  border: none;
 }
 .form-control:focus {
   box-shadow: none;
 }
 .input__name,
 .input__password {
-  margin-bottom: 10px;
   min-width: 200px;
   height: 35px;
   border: none;
   outline: none;
   background: none;
   font-size: 1.2rem;
-  color: #666;
+  color: var(--color-text);
   padding: 10px 15px 10px 10px;
 }
 .button__submit {
-  border-radius: 50px;
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  border-radius: 10px;
+  font-size: 2.5rem;
+  padding: 15px;
+  background-color: var(--color-btn-login);
+  color: var(--color-text);
+}
+.button__submit:hover,
+.button__submit:active,
+.button__submit:visited {
+  background-color: var(--color-btn-login) !important;
+}
+.tree__wrapper {
+  background: orange;
+  flex-grow: 1;
 }
 </style>

@@ -6,8 +6,7 @@ Vue.use(VueRouter);
 const routes = [
   {
     path: "/",
-    // redirect: "/login",
-    redirect: "/main",
+    redirect: "/login",
   },
   {
     path: "/login",
