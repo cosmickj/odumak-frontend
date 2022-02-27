@@ -2,7 +2,7 @@
   <div id="login">
     <div class="login__wrapper">
       <div class="login__container">
-        <h1 class="title">당신의 섬김에 감사합니다.</h1>
+        <div class="title">당신의 섬김에 감사합니다.</div>
         <b-form @submit="onSubmit">
           <div class="input__field shadow">
             <b-form-input
@@ -72,6 +72,7 @@ export default {
   padding: var(--container-padding);
 }
 .title {
+  font-size: 1.6rem;
   color: var(--color-text-white);
   margin-bottom: 5px;
 }
@@ -114,7 +115,7 @@ export default {
   background-color: var(--color-btn-login) !important;
 }
 .tree__wrapper {
-  background: orange;
+  border: 1px solid orange;
   flex-grow: 1;
 }
 </style>
