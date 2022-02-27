@@ -2,25 +2,26 @@
   <div id="main">
     <div class="menu__wrapper">
       <div class="menu__container">
+        <h2 class="welcome">안녕하세요 이경준 선생님</h2>
+
+        <router-link
+          class="menu__item"
+          v-for="(menu, i) in menuList"
+          :key="i"
+          :to="menu.link"
+        >
+          <span class="menu__title">{{ menu.title }}</span>
+          <font-awesome-icon :icon="menu.icon" class="menu__icon" />
+        </router-link>
+
         <div class="bible">
           <div class="bible__content">
-            <!-- Here I am! I stand at the door and knock. If anyone hears my voice
-            and opens the door, I will come in and eat with that persone, and
-            they with me. -->
             볼찌어다 내가 문밖에 서서 두드리노니 누구든지 내 음성을 듣고 문을
             열면 내가 그에게로 들어가 그로 더불어 먹고 그는 나로 더불어 먹으리라
           </div>
           <div class="bible__book">
             요한계시록 3:20 <span class="bible__book__version">개역한글</span>
           </div>
-        </div>
-        <h2 class="welcome">안녕하세요 이경준 선생님</h2>
-
-        <div v-for="(menu, i) in menuList" :key="i" class="menu__item">
-          <router-link :to="menu.link">
-            <span class="menu__title">{{ menu.title }}</span>
-            <font-awesome-icon :icon="menu.icon" class="menu__icon" />
-          </router-link>
         </div>
       </div>
     </div>
@@ -59,6 +60,7 @@ export default {
 
 .bible {
   margin-bottom: 30px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
 }
 .bible__content {
   font-family: "Noto Serif KR", serif;
@@ -75,6 +77,7 @@ export default {
   color: #ccc;
 }
 .welcome {
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
   color: var(--color-text-white);
   margin-bottom: 30px;
 }
@@ -83,25 +86,24 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  --align-items: center;
 }
 .menu__container {
   border-radius: 10px;
   padding: var(--container-padding);
 }
 .menu__item {
-  --display: block;
+  display: block;
   margin-bottom: 15px;
   border-radius: 10px;
   box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.5);
-  background: rgba(255, 255, 255, 0.1);
+  background: #f9f871;
   text-align: center;
   padding: 30px 0;
 }
 .menu__title,
 .menu__icon {
-  font-size: 1.6rem;
-  color: var(--color-text-white);
+  font-size: 2.2rem;
+  color: #333;
 }
 .menu__icon {
   margin-left: 10px;

@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div class="d-flex p-2">
+  <div id="input-attendance">
+    <div class="input-attendance-date d-flex p-2">
       <b-form-datepicker
         class="w-50"
         v-model="selectedDate"
@@ -21,6 +21,7 @@
       </div>
     </div>
 
+    <!-- 학생 출석 입력폼 -->
     <b-container class="p-0" fluid>
       <b-row
         class="p-3 mx-2 my-1 border rounded shadow-sm"
@@ -90,7 +91,6 @@ export default {
           color: "#fbde44ff",
         },
       ],
-
       students: [
         { name: "학생1", birth: "95.12.13", check: "" },
         { name: "학생2", birth: "95.12.13", check: "" },
@@ -110,6 +110,16 @@ export default {
 </script>
 
 <style scoped>
+#input-attendance {
+  height: inherit;
+  overflow: auto;
+}
+.input-attendance-date {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--color-basic);
+}
 #remark {
   height: 28px;
   font-size: 12px;

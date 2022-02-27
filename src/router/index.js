@@ -19,6 +19,11 @@ const routes = [
     component: () => import("@/views/MainPage"),
   },
   {
+    path: "/input-attendance",
+    name: "InputAttendance",
+    component: () => import("@/views/InputAttendance.vue"),
+  },
+  {
     path: "/daily-attendance",
     name: "DailyAttendance",
     component: () => import("@/views/DailyAttendance.vue"),
@@ -28,11 +33,6 @@ const routes = [
     name: "TotalAttendance",
     component: () => import("@/views/TotalAttendance.vue"),
   },
-  {
-    path: "/input-attendance",
-    name: "InputAttendance",
-    component: () => import("@/views/InputAttendance.vue"),
-  },
 ];
 
 const router = new VueRouter({
@@ -40,5 +40,10 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes,
 });
+
+// router.beforeEach((to, from, next) => {
+//   console.log(to, from);
+//   next();
+// });
 
 export default router;

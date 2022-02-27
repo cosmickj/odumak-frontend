@@ -26,9 +26,9 @@
             <span>로그인</span>
           </b-button>
         </b-form>
-        <div class="tree__wrapper">
+        <!-- <div class="tree__wrapper">
           <span>Tree will be in here</span>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>

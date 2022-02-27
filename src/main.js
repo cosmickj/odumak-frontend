@@ -20,9 +20,11 @@ import {
   faPenToSquare,
   faFileLines,
   faBook,
+  faHouse,
+  faBarsStaggered,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-library.add(faPenToSquare, faFileLines, faBook);
+library.add(faPenToSquare, faFileLines, faBook, faHouse, faBarsStaggered);
 Vue.component("font-awesome-icon", FontAwesomeIcon);
 
 Vue.config.productionTip = false;
