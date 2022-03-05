@@ -74,8 +74,9 @@ export default defineComponent({
           password: form.value.password,
         });
         router.push("/main");
-      } catch (error) {
+      } catch (error: any) {
         errorMessage.value = error.message;
+        // console.log(error.message);
       }
     };
 
