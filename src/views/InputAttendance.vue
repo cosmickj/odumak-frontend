@@ -104,16 +104,20 @@ export default {
 };
 </script>
 
-<style>
-.calendar__container > span > .p-button,
-.calendar__container > span > .p-button:hover,
-.calendar__container > span > .p-button:active {
-  background: #cccccc;
-  border: 1px solid #cccccc;
-  color: #333;
-}
-</style>
 <style scoped>
+#input-attendance {
+  min-height: 100vh;
+  max-height: 100vh;
+  overflow: auto;
+}
+.input-attendance__container {
+  padding: var(--container-padding);
+}
+.title__container {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-evenly;
+}
 .student {
   padding: 1rem;
   display: flex;
@@ -126,30 +130,6 @@ export default {
 }
 .student__attendance {
   display: flex;
-}
-.title__container {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-evenly;
-}
-
-/*  */
-#input-attendance {
-  height: 100vh;
-  overflow: auto;
-}
-.input-attendance-date {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: #0084b6;
-}
-.input-attendance__container {
-  padding: var(--container-padding);
-}
-#remark {
-  height: 28px;
-  font-size: 12px;
 }
 input[type="radio"] {
   display: none;
