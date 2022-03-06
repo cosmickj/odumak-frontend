@@ -5,31 +5,31 @@
       :class="{ active: isActive }"
       @click="activeBtnNav"
     >
-      <font-awesome-icon icon="house" v-if="!isActive" />
-      <font-awesome-icon icon="bars-staggered" v-else />
+      <i class="pi pi-home" v-if="!isActive"></i>
+      <i class="pi pi-bars" v-else></i>
     </span>
     <ul class="btn-nav__menus">
       <li @click="activeBtnNav">
         <router-link to="/main">
-          <font-awesome-icon class="pr-10" icon="house" size="1x" />
+          <i class="pr-10 pi pi-home"></i>
           홈화면
         </router-link>
       </li>
       <li @click="activeBtnNav">
         <router-link to="/input-attendance">
-          <font-awesome-icon class="pr-10" icon="pen-to-square" size="1x" />
+          <i class="pr-10 pi pi-pencil"></i>
           출석 입력하기
         </router-link>
       </li>
       <li @click="activeBtnNav">
         <router-link to="/daily-attendance">
-          <font-awesome-icon class="pr-10" icon="file-lines" size="1x" />
+          <i class="pr-10 pi pi-file"></i>
           일일 출석 확인
         </router-link>
       </li>
       <li @click="activeBtnNav">
         <router-link to="/total-attendance">
-          <font-awesome-icon class="pr-10" icon="book" size="1x" />
+          <i class="pr-10 pi pi-book"></i>
           누적 출석 확인
         </router-link>
       </li>

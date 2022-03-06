@@ -2,7 +2,10 @@
   <div id="login">
     <div class="login__wrapper">
       <div class="login__container">
-        <div class="title">당신의 섬김에 감사합니다.</div>
+        <div class="title">
+          당신의 섬김에 감사합니다.
+          <!-- <i class="pi pi-times"></i> -->
+        </div>
         <form @submit.prevent="onSubmit">
           <div class="pt-20">
             <InputText

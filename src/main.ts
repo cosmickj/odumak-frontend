@@ -7,30 +7,20 @@ import store from "./store";
 import "./assets/main.css";
 import "@/css/global.css";
 import "@/css/reset.css";
-// Fontawesome Setup
-import { library } from "@fortawesome/fontawesome-svg-core";
-import {
-  faPenToSquare,
-  faFileLines,
-  faBook,
-  faHouse,
-  faBarsStaggered,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-library.add(faPenToSquare, faFileLines, faBook, faHouse, faBarsStaggered);
 // Prime Vue
 import PrimeVue from "primevue/config";
-import Button from "primevue/button";
-import InputText from "primevue/inputtext";
 import "primevue/resources/themes/saga-blue/theme.css";
 import "primevue/resources/primevue.min.css";
 import "primeicons/primeicons.css";
+import Button from "primevue/button";
+import InputText from "primevue/inputtext";
+import Calendar from "primevue/calendar";
 
 createApp(App)
-  .component("font-awesome-icon", FontAwesomeIcon)
   .use(PrimeVue)
-  .component("InputText", InputText)
   .component("Button", Button)
+  .component("InputText", InputText)
+  .component("Calendar", Calendar)
   .use(store)
   .use(router)
   .mount("#app");
