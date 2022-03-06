@@ -37,6 +37,14 @@
   color: var(--color-basic) !important;
 }
 
+.calendar__container > span > .p-button,
+.calendar__container > span > .p-button:hover,
+.calendar__container > span > .p-button:active {
+  background: #cccccc;
+  border: 1px solid #cccccc;
+  color: #333;
+}
+
 .btn-block {
   display: block;
   width: 100%;

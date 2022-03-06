@@ -15,12 +15,16 @@ import "primeicons/primeicons.css";
 import Button from "primevue/button";
 import InputText from "primevue/inputtext";
 import Calendar from "primevue/calendar";
+import DataTable from "primevue/datatable";
+import Column from "primevue/column";
 
 createApp(App)
   .use(PrimeVue)
   .component("Button", Button)
   .component("InputText", InputText)
   .component("Calendar", Calendar)
+  .component("DataTable", DataTable)
+  .component("Column", Column)
   .use(store)
   .use(router)
   .mount("#app");

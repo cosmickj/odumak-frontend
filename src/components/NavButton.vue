@@ -58,6 +58,7 @@ export default defineComponent({
 
 <style scoped>
 .btn-nav {
+  z-index: 999;
   position: fixed;
   bottom: 40px;
   right: 20px;
