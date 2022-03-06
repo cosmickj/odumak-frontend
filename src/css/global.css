@@ -5,7 +5,7 @@
   --color-text-white: #fff;
   --color-btn-login: #feef90;
   /* size */
-  --container-padding: 40px 30px 0px 30px;
+  --container-padding: 40px 30px 40px 30px;
 }
 
 @keyframes jelly {

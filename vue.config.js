@@ -7,7 +7,7 @@ module.exports = defineConfig({
     },
   },
   pwa: {
-    name: "영은교회 출석부",
+    name: "오두막",
     themeColor: "#005d9a",
   },
 });

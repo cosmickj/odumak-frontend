@@ -1,100 +1,72 @@
 <template>
   <div id="input-attendance">
-    <!-- 학생 출석 입력폼 -->
-    <b-container fluid class="input-attendance__container mt-2">
-      <b-form @submit="onSubmit">
-        <div class="input-attendance-date d-flex p-3">
-          <b-form-datepicker
-            class="w-50"
-            v-model="selectedDate"
-            placeholder="날짜 선택"
-            :date-disabled-fn="dateDisabled"
-            :date-format-options="{
-              year: '2-digit',
-              month: '2-digit',
-              day: '2-digit',
-              weekday: 'narrow',
-            }"
-          ></b-form-datepicker>
-          <div
-            class="d-flex justify-content-center align-items-center flex-grow-1"
-          >
-            <span>3-1</span>
-          </div>
-          <div
-            class="d-flex justify-content-center align-items-center flex-grow-1"
-          >
-            <span>이유빈</span>
-          </div>
-        </div>
-        <b-row
-          class="p-3 mx-2 my-1 border rounded shadow-sm"
-          v-for="(student, index) in students"
-          :key="index"
-        >
-          <!-- 학생 인적사항 -->
-          <b-col cols="5" class="p-0">
-            <label class="pb-1" for="remark">
-              {{ student.name }} / {{ student.birth }}
+    <div class="input-attendance__container">
+      <div class="title__container">
+        <h2 class="title">출석 입력하기</h2>
+        <span>이경준 선생님</span>
+        <span>3-1</span>
+      </div>
+
+      <div class="calendar__container pt-10">
+        <Calendar
+          v-model="selectedDate"
+          class="w-100"
+          :touchUI="true"
+          :showIcon="true"
+          :disabledDays="[1, 2, 3, 4, 5, 6]"
+        />
+      </div>
+
+      <form @submit.prevent="onSubmit">
+        <div v-for="(student, i) in students" :key="i" class="student">
+          <div class="student__name">{{ student.name }}</div>
+          <div class="student__birth">{{ student.birth }}</div>
+          <div class="student__attendance">
+            <input
+              type="radio"
+              :name="student.name"
+              :id="`${student.name}-online`"
+            />
+            <label
+              :for="`${student.name}-online`"
+              style="background: #f65058ff; color: #28334aff"
+            >
+              <span>온라인</span>
             </label>
-            <b-form-input
-              id="remark"
-              type="text"
-              placeholder="비고"
-            ></b-form-input>
-          </b-col>
-          <!-- 학생 출결입력 -->
-          <b-col cols="7" class="p-0">
-            <div class="d-flex justify-content-center align-items-center">
-              <!-- 입력 버튼 -->
-              <!-- <template v-for="(option, idx) in options">
-                <input
-                  type="radio"
-                  :key="`input_${idx}`"
-                  :id="`${student.name}_${idx}`"
-                  :name="student.name"
-                  :value="option.value"
-                  v-model="student.check"
-                />
-                <label
-                  :key="`label_${idx}`"
-                  :for="`${student.name}_${idx}`"
-                  :style="{
-                    background: option.background,
-                    color: option.color,
-                  }"
-                >
-                  {{ option.text }}
-                </label>
-              </template> -->
-            </div>
-          </b-col>
-        </b-row>
 
-        <!-- NOTE: 입력 여부에 따라서 제출 혹은 수정 버튼 나타나게 하기 -->
-        <div class="mx-2 my-4">
-          <b-button
-            class="btn-submit"
-            type="submit"
-            variant="warning"
-            size="lg"
-            block
-          >
-            제출하기
-          </b-button>
+            <input
+              type="radio"
+              :name="student.name"
+              :id="`${student.name}-offline`"
+            />
+            <label
+              :for="`${student.name}-offline`"
+              style="background: #fbde44ff; color: #f65058ff"
+            >
+              <span>오프라인</span>
+            </label>
 
-          <b-button
-            class="btn-submit"
-            type="submit"
-            variant="danger"
-            size="lg"
-            block
-          >
-            수정하기
-          </b-button>
+            <input
+              type="radio"
+              :name="student.name"
+              :id="`${student.name}-absence`"
+            />
+            <label
+              :for="`${student.name}-absence`"
+              style="background: #28334aff; color: #fbde44ff"
+            >
+              <span>결석</span>
+            </label>
+          </div>
         </div>
-      </b-form>
-    </b-container>
+
+        <Button
+          class="p-button-warning p-button-raised btn-block"
+          label="제출하기"
+          type="submit"
+        />
+      </form>
+    </div>
   </div>
 </template>
 
@@ -104,32 +76,15 @@ export default {
     return {
       selectedDate: "",
       selected: "",
-      options: [
-        {
-          text: "미참여",
-          value: "absence",
-          background: "#f65058ff",
-          color: "#28334aff",
-        },
-        {
-          text: "온라인",
-          value: "online",
-          background: "#fbde44ff",
-          color: "#f65058ff",
-        },
-        {
-          text: "현장예배",
-          value: "offline",
-          background: "#28334aff",
-          color: "#fbde44ff",
-        },
-      ],
       students: [
         { name: "학생1", birth: "95.12.13", check: "offline" },
         { name: "학생2", birth: "95.12.13", check: "offline" },
         { name: "학생3", birth: "95.12.13", check: "offline" },
         { name: "학생4", birth: "95.12.13", check: "offline" },
         { name: "학생5", birth: "95.12.13", check: "offline" },
+        { name: "학생6", birth: "95.12.13", check: "offline" },
+        { name: "학생7", birth: "95.12.13", check: "offline" },
+        { name: "학생8", birth: "95.12.13", check: "offline" },
       ],
     };
   },
@@ -138,15 +93,47 @@ export default {
       const sunday = date.getDay();
       return sunday !== 0;
     },
-    onSubmit(event) {
-      event.preventDefault();
-      alert("제출되었습니다");
+    onSubmit() {
+      if (!this.selectedDate) {
+        alert("날짜를 입력해주세요");
+      } else {
+        alert("제출되었습니다");
+      }
     },
   },
 };
 </script>
 
+<style>
+.calendar__container > span > .p-button,
+.calendar__container > span > .p-button:hover,
+.calendar__container > span > .p-button:active {
+  background: #cccccc;
+  border: 1px solid #cccccc;
+  color: #333;
+}
+</style>
 <style scoped>
+.student {
+  padding: 1rem;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin: 10px 0;
+  border-radius: 3px;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+  background: #efefef95;
+}
+.student__attendance {
+  display: flex;
+}
+.title__container {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-evenly;
+}
+
+/*  */
 #input-attendance {
   height: 100vh;
   overflow: auto;
@@ -158,14 +145,14 @@ export default {
   background: #0084b6;
 }
 .input-attendance__container {
-  padding: 0 10px;
+  padding: var(--container-padding);
 }
 #remark {
   height: 28px;
   font-size: 12px;
 }
 input[type="radio"] {
-  --visibility: hidden;
+  display: none;
   height: 0;
   width: 0;
 }

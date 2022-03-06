@@ -11,7 +11,7 @@
           :to="menu.link"
         >
           <span class="menu__title">{{ menu.title }}</span>
-          <font-awesome-icon :icon="menu.icon" class="menu__icon" />
+          <i :class="menu.icon" class="menu__icon" />
         </router-link>
       </div>
     </div>
@@ -34,17 +34,17 @@ export default {
     const menuList = [
       {
         title: "출석 입력하기",
-        icon: "pen-to-square",
+        icon: "pi pi-pencil",
         link: "/input-attendance",
       },
       {
         title: "일일 출석 확인",
-        icon: "file-lines",
+        icon: "pi pi-file",
         link: "/daily-attendance",
       },
       {
         title: "누적 출석 확인",
-        icon: "book",
+        icon: "pi pi-book",
         link: "/total-attendance",
       },
     ];
@@ -110,7 +110,9 @@ export default {
   padding: var(--container-padding);
 }
 .menu__item {
-  display: block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin-bottom: 15px;
   border-radius: 10px;
   box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.5);
