@@ -1,9 +1,11 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
+import store from "@/store/index";
+import { getUserState } from "@/firebase/config";
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
-    redirect: "/login",
+    redirect: "/main",
   },
   {
     path: "/login",
@@ -19,6 +21,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/main",
     name: "MainPage",
     component: () => import("@/views/MainPage.vue"),
+    meta: { requiresAuth: true },
   },
   {
     path: "/input-attendance",
@@ -40,6 +43,25 @@ const routes: Array<RouteRecordRaw> = [
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
+});
+
+// router.beforeEach(async (to, from) => {
+//   if (!store.state.user && to.name !== "LoginPage") {
+//     return { name: "LoginPage" };
+//   }
+// });
+
+router.beforeEach(async (to, from, next) => {
+  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+  const requiresUnauth = to.matched.some(
+    (record) => record.meta.requiresUnauth
+  );
+
+  const isAuth = await getUserState();
+
+  if (requiresAuth && !isAuth) next("/login");
+  else if (requiresUnauth && isAuth) next("/");
+  else next();
 });
 
 export default router;

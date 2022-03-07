@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { collection, getFirestore } from "firebase/firestore";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDPKREFtu36CcmILDCh2m5JQloFuKNyi0o",
@@ -17,6 +18,27 @@ initializeApp(firebaseConfig);
 
 // init firebase auth
 const auth = getAuth();
+
+export const getUserState = () =>
+  new Promise((resolve, reject) => onAuthStateChanged(auth, resolve, reject));
+
+export const useAuthState = () => {
+  const user = ref(null);
+  const error = ref(null);
+  let unsub;
+  onMounted(() => {
+    unsub = onAuthStateChanged(
+      auth,
+      (u) => (user.value = u),
+      (e) => (error.value = e)
+    );
+  });
+  onUnmounted(() => unsub());
+
+  const isAuthenticated = computed(() => user.value != null);
+
+  return { user, error, isAuthenticated };
+};
 
 // init service
 const db = getFirestore();

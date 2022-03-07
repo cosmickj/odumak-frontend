@@ -63,7 +63,7 @@ const store = createStore({
   mutations: {
     setUser(state, payload) {
       state.user = payload;
-      console.log("user state changed:", state.user);
+      // console.log("user state changed:", state.user);
     },
     setAuthIsReady(state, payload) {
       state.authIsReady = payload;
@@ -71,7 +71,7 @@ const store = createStore({
   },
   actions: {
     async signup(context, { email, password }) {
-      console.log("signup action");
+      // console.log("signup action");
       const res = await createUserWithEmailAndPassword(auth, email, password);
       if (res) {
         context.commit("setUser", res.user);
@@ -81,7 +81,7 @@ const store = createStore({
     },
 
     async login(context, { email, password }) {
-      console.log("login action");
+      // console.log("login action");
       const res = await signInWithEmailAndPassword(auth, email, password);
       if (res) {
         context.commit("setUser", res.user);
@@ -91,13 +91,14 @@ const store = createStore({
     },
 
     async logout(context) {
-      console.log("logout action");
+      // console.log("logout action");
       await signOut(auth);
       context.commit("setUser", null);
     },
   },
 });
 
+// Waiting for Auth to be Ready
 const unsub = onAuthStateChanged(auth, (user) => {
   store.commit("setAuthIsReady", true);
   store.commit("setUser", user);

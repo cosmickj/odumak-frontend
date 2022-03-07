@@ -6,46 +6,49 @@
           당신의 섬김에 감사합니다.
           <!-- <i class="pi pi-times"></i> -->
         </div>
-        <form @submit.prevent="onSubmit">
-          <div class="pt-20">
-            <InputText
-              v-model="form.eamil"
-              class="w-100"
-              id="email"
-              type="text"
-              placeholder="이메일을 입력하세요"
-              required
-            ></InputText>
-          </div>
+        <template v-if="authIsReady">
+          <form @submit.prevent="onSubmit">
+            <div class="pt-20">
+              <InputText
+                v-model="form.eamil"
+                class="w-100"
+                id="email"
+                type="text"
+                placeholder="이메일을 입력하세요"
+                required
+              ></InputText>
+            </div>
 
-          <div class="pt-10">
-            <InputText
-              v-model="form.password"
-              class="w-100"
-              id="password"
-              type="password"
-              placeholder="비밀번호를 입력하세요"
-              required
-            ></InputText>
-          </div>
+            <div class="pt-10">
+              <InputText
+                v-model="form.password"
+                class="w-100"
+                id="password"
+                type="password"
+                placeholder="비밀번호를 입력하세요"
+                required
+              ></InputText>
+            </div>
 
-          <div class="pt-20">
-            <Button
-              label="로그인"
-              type="submit"
-              class="btn-block p-button-warning p-button-raised"
-            ></Button>
-          </div>
+            <div class="pt-20">
+              <Button
+                label="로그인"
+                type="submit"
+                class="btn-block p-button-warning p-button-raised"
+              ></Button>
+            </div>
 
-          <div v-if="errorMessage">
-            {{ errorMessage }}
-          </div>
+            <div v-if="errorMessage">
+              {{ errorMessage }}
+            </div>
 
-          <div class="pt-16 ask-container">
-            <span>아직 계정이 없으신가요?</span>
-            <router-link to="/signup"><span>회원가입</span></router-link>
-          </div>
-        </form>
+            <div class="pt-16 ask-container">
+              <span>아직 계정이 없으신가요?</span>
+              <router-link to="/signup"><span>회원가입</span></router-link>
+            </div>
+          </form>
+        </template>
+
         <!-- <div class="tree__wrapper">
           <span>Tree will be in here</span>
         </div> -->
@@ -55,7 +58,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { computed, defineComponent, ref } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 
@@ -79,7 +82,6 @@ export default defineComponent({
         router.push("/main");
       } catch (error: any) {
         errorMessage.value = error.message;
-        // console.log(error.message);
       }
     };
 
@@ -87,6 +89,7 @@ export default defineComponent({
       form,
       errorMessage,
       onSubmit,
+      authIsReady: computed(() => store.state.authIsReady),
     };
   },
 });
