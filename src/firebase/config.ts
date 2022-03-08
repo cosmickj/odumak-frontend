@@ -25,7 +25,7 @@ export const getUserState = () =>
 export const useAuthState = () => {
   const user = ref(null);
   const error = ref(null);
-  let unsub;
+  let unsub: any;
   onMounted(() => {
     unsub = onAuthStateChanged(
       auth,

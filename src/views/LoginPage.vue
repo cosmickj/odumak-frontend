@@ -49,9 +49,9 @@
           </form>
         </template>
 
-        <!-- <div class="tree__wrapper">
-          <span>Tree will be in here</span>
-        </div> -->
+        <div class="pt-24">
+          <InlineSVG :src="require('@/assets/youngeun_basic.svg')"></InlineSVG>
+        </div>
       </div>
     </div>
   </div>
@@ -61,8 +61,13 @@
 import { computed, defineComponent, ref } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
+import InlineSVG from "vue-inline-svg";
+import "animate.css";
 
 export default defineComponent({
+  components: {
+    InlineSVG,
+  },
   setup() {
     const store = useStore();
     const router = useRouter();
@@ -96,6 +101,9 @@ export default defineComponent({
 </script>
 
 <style scoped>
+svg {
+  filter: drop-shadow(3px 5px 2px rgb(0 0 0 / 0.4));
+}
 #login {
   height: 100%;
 }
@@ -125,9 +133,5 @@ export default defineComponent({
   display: flex;
   justify-content: space-evenly;
   align-items: center;
-}
-.tree__wrapper {
-  border: 1px solid orange;
-  flex-grow: 1;
 }
 </style>

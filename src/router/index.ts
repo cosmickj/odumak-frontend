@@ -11,11 +11,13 @@ const routes: Array<RouteRecordRaw> = [
     path: "/login",
     name: "LoginPage",
     component: () => import("@/views/LoginPage.vue"),
+    meta: { requiresUnauth: true },
   },
   {
     path: "/signup",
     name: "SignupPage",
     component: () => import("@/views/SignupPage.vue"),
+    meta: { requiresUnauth: true },
   },
   {
     path: "/main",
@@ -27,16 +29,19 @@ const routes: Array<RouteRecordRaw> = [
     path: "/input-attendance",
     name: "InputAttendance",
     component: () => import("@/views/InputAttendance.vue"),
+    meta: { requiresAuth: true },
   },
   {
     path: "/daily-attendance",
     name: "DailyAttendance",
     component: () => import("@/views/DailyAttendance.vue"),
+    meta: { requiresAuth: true },
   },
   {
     path: "/total-attendance",
     name: "TotalAttendance",
     component: () => import("@/views/TotalAttendance.vue"),
+    meta: { requiresAuth: true },
   },
 ];
 
@@ -44,12 +49,6 @@ const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
 });
-
-// router.beforeEach(async (to, from) => {
-//   if (!store.state.user && to.name !== "LoginPage") {
-//     return { name: "LoginPage" };
-//   }
-// });
 
 router.beforeEach(async (to, from, next) => {
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
