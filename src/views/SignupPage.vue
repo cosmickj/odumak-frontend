@@ -2,7 +2,9 @@
   <div id="signup">
     <div class="signup__wrapper">
       <div class="signup__container">
-        <div class="title">당신의 섬김에 감사합니다.</div>
+        <YoungeunBasic></YoungeunBasic>
+
+        <div class="title fz-16">당신의 섬김에 감사합니다.</div>
         <form @submit.prevent="signupUser">
           <div class="pt-20">
             <InputText
@@ -49,8 +51,10 @@
           </div>
 
           <div class="pt-16 ask-container">
-            <span>이미 계정이 있으신가요?</span>
-            <router-link to="/login"><span>로그인하기</span></router-link>
+            <span class="fz-12">계정이 있으신가요?</span>
+            <router-link to="/login">
+              <span class="fz-12">로그인</span>
+            </router-link>
           </div>
         </form>
       </div>
@@ -64,21 +68,20 @@ import { addDoc, serverTimestamp } from "@firebase/firestore";
 import { defineComponent, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
+import YoungeunBasic from "@/components/YoungeunBasic.vue";
 
 export default defineComponent({
+  components: { YoungeunBasic },
   setup() {
     const store = useStore();
     const router = useRouter();
-
     const form = ref({
       email: null,
       password: null,
       confirmPassword: null,
       name: null,
     });
-
     const signupUser = async () => {
-      // console.log(form.value);
       try {
         await store.dispatch("signup", {
           email: form.value.email,
@@ -89,7 +92,6 @@ export default defineComponent({
         console.log(error);
       }
     };
-
     const addUser = () => {
       addDoc(usersCol, {
         email: form.value.email,
@@ -99,7 +101,6 @@ export default defineComponent({
         router.push("/main");
       });
     };
-
     return {
       form,
       signupUser,
@@ -109,38 +110,5 @@ export default defineComponent({
 </script>
 
 <style scoped>
-#signup {
-  height: 100%;
-}
-.signup__wrapper {
-  height: inherit;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-}
-.signup__container {
-  max-width: 500px;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  padding: var(--container-padding);
-}
-.title {
-  font-size: 1.2rem;
-  color: var(--color-text-white);
-}
-.p-float-label input:focus ~ label {
-  color: yellow;
-  top: -1rem;
-}
-.tree__wrapper {
-  border: 1px solid orange;
-  flex-grow: 1;
-}
-.ask-container {
-  display: flex;
-  justify-content: space-evenly;
-  align-items: center;
-}
+@import url("@/css/views/SignupPage.css");
 </style>

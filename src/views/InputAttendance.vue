@@ -75,7 +75,6 @@ export default {
   data() {
     return {
       selectedDate: "",
-      selected: "",
       students: [
         { name: "학생1", birth: "95.12.13", check: "offline" },
         { name: "학생2", birth: "95.12.13", check: "offline" },

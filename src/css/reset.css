@@ -1,23 +1,11 @@
 @import url("https://fonts.googleapis.com/css2?family=Jua&display=swap");
 
-* {
-  /* font-size: 62.5%; */
-  font-family: "Jua", sans-serif;
-}
+* { font-size: 62.5%; font-family: "Jua", sans-serif; }
 
 html,
-body,
-#app {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  box-sizing: border-box;
-  background: linear-gradient(
-    180deg,
-    rgba(0, 132, 182, 1) 50%,
-    rgba(0, 93, 154, 1) 100%
-  );
-}
+body { margin: 0; padding: 0; height: 100%; box-sizing: border-box; }
+
+#app { min-height: 100vh; background: var(--color-background); }
 
 h1,
 h2,
@@ -25,17 +13,7 @@ h3,
 h4,
 h5,
 ul,
-li {
-  margin: 0;
-  padding: 0;
-}
+li { margin: 0; padding: 0; }
 
 a,
-a:hover {
-  text-decoration: none;
-}
-
-/* CUSTOME BOOTSTRAP-VUE */
-.bg-default {
-  background: #1abc9c !important;
-}
+a:hover { text-decoration: none; }
