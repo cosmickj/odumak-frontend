@@ -6,7 +6,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted } from "vue";
+import { computed, defineComponent } from "vue";
 import NavButton from "@/components/NavButton.vue";
 import { useRouter } from "vue-router";
 
@@ -17,12 +17,10 @@ export default defineComponent({
 
   setup() {
     const router = useRouter();
-    onMounted(() => {
-      console.log(router.currentRoute.value.path);
-    });
     return {
       isContent: computed(() => {
         if (
+          router.currentRoute.value.path === "/" ||
           router.currentRoute.value.path === "/login" ||
           router.currentRoute.value.path === "/signup"
         ) {

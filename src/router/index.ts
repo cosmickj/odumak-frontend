@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
-import store from "@/store/index";
 import { getUserState } from "@/firebase/config";
 
 const routes: Array<RouteRecordRaw> = [

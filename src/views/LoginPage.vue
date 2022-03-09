@@ -1,11 +1,10 @@
 <template>
-  <div id="login">
+  <main id="login">
     <div class="login__wrapper">
       <div class="login__container">
-        <div class="title">
-          당신의 섬김에 감사합니다.
-          <!-- <i class="pi pi-times"></i> -->
-        </div>
+        <YoungeunBasic></YoungeunBasic>
+
+        <div class="title fz-16">당신의 섬김에 감사합니다.</div>
         <template v-if="authIsReady">
           <form @submit.prevent="onSubmit">
             <div class="pt-20">
@@ -43,30 +42,27 @@
             </div>
 
             <div class="pt-16 ask-container">
-              <span>아직 계정이 없으신가요?</span>
-              <router-link to="/signup"><span>회원가입</span></router-link>
+              <span class="fz-12">계정이 없으신가요?</span>
+              <router-link to="/signup">
+                <span class="fz-12">회원가입</span>
+              </router-link>
             </div>
           </form>
         </template>
-
-        <div class="pt-24">
-          <InlineSVG :src="require('@/assets/youngeun_basic.svg')"></InlineSVG>
-        </div>
       </div>
     </div>
-  </div>
+  </main>
 </template>
 
 <script lang="ts">
 import { computed, defineComponent, ref } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
-import InlineSVG from "vue-inline-svg";
-import "animate.css";
+import YoungeunBasic from "@/components/YoungeunBasic.vue";
 
 export default defineComponent({
   components: {
-    InlineSVG,
+    YoungeunBasic,
   },
   setup() {
     const store = useStore();
@@ -101,37 +97,5 @@ export default defineComponent({
 </script>
 
 <style scoped>
-svg {
-  filter: drop-shadow(3px 5px 2px rgb(0 0 0 / 0.4));
-}
-#login {
-  height: 100%;
-}
-.login__wrapper {
-  height: inherit;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-}
-.login__container {
-  max-width: 500px;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  padding: var(--container-padding);
-}
-.title {
-  font-size: 1.2rem;
-  color: var(--color-text-white);
-}
-.p-float-label input:focus ~ label {
-  color: yellow;
-  top: -1rem;
-}
-.ask-container {
-  display: flex;
-  justify-content: space-evenly;
-  align-items: center;
-}
+@import url("@/css/views/LoginPage.css");
 </style>
