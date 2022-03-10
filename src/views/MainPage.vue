@@ -2,7 +2,7 @@
   <div id="main">
     <div class="menu__wrapper">
       <div class="menu__container">
-        <div class="welcome">안녕하세요 이경준 선생님</div>
+        <div class="welcome">안녕하세요 {{ userName }} 선생님</div>
 
         <router-link
           class="menu__item"
@@ -13,6 +13,12 @@
           <span class="menu__title">{{ menu.title }}</span>
           <i :class="menu.icon" class="menu__icon" />
         </router-link>
+
+        <!-- <Button
+          label="test"
+          class="btn-block p-button-help"
+          @click="getUserName"
+        ></Button> -->
       </div>
     </div>
 
@@ -25,34 +31,49 @@
 </template>
 
 <script>
-import { computed } from "@vue/runtime-core";
+import { computed, onMounted, ref } from "@vue/runtime-core";
 import { useStore } from "vuex";
+import { usersCol } from "@/firebase/config";
+import { onSnapshot, query, where } from "firebase/firestore";
+
 export default {
   setup() {
     const store = useStore();
-
+    // prettier-ignore
     const menuList = [
-      {
-        title: "출석 입력하기",
-        icon: "pi pi-pencil",
-        link: "/input-attendance",
-      },
-      {
-        title: "일일 출석 확인",
-        icon: "pi pi-file",
-        link: "/daily-attendance",
-      },
-      {
-        title: "누적 출석 확인",
-        icon: "pi pi-book",
-        link: "/total-attendance",
-      },
+      { title: "출석 입력하기", icon: "pi pi-pencil", link: "/input-attendance" },
+      { title: "일일 출석 확인", icon: "pi pi-file", link: "/daily-attendance"  },
+      { title: "누적 출석 확인", icon: "pi pi-book", link: "/total-attendance"  },
     ];
-
+    const userName = ref("");
     const logout = () => {
       store.dispatch("logout");
     };
+
+    onMounted(() => {
+      const q = query(usersCol, where("email", "==", store.state.user.email));
+      onSnapshot(q, (snapshot) => {
+        let users = [];
+        snapshot.docs.forEach((doc) => {
+          users.push({ ...doc.data(), id: doc.id });
+        });
+        userName.value = users[0].name;
+      });
+    });
+
+    // const getUserName = () => {
+    //   const q = query(usersCol, where("email", "==", store.state.user.email));
+    //   onSnapshot(q, (snapshot) => {
+    //     let users = [];
+    //     snapshot.docs.forEach((doc) => {
+    //       users.push({ ...doc.data(), id: doc.id });
+    //     });
+    //     userName.value = users[0].name;
+    //   });
+    // };
+
     return {
+      userName,
       menuList,
       logout,
       user: computed(() => store.state.user),

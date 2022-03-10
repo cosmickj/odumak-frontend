@@ -4,16 +4,14 @@
       <div class="signup__container">
         <YoungeunBasic></YoungeunBasic>
 
-        <div class="title fz-16">당신의 섬김에 감사합니다.</div>
+        <!-- <div class="title fz-16">당신의 섬김에 감사합니다.</div> -->
         <form @submit.prevent="signupUser">
-          <div class="pt-20">
-            <InputText
-              v-model="form.name"
-              class="w-100"
-              type="text"
-              placeholder="이름"
-            ></InputText>
-          </div>
+          <InputText
+            v-model="form.name"
+            class="w-100"
+            type="text"
+            placeholder="이름"
+          ></InputText>
 
           <div class="pt-10">
             <InputText

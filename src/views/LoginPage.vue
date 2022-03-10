@@ -4,19 +4,17 @@
       <div class="login__container">
         <YoungeunBasic></YoungeunBasic>
 
-        <div class="title fz-16">당신의 섬김에 감사합니다.</div>
+        <!-- <div class="title fz-16">당신의 섬김에 감사합니다.</div> -->
         <template v-if="authIsReady">
           <form @submit.prevent="onSubmit">
-            <div class="pt-20">
-              <InputText
-                v-model="form.eamil"
-                class="w-100"
-                id="email"
-                type="text"
-                placeholder="이메일을 입력하세요"
-                required
-              ></InputText>
-            </div>
+            <InputText
+              v-model="form.eamil"
+              class="w-100"
+              id="email"
+              type="text"
+              placeholder="이메일을 입력하세요"
+              required
+            ></InputText>
 
             <div class="pt-10">
               <InputText
@@ -85,7 +83,6 @@ export default defineComponent({
         errorMessage.value = error.message;
       }
     };
-
     return {
       form,
       errorMessage,
