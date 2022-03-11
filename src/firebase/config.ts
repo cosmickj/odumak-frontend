@@ -43,5 +43,6 @@ const db = getFirestore();
 
 // collection ref
 const usersCol = collection(db, "users");
+const studentsCol = collection(db, "students");
 
-export { auth, db, usersCol };
+export { auth, db, usersCol, studentsCol };

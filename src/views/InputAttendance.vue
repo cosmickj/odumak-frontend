@@ -1,5 +1,5 @@
 <template>
-  <div id="input-attendance">
+  <div id="input-attendance" v-if="authIsReady">
     <div class="input-attendance__container">
       <div class="title__container">
         <h2 class="title">출석 입력하기</h2>
@@ -9,8 +9,8 @@
 
       <div class="calendar__container pt-10">
         <Calendar
-          v-model="selectedDate"
           class="w-100"
+          v-model="selectedDate"
           :touchUI="true"
           :showIcon="true"
           :disabledDays="[1, 2, 3, 4, 5, 6]"
@@ -26,6 +26,7 @@
               type="radio"
               :name="student.name"
               :id="`${student.name}-online`"
+              checked
             />
             <label
               :for="`${student.name}-online`"
@@ -70,37 +71,49 @@
   </div>
 </template>
 
-<script>
-export default {
-  data() {
+<script lang="ts">
+import { studentsCol } from "@/firebase/config";
+import { onSnapshot, query, where } from "@firebase/firestore";
+import { computed, defineComponent, onMounted, ref } from "vue";
+import { useStore } from "vuex";
+
+export default defineComponent({
+  setup() {
+    const store = useStore();
+    const selectedDate = ref("");
+    const students = ref([
+      { name: "학생1", birth: "95.12.13" },
+      { name: "학생2", birth: "95.12.13" },
+      { name: "학생3", birth: "95.12.13" },
+      { name: "학생4", birth: "95.12.13" },
+      { name: "학생5", birth: "95.12.13" },
+      { name: "학생6", birth: "95.12.13" },
+      { name: "학생7", birth: "95.12.13" },
+      { name: "학생8", birth: "95.12.13" },
+    ]);
+    const onSubmit = () => {
+      if (!selectedDate.value) alert("날짜를 입력해주세요");
+      else alert("제출되었습니다");
+    };
+    onMounted(() => {
+      const teacher = "이경준";
+      const q = query(studentsCol, where("teacher", "==", teacher));
+      onSnapshot(q, (snapshot) => {
+        const arr = [];
+        snapshot.docs.forEach((doc) => {
+          arr.push({ ...doc.data(), id: doc.id });
+        });
+        students.value = arr;
+      });
+    });
     return {
-      selectedDate: "",
-      students: [
-        { name: "학생1", birth: "95.12.13", check: "offline" },
-        { name: "학생2", birth: "95.12.13", check: "offline" },
-        { name: "학생3", birth: "95.12.13", check: "offline" },
-        { name: "학생4", birth: "95.12.13", check: "offline" },
-        { name: "학생5", birth: "95.12.13", check: "offline" },
-        { name: "학생6", birth: "95.12.13", check: "offline" },
-        { name: "학생7", birth: "95.12.13", check: "offline" },
-        { name: "학생8", birth: "95.12.13", check: "offline" },
-      ],
+      selectedDate,
+      students,
+      onSubmit,
+      authIsReady: computed(() => store.state.authIsReady),
     };
   },
-  methods: {
-    dateDisabled(_ymd, date) {
-      const sunday = date.getDay();
-      return sunday !== 0;
-    },
-    onSubmit() {
-      if (!this.selectedDate) {
-        alert("날짜를 입력해주세요");
-      } else {
-        alert("제출되었습니다");
-      }
-    },
-  },
-};
+});
 </script>
 
 <style scoped>
