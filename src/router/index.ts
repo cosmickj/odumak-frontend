@@ -49,17 +49,17 @@ const router = createRouter({
   routes,
 });
 
-// router.beforeEach(async (to, from, next) => {
-//   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
-//   const requiresUnauth = to.matched.some(
-//     (record) => record.meta.requiresUnauth
-//   );
+router.beforeEach(async (to, from, next) => {
+  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+  const requiresUnauth = to.matched.some(
+    (record) => record.meta.requiresUnauth
+  );
 
-//   const isAuth = await getUserState();
+  const isAuth = await getUserState();
 
-//   if (requiresAuth && !isAuth) next("/login");
-//   else if (requiresUnauth && isAuth) next("/");
-//   else next();
-// });
+  if (requiresAuth && !isAuth) next("/login");
+  else if (requiresUnauth && isAuth) next("/");
+  else next();
+});
 
 export default router;

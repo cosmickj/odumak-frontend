@@ -5,32 +5,14 @@
       :class="{ active: isActive }"
       @click="activeBtnNav"
     >
-      <i class="pi pi-home" v-if="!isActive"></i>
-      <i class="pi pi-bars" v-else></i>
+      <i class="pi pi-home fz-14" v-if="!isActive"></i>
+      <i class="pi pi-bars fz-14" v-else></i>
     </span>
     <ul class="btn-nav__menus">
-      <li @click="activeBtnNav">
-        <router-link to="/main">
-          <i class="pr-10 pi pi-home"></i>
-          홈화면
-        </router-link>
-      </li>
-      <li @click="activeBtnNav">
-        <router-link to="/input-attendance">
-          <i class="pr-10 pi pi-pencil"></i>
-          출석 입력하기
-        </router-link>
-      </li>
-      <li @click="activeBtnNav">
-        <router-link to="/daily-attendance">
-          <i class="pr-10 pi pi-file"></i>
-          일일 출석 확인
-        </router-link>
-      </li>
-      <li @click="activeBtnNav">
-        <router-link to="/total-attendance">
-          <i class="pr-10 pi pi-book"></i>
-          누적 출석 확인
+      <li v-for="(navMenu, i) in navMenuList" :key="i" @click="activeBtnNav">
+        <router-link :to="navMenu.link">
+          <i class="pr-10" :class="navMenu.icon"></i>
+          {{ navMenu.title }}
         </router-link>
       </li>
     </ul>
@@ -42,13 +24,19 @@ import { defineComponent, ref } from "vue";
 
 export default defineComponent({
   setup() {
+    // prettier-ignore
+    const navMenuList = [
+      { title: "홈화면", icon: "pi pi-home", link: "/main" },
+      { title: "출석 입력하기", icon: "pi pi-pencil", link: "/input-attendance" },
+      { title: "일일 출석 확인", icon: "pi pi-file", link: "/daily-attendance"  },
+      { title: "누적 출석 확인", icon: "pi pi-book", link: "/total-attendance"  },
+    ];
     const isActive = ref(false);
-
     const activeBtnNav = () => {
       isActive.value = !isActive.value;
     };
-
     return {
+      navMenuList,
       isActive,
       activeBtnNav,
     };
@@ -64,18 +52,16 @@ export default defineComponent({
   right: 20px;
   width: 50px;
   height: 50px;
-  background: #eee;
   border-radius: 50%;
+  background: var(--color-grey);
   box-shadow: 0 5px 5px rgba(0, 0, 0, 0.1);
 }
 .btn-nav__icon {
-  position: relative;
-  width: 100%;
   height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  color: #333;
+  color: var(--color-black);
   transition: 0.2s ease-in-out;
   user-select: none;
   cursor: pointer;
@@ -89,7 +75,7 @@ export default defineComponent({
   right: 0;
   background: #fff;
   box-shadow: 0 5px 5px rgba(0, 0, 0, 0.1);
-  min-width: 160px;
+  min-width: 150px;
   padding: 0 14px;
   border-radius: 20px;
   opacity: 0;
@@ -107,9 +93,9 @@ export default defineComponent({
   padding: 8px 0;
   display: flex;
   align-items: center;
-  color: var(--color-text);
+  color: var(--color-black);
 }
 .btn-nav__menus li:not(:last-child) {
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--color-black);
 }
 </style>
