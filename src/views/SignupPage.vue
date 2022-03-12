@@ -81,19 +81,20 @@ export default defineComponent({
     });
     const signupUser = async () => {
       try {
-        await store.dispatch("signup", {
+        const uid = await store.dispatch("signup", {
           email: form.value.email,
           password: form.value.password,
         });
-        addUser();
+        addUser(uid);
       } catch (error) {
         console.log(error);
       }
     };
-    const addUser = () => {
+    const addUser = (uid: string) => {
       addDoc(usersCol, {
         email: form.value.email,
         name: form.value.name,
+        uid,
         createdAt: serverTimestamp(),
       }).then(() => {
         router.push("/main");

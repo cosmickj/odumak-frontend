@@ -1,6 +1,4 @@
 import { createStore } from "vuex";
-
-// firebase import
 import { auth, usersCol } from "@/firebase/config";
 import {
   createUserWithEmailAndPassword,
@@ -13,51 +11,60 @@ import { onSnapshot, query, where } from "firebase/firestore";
 const store = createStore({
   state: {
     user: null,
-    // userName: "",
+    userInfo: null,
     authIsReady: false,
   },
   mutations: {
     SET_USER(state, payload) {
       state.user = payload;
     },
-    // SET_USERNAME(state, payload) {
-    //   state.userName = payload;
-    // },
+    SET_USERINFO(state, payload) {
+      state.userInfo = payload;
+    },
     SET_AUTH_IS_READY(state, payload) {
       state.authIsReady = payload;
     },
   },
   actions: {
-    async signup(context, { email, password }) {
+    async signup({ commit }, { email, password }) {
       const res = await createUserWithEmailAndPassword(auth, email, password);
       if (res) {
-        context.commit("SET_USER", res.user);
+        commit("SET_USER", res.user);
+        return res.user.uid;
       } else {
         throw new Error("could not complete signup");
       }
     },
-    async login(context, { email, password }) {
+    async login({ commit, dispatch }, { email, password }) {
       const res = await signInWithEmailAndPassword(auth, email, password);
       if (res) {
-        context.commit("SET_USER", res.user);
+        localStorage.setItem("uid", JSON.stringify({ uid: res.user.uid }));
+        commit("SET_USER", res.user);
+        dispatch("fetchUserInfo");
       } else {
         throw new Error("could not complete login");
       }
     },
-    async logout(context) {
+    async logout({ commit }) {
       await signOut(auth);
-      context.commit("SET_USER", null);
+      commit("SET_USER", null);
+      commit("SET_USERINFO", null);
+      localStorage.removeItem("uid");
     },
-    // async fetchUserName(context) {
-    //   const q = query(usersCol, where("email", "==", this.state.user["email"]));
-    //   onSnapshot(q, (snapshot) => {
-    //     const users = [];
-    //     snapshot.docs.forEach((doc) => {
-    //       users.push({ ...doc.data(), id: doc.id });
-    //     });
-    //     context.commit("SET_USERNAME", users[0].name);
-    //   });
-    // },
+    fetchUserInfo({ commit }) {
+      const result = localStorage.getItem("uid");
+      if (result !== null) {
+        const uid = JSON.parse(result).uid;
+        const q = query(usersCol, where("uid", "==", uid));
+        onSnapshot(q, (snapshot) => {
+          const users: any = [];
+          snapshot.docs.forEach((doc) => {
+            users.push({ ...doc.data(), id: doc.id });
+          });
+          commit("SET_USERINFO", { name: users[0].name });
+        });
+      }
+    },
   },
 });
 

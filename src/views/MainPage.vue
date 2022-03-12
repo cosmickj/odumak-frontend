@@ -23,15 +23,12 @@
 </template>
 
 <script>
-import { computed, onMounted, ref } from "@vue/runtime-core";
+import { computed } from "@vue/runtime-core";
 import { useStore } from "vuex";
-import { usersCol } from "@/firebase/config";
-import { onSnapshot, query, where } from "firebase/firestore";
 
 export default {
   setup() {
     const store = useStore();
-    const userName = ref(null);
     // prettier-ignore
     const menuList = [
       { title: "출석 입력하기", icon: "pi pi-pencil", link: "/input-attendance" },
@@ -41,21 +38,15 @@ export default {
     const logout = () => {
       store.dispatch("logout");
     };
-    onMounted(() => {
-      const q = query(usersCol, where("email", "==", store.state.user.email));
-      onSnapshot(q, (snapshot) => {
-        let users = [];
-        snapshot.docs.forEach((doc) => {
-          users.push({ ...doc.data(), id: doc.id });
-        });
-        userName.value = users[0].name;
-      });
-    });
     return {
-      userName,
       menuList,
       logout,
       user: computed(() => store.state.user),
+      userName: computed(() => {
+        if (store.state.userInfo) {
+          return store.state.userInfo.name;
+        }
+      }),
       authIsReady: computed(() => store.state.authIsReady),
     };
   },

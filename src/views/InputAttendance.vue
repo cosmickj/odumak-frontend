@@ -72,9 +72,7 @@
 </template>
 
 <script lang="ts">
-import { studentsCol } from "@/firebase/config";
-import { onSnapshot, query, where } from "@firebase/firestore";
-import { computed, defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, ref } from "vue";
 import { useStore } from "vuex";
 
 export default defineComponent({
@@ -95,17 +93,6 @@ export default defineComponent({
       if (!selectedDate.value) alert("날짜를 입력해주세요");
       else alert("제출되었습니다");
     };
-    onMounted(() => {
-      const teacher = "이경준";
-      const q = query(studentsCol, where("teacher", "==", teacher));
-      onSnapshot(q, (snapshot) => {
-        const arr = [];
-        snapshot.docs.forEach((doc) => {
-          arr.push({ ...doc.data(), id: doc.id });
-        });
-        students.value = arr;
-      });
-    });
     return {
       selectedDate,
       students,
