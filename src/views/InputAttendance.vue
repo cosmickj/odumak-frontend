@@ -72,30 +72,24 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import { useStore } from "vuex";
+import Student from "@/types/Student";
 
 export default defineComponent({
   setup() {
     const store = useStore();
     const selectedDate = ref("");
-    const students = ref([
-      { name: "학생1", birth: "95.12.13" },
-      { name: "학생2", birth: "95.12.13" },
-      { name: "학생3", birth: "95.12.13" },
-      { name: "학생4", birth: "95.12.13" },
-      { name: "학생5", birth: "95.12.13" },
-      { name: "학생6", birth: "95.12.13" },
-      { name: "학생7", birth: "95.12.13" },
-      { name: "학생8", birth: "95.12.13" },
-    ]);
     const onSubmit = () => {
       if (!selectedDate.value) alert("날짜를 입력해주세요");
       else alert("제출되었습니다");
     };
+    onMounted(() => {
+      store.dispatch("fetchStudents");
+    });
     return {
       selectedDate,
-      students,
+      students: computed<Student[]>(() => store.state.students),
       onSubmit,
       authIsReady: computed(() => store.state.authIsReady),
     };

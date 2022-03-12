@@ -1,5 +1,5 @@
 import { createStore } from "vuex";
-import { auth, usersCol } from "@/firebase/config";
+import { auth, studentsCol, usersCol } from "@/firebase/config";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -7,11 +7,23 @@ import {
   onAuthStateChanged,
 } from "firebase/auth";
 import { onSnapshot, query, where } from "firebase/firestore";
+import Student from "@/types/Student";
+import UserInfo from "@/types/UserInfo";
 
-const store = createStore({
+export interface State {
+  user: any;
+  userInfo: UserInfo;
+  students: Student[];
+  authIsReady: boolean;
+}
+
+const store = createStore<State>({
   state: {
     user: null,
-    userInfo: null,
+    userInfo: {
+      name: "",
+    },
+    students: [],
     authIsReady: false,
   },
   mutations: {
@@ -20,6 +32,9 @@ const store = createStore({
     },
     SET_USERINFO(state, payload) {
       state.userInfo = payload;
+    },
+    SET_STUDENTS(state, payload) {
+      state.students = payload;
     },
     SET_AUTH_IS_READY(state, payload) {
       state.authIsReady = payload;
@@ -64,6 +79,16 @@ const store = createStore({
           commit("SET_USERINFO", { name: users[0].name });
         });
       }
+    },
+    fetchStudents({ commit }) {
+      const q = query(studentsCol, where("teacher", "==", "이경준"));
+      onSnapshot(q, (snapshot) => {
+        const result: any = [];
+        snapshot.docs.forEach((doc) => {
+          result.push({ ...doc.data(), id: doc.id });
+        });
+        commit("SET_STUDENTS", result);
+      });
     },
   },
 });
