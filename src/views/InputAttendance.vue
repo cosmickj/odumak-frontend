@@ -17,7 +17,7 @@
         />
       </div>
 
-      <form @submit.prevent="onSubmit">
+      <form @submit.prevent="onSubmit" v-if="selectedDate">
         <div v-for="(student, i) in students" :key="i" class="student">
           <div class="student__name">{{ student.name }}</div>
           <div class="student__birth">{{ student.birth }}</div>
@@ -72,7 +72,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, ref } from "vue";
 import { useStore } from "vuex";
 import Student from "@/types/Student";
 
@@ -84,9 +84,6 @@ export default defineComponent({
       if (!selectedDate.value) alert("날짜를 입력해주세요");
       else alert("제출되었습니다");
     };
-    onMounted(() => {
-      store.dispatch("fetchStudents");
-    });
     return {
       selectedDate,
       students: computed<Student[]>(() => store.state.students),

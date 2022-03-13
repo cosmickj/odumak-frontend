@@ -34,7 +34,6 @@ const auth = getAuth();
 // };
 
 // NOTE: onAuthStateChanged를 Promise 객체로 만들어서 async/await을 사용함
-
 export const getUserState = () =>
   new Promise((resolve, reject) => onAuthStateChanged(auth, resolve, reject));
 

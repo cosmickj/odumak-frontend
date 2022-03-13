@@ -61,12 +61,12 @@
 </template>
 
 <script lang="ts">
-import { usersCol } from "@/firebase/config";
-import { addDoc, serverTimestamp } from "@firebase/firestore";
+import YoungeunBasic from "@/components/YoungeunBasic.vue";
 import { defineComponent, ref } from "vue";
+import { db } from "@/firebase/config";
+import { doc, serverTimestamp, setDoc } from "@firebase/firestore";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
-import YoungeunBasic from "@/components/YoungeunBasic.vue";
 
 export default defineComponent({
   components: { YoungeunBasic },
@@ -85,19 +85,17 @@ export default defineComponent({
           email: form.value.email,
           password: form.value.password,
         });
-        addUser(uid);
+        createUser(uid);
+        router.push("/main");
       } catch (error) {
         console.log(error);
       }
     };
-    const addUser = (uid: string) => {
-      addDoc(usersCol, {
+    const createUser = (uid: string) => {
+      setDoc(doc(db, "users", uid), {
         email: form.value.email,
         name: form.value.name,
-        uid,
         createdAt: serverTimestamp(),
-      }).then(() => {
-        router.push("/main");
       });
     };
     return {

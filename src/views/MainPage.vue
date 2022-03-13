@@ -1,5 +1,6 @@
 <template>
-  <div id="main" v-if="authIsReady">
+  <!-- <div id="main" v-if="userName"> -->
+  <div id="main">
     <div class="menu__wrapper">
       <div class="menu__container">
         <div class="welcome">안녕하세요 {{ userName }} 선생님</div>
