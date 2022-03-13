@@ -1,23 +1,24 @@
 <template>
-  <div id="input-attendance">
+  <div id="input-attendance" v-if="authIsReady">
     <div class="input-attendance__container">
-      <div class="title__container">
+      <div class="title__container" v-if="userInfo">
         <h2 class="title">출석 입력하기</h2>
-        <span>이경준 선생님</span>
         <span>3-1</span>
+        <span>{{ userInfo.name }} 선생님</span>
       </div>
 
       <div class="calendar__container pt-10">
         <Calendar
-          v-model="selectedDate"
           class="w-100"
+          v-model="selectedDate"
           :touchUI="true"
           :showIcon="true"
           :disabledDays="[1, 2, 3, 4, 5, 6]"
+          @date-select="fetchStudents"
         />
       </div>
 
-      <form @submit.prevent="onSubmit">
+      <form @submit.prevent="saveAttendance" v-if="selectedDate && students">
         <div v-for="(student, i) in students" :key="i" class="student">
           <div class="student__name">{{ student.name }}</div>
           <div class="student__birth">{{ student.birth }}</div>
@@ -25,11 +26,27 @@
             <input
               type="radio"
               :name="student.name"
-              :id="`${student.name}-online`"
+              :id="`${student.name}__offline`"
+              value="offline"
+              v-model="students[i].attendance"
             />
             <label
-              :for="`${student.name}-online`"
-              style="background: #f65058ff; color: #28334aff"
+              :for="`${student.name}__offline`"
+              style="background: #4caf50; color: #28334aff"
+            >
+              <span>현장</span>
+            </label>
+
+            <input
+              type="radio"
+              :name="student.name"
+              :id="`${student.name}__online`"
+              value="online"
+              v-model="students[i].attendance"
+            />
+            <label
+              :for="`${student.name}__online`"
+              style="background: #fbc02d; color: #28334aff"
             >
               <span>온라인</span>
             </label>
@@ -37,23 +54,13 @@
             <input
               type="radio"
               :name="student.name"
-              :id="`${student.name}-offline`"
+              :id="`${student.name}__absence`"
+              value="absence"
+              v-model="students[i].attendance"
             />
             <label
-              :for="`${student.name}-offline`"
-              style="background: #fbde44ff; color: #f65058ff"
-            >
-              <span>오프라인</span>
-            </label>
-
-            <input
-              type="radio"
-              :name="student.name"
-              :id="`${student.name}-absence`"
-            />
-            <label
-              :for="`${student.name}-absence`"
-              style="background: #28334aff; color: #fbde44ff"
+              :for="`${student.name}__absence`"
+              style="background: #ff4032; color: #28334aff"
             >
               <span>결석</span>
             </label>
@@ -70,37 +77,43 @@
   </div>
 </template>
 
-<script>
-export default {
-  data() {
+<script lang="ts">
+import { computed, defineComponent, ref } from "vue";
+import { useStore } from "vuex";
+import Student from "@/types/Student";
+import { addDoc } from "@firebase/firestore";
+import { attendancesCol } from "@/firebase/config";
+
+export default defineComponent({
+  setup() {
+    const store = useStore();
+    const selectedDate = ref("");
+    const students = computed<Student[]>(() => store.state.students);
+    const userInfo = computed(() => store.state.userInfo);
+    const saveAttendance = () => {
+      const attendanceParams = {
+        date: selectedDate.value,
+        teacher: userInfo.value.name,
+        students: students.value,
+      };
+      addDoc(attendancesCol, attendanceParams).then(() => {
+        alert("제출되었습니다.");
+        selectedDate.value = "";
+      });
+    };
+    const fetchStudents = () => {
+      store.dispatch("fetchStudents", { name: store.state.userInfo.name });
+    };
     return {
-      selectedDate: "",
-      students: [
-        { name: "학생1", birth: "95.12.13", check: "offline" },
-        { name: "학생2", birth: "95.12.13", check: "offline" },
-        { name: "학생3", birth: "95.12.13", check: "offline" },
-        { name: "학생4", birth: "95.12.13", check: "offline" },
-        { name: "학생5", birth: "95.12.13", check: "offline" },
-        { name: "학생6", birth: "95.12.13", check: "offline" },
-        { name: "학생7", birth: "95.12.13", check: "offline" },
-        { name: "학생8", birth: "95.12.13", check: "offline" },
-      ],
+      authIsReady: computed(() => store.state.authIsReady),
+      selectedDate,
+      students,
+      userInfo,
+      saveAttendance,
+      fetchStudents,
     };
   },
-  methods: {
-    dateDisabled(_ymd, date) {
-      const sunday = date.getDay();
-      return sunday !== 0;
-    },
-    onSubmit() {
-      if (!this.selectedDate) {
-        alert("날짜를 입력해주세요");
-      } else {
-        alert("제출되었습니다");
-      }
-    },
-  },
-};
+});
 </script>
 
 <style scoped>
@@ -115,7 +128,9 @@ export default {
 .title__container {
   display: flex;
   align-items: flex-end;
-  justify-content: space-evenly;
+  justify-content: space-between;
+  font-size: 3rem;
+  color: var(--color-white);
 }
 .student {
   padding: 1rem;
@@ -146,10 +161,11 @@ input[type="radio"] ~ label {
   box-shadow: 0px 2px 4px #00000029;
   border-radius: 5px;
   cursor: pointer;
-  opacity: 0.5;
+  opacity: 0.4;
 }
 input[type="radio"]:checked + label {
   opacity: 1;
   animation: jelly 0.6s ease;
+  font-weight: bold;
 }
 </style>

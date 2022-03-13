@@ -4,16 +4,13 @@
       <div class="signup__container">
         <YoungeunBasic></YoungeunBasic>
 
-        <div class="title fz-16">당신의 섬김에 감사합니다.</div>
-        <form @submit.prevent="signupUser">
-          <div class="pt-20">
-            <InputText
-              v-model="form.name"
-              class="w-100"
-              type="text"
-              placeholder="이름"
-            ></InputText>
-          </div>
+        <form @submit.prevent="onSubmit">
+          <InputText
+            v-model="form.name"
+            class="w-100"
+            type="text"
+            placeholder="이름"
+          ></InputText>
 
           <div class="pt-10">
             <InputText
@@ -35,7 +32,7 @@
 
           <div class="pt-10">
             <InputText
-              v-model="form.confirmPassword"
+              v-model="form.confirmedPassword"
               class="w-100"
               type="password"
               placeholder="비밀번호 확인"
@@ -63,11 +60,11 @@
 </template>
 
 <script lang="ts">
-import { usersCol } from "@/firebase/config";
-import { addDoc, serverTimestamp } from "@firebase/firestore";
 import { defineComponent, ref } from "vue";
-import { useRouter } from "vue-router";
 import { useStore } from "vuex";
+import { useRouter } from "vue-router";
+import { db } from "@/firebase/config";
+import { doc, serverTimestamp, setDoc } from "@firebase/firestore";
 import YoungeunBasic from "@/components/YoungeunBasic.vue";
 
 export default defineComponent({
@@ -78,32 +75,31 @@ export default defineComponent({
     const form = ref({
       email: null,
       password: null,
-      confirmPassword: null,
+      confirmedPassword: null,
       name: null,
     });
-    const signupUser = async () => {
+    const createUser = (uid: string) => {
+      setDoc(doc(db, "users", uid), {
+        email: form.value.email,
+        name: form.value.name,
+        createdAt: serverTimestamp(),
+      });
+    };
+    const onSubmit = async () => {
       try {
-        await store.dispatch("signup", {
+        const uid = await store.dispatch("signup", {
           email: form.value.email,
           password: form.value.password,
         });
-        addUser();
+        createUser(uid);
+        router.push("/main");
       } catch (error) {
         console.log(error);
       }
     };
-    const addUser = () => {
-      addDoc(usersCol, {
-        email: form.value.email,
-        name: form.value.name,
-        createdAt: serverTimestamp(),
-      }).then(() => {
-        router.push("/main");
-      });
-    };
     return {
       form,
-      signupUser,
+      onSubmit,
     };
   },
 });

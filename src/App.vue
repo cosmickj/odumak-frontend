@@ -1,33 +1,28 @@
 <template>
   <div>
     <router-view />
-    <NavButton v-if="isContent"></NavButton>
+    <NavButton v-if="showsNavButton"></NavButton>
   </div>
 </template>
 
 <script lang="ts">
 import { computed, defineComponent } from "vue";
-import NavButton from "@/components/NavButton.vue";
 import { useRouter } from "vue-router";
+import NavButton from "@/components/NavButton.vue";
 
 export default defineComponent({
-  components: {
-    NavButton,
-  },
-
+  components: { NavButton },
   setup() {
     const router = useRouter();
     return {
-      isContent: computed(() => {
+      showsNavButton: computed(() => {
         if (
           router.currentRoute.value.path === "/" ||
           router.currentRoute.value.path === "/login" ||
           router.currentRoute.value.path === "/signup"
-        ) {
+        )
           return false;
-        } else {
-          return true;
-        }
+        else return true;
       }),
     };
   },

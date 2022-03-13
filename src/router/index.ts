@@ -1,5 +1,18 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
+import {
+  createRouter,
+  createWebHistory,
+  RouteRecordRaw,
+  RouteLocation,
+  NavigationGuardNext,
+} from "vue-router";
 import { getUserState } from "@/firebase/config";
+import store from "@/store";
+
+const fetchUserInfo =
+  () => (to: RouteLocation, from: RouteLocation, next: NavigationGuardNext) => {
+    store.dispatch("fetchUserInfo");
+    return next();
+  };
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -23,12 +36,14 @@ const routes: Array<RouteRecordRaw> = [
     name: "MainPage",
     component: () => import("@/views/MainPage.vue"),
     meta: { requiresAuth: true },
+    beforeEnter: fetchUserInfo(),
   },
   {
     path: "/input-attendance",
     name: "InputAttendance",
     component: () => import("@/views/InputAttendance.vue"),
     meta: { requiresAuth: true },
+    beforeEnter: fetchUserInfo(),
   },
   {
     path: "/daily-attendance",
@@ -54,9 +69,7 @@ router.beforeEach(async (to, from, next) => {
   const requiresUnauth = to.matched.some(
     (record) => record.meta.requiresUnauth
   );
-
   const isAuth = await getUserState();
-
   if (requiresAuth && !isAuth) next("/login");
   else if (requiresUnauth && isAuth) next("/");
   else next();

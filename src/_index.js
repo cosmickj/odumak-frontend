@@ -27,7 +27,6 @@ import {
   where,
   orderBy,
   serverTimestamp,
-  getDoc,
 } from "firebase/firestore";
 
 // init service

@@ -4,7 +4,6 @@ import "./registerServiceWorker";
 import store from "./store";
 import router from "./router";
 // Global Styles
-import "./assets/main.css";
 import "@/css/global.css";
 import "@/css/reset.css";
 // Prime Vue
