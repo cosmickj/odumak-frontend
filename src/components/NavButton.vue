@@ -3,13 +3,13 @@
     <span
       class="btn-nav__icon"
       :class="{ active: isActive }"
-      @click="activeBtnNav"
+      @click="setNavButton"
     >
       <i class="pi pi-home fz-14" v-if="!isActive"></i>
       <i class="pi pi-bars fz-14" v-else></i>
     </span>
     <ul class="btn-nav__menus">
-      <li v-for="(navMenu, i) in navMenuList" :key="i" @click="activeBtnNav">
+      <li v-for="(navMenu, i) in navMenus" :key="i" @click="setNavButton">
         <router-link :to="navMenu.link">
           <i class="pr-10" :class="navMenu.icon"></i>
           {{ navMenu.title }}
@@ -25,20 +25,20 @@ import { defineComponent, ref } from "vue";
 export default defineComponent({
   setup() {
     // prettier-ignore
-    const navMenuList = [
+    const navMenus = [
       { title: "홈화면", icon: "pi pi-home", link: "/main" },
       { title: "출석 입력하기", icon: "pi pi-pencil", link: "/input-attendance" },
       { title: "일일 출석 확인", icon: "pi pi-file", link: "/daily-attendance"  },
       { title: "누적 출석 확인", icon: "pi pi-book", link: "/total-attendance"  },
     ];
     const isActive = ref(false);
-    const activeBtnNav = () => {
+    const setNavButton = () => {
       isActive.value = !isActive.value;
     };
     return {
-      navMenuList,
+      navMenus,
       isActive,
-      activeBtnNav,
+      setNavButton,
     };
   },
 });

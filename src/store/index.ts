@@ -7,9 +7,9 @@ import {
   onAuthStateChanged,
 } from "firebase/auth";
 import { doc, onSnapshot, query, where } from "firebase/firestore";
-import Student from "@/types/Student";
-import UserInfo from "@/types/UserInfo";
 
+// import Student from "@/types/Student";
+// import UserInfo from "@/types/UserInfo";
 // export interface State {
 //   user: any;
 //   userInfo: UserInfo;
@@ -29,7 +29,7 @@ const store = createStore({
     SET_USER(state, payload) {
       state.user = payload;
     },
-    SET_USERINFO(state, payload) {
+    SET_USER_INFO(state, payload) {
       state.userInfo = payload;
     },
     SET_STUDENTS(state, payload) {
@@ -61,7 +61,7 @@ const store = createStore({
     async logout({ commit }) {
       await signOut(auth);
       commit("SET_USER", null);
-      commit("SET_USERINFO", null);
+      commit("SET_USER_INFO", null);
       localStorage.removeItem("uid");
     },
     fetchUserInfo({ commit }) {
@@ -70,17 +70,21 @@ const store = createStore({
         const uid = JSON.parse(result).uid;
         const docRef = doc(db, "users", uid);
         onSnapshot(docRef, (doc) => {
-          commit("SET_USERINFO", { ...doc.data(), uid: doc.id });
+          commit("SET_USER_INFO", { ...doc.data(), uid: doc.id });
         });
       }
     },
-    fetchStudents({ commit }, payload) {
-      console.log(payload);
-      const q = query(studentsCol, where("teacher", "==", "OOO"));
-      onSnapshot(q, (snapshot) => {
+    fetchStudents({ commit }, { name }) {
+      const q = query(studentsCol, where("teacher", "==", name));
+      onSnapshot(q, (querySnapshot) => {
         const result: any = [];
-        snapshot.docs.forEach((doc) => {
-          result.push({ ...doc.data(), id: doc.id });
+        querySnapshot.forEach((doc) => {
+          // result.push({ ...doc.data(), id: doc.id });
+          result.push({
+            name: doc.data().name,
+            birth: doc.data().birth,
+            attendance: "online",
+          });
         });
         commit("SET_STUDENTS", result);
       });

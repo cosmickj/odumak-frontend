@@ -1,6 +1,6 @@
 :root {
   /* color */
-  --color-background: linear-gradient(180deg,rgba(0, 132, 182, 1) 50%,rgba(0, 93, 154, 1) 100%);
+  --color-background: linear-gradient(180deg, #2196f3 50%, #4baaf5 100%);
   --color-blue: #005d9a;
   --color-black: #333;
   --color-grey: #ccc;

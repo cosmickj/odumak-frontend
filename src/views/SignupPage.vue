@@ -4,8 +4,7 @@
       <div class="signup__container">
         <YoungeunBasic></YoungeunBasic>
 
-        <!-- <div class="title fz-16">당신의 섬김에 감사합니다.</div> -->
-        <form @submit.prevent="signupUser">
+        <form @submit.prevent="onSubmit">
           <InputText
             v-model="form.name"
             class="w-100"
@@ -33,7 +32,7 @@
 
           <div class="pt-10">
             <InputText
-              v-model="form.confirmPassword"
+              v-model="form.confirmedPassword"
               class="w-100"
               type="password"
               placeholder="비밀번호 확인"
@@ -61,12 +60,12 @@
 </template>
 
 <script lang="ts">
-import YoungeunBasic from "@/components/YoungeunBasic.vue";
 import { defineComponent, ref } from "vue";
+import { useStore } from "vuex";
+import { useRouter } from "vue-router";
 import { db } from "@/firebase/config";
 import { doc, serverTimestamp, setDoc } from "@firebase/firestore";
-import { useRouter } from "vue-router";
-import { useStore } from "vuex";
+import YoungeunBasic from "@/components/YoungeunBasic.vue";
 
 export default defineComponent({
   components: { YoungeunBasic },
@@ -76,10 +75,17 @@ export default defineComponent({
     const form = ref({
       email: null,
       password: null,
-      confirmPassword: null,
+      confirmedPassword: null,
       name: null,
     });
-    const signupUser = async () => {
+    const createUser = (uid: string) => {
+      setDoc(doc(db, "users", uid), {
+        email: form.value.email,
+        name: form.value.name,
+        createdAt: serverTimestamp(),
+      });
+    };
+    const onSubmit = async () => {
       try {
         const uid = await store.dispatch("signup", {
           email: form.value.email,
@@ -91,16 +97,9 @@ export default defineComponent({
         console.log(error);
       }
     };
-    const createUser = (uid: string) => {
-      setDoc(doc(db, "users", uid), {
-        email: form.value.email,
-        name: form.value.name,
-        createdAt: serverTimestamp(),
-      });
-    };
     return {
       form,
-      signupUser,
+      onSubmit,
     };
   },
 });

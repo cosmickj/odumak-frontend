@@ -59,19 +59,15 @@ import { useRouter } from "vue-router";
 import YoungeunBasic from "@/components/YoungeunBasic.vue";
 
 export default defineComponent({
-  components: {
-    YoungeunBasic,
-  },
+  components: { YoungeunBasic },
   setup() {
     const store = useStore();
     const router = useRouter();
-
     const form = ref({
       eamil: null,
       password: null,
     });
     const errorMessage = ref(null);
-
     const onSubmit = async () => {
       try {
         await store.dispatch("login", {

@@ -1,12 +1,11 @@
 <template>
-  <!-- <div id="main" v-if="userName"> -->
-  <div id="main">
+  <div id="main" v-if="userName">
     <div class="menu__wrapper">
       <div class="menu__container">
         <div class="welcome">안녕하세요 {{ userName }} 선생님</div>
         <router-link
           class="menu__item"
-          v-for="(menu, i) in menuList"
+          v-for="(menu, i) in menus"
           :key="i"
           :to="menu.link"
         >
@@ -31,7 +30,7 @@ export default {
   setup() {
     const store = useStore();
     // prettier-ignore
-    const menuList = [
+    const menus = [
       { title: "출석 입력하기", icon: "pi pi-pencil", link: "/input-attendance" },
       { title: "일일 출석 확인", icon: "pi pi-file", link: "/daily-attendance"  },
       { title: "누적 출석 확인", icon: "pi pi-book", link: "/total-attendance"  },
@@ -40,7 +39,7 @@ export default {
       store.dispatch("logout");
     };
     return {
-      menuList,
+      menus,
       logout,
       user: computed(() => store.state.user),
       userName: computed(() => {
