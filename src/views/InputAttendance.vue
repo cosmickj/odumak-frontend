@@ -3,8 +3,8 @@
     <div class="input-attendance__container">
       <div class="title__container" v-if="userInfo">
         <h2 class="title">출석 입력하기</h2>
-        <span>3-1</span>
-        <span>{{ userInfo.name }} 선생님</span>
+        <span class="fz-16">3-1</span>
+        <span class="fz-16">{{ userInfo.name }} 선생님</span>
       </div>
 
       <div class="calendar__container pt-10">
@@ -14,7 +14,7 @@
           :touchUI="true"
           :showIcon="true"
           :disabledDays="[1, 2, 3, 4, 5, 6]"
-          @date-select="fetchStudents"
+          @date-select="onSelect"
         />
       </div>
 
@@ -73,6 +73,13 @@
           type="submit"
         />
       </form>
+
+      <div v-else class="indicator__container mt-24">
+        <div class="indicator__items">
+          <InlineSVG :src="require('@/assets/finger_up.svg')"></InlineSVG>
+          <div class="fz-12">날짜를 선택해주세요</div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -83,8 +90,11 @@ import { useStore } from "vuex";
 import Student from "@/types/Student";
 import { addDoc } from "@firebase/firestore";
 import { attendancesCol } from "@/firebase/config";
+import InlineSVG from "vue-inline-svg";
+import "animate.css";
 
 export default defineComponent({
+  components: { InlineSVG },
   setup() {
     const store = useStore();
     const selectedDate = ref("");
@@ -101,8 +111,22 @@ export default defineComponent({
         selectedDate.value = "";
       });
     };
-    const fetchStudents = () => {
-      store.dispatch("fetchStudents", { name: store.state.userInfo.name });
+    const onSelect = async () => {
+      const TEMP = await hasRecord();
+      console.log(TEMP);
+      // hasRecord();
+      fetchStudents();
+    };
+    const hasRecord = async () => {
+      await store.dispatch("hasRecord", {
+        name: userInfo.value.name,
+        date: selectedDate.value,
+      });
+    };
+    const fetchStudents = async () => {
+      await store.dispatch("fetchStudents", {
+        name: userInfo.value.name,
+      });
     };
     return {
       authIsReady: computed(() => store.state.authIsReady),
@@ -110,7 +134,7 @@ export default defineComponent({
       students,
       userInfo,
       saveAttendance,
-      fetchStudents,
+      onSelect,
     };
   },
 });
@@ -167,5 +191,14 @@ input[type="radio"]:checked + label {
   opacity: 1;
   animation: jelly 0.6s ease;
   font-weight: bold;
+}
+.indicator__container {
+  display: flex;
+  justify-content: center;
+}
+.indicator__items {
+  width: 30%;
+  text-align: center;
+  color: var(--color-white);
 }
 </style>

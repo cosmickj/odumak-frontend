@@ -1,12 +1,12 @@
 import { createStore } from "vuex";
-import { auth, db, studentsCol } from "@/firebase/config";
+import { attendancesCol, auth, db, studentsCol } from "@/firebase/config";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
 } from "firebase/auth";
-import { doc, onSnapshot, query, where } from "firebase/firestore";
+import { doc, getDocs, onSnapshot, query, where } from "firebase/firestore";
 
 // import Student from "@/types/Student";
 // import UserInfo from "@/types/UserInfo";
@@ -73,6 +73,15 @@ const store = createStore({
           commit("SET_USER_INFO", { ...doc.data(), uid: doc.id });
         });
       }
+    },
+    async hasRecord(context, { name, date }) {
+      const q = query(
+        attendancesCol,
+        where("teacher", "==", name),
+        where("date", "==", date)
+      );
+      const result = await getDocs(q);
+      return result.docs.length;
     },
     fetchStudents({ commit }, { name }) {
       const q = query(studentsCol, where("teacher", "==", name));
