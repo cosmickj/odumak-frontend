@@ -68,18 +68,21 @@
         </div>
 
         <Button
+          v-if="!record"
           class="p-button-warning p-button-raised btn-block"
           label="제출하기"
           type="submit"
         />
+
+        <Button
+          v-else
+          class="p-button-danger p-button-raised btn-block"
+          label="수정하기"
+          type="submit"
+        />
       </form>
 
-      <div v-else class="indicator__container mt-24">
-        <div class="indicator__items">
-          <InlineSVG :src="require('@/assets/finger_up.svg')"></InlineSVG>
-          <div class="fz-12">날짜를 선택해주세요</div>
-        </div>
-      </div>
+      <FingerUpper v-else></FingerUpper>
     </div>
   </div>
 </template>
@@ -87,17 +90,17 @@
 <script lang="ts">
 import { computed, defineComponent, ref } from "vue";
 import { useStore } from "vuex";
+import { attendancesCol, db } from "@/firebase/config";
+import { addDoc, doc, setDoc } from "@firebase/firestore";
 import Student from "@/types/Student";
-import { addDoc } from "@firebase/firestore";
-import { attendancesCol } from "@/firebase/config";
-import InlineSVG from "vue-inline-svg";
-import "animate.css";
+import FingerUpper from "@/components/FingerUpper.vue";
 
 export default defineComponent({
-  components: { InlineSVG },
+  components: { FingerUpper },
   setup() {
     const store = useStore();
     const selectedDate = ref("");
+    const record = computed(() => store.state.record);
     const students = computed<Student[]>(() => store.state.students);
     const userInfo = computed(() => store.state.userInfo);
     const saveAttendance = () => {
@@ -106,31 +109,30 @@ export default defineComponent({
         teacher: userInfo.value.name,
         students: students.value,
       };
-      addDoc(attendancesCol, attendanceParams).then(() => {
-        alert("제출되었습니다.");
+      if (!record.value) {
+        addDoc(attendancesCol, attendanceParams).then(() => {
+          alert("제출되었습니다.");
+          selectedDate.value = "";
+        });
+      } else {
+        setDoc(doc(db, "attendances", record.value), attendanceParams);
+        alert("수정되었습니다.");
         selectedDate.value = "";
-      });
+      }
     };
     const onSelect = async () => {
-      const TEMP = await hasRecord();
-      console.log(TEMP);
-      // hasRecord();
-      fetchStudents();
+      await checkRecord();
     };
-    const hasRecord = async () => {
-      await store.dispatch("hasRecord", {
+    const checkRecord = async () => {
+      await store.dispatch("checkRecord", {
         name: userInfo.value.name,
         date: selectedDate.value,
-      });
-    };
-    const fetchStudents = async () => {
-      await store.dispatch("fetchStudents", {
-        name: userInfo.value.name,
       });
     };
     return {
       authIsReady: computed(() => store.state.authIsReady),
       selectedDate,
+      record,
       students,
       userInfo,
       saveAttendance,
@@ -154,7 +156,7 @@ export default defineComponent({
   align-items: flex-end;
   justify-content: space-between;
   font-size: 3rem;
-  color: var(--color-white);
+  color: var(--color-black);
 }
 .student {
   padding: 1rem;
@@ -191,14 +193,5 @@ input[type="radio"]:checked + label {
   opacity: 1;
   animation: jelly 0.6s ease;
   font-weight: bold;
-}
-.indicator__container {
-  display: flex;
-  justify-content: center;
-}
-.indicator__items {
-  width: 30%;
-  text-align: center;
-  color: var(--color-white);
 }
 </style>

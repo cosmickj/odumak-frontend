@@ -53,7 +53,7 @@ export default defineComponent({
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: var(--color-grey);
+  background: var(--color-yellow);
   box-shadow: 0 5px 5px rgba(0, 0, 0, 0.1);
 }
 .btn-nav__icon {

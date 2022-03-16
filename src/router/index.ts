@@ -50,6 +50,7 @@ const routes: Array<RouteRecordRaw> = [
     name: "DailyAttendance",
     component: () => import("@/views/DailyAttendance.vue"),
     meta: { requiresAuth: true },
+    beforeEnter: fetchUserInfo(),
   },
   {
     path: "/total-attendance",

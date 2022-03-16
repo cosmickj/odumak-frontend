@@ -19,7 +19,8 @@ export default defineComponent({
         if (
           router.currentRoute.value.path === "/" ||
           router.currentRoute.value.path === "/login" ||
-          router.currentRoute.value.path === "/signup"
+          router.currentRoute.value.path === "/signup" ||
+          router.currentRoute.value.path === "/main"
         )
           return false;
         else return true;

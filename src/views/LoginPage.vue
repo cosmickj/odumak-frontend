@@ -4,7 +4,6 @@
       <div class="login__container">
         <YoungeunBasic></YoungeunBasic>
 
-        <!-- <div class="title fz-16">당신의 섬김에 감사합니다.</div> -->
         <template v-if="authIsReady">
           <form @submit.prevent="onSubmit">
             <InputText

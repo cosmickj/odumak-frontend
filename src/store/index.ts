@@ -22,6 +22,7 @@ const store = createStore({
   state: {
     user: null,
     userInfo: null,
+    record: null,
     students: null,
     authIsReady: false,
   },
@@ -31,6 +32,9 @@ const store = createStore({
     },
     SET_USER_INFO(state, payload) {
       state.userInfo = payload;
+    },
+    SET_RECORD(state, payload) {
+      state.record = payload;
     },
     SET_STUDENTS(state, payload) {
       state.students = payload;
@@ -74,21 +78,33 @@ const store = createStore({
         });
       }
     },
-    async hasRecord(context, { name, date }) {
+    async checkRecord({ commit, dispatch }, { name, date }) {
       const q = query(
         attendancesCol,
         where("teacher", "==", name),
         where("date", "==", date)
       );
       const result = await getDocs(q);
-      return result.docs.length;
+      if (result.docs.length === 1) {
+        // 출석 입력 기록 O
+        const students = result.docs[0].data().students;
+        commit("SET_STUDENTS", students);
+        commit("SET_RECORD", result.docs[0].id);
+      } else {
+        // 출석 입력 기록 X
+        dispatch("fetchStudents", { name });
+        commit("SET_RECORD", null);
+      }
     },
+    // fetchRecord({ state, commit }) {
+    //   const students = state.records.students;
+    //   commit("SET_STUDENTS", students);
+    // },
     fetchStudents({ commit }, { name }) {
       const q = query(studentsCol, where("teacher", "==", name));
       onSnapshot(q, (querySnapshot) => {
         const result: any = [];
         querySnapshot.forEach((doc) => {
-          // result.push({ ...doc.data(), id: doc.id });
           result.push({
             name: doc.data().name,
             birth: doc.data().birth,
