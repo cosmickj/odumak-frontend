@@ -3,7 +3,7 @@ module.exports = defineConfig({
   transpileDependencies: true,
   pwa: {
     name: "오두막",
-    themeColor: "#005d9a",
+    themeColor: "#f8f9fa",
   },
   devServer: {
     client: {
