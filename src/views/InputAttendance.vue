@@ -68,6 +68,11 @@
         </div>
 
         <Button
+          class="p-button-success p-button-raised btn-block"
+          label="다음"
+        />
+
+        <!-- <Button
           v-if="!record"
           class="p-button-warning p-button-raised btn-block"
           label="제출하기"
@@ -79,7 +84,7 @@
           class="p-button-danger p-button-raised btn-block"
           label="수정하기"
           type="submit"
-        />
+        /> -->
       </form>
 
       <FingerUpper v-else></FingerUpper>

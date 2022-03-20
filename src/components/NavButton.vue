@@ -27,7 +27,7 @@ export default defineComponent({
     // prettier-ignore
     const navMenus = [
       { title: "홈화면", icon: "pi pi-home", link: "/main" },
-      { title: "출석 입력하기", icon: "pi pi-pencil", link: "/input-attendance" },
+      { title: "출석 입력하기", icon: "pi pi-pencil", link: "/input" },
       { title: "일일 출석 확인", icon: "pi pi-file", link: "/daily-attendance"  },
       { title: "누적 출석 확인", icon: "pi pi-book", link: "/total-attendance"  },
     ];
