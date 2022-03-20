@@ -6,7 +6,7 @@ import router from "./router";
 // Global Styles
 import "@/css/reset.css";
 import "@/css/style.css";
-// Prime Vue
+// PrimeVue
 import PrimeVue from "primevue/config";
 import "primevue/resources/themes/saga-blue/theme.css";
 import "primevue/resources/primevue.min.css";
@@ -16,6 +16,8 @@ import InputText from "primevue/inputtext";
 import Calendar from "primevue/calendar";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
+// PrimeFlex
+import "/node_modules/primeflex/primeflex.css";
 
 createApp(App)
   .use(PrimeVue)

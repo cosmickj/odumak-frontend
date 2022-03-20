@@ -18,9 +18,11 @@
         />
       </div>
 
-      <form v-if="selectedDate">
-        <Students v-if="stage === 'students'"></Students>
-        <Teacher v-if="stage === 'teacher'"></Teacher>
+      <form>
+        <!-- <form v-if="selectedDate"> -->
+        <!-- <Students v-if="stage === 'students'"></Students> -->
+        <!-- <Teacher v-if="stage === 'teacher'"></Teacher> -->
+        <Teacher></Teacher>
       </form>
     </div>
   </div>
@@ -29,12 +31,15 @@
 <script lang="ts">
 import { computed, defineComponent, ref } from "vue";
 import { useStore } from "vuex";
-import Students from "./Students.vue";
+// import Students from "./Students.vue";
 import Teacher from "./Teacher.vue";
 
 export default defineComponent({
   name: "InputAttendanceLayout",
-  components: { Students, Teacher },
+  components: {
+    // Students,
+    Teacher,
+  },
   setup() {
     const store = useStore();
     const userInfo = computed(() => store.state.user.info);
