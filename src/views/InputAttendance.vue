@@ -2,7 +2,7 @@
   <div id="input-attendance" v-if="authIsReady">
     <div class="input-attendance__container">
       <div class="title__container" v-if="userInfo">
-        <h2 class="title">출석 입력하기</h2>
+        <span class="title">출석 입력하기</span>
         <span class="fz-16">3-1</span>
         <span class="fz-16">{{ userInfo.name }} 선생님</span>
       </div>
@@ -155,7 +155,7 @@ export default defineComponent({
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  font-size: 3rem;
+  font-size: 1.6rem;
   color: var(--color-black);
 }
 .student {

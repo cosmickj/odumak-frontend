@@ -4,8 +4,8 @@ import "./registerServiceWorker";
 import store from "./store";
 import router from "./router";
 // Global Styles
-import "@/css/global.css";
 import "@/css/reset.css";
+import "@/css/style.css";
 // Prime Vue
 import PrimeVue from "primevue/config";
 import "primevue/resources/themes/saga-blue/theme.css";
