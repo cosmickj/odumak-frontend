@@ -49,8 +49,8 @@
     </div>
 
     <Button
-      class="p-button-success p-button-raised btn-block"
       label="다음"
+      class="p-button-success p-button-raised btn-block"
       @click="moveStage('teacher')"
     />
   </template>

@@ -18,11 +18,9 @@
         />
       </div>
 
-      <form>
-        <!-- <form v-if="selectedDate"> -->
-        <!-- <Students v-if="stage === 'students'"></Students> -->
-        <!-- <Teacher v-if="stage === 'teacher'"></Teacher> -->
-        <Teacher></Teacher>
+      <form v-if="selectedDate" @submit.prevent="onSubmit">
+        <Students v-if="stage === 'students'"></Students>
+        <Teacher v-if="stage === 'teacher'"></Teacher>
       </form>
     </div>
   </div>
@@ -31,19 +29,19 @@
 <script lang="ts">
 import { computed, defineComponent, ref } from "vue";
 import { useStore } from "vuex";
-// import Students from "./Students.vue";
+import Students from "./Students.vue";
 import Teacher from "./Teacher.vue";
 
 export default defineComponent({
   name: "InputAttendanceLayout",
   components: {
-    // Students,
+    Students,
     Teacher,
   },
   setup() {
     const store = useStore();
     const userInfo = computed(() => store.state.user.info);
-    const selectedDate = ref("");
+    const selectedDate = ref<any>(null);
     const stage = computed(() => store.state.attendance.stage);
     const moveStage = (stage: string) =>
       store.commit("attendance/SET_STAGE", stage);
@@ -54,10 +52,14 @@ export default defineComponent({
         date: selectedDate.value,
       });
     };
+    const onSubmit = () => {
+      console.log("submitted");
+    };
     return {
       stage,
       selectedDate,
       onDateSelect,
+      onSubmit,
     };
   },
 });
