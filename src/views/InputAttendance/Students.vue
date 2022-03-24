@@ -1,5 +1,24 @@
 <template>
   <template v-if="students">
+    <div class="teacher">
+      <div>선생님께서는 어디서 예배하셨나요?</div>
+      <label for="teacher-online">온라인</label>
+      <input
+        v-model="teacherAttendance"
+        id="teacher-online"
+        type="radio"
+        name="teacher-attendance"
+        value="online"
+      />
+      <label for="teacher-offline">현장예배</label>
+      <input
+        v-model="teacherAttendance"
+        id="teacher-offline"
+        type="radio"
+        name="teacher-attendance"
+        value="offline"
+      />
+    </div>
     <div v-for="(student, i) in students" :key="i" class="student">
       <div class="student__name">{{ student.name }}</div>
       <div class="student__birth">{{ student.birth }}</div>
@@ -57,7 +76,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from "vue";
+import { computed, defineComponent, ref } from "vue";
 import { useStore } from "vuex";
 import Student from "@/types/Student";
 
@@ -65,10 +84,12 @@ export default defineComponent({
   name: "InputAttendanceStudents",
   setup() {
     const store = useStore();
+    const teacherAttendance = ref("");
     const students = computed<Student[]>(() => store.state.attendance.students);
     const moveStage = (stage: string) =>
       store.commit("attendance/SET_STAGE", stage);
     return {
+      teacherAttendance,
       students,
       moveStage,
     };
@@ -77,6 +98,16 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.teacher {
+  padding: 1rem;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin: 10px 0;
+  border-radius: 3px;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+  background: #efefef95;
+}
 .student {
   padding: 1rem;
   display: flex;
