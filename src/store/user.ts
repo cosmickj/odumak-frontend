@@ -36,6 +36,7 @@ export const user: Module<UserState, RootState> = {
       const res = await createUserWithEmailAndPassword(auth, email, password);
       if (res) {
         commit("SET_USER", res.user);
+        localStorage.setItem("uid", JSON.stringify({ uid: res.user.uid }));
         return res.user.uid;
       } else {
         throw new Error("could not complete signup");
@@ -56,6 +57,7 @@ export const user: Module<UserState, RootState> = {
       commit("SET_USER_INFO", null);
       localStorage.removeItem("uid");
     },
+
     fetchUserInfo({ commit }) {
       const result = localStorage.getItem("uid");
       if (result !== null) {

@@ -1,5 +1,6 @@
 <template>
-  <div id="main" v-if="name">
+  <!-- <div id="main" v-if="name"> -->
+  <div id="main">
     <div class="menu__wrapper">
       <div class="menu__container">
         <div class="welcome">안녕하세요 {{ name }} 선생님</div>
@@ -22,11 +23,11 @@
   </div>
 </template>
 
-<script>
-import { computed } from "@vue/runtime-core";
+<script lang="ts">
+import { computed, defineComponent } from "vue";
 import { useStore } from "vuex";
 
-export default {
+export default defineComponent({
   setup() {
     const store = useStore();
     // prettier-ignore
@@ -44,12 +45,14 @@ export default {
       name: computed(() => {
         if (store.state.user.info) {
           return store.state.user.info.name;
+        } else {
+          return false;
         }
       }),
       authIsReady: computed(() => store.state.user.authIsReady),
     };
   },
-};
+});
 </script>
 
 <style scoped>
