@@ -74,7 +74,7 @@ export default defineComponent({
     ]);
 
     return {
-      authIsReady: computed(() => store.state.authIsReady),
+      authIsReady: computed(() => store.state.user.authIsReady),
       userInfo: computed(() => store.state.userInfo),
       selectedDate,
       dailyAttendances,

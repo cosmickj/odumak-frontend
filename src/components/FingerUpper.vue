@@ -2,7 +2,7 @@
   <div class="indicator__container mt-24">
     <div class="indicator__items">
       <InlineSVG :src="require('@/assets/finger_up.svg')"></InlineSVG>
-      <div>날짜를 선택해주세요</div>
+      <!-- <div>날짜를 선택해주세요</div> -->
     </div>
   </div>
 </template>

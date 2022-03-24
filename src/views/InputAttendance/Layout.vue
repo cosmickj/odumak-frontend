@@ -18,7 +18,9 @@
         />
       </div>
 
-      <form v-if="selectedDate" @submit.prevent="onSubmit">
+      <FingerUpper v-if="!selectedDate"></FingerUpper>
+
+      <form v-else @submit.prevent="onSubmit">
         <Students v-if="stage === 'students'"></Students>
         <Teacher v-if="stage === 'teacher'"></Teacher>
       </form>
@@ -29,12 +31,14 @@
 <script lang="ts">
 import { computed, defineComponent, ref } from "vue";
 import { useStore } from "vuex";
+import FingerUpper from "@/components/FingerUpper.vue";
 import Students from "./Students.vue";
 import Teacher from "./Teacher.vue";
 
 export default defineComponent({
   name: "InputAttendanceLayout",
   components: {
+    FingerUpper,
     Students,
     Teacher,
   },
