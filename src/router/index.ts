@@ -10,7 +10,7 @@ import store from "@/store";
 
 const fetchUserInfo =
   () => (to: RouteLocation, from: RouteLocation, next: NavigationGuardNext) => {
-    store.dispatch("fetchUserInfo");
+    store.dispatch("user/fetchUserInfo");
     return next();
   };
 
@@ -32,25 +32,25 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresUnauth: true },
   },
   {
+    beforeEnter: fetchUserInfo(),
     path: "/main",
     name: "MainPage",
     component: () => import("@/views/MainPage.vue"),
     meta: { requiresAuth: true },
-    beforeEnter: fetchUserInfo(),
   },
   {
-    path: "/input-attendance",
+    beforeEnter: fetchUserInfo(),
+    path: "/input",
     name: "InputAttendance",
-    component: () => import("@/views/InputAttendance.vue"),
+    component: () => import("@/views/InputAttendance/Layout.vue"),
     meta: { requiresAuth: true },
-    beforeEnter: fetchUserInfo(),
   },
   {
+    beforeEnter: fetchUserInfo(),
     path: "/daily-attendance",
     name: "DailyAttendance",
     component: () => import("@/views/DailyAttendance.vue"),
     meta: { requiresAuth: true },
-    beforeEnter: fetchUserInfo(),
   },
   {
     path: "/total-attendance",

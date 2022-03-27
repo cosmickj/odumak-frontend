@@ -60,7 +60,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, reactive, ref } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { db } from "@/firebase/config";
@@ -72,27 +72,28 @@ export default defineComponent({
   setup() {
     const store = useStore();
     const router = useRouter();
-    const form = ref({
-      email: null,
-      password: null,
-      confirmedPassword: null,
-      name: null,
-    });
-    const createUser = (uid: string) => {
-      setDoc(doc(db, "users", uid), {
-        email: form.value.email,
-        name: form.value.name,
+    const initialForm = {
+      email: "",
+      password: "",
+      confirmedPassword: "",
+      name: "",
+    };
+    const form = reactive({ ...initialForm });
+    const createUser = async (uid: string) => {
+      await setDoc(doc(db, "users", uid), {
+        email: form.email,
+        name: form.name,
         createdAt: serverTimestamp(),
       });
     };
     const onSubmit = async () => {
       try {
-        const uid = await store.dispatch("signup", {
-          email: form.value.email,
-          password: form.value.password,
+        const uid = await store.dispatch("user/signup", {
+          email: form.email,
+          password: form.password,
         });
-        createUser(uid);
-        router.push("/main");
+        await createUser(uid);
+        router.push("/login");
       } catch (error) {
         console.log(error);
       }

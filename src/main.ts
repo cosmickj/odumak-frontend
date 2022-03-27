@@ -4,9 +4,9 @@ import "./registerServiceWorker";
 import store from "./store";
 import router from "./router";
 // Global Styles
-import "@/css/global.css";
 import "@/css/reset.css";
-// Prime Vue
+import "@/css/style.css";
+// PrimeVue
 import PrimeVue from "primevue/config";
 import "primevue/resources/themes/saga-blue/theme.css";
 import "primevue/resources/primevue.min.css";
@@ -16,6 +16,8 @@ import InputText from "primevue/inputtext";
 import Calendar from "primevue/calendar";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
+// PrimeFlex
+import "/node_modules/primeflex/primeflex.css";
 
 createApp(App)
   .use(PrimeVue)

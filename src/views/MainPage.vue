@@ -1,8 +1,9 @@
 <template>
-  <div id="main" v-if="userName">
+  <!-- <div id="main" v-if="name"> -->
+  <div id="main">
     <div class="menu__wrapper">
       <div class="menu__container">
-        <div class="welcome">안녕하세요 {{ userName }} 선생님</div>
+        <div class="welcome">안녕하세요 {{ name }} 선생님</div>
         <router-link
           class="menu__item"
           v-for="(menu, i) in menus"
@@ -22,35 +23,36 @@
   </div>
 </template>
 
-<script>
-import { computed } from "@vue/runtime-core";
+<script lang="ts">
+import { computed, defineComponent } from "vue";
 import { useStore } from "vuex";
 
-export default {
+export default defineComponent({
   setup() {
     const store = useStore();
     // prettier-ignore
     const menus = [
-      { title: "출석 입력하기", icon: "pi pi-pencil", link: "/input-attendance" },
+      { title: "출석 입력하기", icon: "pi pi-pencil", link: "/input" },
       { title: "일일 출석 확인", icon: "pi pi-file", link: "/daily-attendance"  },
       { title: "누적 출석 확인", icon: "pi pi-book", link: "/total-attendance"  },
     ];
     const logout = () => {
-      store.dispatch("logout");
+      store.dispatch("user/logout");
     };
     return {
       menus,
       logout,
-      user: computed(() => store.state.user),
-      userName: computed(() => {
-        if (store.state.userInfo) {
-          return store.state.userInfo.name;
+      name: computed(() => {
+        if (store.state.user.info) {
+          return store.state.user.info.name;
+        } else {
+          return false;
         }
       }),
-      authIsReady: computed(() => store.state.authIsReady),
+      authIsReady: computed(() => store.state.user.authIsReady),
     };
   },
-};
+});
 </script>
 
 <style scoped>

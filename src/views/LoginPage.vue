@@ -69,7 +69,7 @@ export default defineComponent({
     const errorMessage = ref(null);
     const onSubmit = async () => {
       try {
-        await store.dispatch("login", {
+        await store.dispatch("user/login", {
           email: form.value.eamil,
           password: form.value.password,
         });
@@ -82,7 +82,7 @@ export default defineComponent({
       form,
       errorMessage,
       onSubmit,
-      authIsReady: computed(() => store.state.authIsReady),
+      authIsReady: computed(() => store.state.user.authIsReady),
     };
   },
 });
