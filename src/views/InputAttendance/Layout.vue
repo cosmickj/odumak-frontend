@@ -1,29 +1,45 @@
 <template>
-  <div id="input-attendance">
+  <div id="input-attendance" v-if="userInfo">
     <div class="input-attendance__container">
       <div class="title__container">
         <span class="title">출석 입력하기</span>
         <span class="fz-16">3-1</span>
-        <span class="fz-16">이경준 선생님</span>
+        <span class="fz-16">{{ userInfo.name }} 선생님</span>
       </div>
 
       <div class="calendar__container pt-10">
         <Calendar
-          v-model="selectedDate"
+          v-model="attendanceDate"
           class="w-100"
           :touchUI="true"
           :showIcon="true"
           :disabledDays="[1, 2, 3, 4, 5, 6]"
-          @date-select="onDateSelect"
+          @date-select="onAttendanceDateSelect"
         />
       </div>
 
-      <FingerUpper v-if="!selectedDate"></FingerUpper>
+      <form
+        v-if="attendanceDate && studentsAttendanceStatus"
+        @submit.prevent="onSubmit"
+      >
+        <Teacher v-model="teacherAttendanceStatus"></Teacher>
+        <Students v-model="studentsAttendanceStatus"></Students>
 
-      <form v-else @submit.prevent="onSubmit">
-        <Students v-if="stage === 'students'"></Students>
-        <Teacher v-if="stage === 'teacher'"></Teacher>
+        <Button
+          v-if="!attendanceRecord"
+          type="submit"
+          label="제출하기"
+          class="btn-block p-button-warning p-button-raised"
+        />
+        <Button
+          v-else
+          type="submit"
+          label="수정하기"
+          class="btn-block p-button-danger p-button-raised"
+        />
       </form>
+
+      <FingerUpper v-else></FingerUpper>
     </div>
   </div>
 </template>
@@ -31,38 +47,43 @@
 <script lang="ts">
 import { computed, defineComponent, ref } from "vue";
 import { useStore } from "vuex";
+import Student from "@/types/Student";
 import FingerUpper from "@/components/FingerUpper.vue";
-import Students from "./Students.vue";
-import Teacher from "./Teacher.vue";
+import Teacher from "@/views/InputAttendance/Teacher.vue";
+import Students from "@/views/InputAttendance/Students.vue";
 
 export default defineComponent({
   name: "InputAttendanceLayout",
   components: {
     FingerUpper,
-    Students,
     Teacher,
+    Students,
   },
   setup() {
     const store = useStore();
     const userInfo = computed(() => store.state.user.info);
-    const selectedDate = ref<any>(null);
-    const stage = computed(() => store.state.attendance.stage);
-    const moveStage = (stage: string) =>
-      store.commit("attendance/SET_STAGE", stage);
-    const onDateSelect = async () => {
-      moveStage("students");
+    const attendanceDate = ref<any>(null);
+    const attendanceRecord = computed(() => store.state.attendance.record);
+    const teacherAttendanceStatus = ref("online");
+    const studentsAttendanceStatus = computed<Student[]>(
+      () => store.state.attendance.students
+    );
+    const onAttendanceDateSelect = async () => {
       await store.dispatch("attendance/checkRecord", {
         name: userInfo.value.name,
-        date: selectedDate.value,
+        date: attendanceDate.value,
       });
     };
     const onSubmit = () => {
       console.log("submitted");
     };
     return {
-      stage,
-      selectedDate,
-      onDateSelect,
+      userInfo,
+      attendanceDate,
+      attendanceRecord,
+      teacherAttendanceStatus,
+      studentsAttendanceStatus,
+      onAttendanceDateSelect,
       onSubmit,
     };
   },

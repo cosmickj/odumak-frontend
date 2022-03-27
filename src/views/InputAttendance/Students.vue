@@ -1,35 +1,4 @@
-<template v-if="students">
-  <!-- 선생님 출석체크 -->
-  <div class="attendance teacher">
-    <div>선생님께서는 어디서 예배하셨나요?</div>
-    <input
-      type="radio"
-      id="teacher-online"
-      value="online"
-      v-model="teacher"
-      class="attendance__input"
-    />
-    <label
-      for="teacher-online"
-      class="attendance__label attendance__label--online"
-    >
-      <span>온라인</span>
-    </label>
-    <input
-      type="radio"
-      id="teacher-offline"
-      value="offline"
-      v-model="teacher"
-      class="attendance__input"
-    />
-    <label
-      for="teacher-offline"
-      class="attendance__label attendance__label--offline"
-    >
-      <span>현장</span>
-    </label>
-  </div>
-
+<template>
   <!-- 학생 출석체크 -->
   <div v-for="(student, i) in students" :key="i" class="attendance student">
     <div class="student__name">{{ student.name }}</div>
@@ -43,7 +12,7 @@
     />
     <label
       :for="`absence-${student.name}`"
-      class="attendance__label attendance__label--absence"
+      class="attendance__label attendance__label__absence"
     >
       <span>결석</span>
     </label>
@@ -56,7 +25,7 @@
     />
     <label
       :for="`online-${student.name}`"
-      class="attendance__label attendance__label--online"
+      class="attendance__label attendance__label__online"
     >
       <span>온라인</span>
     </label>
@@ -69,38 +38,36 @@
     />
     <label
       :for="`offline-${student.name}`"
-      class="attendance__label attendance__label--offline"
+      class="attendance__label attendance__label__offline"
     >
       <span>현장</span>
     </label>
   </div>
-
-  <!-- 버튼 영역 -->
-  <Button
-    label="다음"
-    class="p-button-success p-button-raised btn-block"
-    @click="moveStage('teacher')"
-  />
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref } from "vue";
-import { useStore } from "vuex";
+import { computed, defineComponent, PropType } from "vue";
 import Student from "@/types/Student";
 
 export default defineComponent({
-  name: "InputAttendance",
-  setup() {
-    const store = useStore();
-    const teacher = ref("offline");
-    const students = computed<Student[]>(() => store.state.attendance.students);
-    const moveStage = (stage: string) =>
-      store.commit("attendance/SET_STAGE", stage);
-    return {
-      teacher,
-      students,
-      moveStage,
-    };
+  name: "StudentsAttendanceStatus",
+  props: {
+    modelValue: {
+      type: Array as PropType<Student[]>,
+      required: true,
+    },
+  },
+  emits: ["update:modelValue"],
+  setup(props, { emit }) {
+    const students = computed<Student[]>({
+      get() {
+        return props.modelValue;
+      },
+      set(students) {
+        emit("update:modelValue", students);
+      },
+    });
+    return { students };
   },
 });
 </script>
@@ -116,25 +83,11 @@ export default defineComponent({
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
   background: #efefef95;
 }
-.attendance__label--offline {
-  background-color: #4caf50;
-  color: #28334aff;
-}
-.attendance__label--online {
-  background-color: #fbc02d;
-  color: #28334aff;
-}
-.attendance__label--absence {
-  background-color: #ff4032;
-  color: #28334aff;
-}
-/* input[type="radio"] { */
 .attendance__input {
   display: none;
   height: 0;
   width: 0;
 }
-/* input[type="radio"] ~ label { */
 .attendance__label {
   height: 48px;
   width: 48px;
@@ -148,9 +101,21 @@ export default defineComponent({
   cursor: pointer;
   opacity: 0.4;
 }
-input[type="radio"]:checked + label {
+.attendance__input:checked + .attendance__label {
   opacity: 1;
   animation: jelly 0.6s ease;
   font-weight: bold;
+}
+.attendance__label__offline {
+  background-color: #4caf50;
+  color: #28334aff;
+}
+.attendance__label__online {
+  background-color: #fbc02d;
+  color: #28334aff;
+}
+.attendance__label__absence {
+  background-color: #ff4032;
+  color: #28334aff;
 }
 </style>

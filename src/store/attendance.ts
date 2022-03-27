@@ -4,26 +4,21 @@ import { attendancesCol, studentsCol } from "@/firebase/config";
 import { getDocs, onSnapshot, query, where } from "firebase/firestore";
 
 export interface AttendanceState {
-  stage: string;
   students: any;
-  records: any;
+  record: any;
 }
 export const attendance: Module<AttendanceState, RootState> = {
   namespaced: true,
   state: () => ({
-    stage: "",
     students: null,
-    records: null,
+    record: null,
   }),
   mutations: {
-    SET_STAGE(state, payload) {
-      state.stage = payload;
-    },
     SET_STUDENTS(state, payload) {
       state.students = payload;
     },
-    SET_RECORDS(state, payload) {
-      state.records = payload;
+    SET_RECORD(state, payload) {
+      state.record = payload;
     },
   },
   actions: {
@@ -38,11 +33,11 @@ export const attendance: Module<AttendanceState, RootState> = {
         // 출석 입력 기록 O
         const students = result.docs[0].data().students;
         commit("SET_STUDENTS", students);
-        commit("SET_RECORDS", result.docs[0].id);
+        commit("SET_RECORD", result.docs[0].id);
       } else {
         // 출석 입력 기록 X
         dispatch("fetchStudents", { name });
-        commit("SET_RECORDS", null);
+        commit("SET_RECORD", null);
       }
     },
     fetchStudents({ commit }, { name }) {
