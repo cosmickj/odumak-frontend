@@ -49,7 +49,7 @@ const routes: Array<RouteRecordRaw> = [
     beforeEnter: fetchUserInfo(),
     path: "/daily-attendance",
     name: "DailyAttendance",
-    component: () => import("@/views/DailyAttendance.vue"),
+    component: () => import("@/views/DailyAttendance/Layout.vue"),
     meta: { requiresAuth: true },
   },
   {

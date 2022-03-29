@@ -1,8 +1,6 @@
 <template>
-  <div>
-    <router-view />
-    <NavButton v-if="showsNavButton"></NavButton>
-  </div>
+  <router-view />
+  <NavButton v-if="showsNavButton"></NavButton>
 </template>
 
 <script lang="ts">

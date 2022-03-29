@@ -60,7 +60,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, ref } from "vue";
+import { defineComponent, reactive } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { db } from "@/firebase/config";

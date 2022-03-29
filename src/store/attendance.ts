@@ -6,13 +6,16 @@ import { getDocs, onSnapshot, query, where } from "firebase/firestore";
 export interface AttendanceState {
   students: any;
   record: any;
+  studentsDailyAttendance: any;
 }
 export const attendance: Module<AttendanceState, RootState> = {
   namespaced: true,
   state: () => ({
     students: null,
     record: null,
+    studentsDailyAttendance: null,
   }),
+
   mutations: {
     SET_STUDENTS(state, payload) {
       state.students = payload;
@@ -20,7 +23,13 @@ export const attendance: Module<AttendanceState, RootState> = {
     SET_RECORD(state, payload) {
       state.record = payload;
     },
+    SET_STUDENTS_DAILY_ATTENDANCE(state, payload) {
+      console.log(payload);
+
+      state.studentsDailyAttendance = payload;
+    },
   },
+
   actions: {
     async checkRecord({ commit, dispatch }, { name, date }) {
       const q = query(
@@ -53,6 +62,16 @@ export const attendance: Module<AttendanceState, RootState> = {
         });
         commit("SET_STUDENTS", result);
       });
+    },
+
+    async fetchStudentsDailyAttendance({ commit }, { date }) {
+      const result = [];
+      const q = query(attendancesCol, where("date", "==", date));
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach((doc) => {
+        result.push(...doc.data().students);
+      });
+      commit("SET_STUDENTS_DAILY_ATTENDANCE", result);
     },
   },
 };
