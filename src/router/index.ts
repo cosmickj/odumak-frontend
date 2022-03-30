@@ -35,28 +35,28 @@ const routes: Array<RouteRecordRaw> = [
     beforeEnter: fetchUserInfo(),
     path: "/main",
     name: "MainPage",
-    component: () => import("@/views/MainPage.vue"),
-    meta: { requiresAuth: true },
+    component: () => import("@/views/NewMainPage.vue"),
+    // meta: { requiresAuth: true },
   },
   {
     beforeEnter: fetchUserInfo(),
     path: "/input",
     name: "InputAttendance",
     component: () => import("@/views/InputAttendance/Layout.vue"),
-    meta: { requiresAuth: true },
+    // meta: { requiresAuth: true },
   },
   {
     beforeEnter: fetchUserInfo(),
     path: "/daily-attendance",
     name: "DailyAttendance",
     component: () => import("@/views/DailyAttendance/Layout.vue"),
-    meta: { requiresAuth: true },
+    // meta: { requiresAuth: true },
   },
   {
     path: "/total-attendance",
     name: "TotalAttendance",
     component: () => import("@/views/TotalAttendance.vue"),
-    meta: { requiresAuth: true },
+    // meta: { requiresAuth: true },
   },
 ];
 
