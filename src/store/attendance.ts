@@ -2,18 +2,19 @@ import { Module } from "vuex";
 import { RootState } from "./index";
 import { attendancesCol, studentsCol } from "@/firebase/config";
 import { getDocs, onSnapshot, query, where } from "firebase/firestore";
+import StudentAttendance from "@/types/StudentAttendance";
 
 export interface AttendanceState {
   students: any;
   record: any;
-  studentsDailyAttendance: any;
+  studentsDailyAttendance: StudentAttendance[];
 }
 export const attendance: Module<AttendanceState, RootState> = {
   namespaced: true,
   state: () => ({
     students: null,
     record: null,
-    studentsDailyAttendance: null,
+    studentsDailyAttendance: [],
   }),
 
   mutations: {
@@ -65,7 +66,7 @@ export const attendance: Module<AttendanceState, RootState> = {
     },
 
     async fetchStudentsDailyAttendance({ commit }, { date }) {
-      const result = [];
+      const result: StudentAttendance[] = [];
       const q = query(attendancesCol, where("date", "==", date));
       const querySnapshot = await getDocs(q);
       querySnapshot.forEach((doc) => {
