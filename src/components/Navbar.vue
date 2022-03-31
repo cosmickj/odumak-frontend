@@ -1,7 +1,7 @@
 <template>
-  <div class="fixed right-0 bottom-0 left-0">
+  <div class="app-size fixed right-0 bottom-0 left-0">
     <div
-      class="navbar flex align-items-center justify-content-evenly bg-white h-5rem border-round"
+      class="flex align-items-center justify-content-evenly bg-white h-5rem border-round shadow"
     >
       <router-link to="/main">
         <div class="p-2">
@@ -23,11 +23,3 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts"></script>
-
-<style scoped>
-.navbar {
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-}
-</style>

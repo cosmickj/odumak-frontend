@@ -1,60 +1,84 @@
 <template>
-  <!-- <div id="main" v-if="name"> -->
-  <div id="main">
-    <div class="menu__wrapper">
-      <div class="menu__container">
-        <div class="welcome">안녕하세요 {{ name }} 선생님</div>
-        <router-link
-          class="menu__item"
-          v-for="(menu, i) in menus"
-          :key="i"
-          :to="menu.link"
-        >
-          <span class="menu__title">{{ menu.title }}</span>
-          <i :class="menu.icon" class="menu__icon ml-10" />
-        </router-link>
+  <div class="main overflow-auto">
+    <div class="welcome p-6 mb-3 bg-white h-10rem">
+      <div
+        class="h-full flex flex-column justify-content-center align-items-center"
+      >
+        <span class="text-2xl">안녕하세요,</span>
+        <span class="text-4xl ml-2">이경준 선생님!</span>
       </div>
     </div>
-    <span class="btn-logout__container">
-      <router-link to="/login" class="btn-logout" @click="logout">
-        로그아웃
-      </router-link>
-    </span>
+    <div class="flex flex-column justify-content-center align-items-center">
+      <div class="flex w-full">
+        <router-link to="/daily-attendance" class="w-6 m-3">
+          <Card>
+            <template #title>
+              <div>학생 <i class="pi pi-users"></i></div>
+              <div class="pt-2">
+                <span class="text-yellow-500">일일</span> 출석 현황
+              </div>
+            </template>
+          </Card>
+        </router-link>
+        <Card class="w-6 m-3">
+          <template #title>
+            <div>학생 <i class="pi pi-users"></i></div>
+            <div class="pt-2">
+              <span class="text-yellow-500">누적</span> 출석 현황
+            </div>
+          </template>
+        </Card>
+      </div>
+
+      <div class="flex w-full">
+        <Card class="w-6 m-3">
+          <template #title>
+            <div>교사 <i class="pi pi-user-edit"></i></div>
+            <div class="pt-2">
+              <span class="text-yellow-500">일일</span> 출석 현황
+            </div>
+          </template>
+        </Card>
+        <Card class="w-6 m-3">
+          <template #title>
+            <div>교사 <i class="pi pi-user-edit"></i></div>
+            <div class="pt-2">
+              <span class="text-yellow-500">누적</span> 출석 현황
+            </div>
+          </template>
+        </Card>
+      </div>
+    </div>
   </div>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent } from "vue";
-import { useStore } from "vuex";
-
-export default defineComponent({
-  setup() {
-    const store = useStore();
-    // prettier-ignore
-    const menus = [
-      { title: "출석 입력하기", icon: "pi pi-pencil", link: "/input" },
-      { title: "일일 출석 확인", icon: "pi pi-file", link: "/daily-attendance"  },
-      { title: "누적 출석 확인", icon: "pi pi-book", link: "/total-attendance"  },
-    ];
-    const logout = () => {
-      store.dispatch("user/logout");
-    };
-    return {
-      menus,
-      logout,
-      name: computed(() => {
-        if (store.state.user.info) {
-          return store.state.user.info.name;
-        } else {
-          return false;
-        }
-      }),
-      authIsReady: computed(() => store.state.user.authIsReady),
-    };
-  },
-});
+<script setup lang="ts">
+import Card from "primevue/card";
 </script>
 
+<style>
+.p-card {
+  aspect-ratio: 1/1;
+}
+.p-card-body {
+  height: 100%;
+}
+.p-card-title {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: inherit;
+  margin: 0 !important;
+}
+</style>
+
 <style scoped>
-@import url("@/css/views/MainPage.css");
+.main {
+  max-height: calc(100vh - var(--navbar-height));
+  min-height: calc(100vh - var(--navbar-height));
+}
+.pi {
+  font-size: 1.5rem;
+}
 </style>

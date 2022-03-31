@@ -35,7 +35,7 @@ const routes: Array<RouteRecordRaw> = [
     beforeEnter: fetchUserInfo(),
     path: "/main",
     name: "MainPage",
-    component: () => import("@/views/NewMainPage.vue"),
+    component: () => import("@/views/MainPage.vue"),
     // meta: { requiresAuth: true },
   },
   {
