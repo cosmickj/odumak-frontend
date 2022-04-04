@@ -1,110 +1,116 @@
 <template>
-  <div id="signup" class="min-h-screen flex flex-column justify-content-center">
-    <div class="flex justify-content-center">
-      <div class="flex flex-column">
-        <YoungeunBasic></YoungeunBasic>
+  <div
+    id="signup"
+    class="min-h-screen flex justify-content-center align-items-center"
+  >
+    <div class="w-25rem">
+      <YoungeunBasic></YoungeunBasic>
 
-        <form @submit.prevent="onSubmit">
-          <div class="pb-1">
-            <InputText
-              v-model="signupForm.email"
-              class="w-full"
-              type="email"
-              placeholder="이메일을 입력하세요."
-            />
-            <div class="flex w-30rem overflow-x-auto pt-1 pb-1">
-              <div class="bg-white border-round p-1 mr-2" @click="appendEmail">
-                <span>@gmail.com</span>
-              </div>
-              <p class="bg-white border-round p-1 mr-2">@naver.com</p>
-              <p class="bg-white border-round p-1 mr-2">@hotmail.com</p>
-              <p class="bg-white border-round p-1 mr-2">@yahoo.com</p>
-              <p class="bg-white border-round p-1 mr-2">@outlook.com</p>
-            </div>
-          </div>
-
-          <div class="pb-1">
-            <Password
-              v-model="signupForm.password"
-              class="w-full"
-              toggleMask
-              placeholder="비밀번호를 입력하세요."
+      <form @submit.prevent="onSubmit">
+        <div class="pb-1">
+          <InputText
+            v-model="signupForm.email"
+            class="w-full"
+            type="email"
+            placeholder="이메일을 입력하세요."
+            required
+          />
+          <div class="flex overflow-x-auto py-1">
+            <div
+              class="bg-white border-round p-2 mr-2"
+              v-for="(email, i) in emails"
+              :key="i"
+              @click="appendEmail(email)"
             >
-              <template #footer>
-                <div class="mt-3">
-                  영문 대소문자+숫자를 조합하여 8자리 이상 입력하세요.
-                </div>
-              </template>
-            </Password>
-          </div>
-
-          <div class="pb-1">
-            <Password
-              v-model="signupForm.confirmedPassword"
-              class="w-full"
-              :feedback="false"
-              placeholder="비밀번호를 한 번 더 입력하세요."
-            />
-          </div>
-
-          <div class="pb-1">
-            <InputText
-              v-model="signupForm.name"
-              class="w-full"
-              type="text"
-              placeholder="이름을 입력하세요."
-            />
-          </div>
-
-          <div class="flex pb-2">
-            <div class="w-full flex justify-content-evenly">
-              <div class="flex align-items-center pr-2">
-                <RadioButton
-                  v-model="signupForm.grade"
-                  id="third-grade"
-                  name="grade"
-                  value="3"
-                />
-                <label for="third-grade">3학년</label>
-              </div>
-
-              <div class="flex align-items-center pr-2">
-                <RadioButton
-                  v-model="signupForm.grade"
-                  id="forth-grade"
-                  name="grade"
-                  value="4"
-                />
-                <label for="forth-grade">4학년</label>
-              </div>
+              <span>{{ email }}</span>
             </div>
+          </div>
+        </div>
 
-            <div class="w-full">
-              <Dropdown
-                class="w-full"
-                v-model="signupForm.group"
-                :options="group"
-                optionLabel="name"
-                optionValue="value"
-                placeholder="담당 학급을 선택하세요."
+        <div class="pb-1">
+          <Password
+            v-model="signupForm.password"
+            class="w-full"
+            toggleMask
+            placeholder="비밀번호를 입력하세요."
+            required
+          >
+            <template #footer>
+              <div class="mt-3">
+                영문 대소문자+숫자를 조합하여 8자리 이상 입력하세요.
+              </div>
+            </template>
+          </Password>
+        </div>
+
+        <div class="pb-1">
+          <Password
+            v-model="confirmedPassword"
+            class="w-full"
+            :feedback="false"
+            placeholder="비밀번호를 한 번 더 입력하세요."
+            required
+          />
+        </div>
+
+        <div class="pb-1">
+          <InputText
+            v-model="signupForm.name"
+            class="w-full"
+            type="text"
+            placeholder="성함을 입력하세요."
+            required
+          />
+        </div>
+
+        <div class="flex pb-2">
+          <div class="w-full flex justify-content-evenly">
+            <div class="flex align-items-center pr-2">
+              <RadioButton
+                v-model="signupForm.grade"
+                id="third-grade"
+                name="grade"
+                value="3"
               />
+              <label for="third-grade">3학년</label>
+            </div>
+
+            <div class="flex align-items-center pr-2">
+              <RadioButton
+                v-model="signupForm.grade"
+                id="forth-grade"
+                name="grade"
+                value="4"
+              />
+              <label for="forth-grade">4학년</label>
             </div>
           </div>
 
-          <Button
-            class="p-button-warning p-button-raised w-full"
-            label="회원가입"
-            type="submit"
-          ></Button>
-
-          <div class="flex justify-content-evenly align-items-center pt-3">
-            <span>계정이 있으신가요?</span>
-            <router-link to="/login">
-              <span>로그인</span>
-            </router-link>
+          <div class="w-full">
+            <Dropdown
+              class="w-full"
+              v-model="signupForm.group"
+              :options="group"
+              optionLabel="name"
+              optionValue="value"
+              placeholder="담당 학급을 선택하세요."
+            />
           </div>
-        </form>
-      </div>
+        </div>
+
+        <Button
+          class="p-button-warning p-button-raised w-full"
+          label="회원가입"
+          type="submit"
+        ></Button>
+
+        <div class="flex justify-content-evenly align-items-center pt-3">
+          <span>계정이 있으신가요?</span>
+          <router-link to="/login">
+            <span>로그인</span>
+          </router-link>
+        </div>
+      </form>
     </div>
   </div>
 </template>
@@ -132,36 +138,40 @@ const group = ref([
   { name: "9반", value: "9" },
   { name: "10반", value: "10" },
 ]);
+const emails = ref([
+  "@gmail.com",
+  "@naver.com",
+  "@hotmail.com",
+  "@yahoo.com",
+  "@outlook.com",
+]);
+const confirmedPassword = ref("");
 
 const store = useStore();
 const router = useRouter();
+
 const initSignupForm = {
   email: "",
   password: "",
-  confirmedPassword: "",
   name: "",
   grade: "3",
   group: "",
 };
 const signupForm = reactive({ ...initSignupForm });
 
-const appendEmail = () => {
-  signupForm.email = signupForm.email + "@hello.com";
-};
-
-const createUser = async (uid: string) => {
-  // await setDoc(doc(db, "users", uid), {
-  //   email: form.email,
-  //   name: form.name,
-  //   createdAt: serverTimestamp(),
-  // });
+const appendEmail = (email: string) => {
+  const asperand = signupForm.email.indexOf("@");
+  if (asperand > -1) {
+    const emailHead = signupForm.email.slice(0, asperand);
+    signupForm.email = emailHead + email;
+  } else {
+    signupForm.email = signupForm.email + email;
+  }
 };
 
 const onSubmit = async () => {
-  if (signupForm.password !== signupForm.confirmedPassword) {
+  if (signupForm.password !== confirmedPassword.value) {
     alert("비밀번호가 일치하지 않습니다.");
-    signupForm.password = "";
-    signupForm.confirmedPassword = "";
   }
 
   // try {
@@ -174,6 +184,14 @@ const onSubmit = async () => {
   // } catch (error) {
   //   console.log(error);
   // }
+};
+
+const createUser = async (uid: string) => {
+  // await setDoc(doc(db, "users", uid), {
+  //   email: form.email,
+  //   name: form.name,
+  //   createdAt: serverTimestamp(),
+  // });
 };
 </script>
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="main overflow-auto">
+  <div class="app-size main overflow-auto">
     <div class="welcome p-6 mb-3 bg-white h-10rem">
       <div
         class="h-full flex flex-column justify-content-center align-items-center"
