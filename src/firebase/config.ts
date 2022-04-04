@@ -4,7 +4,7 @@ import { collection, getFirestore } from "firebase/firestore";
 // import { computed, onMounted, onUnmounted, ref } from "vue";
 
 // init firebase
-export const firebaseApii = initializeApp({
+const app = initializeApp({
   apiKey: "AIzaSyDPKREFtu36CcmILDCh2m5JQloFuKNyi0o",
   authDomain: "the-shack-backend.firebaseapp.com",
   projectId: "the-shack-backend",
