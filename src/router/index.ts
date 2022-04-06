@@ -20,17 +20,30 @@ const routes: Array<RouteRecordRaw> = [
     redirect: "/main",
   },
   {
-    path: "/login",
-    name: "LoginPage",
-    component: () => import("@/views/LoginPage.vue"),
-    meta: { requiresUnauth: true },
+    path: "/account",
+    name: "AccountPage",
+    component: () => import("@/views/Account/LayoutPage.vue"),
+    children: [
+      {
+        path: "login",
+        name: "LoginPage",
+        component: () => import("@/views/Account/LoginPage.vue"),
+        // meta: { requiresUnauth: true },
+      },
+      {
+        path: "signup",
+        name: "SignupPage",
+        component: () => import("@/views/Account/SignupPage.vue"),
+        // meta: { requiresUnauth: true },
+      },
+    ],
   },
-  {
-    path: "/signup",
-    name: "SignupPage",
-    component: () => import("@/views/SignupPage.vue"),
-    meta: { requiresUnauth: true },
-  },
+  // {
+  //   path: "/signup",
+  //   name: "SignupPage",
+  //   component: () => import("@/views/SignupPage.vue"),
+  //   meta: { requiresUnauth: true },
+  // },
   {
     beforeEnter: fetchUserInfo(),
     path: "/main",

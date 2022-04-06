@@ -1,6 +1,6 @@
 <template>
   <router-view />
-  <Navbar v-if="isNavbar"></Navbar>
+  <!-- <Navbar v-if="isNavbar"></Navbar> -->
 </template>
 
 <script setup lang="ts">
