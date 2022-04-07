@@ -4,14 +4,14 @@
       <div class="mx-7 mb-2">
         <InputText
           v-model="signupForm.email"
-          class="w-full"
+          class="w-full border-round"
           type="email"
           placeholder="이메일을 입력하세요."
           required
         />
       </div>
 
-      <!-- <div class="mx-7 mb-2">
+      <div class="mx-7 mb-2">
         <div>
           <div class="flex overflow-auto">
             <span
@@ -24,7 +24,7 @@
             </span>
           </div>
         </div>
-      </div> -->
+      </div>
 
       <div class="mx-7 mb-2">
         <Password
@@ -55,7 +55,7 @@
       <div class="mx-7 mb-2">
         <InputText
           v-model="signupForm.name"
-          class="w-full"
+          class="w-full border-round"
           type="text"
           placeholder="성함을 입력하세요."
           required
@@ -122,7 +122,6 @@ import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { db } from "@/firebase/config";
 import { doc, serverTimestamp, setDoc } from "@firebase/firestore";
-import YoungeunBasic from "@/components/YoungeunBasic.vue";
 import RadioButton from "primevue/radiobutton";
 import Dropdown from "primevue/dropdown";
 import Password from "primevue/password";
@@ -173,6 +172,9 @@ const appendEmail = (email: string) => {
 const onSubmit = async () => {
   if (signupForm.password !== confirmedPassword.value) {
     alert("비밀번호가 일치하지 않습니다.");
+  } else {
+    await store.dispatch("user/signup", signupForm);
+    router.push({ name: "LoginPage" });
   }
 
   // try {
@@ -199,6 +201,7 @@ const createUser = async (uid: string) => {
 <style>
 .p-password > input {
   width: inherit;
+  border-radius: var(--border-radius);
 }
 .p-dropdown {
   width: 80px;

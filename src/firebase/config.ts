@@ -3,8 +3,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { collection, getFirestore } from "firebase/firestore";
 // import { computed, onMounted, onUnmounted, ref } from "vue";
 
-// init firebase
-const app = initializeApp({
+const firebaseConfig = {
   apiKey: "AIzaSyDPKREFtu36CcmILDCh2m5JQloFuKNyi0o",
   authDomain: "the-shack-backend.firebaseapp.com",
   projectId: "the-shack-backend",
@@ -12,7 +11,10 @@ const app = initializeApp({
   messagingSenderId: "53415125040",
   appId: "1:53415125040:web:157fb9483feccfe8b40df5",
   measurementId: "G-5HQ64ZGGWJ",
-});
+};
+
+// init firebase
+initializeApp(firebaseConfig);
 
 // init firebase auth
 const auth = getAuth();

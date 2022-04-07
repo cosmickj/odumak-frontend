@@ -3,6 +3,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
+  updateProfile,
 } from "firebase/auth";
 import { doc, onSnapshot } from "firebase/firestore";
 import { Module } from "vuex";
@@ -32,24 +33,29 @@ export const user: Module<UserState, RootState> = {
     },
   },
   actions: {
-    async signup({ commit }, { email, password }) {
-      const res = await createUserWithEmailAndPassword(auth, email, password);
-      if (res) {
-        commit("SET_USER", res.user);
-        localStorage.setItem("uid", JSON.stringify({ uid: res.user.uid }));
-        return res.user.uid;
-      } else {
+    async signup(_context, { email, password, name }) {
+      try {
+        const res = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(res.user, { displayName: name });
+        console.log(res);
+      } catch (error) {
         throw new Error("could not complete signup");
       }
     },
+    // async addUser() {
+
+    // },
     async login({ commit }, { email, password }) {
-      const res = await signInWithEmailAndPassword(auth, email, password);
-      if (res) {
-        commit("SET_USER", res.user);
-        localStorage.setItem("uid", JSON.stringify({ uid: res.user.uid }));
-      } else {
-        throw new Error("could not complete login");
-      }
+      const response = await signInWithEmailAndPassword(auth, email, password);
+      console.log(response);
+
+      // const res = await signInWithEmailAndPassword(auth, email, password);
+      // if (res) {
+      //   commit("SET_USER", res.user);
+      //   localStorage.setItem("uid", JSON.stringify({ uid: res.user.uid }));
+      // } else {
+      //   throw new Error("could not complete login");
+      // }
     },
     async logout({ commit }) {
       await signOut(auth);
