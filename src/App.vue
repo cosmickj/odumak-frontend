@@ -1,24 +1,17 @@
 <template>
-  <router-view />
-  <!-- <Navbar v-if="isNavbar"></Navbar> -->
+  <section class="min-h-screen flex">
+    <main class="flex-grow-1 flex justify-content-center align-items-center">
+      <router-view />
+    </main>
+  </section>
 </template>
 
-<script setup lang="ts">
-import { computed } from "vue";
-import { useRouter } from "vue-router";
-import Navbar from "@/components/Navbar.vue";
+<script setup lang="ts"></script>
 
-const router = useRouter();
-
-const isNavbar = computed(() => {
-  if (
-    router.currentRoute.value.path === "/" ||
-    router.currentRoute.value.path === "/login" ||
-    router.currentRoute.value.path === "/signup"
-  ) {
-    return false;
-  } else {
-    return true;
+<style scoped>
+@media (min-width: 451px) {
+  main {
+    background-color: var(--surface-100) !important;
   }
-});
-</script>
+}
+</style>

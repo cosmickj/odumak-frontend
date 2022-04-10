@@ -46,10 +46,10 @@
 <script setup lang="ts">
 import { reactive, ref } from "vue";
 import { useStore } from "vuex";
-import { useRouter } from "vue-router";
+// import { useRouter } from "vue-router";
 
 const store = useStore();
-const router = useRouter();
+// const router = useRouter();
 
 const errorMessage = ref(null);
 const initLoginForm = {
