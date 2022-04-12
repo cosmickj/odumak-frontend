@@ -1,10 +1,10 @@
 <template>
-  <div id="daily-attendance" v-if="userInfo">
+  <div id="daily-attendance">
     <div class="daily-attendance__container">
       <div class="flex justify-content-between align-items-center">
         <h2 class="title">일일 출석 확인</h2>
         <span>3-1</span>
-        <span>{{ userInfo.name }} 선생님</span>
+        <!-- <span>{{ userInfo.name }} 선생님</span> -->
       </div>
 
       <div class="calendar__container pt-10">

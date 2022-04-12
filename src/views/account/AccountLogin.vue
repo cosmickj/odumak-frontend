@@ -35,7 +35,7 @@
         class="mx-7 mt-4 mb-2 flex justify-content-evenly align-items-center"
       >
         <span>계정이 없으신가요?</span>
-        <router-link :to="{ name: 'SignupPage' }">
+        <router-link :to="{ name: 'AccountSignup' }">
           <span class="text-yellow-500 font-bold">회원가입</span>
         </router-link>
       </div>

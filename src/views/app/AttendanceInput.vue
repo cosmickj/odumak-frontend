@@ -1,10 +1,10 @@
 <template>
-  <div id="input-attendance" v-if="userInfo">
+  <div id="input-attendance">
     <div class="input-attendance__container">
       <div class="title__container">
         <span class="title">출석 입력하기</span>
         <span class="fz-16">3-1</span>
-        <span class="fz-16">{{ userInfo.name }} 선생님</span>
+        <!-- <span class="fz-16">{{ userInfo.name }} 선생님</span> -->
       </div>
 
       <div class="calendar__container pt-10">
@@ -22,8 +22,12 @@
         v-if="attendanceDate && studentsAttendanceStatus"
         @submit.prevent="onSubmit"
       >
-        <Teacher v-model="teacherAttendanceStatus"></Teacher>
-        <Students v-model="studentsAttendanceStatus"></Students>
+        <AttendanceInputTeacher
+          v-model="teacherAttendanceStatus"
+        ></AttendanceInputTeacher>
+        <AttendanceInputStudents
+          v-model="studentsAttendanceStatus"
+        ></AttendanceInputStudents>
 
         <Button
           v-if="!attendanceRecord"
@@ -39,7 +43,7 @@
         />
       </form>
 
-      <FingerUpper v-else></FingerUpper>
+      <AppFingerUpper v-else></AppFingerUpper>
     </div>
   </div>
 </template>
@@ -48,16 +52,16 @@
 import { computed, defineComponent, ref } from "vue";
 import { useStore } from "vuex";
 import Student from "@/types/Student";
-import FingerUpper from "@/components/FingerUpper.vue";
-import Teacher from "@/views/InputAttendance/Teacher.vue";
-import Students from "@/views/InputAttendance/Students.vue";
+import AppFingerUpper from "@/components/AppFingerUpper.vue";
+import AttendanceInputTeacher from "@/components/AttendanceInputTeacher.vue";
+import AttendanceInputStudents from "@/components/AttendanceInputStudents.vue";
 
 export default defineComponent({
   name: "InputAttendanceLayout",
   components: {
-    FingerUpper,
-    Teacher,
-    Students,
+    AppFingerUpper,
+    AttendanceInputTeacher,
+    AttendanceInputStudents,
   },
   setup() {
     const store = useStore();

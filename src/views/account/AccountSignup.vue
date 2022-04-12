@@ -108,7 +108,7 @@
         class="mx-7 mt-4 mb-2 flex justify-content-evenly align-items-center"
       >
         <span>계정이 있으신가요?</span>
-        <router-link :to="{ name: 'LoginPage' }">
+        <router-link :to="{ name: 'AccountLogin' }">
           <span class="text-yellow-500 font-bold">로그인</span>
         </router-link>
       </div>

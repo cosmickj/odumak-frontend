@@ -14,62 +14,73 @@ const fetchUserInfo =
     return next();
   };
 
+//   {
+//     beforeEnter: fetchUserInfo(),
+//     path: "/daily-attendance",
+//     name: "DailyAttendance",
+//     component: () => import("@/views/DailyAttendance/Layout.vue"),
+//     // meta: { requiresAuth: true },
+//   },
+
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
-    redirect: "/main",
+    name: "AppView",
+    component: () => import("@/views/app/AppView.vue"),
+    children: [
+      {
+        path: "",
+        name: "AppHome",
+        component: () => import("@/views/app/AppHome.vue"),
+      },
+      {
+        path: "/user",
+        name: "AppUser",
+        component: () => import("@/views/app/AppUser.vue"),
+      },
+      {
+        path: "/attendance/input",
+        name: "AttendanceInput",
+        component: () => import("@/views/app/AttendanceInput.vue"),
+      },
+      // {
+      //   path: "/attendance/student/daily",
+      //   name: "AttendanceStudentDaily",
+      //   component: "",
+      // },
+      // {
+      //   path: "/attendance/student/total",
+      //   name: "AttendanceStudentTotal",
+      //   component: "",
+      // },
+      // {
+      //   path: "/attendance/teacher/daily",
+      //   name: "AttendanceTeacherDaily",
+      //   component: "",
+      // },
+      // {
+      //   path: "/attendance/teacher/total",
+      //   name: "AttendanceTeacherTotal",
+      //   component: "",
+      // },
+    ],
   },
   {
     path: "/account",
-    name: "AccountPage",
-    component: () => import("@/views/Account/LayoutPage.vue"),
+    name: "AccountView",
+    component: () => import("@/views/account/AccountView.vue"),
     children: [
       {
-        path: "login",
-        name: "LoginPage",
-        component: () => import("@/views/Account/LoginPage.vue"),
-        // meta: { requiresUnauth: true },
+        path: "/account/signup",
+        name: "AccountSignup",
+        component: () => import("@/views/account/AccountSignup.vue"),
       },
       {
-        path: "signup",
-        name: "SignupPage",
-        component: () => import("@/views/Account/SignupPage.vue"),
-        // meta: { requiresUnauth: true },
+        path: "/account/login",
+        name: "AccountLogin",
+        component: () => import("@/views/account/AccountLogin.vue"),
       },
     ],
-  },
-  // {
-  //   path: "/signup",
-  //   name: "SignupPage",
-  //   component: () => import("@/views/SignupPage.vue"),
-  //   meta: { requiresUnauth: true },
-  // },
-  {
-    beforeEnter: fetchUserInfo(),
-    path: "/main",
-    name: "MainPage",
-    component: () => import("@/views/MainPage.vue"),
-    // meta: { requiresAuth: true },
-  },
-  {
-    beforeEnter: fetchUserInfo(),
-    path: "/input",
-    name: "InputAttendance",
-    component: () => import("@/views/InputAttendance/Layout.vue"),
-    // meta: { requiresAuth: true },
-  },
-  {
-    beforeEnter: fetchUserInfo(),
-    path: "/daily-attendance",
-    name: "DailyAttendance",
-    component: () => import("@/views/DailyAttendance/Layout.vue"),
-    // meta: { requiresAuth: true },
-  },
-  {
-    path: "/total-attendance",
-    name: "TotalAttendance",
-    component: () => import("@/views/TotalAttendance.vue"),
-    // meta: { requiresAuth: true },
   },
 ];
 
