@@ -95,7 +95,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-#input-attendance {
+/* #input-attendance {
   min-height: 100vh;
   max-height: 100vh;
   overflow: auto;
@@ -109,5 +109,5 @@ export default defineComponent({
   justify-content: space-between;
   font-size: 1.6rem;
   color: var(--color-black);
-}
+} */
 </style>
