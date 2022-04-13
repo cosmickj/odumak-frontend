@@ -1,7 +1,9 @@
 <template>
-  <main class="main">
+  <div
+    class="container flex-grow-1 w-screen h-full overflow-auto border-round-top"
+  >
     <router-view></router-view>
-  </main>
+  </div>
   <AppNavbar></AppNavbar>
 </template>
 
@@ -10,8 +12,10 @@ import AppNavbar from "@/components/AppNavbar.vue";
 </script>
 
 <style scoped>
-.main {
-  /* display: flex; */
-  height: calc(100vh - 50px);
+@media (min-width: 450px) {
+  .container {
+    max-width: 350px !important;
+    max-height: 600px !important;
+  }
 }
 </style>

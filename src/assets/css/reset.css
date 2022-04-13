@@ -32,7 +32,4 @@ input[type="date"],
 textarea { -webkit-appearance:none; -moz-appearance:none; appearance:none; -webkit-border-radius:0; outline:0;}
 textarea { resize: none;}
 
-.router-link-exact-active, .router-link-active { color: var(--color-basic) !important; }
-.calendar__container > span > .p-button,
-.calendar__container > span > .p-button:hover,
-.calendar__container > span > .p-button:active { background: var(--color-yellow); border: 1px solid var(--color-yellow); color: var(--color-black); }
+/* .router-link-exact-active, .router-link-active { color: var(--color-basic) !important; } */

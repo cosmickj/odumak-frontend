@@ -14,6 +14,7 @@ export interface UserState {
   info: any;
   authIsReady: any;
 }
+
 export const user: Module<UserState, RootState> = {
   namespaced: true,
   state: () => ({
@@ -57,6 +58,7 @@ export const user: Module<UserState, RootState> = {
       //   throw new Error("could not complete login");
       // }
     },
+
     async logout({ commit }) {
       await signOut(auth);
       commit("SET_USER", null);

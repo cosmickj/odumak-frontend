@@ -1,5 +1,5 @@
 <template>
-  <div class="content flex-grow-1 w-screen h-full overflow-auto bg-yellow-500">
+  <div class="bg-yellow-500 h-full">
     <div class="p-5">
       <div class="text-2xl">안녕하세요,</div>
       <div class="text-4xl">이경준 선생님!</div>
@@ -81,14 +81,5 @@ import Card from "primevue/card";
 }
 .p-card-title {
   text-align: center;
-}
-</style>
-
-<style scoped>
-@media (min-width: 450px) {
-  .content {
-    max-width: 350px !important;
-    max-height: 600px !important;
-  }
 }
 </style>
