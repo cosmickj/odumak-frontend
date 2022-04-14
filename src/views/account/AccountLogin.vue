@@ -46,10 +46,10 @@
 <script setup lang="ts">
 import { reactive, ref } from "vue";
 import { useStore } from "vuex";
-// import { useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 
 const store = useStore();
-// const router = useRouter();
+const router = useRouter();
 
 const errorMessage = ref(null);
 const initLoginForm = {
@@ -60,8 +60,8 @@ const loginForm = reactive({ ...initLoginForm });
 
 const onSubmit = async () => {
   try {
-    await store.dispatch("user/login", loginForm);
-    // router.push("/main");
+    await store.dispatch("account/login", loginForm);
+    router.push({ name: "AppHome" });
   } catch (error: any) {
     errorMessage.value = error.message;
   }

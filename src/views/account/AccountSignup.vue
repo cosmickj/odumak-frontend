@@ -120,13 +120,11 @@
 import { reactive, ref } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
-import { db } from "@/firebase/config";
-import { doc, serverTimestamp, setDoc } from "@firebase/firestore";
 import RadioButton from "primevue/radiobutton";
 import Dropdown from "primevue/dropdown";
 import Password from "primevue/password";
 
-const group = ref([
+const group = [
   { name: "1반", value: "1" },
   { name: "2반", value: "2" },
   { name: "3반", value: "3" },
@@ -137,19 +135,14 @@ const group = ref([
   { name: "8반", value: "8" },
   { name: "9반", value: "9" },
   { name: "10반", value: "10" },
-]);
-const emails = ref([
+];
+const emails = [
   "@gmail.com",
   "@naver.com",
   "@hotmail.com",
   "@yahoo.com",
   "@outlook.com",
-]);
-const confirmedPassword = ref("");
-
-const store = useStore();
-const router = useRouter();
-
+];
 const initSignupForm = {
   email: "",
   password: "",
@@ -158,6 +151,10 @@ const initSignupForm = {
   group: "",
 };
 const signupForm = reactive({ ...initSignupForm });
+const confirmedPassword = ref("");
+
+const store = useStore();
+const router = useRouter();
 
 const appendEmail = (email: string) => {
   const asperand = signupForm.email.indexOf("@");
@@ -170,31 +167,20 @@ const appendEmail = (email: string) => {
 };
 
 const onSubmit = async () => {
-  if (signupForm.password !== confirmedPassword.value) {
-    alert("비밀번호가 일치하지 않습니다.");
-  } else {
-    await store.dispatch("user/signup", signupForm);
-    router.push({ name: "LoginPage" });
+  try {
+    if (signupForm.password !== confirmedPassword.value) {
+      alert("비밀번호가 일치하지 않습니다.");
+    } else {
+      const signupResult = await store.dispatch("account/signup", signupForm);
+      await store.dispatch("account/createUser", {
+        uid: signupResult.user.uid,
+        ...signupForm,
+      });
+      router.push({ name: "AccountLogin" });
+    }
+  } catch (error) {
+    console.log(error);
   }
-
-  // try {
-  //   const uid = await store.dispatch("user/signup", {
-  //     email: form.email,
-  //     password: form.password,
-  //   });
-  //   await createUser(uid);
-  //   router.push("/login");
-  // } catch (error) {
-  //   console.log(error);
-  // }
-};
-
-const createUser = async (uid: string) => {
-  // await setDoc(doc(db, "users", uid), {
-  //   email: form.email,
-  //   name: form.name,
-  //   createdAt: serverTimestamp(),
-  // });
 };
 </script>
 

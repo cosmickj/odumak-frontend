@@ -1,14 +1,9 @@
 import { Module } from "vuex";
-import { RootState } from "./index";
 import { attendancesCol, studentsCol } from "@/firebase/config";
 import { getDocs, onSnapshot, query, where } from "firebase/firestore";
+import { RootState, AttendanceState } from "@/store/types";
 import StudentAttendance from "@/types/StudentAttendance";
 
-export interface AttendanceState {
-  students: any;
-  record: any;
-  studentsDailyAttendance: StudentAttendance[];
-}
 export const attendance: Module<AttendanceState, RootState> = {
   namespaced: true,
   state: () => ({

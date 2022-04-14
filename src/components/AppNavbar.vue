@@ -14,7 +14,7 @@
       </div>
     </router-link>
 
-    <router-link to="#">
+    <router-link :to="{ name: 'AppUser' }">
       <div class="p-2">
         <i class="pi pi-user" style="font-size: 2rem"></i>
       </div>

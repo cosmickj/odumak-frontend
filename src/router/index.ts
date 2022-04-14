@@ -10,19 +10,37 @@ import store from "@/store";
 
 const fetchUserInfo =
   () => (to: RouteLocation, from: RouteLocation, next: NavigationGuardNext) => {
-    store.dispatch("user/fetchUserInfo");
+    store.dispatch("account/fetchUserInfo");
     return next();
   };
 
-//   {
-//     beforeEnter: fetchUserInfo(),
-//     path: "/daily-attendance",
-//     name: "DailyAttendance",
-//     component: () => import("@/views/DailyAttendance/Layout.vue"),
-//     // meta: { requiresAuth: true },
-//   },
-
+/*
+{
+  beforeEnter: fetchUserInfo(),
+  path: "/daily-attendance",
+  name: "DailyAttendance",
+  component: () => import("@/views/DailyAttendance/Layout.vue"),
+    meta: { requiresAuth: true },
+},
+*/
 const routes: Array<RouteRecordRaw> = [
+  {
+    path: "/account",
+    name: "AccountView",
+    component: () => import("@/views/account/AccountView.vue"),
+    children: [
+      {
+        path: "/account/signup",
+        name: "AccountSignup",
+        component: () => import("@/views/account/AccountSignup.vue"),
+      },
+      {
+        path: "/account/login",
+        name: "AccountLogin",
+        component: () => import("@/views/account/AccountLogin.vue"),
+      },
+    ],
+  },
   {
     path: "/",
     name: "AppView",
@@ -63,23 +81,6 @@ const routes: Array<RouteRecordRaw> = [
       //   name: "AttendanceTeacherTotal",
       //   component: "",
       // },
-    ],
-  },
-  {
-    path: "/account",
-    name: "AccountView",
-    component: () => import("@/views/account/AccountView.vue"),
-    children: [
-      {
-        path: "/account/signup",
-        name: "AccountSignup",
-        component: () => import("@/views/account/AccountSignup.vue"),
-      },
-      {
-        path: "/account/login",
-        name: "AccountLogin",
-        component: () => import("@/views/account/AccountLogin.vue"),
-      },
     ],
   },
 ];
