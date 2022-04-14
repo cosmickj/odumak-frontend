@@ -47,7 +47,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, PropType } from "vue";
-import Student from "@/types/Student";
+import { Student } from "@/types/index";
 
 export default defineComponent({
   name: "StudentsAttendanceStatus",
