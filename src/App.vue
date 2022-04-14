@@ -1,31 +1,23 @@
 <template>
-  <div>
-    <router-view />
-    <NavButton v-if="showsNavButton"></NavButton>
-  </div>
+  <main class="min-h-screen flex">
+    <section class="flex-grow-1 flex justify-content-center align-items-center">
+      <div
+        class="wrapper flex-grow-1 flex flex-column justify-content-center w-screen h-screen surface-0 border-round"
+      >
+        <router-view></router-view>
+      </div>
+    </section>
+  </main>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent } from "vue";
-import { useRouter } from "vue-router";
-import NavButton from "@/components/NavButton.vue";
-
-export default defineComponent({
-  components: { NavButton },
-  setup() {
-    const router = useRouter();
-    return {
-      showsNavButton: computed(() => {
-        if (
-          router.currentRoute.value.path === "/" ||
-          router.currentRoute.value.path === "/login" ||
-          router.currentRoute.value.path === "/signup" ||
-          router.currentRoute.value.path === "/main"
-        )
-          return false;
-        else return true;
-      }),
-    };
-  },
-});
-</script>
+<style scoped>
+@media (min-width: 450px) {
+  main {
+    background-color: var(--surface-200) !important;
+  }
+  .wrapper {
+    max-width: 350px !important;
+    max-height: 600px !important;
+  }
+}
+</style>

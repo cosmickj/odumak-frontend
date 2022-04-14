@@ -4,8 +4,8 @@ import "./registerServiceWorker";
 import store from "./store";
 import router from "./router";
 // Global Styles
-import "@/css/reset.css";
-import "@/css/style.css";
+import "@/assets/css/reset.css";
+import "@/assets/css/style.css";
 // PrimeVue
 import PrimeVue from "primevue/config";
 import "primevue/resources/themes/saga-blue/theme.css";
@@ -16,6 +16,8 @@ import InputText from "primevue/inputtext";
 import Calendar from "primevue/calendar";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
+import TabView from "primevue/tabview";
+import TabPanel from "primevue/tabpanel";
 // PrimeFlex
 import "/node_modules/primeflex/primeflex.css";
 
@@ -26,6 +28,8 @@ createApp(App)
   .component("Calendar", Calendar)
   .component("DataTable", DataTable)
   .component("Column", Column)
+  .component("TabView", TabView)
+  .component("TabPanel", TabPanel)
   .use(store)
   .use(router)
   .mount("#app");

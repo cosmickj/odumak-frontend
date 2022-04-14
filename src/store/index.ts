@@ -1,25 +1,32 @@
 import { createStore } from "vuex";
-import { auth } from "@/firebase/config";
 import { onAuthStateChanged } from "firebase/auth";
-import { user, UserState } from "./user";
-import { attendance, AttendanceState } from "./attendance";
-
-export interface RootState {
-  User: UserState;
-  Attendance: AttendanceState;
-}
+import { auth } from "@/firebase/config";
+// Modules
+import { account } from "./account";
+import { attendance } from "./attendance";
 
 const store = createStore({
   modules: {
+    account,
     attendance,
-    user,
   },
 });
 
 // Waiting for Auth to be Ready
-const unsub = onAuthStateChanged(auth, (user) => {
-  store.commit("user/SET_AUTH_IS_READY", true);
-  store.commit("user/SET_USER", user);
+const unsub = onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    const fetchUserResult = await store.dispatch(
+      "account/fetchUser",
+      user?.uid
+    );
+    store.commit("account/SET_USER", {
+      name: user?.displayName,
+      email: user?.email,
+      uid: user?.uid,
+      ...fetchUserResult,
+    });
+    store.commit("account/SET_AUTH_IS_READY", true);
+  }
   unsub();
 });
 
