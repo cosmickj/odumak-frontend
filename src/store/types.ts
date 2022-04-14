@@ -1,4 +1,4 @@
-import StudentAttendance from "@/types/StudentAttendance";
+import { StudentAttendance } from "@/types/index";
 
 export interface RootState {
   User: AccountState;

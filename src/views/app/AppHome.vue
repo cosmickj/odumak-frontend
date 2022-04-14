@@ -2,7 +2,7 @@
   <div class="bg-yellow-500 h-full">
     <div class="p-5">
       <div class="text-2xl">안녕하세요,</div>
-      <div class="text-4xl">이경준 선생님!</div>
+      <div class="text-4xl" v-if="authIsReady">{{ userName }} 선생님!</div>
     </div>
 
     <div class="p-5">
@@ -67,6 +67,12 @@
 
 <script setup lang="ts">
 import Card from "primevue/card";
+import { computed } from "vue";
+import { useStore } from "vuex";
+
+const store = useStore();
+const authIsReady = computed(() => store.state.account.authIsReady);
+const userName = computed(() => store.state.account.user.name);
 </script>
 
 <style>
