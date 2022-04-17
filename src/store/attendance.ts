@@ -1,6 +1,6 @@
 import { Module } from "vuex";
-import { attendancesCol, studentsCol } from "@/firebase/config";
-import { addDoc, getDocs, query, where } from "firebase/firestore";
+import { attendancesCol, db, studentsCol } from "@/firebase/config";
+import { addDoc, doc, getDocs, query, setDoc, where } from "firebase/firestore";
 import { RootState, AttendanceState } from "@/store/types";
 import { Student } from "@/types/index";
 
@@ -14,12 +14,16 @@ const sortByName = (assignedStudents: Student[]) => {
 export const attendance: Module<AttendanceState, RootState> = {
   namespaced: true,
   state: () => ({
-    students: null,
+    students: [],
+    hasRecord: false,
   }),
 
   mutations: {
     SET_STUDENTS(state, payload) {
       state.students = payload;
+    },
+    SET_HAS_RECORD(state, payload) {
+      state.hasRecord = payload;
     },
   },
 
@@ -42,9 +46,11 @@ export const attendance: Module<AttendanceState, RootState> = {
         );
         assignedStudents = sortByName(assignedStudents);
         commit("SET_STUDENTS", assignedStudents);
+        commit("SET_HAS_RECORD", true);
       } else {
         // 출석 입력 기록 X
         dispatch("fetchStudents", { name, grade, group });
+        commit("SET_HAS_RECORD", false);
       }
     },
     async fetchStudents({ commit }, { name, grade, group }) {
@@ -69,8 +75,16 @@ export const attendance: Module<AttendanceState, RootState> = {
       commit("SET_STUDENTS", assignedStudents);
     },
     async addStudentsAttendanceStatus(_context, payload) {
-      for (const studenAttendanceStatus of payload) {
-        await addDoc(attendancesCol, studenAttendanceStatus);
+      if (!payload[0].id) {
+        for (const studenAttendanceStatus of payload) {
+          await addDoc(attendancesCol, studenAttendanceStatus);
+        }
+      } else {
+        for (const studenAttendanceStatus of payload) {
+          await setDoc(doc(db, "attendances", studenAttendanceStatus.id), {
+            ...studenAttendanceStatus,
+          });
+        }
       }
     },
 

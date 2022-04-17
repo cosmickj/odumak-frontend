@@ -22,7 +22,7 @@
       <AttendanceInputTeacher v-model="teacherAttendanceStatus" />
       <AttendanceInputStudents v-model="studentsAttendanceStatus" />
       <Button
-        v-if="!attendanceRecord"
+        v-if="!hasRecord"
         class="p-button-warning w-full mb-5"
         type="submit"
         label="제출하기"
@@ -54,7 +54,7 @@ const userGrade = computed(() => store.state.account.user.grade);
 const userGroup = computed(() => store.state.account.user.group);
 
 const attendanceDate = ref<Date>();
-const attendanceRecord = computed(() => store.state.attendance.record);
+const hasRecord = computed(() => store.state.attendance.hasRecord);
 
 const teacherAttendanceStatus = ref("online");
 const studentsAttendanceStatus = computed<Student[]>(
@@ -81,7 +81,12 @@ const onSubmit = async () => {
     "attendance/addStudentsAttendanceStatus",
     studentsAttendanceStatus.value
   );
-  alert("제출되었습니다.");
+  if (!hasRecord.value) {
+    store.commit("attendance/SET_HAS_RECORD", true);
+    alert("제출되었습니다.");
+  } else {
+    alert("수정되었습니다.");
+  }
 };
 </script>
 

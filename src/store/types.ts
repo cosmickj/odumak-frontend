@@ -1,4 +1,4 @@
-import { StudentAttendance } from "@/types/index";
+import { Student } from "@/types/index";
 
 export interface RootState {
   User: AccountState;
@@ -12,7 +12,8 @@ export interface AccountState {
 }
 
 export interface AttendanceState {
-  students: any;
+  students: Student[];
+  hasRecord: boolean;
   // record: any;
   // studentsDailyAttendance: StudentAttendance[];
 }
