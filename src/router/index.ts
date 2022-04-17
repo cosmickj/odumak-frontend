@@ -45,26 +45,30 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/views/app/AttendanceInput.vue"),
         meta: { requiresAuth: true },
       },
-      // {
-      //   path: "/attendance/student/daily",
-      //   name: "AttendanceStudentDaily",
-      //   component: "",
-      // },
-      // {
-      //   path: "/attendance/student/total",
-      //   name: "AttendanceStudentTotal",
-      //   component: "",
-      // },
-      // {
-      //   path: "/attendance/teacher/daily",
-      //   name: "AttendanceTeacherDaily",
-      //   component: "",
-      // },
-      // {
-      //   path: "/attendance/teacher/total",
-      //   name: "AttendanceTeacherTotal",
-      //   component: "",
-      // },
+      {
+        path: "/attendance/student/daily",
+        name: "AttendanceStudentDaily",
+        component: () => import("@/views/app/AttendanceStudentsDaily.vue"),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: "/attendance/student/total",
+        name: "AttendanceStudentTotal",
+        component: () => import("@/views/app/AttendanceStudentsTotal.vue"),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: "/attendance/teacher/daily",
+        name: "AttendanceTeacherDaily",
+        component: () => import("@/views/app/AttendanceTeachersDaily.vue"),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: "/attendance/teacher/total",
+        name: "AttendanceTeacherTotal",
+        component: () => import("@/views/app/AttendanceTeachersTotal.vue"),
+        meta: { requiresAuth: true },
+      },
     ],
   },
 ];

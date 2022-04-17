@@ -89,13 +89,3 @@ const onSubmit = async () => {
   }
 };
 </script>
-
-<style>
-.p-calendar > .p-button,
-.p-calendar > .p-button:hover,
-.p-calendar > .p-button:active {
-  background: var(--yellow-500);
-  border: 1px solid var(--yellow-500);
-  color: var(--text-color);
-}
-</style>

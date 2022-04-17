@@ -8,7 +8,7 @@
     <div class="p-5">
       <div class="flex pb-2">
         <!-- 학생 일일 출석 현황 -->
-        <router-link to="#" class="w-6">
+        <router-link :to="{ name: 'AttendanceStudentDaily' }" class="w-6">
           <Card class="mr-2">
             <template #title>
               <div><i class="pi pi-users" style="font-size: 2rem"></i></div>
@@ -20,7 +20,7 @@
         </router-link>
 
         <!-- 학생 누적 출석 현황 -->
-        <router-link to="#" class="w-6">
+        <router-link :to="{ name: 'AttendanceStudentTotal' }" class="w-6">
           <Card class="ml-2">
             <template #title>
               <div><i class="pi pi-users" style="font-size: 2rem"></i></div>
@@ -34,7 +34,7 @@
 
       <div class="flex pt-2">
         <!-- 교사 일일 출석 현황 -->
-        <router-link to="#" class="w-6">
+        <router-link :to="{ name: 'AttendanceTeacherDaily' }" class="w-6">
           <Card class="mr-2">
             <template #title>
               <div>
@@ -48,7 +48,7 @@
         </router-link>
 
         <!-- 교사 누적 출석 현황 -->
-        <router-link to="#" class="w-6">
+        <router-link :to="{ name: 'AttendanceTeacherTotal' }" class="w-6">
           <Card class="ml-2">
             <template #title>
               <div>
