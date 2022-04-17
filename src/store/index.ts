@@ -25,8 +25,8 @@ const unsub = onAuthStateChanged(auth, async (user) => {
       uid: user?.uid,
       ...fetchUserResult,
     });
-    store.commit("account/SET_AUTH_IS_READY", true);
   }
+  store.commit("account/SET_AUTH_IS_READY", true);
   unsub();
 });
 

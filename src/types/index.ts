@@ -1,13 +1,12 @@
 export interface Student {
+  id?: string;
   name: string;
   birth: string;
   attendance: string;
-  // address: string;
-  // class: string;
-  // createdAt: Date;
-  // gender: string;
-  // phone: string;
-  // teacher: string;
+  teacher?: string;
+  grade?: string;
+  group?: string;
+  date?: Date | string;
 }
 
 export interface StudentAttendance {

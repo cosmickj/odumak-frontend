@@ -70,8 +70,18 @@ const onAttendanceDateSelect = async () => {
   });
 };
 
-const onSubmit = () => {
-  console.log("submitted");
+const onSubmit = async () => {
+  studentsAttendanceStatus.value.forEach((student) => {
+    student["teacher"] = userName.value;
+    student["grade"] = userGrade.value;
+    student["group"] = userGroup.value;
+    student["date"] = attendanceDate.value;
+  });
+  await store.dispatch(
+    "attendance/addStudentsAttendanceStatus",
+    studentsAttendanceStatus.value
+  );
+  alert("제출되었습니다.");
 };
 </script>
 

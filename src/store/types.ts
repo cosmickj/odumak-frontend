@@ -13,6 +13,6 @@ export interface AccountState {
 
 export interface AttendanceState {
   students: any;
-  record: any;
-  studentsDailyAttendance: StudentAttendance[];
+  // record: any;
+  // studentsDailyAttendance: StudentAttendance[];
 }
