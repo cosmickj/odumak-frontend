@@ -35,7 +35,6 @@ export const attendance: Module<AttendanceState, RootState> = {
         where("date", "==", date)
       );
       const checkRecordResponse = await getDocs(q);
-
       if (checkRecordResponse.docs.length > 0) {
         // 출석 입력 기록 O
         let assignedStudents: Student[] = checkRecordResponse.docs.map(
@@ -53,6 +52,7 @@ export const attendance: Module<AttendanceState, RootState> = {
         commit("SET_HAS_RECORD", false);
       }
     },
+
     async fetchStudents({ commit }, { name, grade, group }) {
       let assignedStudents: Student[] = [];
       const q = query(
@@ -71,9 +71,9 @@ export const attendance: Module<AttendanceState, RootState> = {
         });
       });
       assignedStudents = sortByName(assignedStudents);
-
       commit("SET_STUDENTS", assignedStudents);
     },
+
     async addStudentsAttendanceStatus(_context, payload) {
       if (!payload[0].id) {
         for (const studenAttendanceStatus of payload) {
@@ -88,14 +88,24 @@ export const attendance: Module<AttendanceState, RootState> = {
       }
     },
 
-    // async fetchStudentsDailyAttendance({ commit }, { date }) {
-    //   const result: StudentAttendance[] = [];
-    //   const q = query(attendancesCol, where("date", "==", date));
-    //   const querySnapshot = await getDocs(q);
-    //   querySnapshot.forEach((doc) => {
-    //     result.push(...doc.data().students);
-    //   });
-    //   commit("SET_STUDENTS_DAILY_ATTENDANCE", result);
-    // },
+    async fetchAttendanceStudentDaily({ commit }, { date }) {
+      const querySnapshot = await getDocs(studentsCol);
+      const students = querySnapshot.docs.map((doc) => doc.data().name);
+
+      const q = query(attendancesCol, where("date", "==", date));
+      const response = await getDocs(q);
+      const records: Student[] = response.docs.map(
+        (doc) => doc.data() as Student
+      );
+      // records = sortByName(records);
+
+      for (const record of records) {
+        const index = students.indexOf(record.name);
+        if (index > -1) {
+          students.splice(index, 1);
+        }
+      }
+      commit("SET_STUDENTS", records);
+    },
   },
 };
