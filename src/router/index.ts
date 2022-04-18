@@ -4,8 +4,8 @@ import { getUserState } from "@/firebase/config";
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/account",
-    redirect: "/account/login",
     name: "AccountView",
+    redirect: "/account/login",
     component: () => import("@/views/account/AccountView.vue"),
     children: [
       {

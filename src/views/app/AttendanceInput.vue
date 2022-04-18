@@ -42,7 +42,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { useStore } from "vuex";
-import { Student } from "@/types/index";
+import { Student } from "@/store/types";
 import AppFingerUpper from "@/components/AppFingerUpper.vue";
 import AttendanceInputTeacher from "@/components/AttendanceInputTeacher.vue";
 import AttendanceInputStudents from "@/components/AttendanceInputStudents.vue";

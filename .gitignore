@@ -25,3 +25,4 @@ pnpm-debug.log*
 # 추가사항
 package-lock.json
 samples
+src/json

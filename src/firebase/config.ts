@@ -1,7 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { collection, getFirestore } from "firebase/firestore";
-// import { computed, onMounted, onUnmounted, ref } from "vue";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDPKREFtu36CcmILDCh2m5JQloFuKNyi0o",
@@ -17,34 +16,16 @@ const firebaseConfig = {
 initializeApp(firebaseConfig);
 
 // init firebase auth
-const auth = getAuth();
+export const auth = getAuth();
 
-// export const useAuthState = () => {
-//   const user = ref(null);
-//   const error = ref(null);
-//   let unsubscribe: any;
-//   onMounted(() => {
-//     unsubscribe = onAuthStateChanged(
-//       auth,
-//       (u) => (user.value = u),
-//       (e) => (error.value = e)
-//     );
-//   });
-//   onUnmounted(() => unsubscribe());
-//   const isAuthenticated = computed(() => user.value != null);
-//   return { user, error, isAuthenticated };
-// };
-
-// NOTE: onAuthStateChanged를 Promise 객체로 만들어서 async/await을 사용함
+// router auth checker
 export const getUserState = () =>
   new Promise((resolve, reject) => onAuthStateChanged(auth, resolve, reject));
 
 // init service
-const db = getFirestore();
-
+export const db = getFirestore();
 // collection ref
-const usersCol = collection(db, "users");
-const studentsCol = collection(db, "students");
-const attendancesCol = collection(db, "attendances");
-
-export { auth, db, usersCol, studentsCol, attendancesCol };
+export const usersCol = collection(db, "users");
+export const studentsCol = collection(db, "students");
+export const teachersCol = collection(db, "teachers");
+export const attendancesCol = collection(db, "attendances");

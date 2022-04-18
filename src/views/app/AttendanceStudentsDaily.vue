@@ -42,19 +42,20 @@
           </div>
         </div>
       </template> -->
+
       <Column header="학년반" :sortable="true">
-        <template #body="slotProps">
+        <!-- <template #body="slotProps">
           <span>{{ `${slotProps.data.grade}-${slotProps.data.group}` }}</span>
-        </template>
+        </template> -->
       </Column>
       <Column field="teacher" header="담임" :sortable="true"></Column>
       <Column field="name" header="학생" :sortable="true"></Column>
       <Column field="attendance" header="출결" :sortable="true">
-        <template #body="slotProps">
+        <!-- <template #body="slotProps">
           <span :class="`attendance-${slotProps.data.attendance}`">
             {{ convertKorean(slotProps.data.attendance) }}
           </span>
-        </template>
+        </template> -->
       </Column>
     </DataTable>
 
@@ -64,8 +65,8 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import AppFingerUpper from "@/components/AppFingerUpper.vue";
 import { useStore } from "vuex";
+import AppFingerUpper from "@/components/AppFingerUpper.vue";
 
 // import { FilterMatchMode } from "primevue/api";
 // interface Filter {
@@ -85,16 +86,16 @@ import { useStore } from "vuex";
 const store = useStore();
 
 const attendanceDate = ref<Date>();
+const studentsDailyAttendance = computed(() => store.state.attendance.students);
 
 const onAttendanceDateSelect = async () => {
+  if (store.state.attendance.teachers.length < 1) {
+    await store.dispatch("attendance/fetchTeachers");
+  }
   await store.dispatch("attendance/fetchAttendanceStudentDaily", {
     date: attendanceDate.value,
   });
 };
-
-const studentsDailyAttendance = computed(() => {
-  return store.state.attendance.students;
-});
 
 const convertKorean = (attendance: string) => {
   if (attendance === "online") return "온라인";
