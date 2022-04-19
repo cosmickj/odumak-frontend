@@ -30,4 +30,5 @@ export interface AttendanceState {
   students: Student[];
   teachers: Teacher[];
   hasRecord: boolean;
+  attendanceStudentsDaily: any;
 }
