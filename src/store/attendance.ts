@@ -128,7 +128,7 @@ export const attendance: Module<AttendanceState, RootState> = {
               teacher: student.teacher,
               name: student.name,
               birth: student.birth,
-              attendance: "미입력",
+              attendance: "none",
             };
             return temp;
           }
@@ -139,9 +139,9 @@ export const attendance: Module<AttendanceState, RootState> = {
   },
 };
 
-const sortByName = (assignedStudents: Student[]) => {
-  assignedStudents.sort((a, b) =>
-    a.name > b.name ? 1 : b.name > a.name ? -1 : 0
-  );
-  return assignedStudents;
-};
+// const sortByName = (assignedStudents: Student[]) => {
+//   assignedStudents.sort((a, b) =>
+//     a.name > b.name ? 1 : b.name > a.name ? -1 : 0
+//   );
+//   return assignedStudents;
+// };
