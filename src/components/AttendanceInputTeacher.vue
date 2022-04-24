@@ -7,6 +7,7 @@
       id="teacher-online"
       value="online"
       v-model="teacher"
+      @change="$emit('test', teacher)"
       class="attendance__input"
     />
     <label
@@ -20,6 +21,7 @@
       id="teacher-offline"
       value="offline"
       v-model="teacher"
+      @change="$emit('test', teacher)"
       class="attendance__input"
     />
     <label
@@ -31,30 +33,15 @@
   </div>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent } from "vue";
+<script setup lang="ts">
+import { ref } from "vue";
 
-export default defineComponent({
-  name: "TeacherAttendanceStatus",
-  props: {
-    modelValue: {
-      type: String,
-      required: true,
-    },
-  },
-  emits: ["update:modelValue"],
-  setup(props, { emit }) {
-    const teacher = computed({
-      get() {
-        return props.modelValue;
-      },
-      set(teacher) {
-        emit("update:modelValue", teacher);
-      },
-    });
-    return { teacher };
-  },
-});
+const props = defineProps<{
+  teacher: string;
+}>();
+// const emit = defineEmits(["test"]);
+
+const teacher = ref(props.teacher);
 </script>
 
 <style scoped>

@@ -21,9 +21,8 @@
       removableSort
       sortMode="single"
       sortField="teacher"
-      :sortOrder="1"
       scrollable
-      scrollHeight="calc(100vh - 230px)"
+      :sortOrder="1"
       :filters="filter"
     >
       <template #header>

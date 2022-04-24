@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex justify-content-evenly align-items-center h-5rem border-round shadow"
+    class="z-5 flex justify-content-evenly align-items-center h-5rem border-round shadow"
   >
     <router-link :to="{ name: 'AppHome' }">
       <div class="p-2">

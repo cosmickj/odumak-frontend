@@ -28,7 +28,7 @@ export interface Teacher {
 
 export interface AttendanceState {
   students: Student[];
-  teachers: Teacher[];
+  teacherAttendance: "online" | "offline";
   hasRecord: boolean;
   attendanceStudentsDaily: any;
 }

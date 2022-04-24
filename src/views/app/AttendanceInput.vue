@@ -19,8 +19,12 @@
       v-if="attendanceDate && studentsAttendanceStatus"
       @submit.prevent="onSubmit"
     >
-      <AttendanceInputTeacher v-model="teacherAttendanceStatus" />
+      <AttendanceInputTeacher
+        :teacher="teacherAttendanceStatus"
+        @test="testTeacher"
+      />
       <AttendanceInputStudents v-model="studentsAttendanceStatus" />
+
       <Button
         v-if="!hasRecord"
         class="p-button-warning w-full mb-5"
@@ -56,7 +60,12 @@ const userGroup = computed(() => store.state.account.user.group);
 const attendanceDate = ref<Date>();
 const hasRecord = computed(() => store.state.attendance.hasRecord);
 
-const teacherAttendanceStatus = ref("online");
+const teacherAttendanceStatus = computed(
+  () => store.state.attendance.teacherAttendance
+);
+const testTeacher = (result: string) => {
+  store.commit("attendance/SET_TEACHER_ATTENDANCE", result);
+};
 const studentsAttendanceStatus = computed<Student[]>(
   () => store.state.attendance.students
 );
@@ -71,21 +80,29 @@ const onAttendanceDateSelect = async () => {
 };
 
 const onSubmit = async () => {
-  studentsAttendanceStatus.value.forEach((student) => {
-    student["teacher"] = userName.value;
-    student["grade"] = userGrade.value;
-    student["group"] = userGroup.value;
-    student["date"] = attendanceDate.value;
+  await store.dispatch("attendance/addTeacherAttendanceStatus", {
+    name: userName.value,
+    grade: userGrade.value,
+    group: userGroup.value,
+    date: attendanceDate.value,
+    attendance: teacherAttendanceStatus.value,
   });
-  await store.dispatch(
-    "attendance/addStudentsAttendanceStatus",
-    studentsAttendanceStatus.value
-  );
-  if (!hasRecord.value) {
-    store.commit("attendance/SET_HAS_RECORD", true);
-    alert("제출되었습니다.");
-  } else {
-    alert("수정되었습니다.");
-  }
+
+  // studentsAttendanceStatus.value.forEach((student) => {
+  //   student["teacher"] = userName.value;
+  //   student["grade"] = userGrade.value;
+  //   student["group"] = userGroup.value;
+  //   student["date"] = attendanceDate.value;
+  // });
+  // await store.dispatch(
+  //   "attendance/addStudentsAttendanceStatus",
+  //   studentsAttendanceStatus.value
+  // );
+  // if (!hasRecord.value) {
+  //   store.commit("attendance/SET_HAS_RECORD", true);
+  //   alert("제출되었습니다.");
+  // } else {
+  //   alert("수정되었습니다.");
+  // }
 };
 </script>
