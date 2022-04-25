@@ -23,7 +23,7 @@
       <AttendanceInputStudents v-model="studentsAttendanceStatus" />
 
       <Button
-        v-if="!hasRecord"
+        v-if="!recordId"
         class="p-button-warning w-full mb-5"
         type="submit"
         label="제출하기"
@@ -54,7 +54,7 @@ const userName = computed(() => store.state.account.user.name);
 const userGrade = computed(() => store.state.account.user.grade);
 const userGroup = computed(() => store.state.account.user.group);
 
-const hasRecord = computed(() => store.state.attendance.hasRecord);
+const recordId = ref("");
 const attendanceDate = ref<Date>();
 const studentsAttendanceStatus = ref<Student[]>([]);
 const teacherAttendanceStatus = computed(
@@ -68,12 +68,14 @@ const onAttendanceDateSelect = async () => {
     group: userGroup.value,
     date: attendanceDate.value,
   });
-  result.forEach((element: Student) => {
+
+  result.attendances.forEach((element: Student) => {
     if (!element.attendance) {
       element.attendance = "offline";
     }
   });
-  studentsAttendanceStatus.value = result;
+  recordId.value = result.id;
+  studentsAttendanceStatus.value = result.attendances;
 };
 
 const onSubmit = async () => {
@@ -89,27 +91,18 @@ const onSubmit = async () => {
     date: attendanceDate.value,
     grade: userGrade.value,
     group: userGroup.value,
-    attendance: studentsAttendanceStatus.value,
-    hasRecord: hasRecord.value,
+    teacher: userName.value,
+    attendances: studentsAttendanceStatus.value,
+    recordId: recordId.value,
   };
 
   await store.dispatch("attendance/addStudentsAttendanceStatus", params);
 
-  // studentsAttendanceStatus.value.forEach((student) => {
-  //   student["teacher"] = userName.value;
-  //   student["grade"] = userGrade.value;
-  //   student["group"] = userGroup.value;
-  //   student["date"] = attendanceDate.value;
-  // });
-  // await store.dispatch(
-  //   "attendance/addStudentsAttendanceStatus",
-  //   studentsAttendanceStatus.value
-  // );
-  // if (!hasRecord.value) {
-  //   store.commit("attendance/SET_HAS_RECORD", true);
-  //   alert("제출되었습니다.");
-  // } else {
-  //   alert("수정되었습니다.");
-  // }
+  if (!recordId.value) {
+    recordId.value = "submit success";
+    alert("제출되었습니다.");
+  } else {
+    alert("수정되었습니다.");
+  }
 };
 </script>

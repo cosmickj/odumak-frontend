@@ -116,21 +116,12 @@ export const attendance: Module<AttendanceState, RootState> = {
     // },
 
     async addStudentsAttendanceStatus(context, payload) {
-      if (payload.hasRecord) {
-        console.log("수정하기");
-        // for (const studenAttendanceStatus of payload) {
-        //   await addDoc(studentAttendancesCol, studenAttendanceStatus);
-        // }
+      if (payload.recordId) {
+        const id = payload.recordId;
+        delete payload.recordId;
+        await setDoc(doc(db, "studentAttendances", id), payload);
       } else {
-        console.log("제출하기");
-        // for (const studenAttendanceStatus of payload) {
-        //   await setDoc(
-        //     doc(db, "studentAttendances", studenAttendanceStatus.id),
-        //     {
-        //       ...studenAttendanceStatus,
-        //     }
-        //   );
-        // }
+        await addDoc(studentAttendancesCol, payload);
       }
     },
 
@@ -150,33 +141,34 @@ export const attendance: Module<AttendanceState, RootState> = {
 
       // 입력된 출석현황이 있어서 그 결과를 붙여줌
       if (fetchStudentAttendancesResponse.docs.length > 0) {
-        context.commit("SET_HAS_RECORD", true);
-        const fetchStudentAttendancesResult =
-          fetchStudentAttendancesResponse.docs.map((doc) => ({
-            teacher: doc.data().teacher,
-            grade: doc.data().grade,
-            group: doc.data().group,
-            name: doc.data().name,
-            attendance: doc.data().attendance,
-          }));
+        const fetchStudentAttendancesResult = {
+          id: fetchStudentAttendancesResponse.docs[0].id,
+          attendances: [
+            ...fetchStudentAttendancesResponse.docs[0].data().attendances,
+          ],
+        };
         return fetchStudentAttendancesResult;
       }
       // 입력된 출석현황이 없기에 그 결과를 담아줄 템플릿을 건네줌
       else {
-        context.commit("SET_HAS_RECORD", false);
         const fetchStudentsByClassResponse = await context.dispatch(
           "fetchStudentsByClass",
           payload
         );
         // 템플릿 만들어주기
-        const fetchStudentAttendancesResult =
-          fetchStudentsByClassResponse.docs.map((doc) => ({
+        const attendancesTemplate = fetchStudentsByClassResponse.docs.map(
+          (doc) => ({
             teacher: doc.data().teacher,
             grade: doc.data().grade,
             group: doc.data().group,
             name: doc.data().name,
             attendance: "",
-          }));
+          })
+        );
+        const fetchStudentAttendancesResult = {
+          id: "",
+          attendances: attendancesTemplate,
+        };
         return fetchStudentAttendancesResult;
       }
     },
