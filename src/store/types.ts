@@ -5,7 +5,6 @@ export interface RootState {
 
 export interface AccountState {
   user: any;
-  // account: any;
   authIsReady: any;
 }
 

@@ -19,10 +19,7 @@
       v-if="attendanceDate && studentsAttendanceStatus"
       @submit.prevent="onSubmit"
     >
-      <AttendanceInputTeacher
-        :teacher="teacherAttendanceStatus"
-        @test="testTeacher"
-      />
+      <AttendanceInputTeacher :teacher="teacherAttendanceStatus" />
       <AttendanceInputStudents v-model="studentsAttendanceStatus" />
 
       <Button
@@ -57,36 +54,46 @@ const userName = computed(() => store.state.account.user.name);
 const userGrade = computed(() => store.state.account.user.grade);
 const userGroup = computed(() => store.state.account.user.group);
 
-const attendanceDate = ref<Date>();
 const hasRecord = computed(() => store.state.attendance.hasRecord);
-
+const attendanceDate = ref<Date>();
+const studentsAttendanceStatus = ref<Student[]>([]);
 const teacherAttendanceStatus = computed(
   () => store.state.attendance.teacherAttendance
 );
-const testTeacher = (result: string) => {
-  store.commit("attendance/SET_TEACHER_ATTENDANCE", result);
-};
-const studentsAttendanceStatus = computed<Student[]>(
-  () => store.state.attendance.students
-);
 
 const onAttendanceDateSelect = async () => {
-  await store.dispatch("attendance/checkRecord", {
+  const result = await store.dispatch("attendance/fetchStudentAttendances", {
     name: userName.value,
     grade: userGrade.value,
     group: userGroup.value,
     date: attendanceDate.value,
   });
+  result.forEach((element: Student) => {
+    if (!element.attendance) {
+      element.attendance = "offline";
+    }
+  });
+  studentsAttendanceStatus.value = result;
 };
 
 const onSubmit = async () => {
-  await store.dispatch("attendance/addTeacherAttendanceStatus", {
-    name: userName.value,
+  // await store.dispatch("attendance/addTeacherAttendanceStatus", {
+  //   name: userName.value,
+  //   grade: userGrade.value,
+  //   group: userGroup.value,
+  //   date: attendanceDate.value,
+  //   attendance: teacherAttendanceStatus.value,
+  // });
+
+  const params = {
+    date: attendanceDate.value,
     grade: userGrade.value,
     group: userGroup.value,
-    date: attendanceDate.value,
-    attendance: teacherAttendanceStatus.value,
-  });
+    attendance: studentsAttendanceStatus.value,
+    hasRecord: hasRecord.value,
+  };
+
+  await store.dispatch("attendance/addStudentsAttendanceStatus", params);
 
   // studentsAttendanceStatus.value.forEach((student) => {
   //   student["teacher"] = userName.value;

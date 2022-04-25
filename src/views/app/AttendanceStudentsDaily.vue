@@ -12,9 +12,9 @@
     />
 
     <DataTable
-      v-if="attendanceDate"
+      v-if="attendanceDate && !isLoading"
       ref="dt"
-      :value="customers"
+      :value="finalResult"
       class="p-datatable-sm pt-5"
       rowGroupMode="subheader"
       groupRowsBy="teacher"
@@ -93,7 +93,7 @@
       </template>
     </DataTable>
 
-    <AppFingerUpper v-else class="pt-5" />
+    <AppFingerUpper v-else-if="!attendanceDate && isLoading" class="pt-5" />
   </div>
 </template>
 
@@ -102,6 +102,7 @@ import { computed, ref } from "vue";
 import { useStore } from "vuex";
 import { FilterMatchMode } from "primevue/api";
 import AppFingerUpper from "@/components/AppFingerUpper.vue";
+import totalClassesData from "@/json/total-classes-2022.json";
 
 interface Filter {
   global: {
@@ -122,12 +123,12 @@ const customers = computed(
   () => store.state.attendance.attendanceStudentsDaily
 );
 
-const onAttendanceDateSelect = async () => {
-  await store.dispatch("attendance/fetchStudents");
-  await store.dispatch("attendance/fetchAttendanceStudentsDaily", {
-    date: attendanceDate.value,
-  });
-};
+// const onAttendanceDateSelect = async () => {
+//   await store.dispatch("attendance/fetchStudents");
+//   await store.dispatch("attendance/fetchAttendanceStudentsDaily", {
+//     date: attendanceDate.value,
+//   });
+// };
 
 const translateAttendance = (attendance: string) => {
   if (attendance === "online") return "온라인";
@@ -144,6 +145,30 @@ const calculateCustomerTotal = (name: string) => {
     }
   }
   return total;
+};
+
+// 리팩토링
+const isLoading = ref(true);
+const totalClasses = totalClassesData;
+const finalResult = ref([]);
+
+const onAttendanceDateSelect = async () => {
+  isLoading.value = true;
+  finalResult.value = [];
+
+  for (let { grade, group } of totalClasses) {
+    const params = {
+      date: attendanceDate.value,
+      grade,
+      group,
+    };
+    const result = await store.dispatch(
+      "attendance/fetchStudentAttendances",
+      params
+    );
+    finalResult.value.push(...result);
+  }
+  isLoading.value = false;
 };
 </script>
 
