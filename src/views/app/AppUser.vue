@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="p-5 h-full flex flex-column justify-content-center align-items-center"
-  >
+  <div class="p-5 h-full flex flex-column justify-content-center align-items-center">
     <div class="pb-5 text-center">
       <h1>마이 페이지</h1>
       <div>아직 준비중입니다</div>

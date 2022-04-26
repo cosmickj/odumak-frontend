@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="container flex-grow-1 w-screen h-full overflow-auto border-round-top"
-  >
+  <div class="container flex-grow-1 w-screen h-full overflow-auto border-round-top">
     <router-view></router-view>
   </div>
   <AppNavbar></AppNavbar>

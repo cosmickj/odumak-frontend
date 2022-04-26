@@ -38,38 +38,17 @@
           <div class="flex justify-content-end align-items-center">
             <span class="p-input-icon-left">
               <i class="pi pi-search" />
-              <InputText
-                v-model="filter.global.value"
-                class="p-inputtext-sm"
-                placeholder="검색하기"
-              />
+              <InputText v-model="filter.global.value" class="p-inputtext-sm" placeholder="검색하기" />
             </span>
           </div>
         </div>
       </template>
 
       <Column field="teacher" header="선생님"></Column>
-      <Column
-        field="name"
-        header="이름"
-        :sortable="true"
-        class="justify-content-center"
-      ></Column>
-      <Column
-        field="grade"
-        header="학년"
-        class="justify-content-center"
-      ></Column>
-      <Column
-        field="group"
-        header="학급"
-        class="justify-content-center"
-      ></Column>
-      <Column
-        field="attendance"
-        header="출석현황"
-        class="justify-content-center"
-      >
+      <Column field="name" header="이름" :sortable="true" class="justify-content-center"></Column>
+      <Column field="grade" header="학년" class="justify-content-center"></Column>
+      <Column field="group" header="학급" class="justify-content-center"></Column>
+      <Column field="attendance" header="출석현황" class="justify-content-center">
         <template #body="slotProps">
           <span :class="`attendance-${slotProps.data.attendance}`">
             {{ translateAttendance(slotProps.data.attendance) }}
@@ -119,9 +98,7 @@ const exportCSV = () => dt.value.exportCSV();
 const store = useStore();
 const attendanceDate = ref<Date>();
 // const studentsDailyAttendance = computed(() => store.state.attendance.students);
-const customers = computed(
-  () => store.state.attendance.attendanceStudentsDaily
-);
+const customers = computed(() => store.state.attendance.attendanceStudentsDaily);
 
 // const onAttendanceDateSelect = async () => {
 //   await store.dispatch("attendance/fetchStudents");
@@ -155,18 +132,14 @@ const finalResult = ref([]);
 const onAttendanceDateSelect = async () => {
   isLoading.value = true;
   finalResult.value = [];
-
   for (let { grade, group } of totalClasses) {
     const params = {
       date: attendanceDate.value,
       grade,
       group,
     };
-    const result = await store.dispatch(
-      "attendance/fetchStudentAttendances",
-      params
-    );
-    finalResult.value.push(...result);
+    const result = await store.dispatch("attendance/fetchStudentAttendances", params);
+    finalResult.value.push(...result.attendances);
   }
   isLoading.value = false;
 };
@@ -191,7 +164,8 @@ const onAttendanceDateSelect = async () => {
   font-weight: bold;
   padding: 0.5rem;
 }
-.attendance-none {
+/* .attendance-none { */
+.attendance- {
   background-color: #cccccc;
   border-radius: 3px;
   font-weight: bold;

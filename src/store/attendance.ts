@@ -1,10 +1,5 @@
 import { Module } from "vuex";
-import {
-  db,
-  studentAttendancesCol,
-  studentsCol,
-  teacherAttendancesCol,
-} from "@/firebase/config";
+import { db, studentAttendancesCol, studentsCol } from "@/firebase/config";
 import { addDoc, doc, getDocs, query, setDoc, where } from "firebase/firestore";
 import { RootState, AttendanceState, Student } from "@/store/types";
 
@@ -125,10 +120,6 @@ export const attendance: Module<AttendanceState, RootState> = {
       }
     },
 
-    async addTeacherAttendanceStatus(context, payload) {
-      await addDoc(teacherAttendancesCol, payload);
-    },
-
     // 리팩토링
     async fetchStudentAttendances(context, payload) {
       const q = query(
@@ -141,30 +132,28 @@ export const attendance: Module<AttendanceState, RootState> = {
 
       // 입력된 출석현황이 있어서 그 결과를 붙여줌
       if (fetchStudentAttendancesResponse.docs.length > 0) {
+        context.commit(
+          "SET_TEACHER_ATTENDANCE",
+          fetchStudentAttendancesResponse.docs[0].data().teacherAttendance
+        );
         const fetchStudentAttendancesResult = {
           id: fetchStudentAttendancesResponse.docs[0].id,
-          attendances: [
-            ...fetchStudentAttendancesResponse.docs[0].data().attendances,
-          ],
+          ...fetchStudentAttendancesResponse.docs[0].data(),
         };
         return fetchStudentAttendancesResult;
       }
       // 입력된 출석현황이 없기에 그 결과를 담아줄 템플릿을 건네줌
       else {
-        const fetchStudentsByClassResponse = await context.dispatch(
-          "fetchStudentsByClass",
-          payload
-        );
+        const fetchStudentsByClassResponse = await context.dispatch("fetchStudentsByClass", payload);
+
         // 템플릿 만들어주기
-        const attendancesTemplate = fetchStudentsByClassResponse.docs.map(
-          (doc) => ({
-            teacher: doc.data().teacher,
-            grade: doc.data().grade,
-            group: doc.data().group,
-            name: doc.data().name,
-            attendance: "",
-          })
-        );
+        const attendancesTemplate = fetchStudentsByClassResponse.docs.map((doc) => ({
+          teacher: doc.data().teacher,
+          grade: doc.data().grade,
+          group: doc.data().group,
+          name: doc.data().name,
+          attendance: "",
+        }));
         const fetchStudentAttendancesResult = {
           id: "",
           attendances: attendancesTemplate,
@@ -174,11 +163,7 @@ export const attendance: Module<AttendanceState, RootState> = {
     },
 
     async fetchStudentsByClass(context, payload) {
-      const q = query(
-        studentsCol,
-        where("grade", "==", payload.grade),
-        where("group", "==", payload.group)
-      );
+      const q = query(studentsCol, where("grade", "==", payload.grade), where("group", "==", payload.group));
       const fetchStudentsByClassResponse = await getDocs(q);
       return fetchStudentsByClassResponse;
     },

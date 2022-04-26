@@ -6,42 +6,39 @@
       type="radio"
       id="teacher-online"
       value="online"
-      v-model="teacher"
-      @change="$emit('test', teacher)"
+      v-model="teacherAttendance"
       class="attendance__input"
     />
-    <label
-      for="teacher-online"
-      class="attendance__label attendance__label__online"
-    >
+    <label for="teacher-online" class="attendance__label attendance__label__online">
       <span>온라인</span>
     </label>
     <input
       type="radio"
       id="teacher-offline"
       value="offline"
-      v-model="teacher"
-      @change="$emit('test', teacher)"
+      v-model="teacherAttendance"
       class="attendance__input"
     />
-    <label
-      for="teacher-offline"
-      class="attendance__label attendance__label__offline"
-    >
+    <label for="teacher-offline" class="attendance__label attendance__label__offline">
       <span>현장</span>
     </label>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed } from "vue";
 
-const props = defineProps<{
-  teacher: string;
-}>();
-// const emit = defineEmits(["test"]);
+const props = defineProps(["modelValue"]);
+const emits = defineEmits(["update:modelValue"]);
 
-const teacher = ref(props.teacher);
+const teacherAttendance = computed({
+  get() {
+    return props.modelValue;
+  },
+  set(newValue) {
+    emits("update:modelValue", newValue);
+  },
+});
 </script>
 
 <style scoped>

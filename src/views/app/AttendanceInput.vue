@@ -15,25 +15,12 @@
       @date-select="onAttendanceDateSelect"
     />
 
-    <form
-      v-if="attendanceDate && studentsAttendanceStatus"
-      @submit.prevent="onSubmit"
-    >
-      <AttendanceInputTeacher :teacher="teacherAttendanceStatus" />
+    <form v-if="attendanceDate && studentsAttendanceStatus" @submit.prevent="onSubmit">
+      <AttendanceInputTeacher v-model="teacherAttendanceStatus" />
       <AttendanceInputStudents v-model="studentsAttendanceStatus" />
 
-      <Button
-        v-if="!recordId"
-        class="p-button-warning w-full mb-5"
-        type="submit"
-        label="제출하기"
-      />
-      <Button
-        v-else
-        class="p-button-danger w-full mb-5"
-        type="submit"
-        label="수정하기"
-      />
+      <Button v-if="!recordId" class="p-button-warning w-full mb-5" type="submit" label="제출하기" />
+      <Button v-else class="p-button-danger w-full mb-5" type="submit" label="수정하기" />
     </form>
 
     <AppFingerUpper v-else class="pt-5" />
@@ -57,9 +44,7 @@ const userGroup = computed(() => store.state.account.user.group);
 const recordId = ref("");
 const attendanceDate = ref<Date>();
 const studentsAttendanceStatus = ref<Student[]>([]);
-const teacherAttendanceStatus = computed(
-  () => store.state.attendance.teacherAttendance
-);
+const teacherAttendanceStatus = ref("online");
 
 const onAttendanceDateSelect = async () => {
   const result = await store.dispatch("attendance/fetchStudentAttendances", {
@@ -76,33 +61,28 @@ const onAttendanceDateSelect = async () => {
   });
   recordId.value = result.id;
   studentsAttendanceStatus.value = result.attendances;
+  teacherAttendanceStatus.value = result.teacherAttendance;
 };
 
 const onSubmit = async () => {
-  // await store.dispatch("attendance/addTeacherAttendanceStatus", {
-  //   name: userName.value,
-  //   grade: userGrade.value,
-  //   group: userGroup.value,
-  //   date: attendanceDate.value,
-  //   attendance: teacherAttendanceStatus.value,
-  // });
-
   const params = {
     date: attendanceDate.value,
     grade: userGrade.value,
     group: userGroup.value,
     teacher: userName.value,
+    teacherAttendance: teacherAttendanceStatus.value,
     attendances: studentsAttendanceStatus.value,
     recordId: recordId.value,
   };
+  console.log(params);
 
-  await store.dispatch("attendance/addStudentsAttendanceStatus", params);
+  // await store.dispatch("attendance/addStudentsAttendanceStatus", params);
 
-  if (!recordId.value) {
-    recordId.value = "submit success";
-    alert("제출되었습니다.");
-  } else {
-    alert("수정되었습니다.");
-  }
+  // if (!recordId.value) {
+  //   recordId.value = "submit success";
+  //   alert("제출되었습니다.");
+  // } else {
+  //   alert("수정되었습니다.");
+  // }
 };
 </script>

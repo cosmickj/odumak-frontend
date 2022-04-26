@@ -29,11 +29,7 @@ export const account: Module<AccountState, RootState> = {
   actions: {
     async signup(_context, { email, password, name }) {
       try {
-        const signupResponse = await createUserWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
+        const signupResponse = await createUserWithEmailAndPassword(auth, email, password);
         await updateProfile(signupResponse.user, { displayName: name });
         return signupResponse;
       } catch (error) {
@@ -53,15 +49,8 @@ export const account: Module<AccountState, RootState> = {
     },
     async login({ commit, dispatch }, { email, password }) {
       try {
-        const loginResponse = await signInWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
-        const fetchUserResponse = await dispatch(
-          "fetchUser",
-          loginResponse.user.uid
-        );
+        const loginResponse = await signInWithEmailAndPassword(auth, email, password);
+        const fetchUserResponse = await dispatch("fetchUser", loginResponse.user.uid);
         commit("SET_USER", {
           name: loginResponse.user.displayName,
           email: loginResponse.user.email,
