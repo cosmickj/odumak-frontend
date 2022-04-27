@@ -5,18 +5,7 @@ export interface RootState {
 
 export interface AccountState {
   user: any;
-  authIsReady: any;
-}
-
-export interface Student {
-  id?: string;
-  name: string;
-  birth: string;
-  attendance: string;
-  teacher?: string;
-  grade?: string;
-  group?: string;
-  date?: Date | string;
+  authIsReady: boolean;
 }
 
 export interface Teacher {
@@ -26,8 +15,5 @@ export interface Teacher {
 }
 
 export interface AttendanceState {
-  students: Student[];
   teacherAttendance: "online" | "offline";
-  hasRecord: boolean;
-  attendanceStudentsDaily: any;
 }

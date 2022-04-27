@@ -1,9 +1,10 @@
 .DS_Store
 node_modules
+package-lock.json
 /dist
 
-
-# local env files
+# env files
+.env
 .env.local
 .env.*.local
 
@@ -23,6 +24,4 @@ pnpm-debug.log*
 *.sw?
 
 # 추가사항
-package-lock.json
-samples
 src/json

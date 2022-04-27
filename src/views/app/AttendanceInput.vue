@@ -47,42 +47,40 @@ const studentsAttendanceStatus = ref<Student[]>([]);
 const teacherAttendanceStatus = ref("online");
 
 const onAttendanceDateSelect = async () => {
-  const result = await store.dispatch("attendance/fetchStudentAttendances", {
+  const result = await store.dispatch("attendance/fetchAttendances", {
     name: userName.value,
     grade: userGrade.value,
     group: userGroup.value,
     date: attendanceDate.value,
   });
 
-  result.attendances.forEach((element: Student) => {
-    if (!element.attendance) {
-      element.attendance = "offline";
+  result.studentAttendances.forEach((student: Student) => {
+    if (!student.attendance) {
+      student.attendance = "offline";
     }
   });
-  recordId.value = result.id;
-  studentsAttendanceStatus.value = result.attendances;
+  recordId.value = result.recordId;
+  studentsAttendanceStatus.value = result.studentAttendances;
   teacherAttendanceStatus.value = result.teacherAttendance;
 };
 
 const onSubmit = async () => {
-  const params = {
+  const attendanceParams = {
     date: attendanceDate.value,
     grade: userGrade.value,
     group: userGroup.value,
     teacher: userName.value,
     teacherAttendance: teacherAttendanceStatus.value,
-    attendances: studentsAttendanceStatus.value,
+    studentAttendances: studentsAttendanceStatus.value,
     recordId: recordId.value,
   };
-  console.log(params);
+  const result = await store.dispatch("attendance/addAttendance", attendanceParams);
 
-  // await store.dispatch("attendance/addStudentsAttendanceStatus", params);
-
-  // if (!recordId.value) {
-  //   recordId.value = "submit success";
-  //   alert("제출되었습니다.");
-  // } else {
-  //   alert("수정되었습니다.");
-  // }
+  if (!recordId.value) {
+    recordId.value = result.id;
+    alert("제출되었습니다.");
+  } else {
+    alert("수정되었습니다.");
+  }
 };
 </script>
