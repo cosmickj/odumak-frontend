@@ -15,24 +15,12 @@
       @date-select="onAttendanceDateSelect"
     />
 
-    <form
-      v-if="attendanceDate && studentsAttendanceStatus"
-      @submit.prevent="onSubmit"
-    >
+    <form v-if="attendanceDate && studentsAttendanceStatus" @submit.prevent="onSubmit">
       <AttendanceInputTeacher v-model="teacherAttendanceStatus" />
       <AttendanceInputStudents v-model="studentsAttendanceStatus" />
-      <Button
-        v-if="!attendanceRecord"
-        class="p-button-warning w-full mb-5"
-        type="submit"
-        label="제출하기"
-      />
-      <Button
-        v-else
-        class="p-button-danger w-full mb-5"
-        type="submit"
-        label="수정하기"
-      />
+
+      <Button v-if="!recordId" class="p-button-warning w-full mb-5" type="submit" label="제출하기" />
+      <Button v-else class="p-button-danger w-full mb-5" type="submit" label="수정하기" />
     </form>
 
     <AppFingerUpper v-else class="pt-5" />
@@ -42,7 +30,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { useStore } from "vuex";
-import { Student } from "@/types/index";
+import { Student } from "@/store/types";
 import AppFingerUpper from "@/components/AppFingerUpper.vue";
 import AttendanceInputTeacher from "@/components/AttendanceInputTeacher.vue";
 import AttendanceInputStudents from "@/components/AttendanceInputStudents.vue";
@@ -53,34 +41,46 @@ const userName = computed(() => store.state.account.user.name);
 const userGrade = computed(() => store.state.account.user.grade);
 const userGroup = computed(() => store.state.account.user.group);
 
+const recordId = ref("");
 const attendanceDate = ref<Date>();
-const attendanceRecord = computed(() => store.state.attendance.record);
-
+const studentsAttendanceStatus = ref<Student[]>([]);
 const teacherAttendanceStatus = ref("online");
-const studentsAttendanceStatus = computed<Student[]>(
-  () => store.state.attendance.students
-);
 
 const onAttendanceDateSelect = async () => {
-  await store.dispatch("attendance/checkRecord", {
+  const result = await store.dispatch("attendance/fetchAttendances", {
     name: userName.value,
     grade: userGrade.value,
     group: userGroup.value,
     date: attendanceDate.value,
   });
+
+  result.studentAttendances.forEach((student: Student) => {
+    if (!student.attendance) {
+      student.attendance = "offline";
+    }
+  });
+  recordId.value = result.recordId;
+  studentsAttendanceStatus.value = result.studentAttendances;
+  teacherAttendanceStatus.value = result.teacherAttendance;
 };
 
-const onSubmit = () => {
-  console.log("submitted");
+const onSubmit = async () => {
+  const attendanceParams = {
+    date: attendanceDate.value,
+    grade: userGrade.value,
+    group: userGroup.value,
+    teacher: userName.value,
+    teacherAttendance: teacherAttendanceStatus.value,
+    studentAttendances: studentsAttendanceStatus.value,
+    recordId: recordId.value,
+  };
+  const result = await store.dispatch("attendance/addAttendance", attendanceParams);
+
+  if (!recordId.value) {
+    recordId.value = result.id;
+    alert("제출되었습니다.");
+  } else {
+    alert("수정되었습니다.");
+  }
 };
 </script>
-
-<style>
-.p-calendar > .p-button,
-.p-calendar > .p-button:hover,
-.p-calendar > .p-button:active {
-  background: var(--yellow-500);
-  border: 1px solid var(--yellow-500);
-  color: var(--text-color);
-}
-</style>

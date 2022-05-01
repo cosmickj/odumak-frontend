@@ -15,18 +15,15 @@ const store = createStore({
 // Waiting for Auth to be Ready
 const unsub = onAuthStateChanged(auth, async (user) => {
   if (user) {
-    const fetchUserResult = await store.dispatch(
-      "account/fetchUser",
-      user?.uid
-    );
+    const fetchUserResult = await store.dispatch("account/fetchUser", user?.uid);
     store.commit("account/SET_USER", {
       name: user?.displayName,
       email: user?.email,
       uid: user?.uid,
       ...fetchUserResult,
     });
-    store.commit("account/SET_AUTH_IS_READY", true);
   }
+  store.commit("account/SET_AUTH_IS_READY", true);
   unsub();
 });
 

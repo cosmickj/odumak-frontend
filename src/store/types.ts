@@ -1,5 +1,3 @@
-import { StudentAttendance } from "@/types/index";
-
 export interface RootState {
   User: AccountState;
   Attendance: AttendanceState;
@@ -7,12 +5,15 @@ export interface RootState {
 
 export interface AccountState {
   user: any;
-  // account: any;
-  authIsReady: any;
+  authIsReady: boolean;
+}
+
+export interface Teacher {
+  name: string;
+  grade: string;
+  group: string;
 }
 
 export interface AttendanceState {
-  students: any;
-  record: any;
-  studentsDailyAttendance: StudentAttendance[];
+  teacherAttendance: "online" | "offline";
 }

@@ -1,90 +1,95 @@
 import { Module } from "vuex";
-import { attendancesCol, studentsCol } from "@/firebase/config";
-import { getDocs, query, where } from "firebase/firestore";
+import { db, attendancesCol, studentsCol } from "@/firebase/config";
+import { addDoc, doc, getDocs, query, setDoc, where } from "firebase/firestore";
 import { RootState, AttendanceState } from "@/store/types";
-import { Student, StudentAttendance } from "@/types/index";
 
 export const attendance: Module<AttendanceState, RootState> = {
   namespaced: true,
   state: () => ({
-    students: null,
-    record: null,
-    studentsDailyAttendance: [],
+    teacherAttendance: "online",
   }),
 
   mutations: {
-    SET_STUDENTS(state, payload) {
-      state.students = payload;
-    },
-    SET_RECORD(state, payload) {
-      state.record = payload;
-    },
-    SET_STUDENTS_DAILY_ATTENDANCE(state, payload) {
-      state.studentsDailyAttendance = payload;
+    SET_TEACHER_ATTENDANCE(state, payload) {
+      state.teacherAttendance = payload;
     },
   },
 
   actions: {
-    async checkRecord({ commit, dispatch }, { name, grade, group, date }) {
+    async fetchAllStudents() {
+      const querySnapshot = await getDocs(studentsCol);
+      const result = querySnapshot.docs.map((doc) => ({
+        grade: doc.data().grade,
+        group: doc.data().group,
+        name: doc.data().name,
+        teacher: doc.data().teacher,
+        attendance: "",
+      }));
+      return result;
+    },
+
+    async fetchStudentAttendancesByDate(context, payload) {
+      const q = query(attendancesCol, where("date", "==", payload.date));
+      const res = await getDocs(q);
+      const result = res.docs.map((value) => value.data().studentAttendances);
+      return result.flat();
+    },
+
+    async fetchAttendances(context, payload) {
       const q = query(
         attendancesCol,
-        where("teacher", "==", name),
-        where("date", "==", date)
+        where("date", "==", payload.date),
+        where("grade", "==", payload.grade),
+        where("group", "==", payload.group)
       );
-      const checkRecordResponse = await getDocs(q);
-      if (checkRecordResponse.docs.length === 1) {
-        // 출석 입력 기록 O
-        const assignedStudents = checkRecordResponse.docs[0].data().students;
-        commit("SET_STUDENTS", assignedStudents);
-        commit("SET_RECORD", checkRecordResponse.docs[0].id);
-      } else {
-        // 출석 입력 기록 X
-        dispatch("fetchStudents", { name, grade, group });
-        commit("SET_RECORD", null);
+      const fetchAttendancesResponse = await getDocs(q);
+
+      // 입력된 출석현황 있음
+      if (fetchAttendancesResponse.docs.length > 0) {
+        context.commit("SET_TEACHER_ATTENDANCE", fetchAttendancesResponse.docs[0].data().teacherAttendance);
+        const fetchAttendancesResult = {
+          recordId: fetchAttendancesResponse.docs[0].id,
+          ...fetchAttendancesResponse.docs[0].data(),
+        };
+        return fetchAttendancesResult;
+      }
+      // 입력된 출석현황 없음
+      else {
+        const fetchStudentsByClassResponse = await context.dispatch("fetchStudentsByClass", payload);
+
+        // 템플릿 만들어주기
+        const initAttendances = fetchStudentsByClassResponse.docs.map((doc) => ({
+          teacher: doc.data().teacher,
+          grade: doc.data().grade,
+          group: doc.data().group,
+          name: doc.data().name,
+          attendance: "",
+        }));
+        const fetchAttendancesResult = {
+          recordId: "",
+          teacherAttendance: "online",
+          studentAttendances: [...initAttendances],
+        };
+        return fetchAttendancesResult;
       }
     },
-    async fetchStudents({ commit }, { name, grade, group }) {
-      const assignedStudents: Student[] = [];
-      const q = query(
-        studentsCol,
-        where("teacher", "==", name),
-        where("grade", "==", grade),
-        where("group", "==", group)
-      );
-      const querySnapshot = await getDocs(q);
-      querySnapshot.forEach((doc) => {
-        assignedStudents.push({
-          // id: doc.id
-          name: doc.data().name,
-          birth: doc.data().birth,
-          attendance: "online",
-        });
-      });
-      commit("SET_STUDENTS", assignedStudents);
 
-      /* 실시간 변경 추적 코드
-      onSnapshot(q, (querySnapshot) => {
-        const result: any = [];
-        querySnapshot.forEach((doc) => {
-          result.push({
-            name: doc.data().name,
-            birth: doc.data().birth,
-            attendance: "online",
-          });
-        });
-        commit("SET_STUDENTS", result);
-      });
-      */
+    async fetchStudentsByClass(context, payload) {
+      const q = query(studentsCol, where("grade", "==", payload.grade), where("group", "==", payload.group));
+      const fetchStudentsByClassResponse = await getDocs(q);
+      return fetchStudentsByClassResponse;
     },
 
-    async fetchStudentsDailyAttendance({ commit }, { date }) {
-      const result: StudentAttendance[] = [];
-      const q = query(attendancesCol, where("date", "==", date));
-      const querySnapshot = await getDocs(q);
-      querySnapshot.forEach((doc) => {
-        result.push(...doc.data().students);
-      });
-      commit("SET_STUDENTS_DAILY_ATTENDANCE", result);
+    async addAttendance(context, payload) {
+      if (payload.recordId) {
+        const docId = payload.recordId;
+        delete payload.recordId;
+        await setDoc(doc(db, "attendances", docId), payload);
+      } else {
+        delete payload.recordId;
+        const result = await addDoc(attendancesCol, payload);
+        return result;
+      }
     },
   },
 };

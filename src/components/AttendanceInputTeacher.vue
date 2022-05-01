@@ -6,53 +6,37 @@
       type="radio"
       id="teacher-online"
       value="online"
-      v-model="teacher"
+      v-model="teacherAttendance"
       class="attendance__input"
     />
-    <label
-      for="teacher-online"
-      class="attendance__label attendance__label__online"
-    >
+    <label for="teacher-online" class="attendance__label attendance__label__online">
       <span>온라인</span>
     </label>
     <input
       type="radio"
       id="teacher-offline"
       value="offline"
-      v-model="teacher"
+      v-model="teacherAttendance"
       class="attendance__input"
     />
-    <label
-      for="teacher-offline"
-      class="attendance__label attendance__label__offline"
-    >
+    <label for="teacher-offline" class="attendance__label attendance__label__offline">
       <span>현장</span>
     </label>
   </div>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent } from "vue";
+<script setup lang="ts">
+import { computed } from "vue";
 
-export default defineComponent({
-  name: "TeacherAttendanceStatus",
-  props: {
-    modelValue: {
-      type: String,
-      required: true,
-    },
+const props = defineProps(["modelValue"]);
+const emits = defineEmits(["update:modelValue"]);
+
+const teacherAttendance = computed({
+  get() {
+    return props.modelValue;
   },
-  emits: ["update:modelValue"],
-  setup(props, { emit }) {
-    const teacher = computed({
-      get() {
-        return props.modelValue;
-      },
-      set(teacher) {
-        emit("update:modelValue", teacher);
-      },
-    });
-    return { teacher };
+  set(newValue) {
+    emits("update:modelValue", newValue);
   },
 });
 </script>
