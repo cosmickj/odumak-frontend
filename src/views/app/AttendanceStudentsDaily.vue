@@ -12,13 +12,14 @@
     />
 
     <DataTable
+      class="p-datatable-sm pt-5"
       v-if="attendanceDate && !isLoading"
       ref="table"
       :value="finalResult"
-      class="p-datatable-sm pt-5"
       rowGroupMode="subheader"
       groupRowsBy="teacher"
-      sortField="class"
+      sortMode="single"
+      sortField="group"
       :sortOrder="1"
       scrollable
     >
@@ -41,16 +42,9 @@
         </div>
       </template>
 
-      <!-- <Column field="teacher" header="선생님"></Column> -->
-
-      <Column field="class" header="학년반" class="justify-content-center">
-        <template #body="slotProps">
-          <span>{{ slotProps.data.grade }} - {{ slotProps.data.group }}</span>
-        </template>
-      </Column>
-
+      <Column field="grade" header="학년" class="justify-content-center"></Column>
+      <Column field="group" header="학급" class="justify-content-center"></Column>
       <Column field="name" header="이름" class="justify-content-center"></Column>
-
       <Column field="attendance" header="출석현황" class="justify-content-center">
         <template #body="slotProps">
           <span :class="`attendance-${slotProps.data.attendance}`">
@@ -75,6 +69,10 @@
       </template>
     </DataTable>
 
+    <div class="spinner" v-else-if="attendanceDate && isLoading">
+      <i class="pi pi-spin pi-spinner" style="font-size: 3rem"></i>
+    </div>
+
     <AppFingerUpper v-else-if="!attendanceDate && isLoading" class="pt-5" />
   </div>
 </template>
@@ -83,7 +81,6 @@
 import { ref } from "vue";
 import { useStore } from "vuex";
 import AppFingerUpper from "@/components/AppFingerUpper.vue";
-import totalClassesData from "@/json/total-classes-2022.json";
 
 // import { FilterMatchMode } from "primevue/api";
 // interface Filter {
@@ -96,47 +93,50 @@ import totalClassesData from "@/json/total-classes-2022.json";
 //   global: { value: "", matchMode: FilterMatchMode.CONTAINS },
 // });
 
+interface StudentAttendance {
+  grade: string;
+  group: string;
+  name: string;
+  teacher: string;
+  attendance: string;
+}
+
 const store = useStore();
 
 const isLoading = ref(true);
 const attendanceDate = ref<Date>();
-const totalClasses = totalClassesData;
-const finalResult = ref([]);
+const finalResult = ref<StudentAttendance[]>([]);
 
 const onAttendanceDateSelect = async () => {
   isLoading.value = true;
-  // finalResult.value = [];
-  // for (let { grade, group } of totalClasses) {
-  //   const params = {
-  //     date: attendanceDate.value,
-  //     grade,
-  //     group,
-  //   };
-  //   const result = await store.dispatch("attendance/fetchAttendances", params);
-  //   finalResult.value.push(...result.studentAttendances);
-  // }
 
-  const result1 = await store.dispatch("attendance/fetchAllStudents");
-  const result2 = await store.dispatch("attendance/testCode", { date: attendanceDate.value });
+  const allStudents = await store.dispatch("attendance/fetchAllStudents");
+  const studentAttendances = await store.dispatch("attendance/fetchStudentAttendancesByDate", {
+    date: attendanceDate.value,
+  });
 
-  for (let temp of result2) {
-    for (let data of result1) {
-      if (temp.grade == data.grade && temp.group == data.group && temp.name == data.name) {
-        data.attendance = temp.attendance;
+  for (let studentAttendance of studentAttendances) {
+    for (let student of allStudents) {
+      if (
+        student.grade === studentAttendance.grade &&
+        student.group === studentAttendance.group &&
+        student.name === studentAttendance.name
+      ) {
+        student.attendance = studentAttendance.attendance;
         break;
       }
     }
   }
 
-  const sortByTeacher = (array) => {
-    array.sort((a, b) => (a.teacher > b.teacher ? 1 : b.teacher > a.teacher ? -1 : 0));
-    return array;
-  };
-
-  finalResult.value = sortByTeacher(result1);
-
+  // finalResult.value = sortByTeacher(allStudents);
+  finalResult.value = allStudents;
   isLoading.value = false;
 };
+
+// const sortByTeacher = (studentAttendance: StudentAttendance[]) => {
+//   studentAttendance.sort((a, b) => (a.teacher > b.teacher ? 1 : b.teacher > a.teacher ? -1 : 0));
+//   return studentAttendance;
+// };
 
 const translateAttendance = (attendance: string) => {
   if (attendance === "online") return "온라인";
@@ -184,5 +184,10 @@ const exportCSV = () => table.value.exportCSV();
   border-radius: 3px;
   font-weight: bold;
   padding: 0.5rem;
+}
+.spinner {
+  position: absolute;
+  top: calc(50% - 1.5rem);
+  left: calc(50% - 1.5rem);
 }
 </style>

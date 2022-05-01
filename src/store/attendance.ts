@@ -16,25 +16,23 @@ export const attendance: Module<AttendanceState, RootState> = {
   },
 
   actions: {
-    async testCode(context, payload) {
-      const q = query(attendancesCol, where("date", "==", payload.date));
-      const res = await getDocs(q);
-      const result = res.docs.map((value) => value.data().studentAttendances);
-      return result.flat();
-    },
-
     async fetchAllStudents() {
       const querySnapshot = await getDocs(studentsCol);
-      let result = querySnapshot.docs.map((doc) => ({
+      const result = querySnapshot.docs.map((doc) => ({
         grade: doc.data().grade,
         group: doc.data().group,
         name: doc.data().name,
         teacher: doc.data().teacher,
         attendance: "",
       }));
-
-      result = sortByTeacher(result);
       return result;
+    },
+
+    async fetchStudentAttendancesByDate(context, payload) {
+      const q = query(attendancesCol, where("date", "==", payload.date));
+      const res = await getDocs(q);
+      const result = res.docs.map((value) => value.data().studentAttendances);
+      return result.flat();
     },
 
     async fetchAttendances(context, payload) {
@@ -67,12 +65,11 @@ export const attendance: Module<AttendanceState, RootState> = {
           name: doc.data().name,
           attendance: "",
         }));
-        let fetchAttendancesResult = {
+        const fetchAttendancesResult = {
           recordId: "",
           teacherAttendance: "online",
           studentAttendances: [...initAttendances],
         };
-        fetchAttendancesResult = sortByTeacher(fetchAttendancesResult);
         return fetchAttendancesResult;
       }
     },
@@ -95,9 +92,4 @@ export const attendance: Module<AttendanceState, RootState> = {
       }
     },
   },
-};
-
-const sortByTeacher = (array) => {
-  array.sort((a, b) => (a.teacher > b.teacher ? 1 : b.teacher > a.teacher ? -1 : 0));
-  return array;
 };
