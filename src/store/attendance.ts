@@ -35,6 +35,18 @@ export const attendance: Module<AttendanceState, RootState> = {
       return result.flat();
     },
 
+    async fetchTeacherAttendancesByDate(context, payload) {
+      const q = query(attendancesCol, where("date", "==", payload.date));
+      const res = await getDocs(q);
+      const result = res.docs.map((value) => ({
+        grade: value.data().grade,
+        group: value.data().group,
+        name: value.data().teacher,
+        attendance: value.data().teacherAttendance,
+      }));
+      return result;
+    },
+
     async fetchAttendances(context, payload) {
       const q = query(
         attendancesCol,
@@ -58,7 +70,7 @@ export const attendance: Module<AttendanceState, RootState> = {
         const fetchStudentsByClassResponse = await context.dispatch("fetchStudentsByClass", payload);
 
         // 템플릿 만들어주기
-        const initAttendances = fetchStudentsByClassResponse.docs.map((doc) => ({
+        const initAttendances = fetchStudentsByClassResponse.docs.map((doc: any) => ({
           teacher: doc.data().teacher,
           grade: doc.data().grade,
           group: doc.data().group,
