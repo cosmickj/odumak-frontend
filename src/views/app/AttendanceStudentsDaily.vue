@@ -18,7 +18,6 @@
       class="p-datatable-sm pt-5"
       rowGroupMode="subheader"
       groupRowsBy="teacher"
-      removableSort
       sortField="class"
       :sortOrder="1"
       scrollable
@@ -42,7 +41,7 @@
         </div>
       </template>
 
-      <Column field="teacher" header="선생님"></Column>
+      <!-- <Column field="teacher" header="선생님"></Column> -->
 
       <Column field="class" header="학년반" class="justify-content-center">
         <template #body="slotProps">
@@ -106,16 +105,36 @@ const finalResult = ref([]);
 
 const onAttendanceDateSelect = async () => {
   isLoading.value = true;
-  finalResult.value = [];
-  for (let { grade, group } of totalClasses) {
-    const params = {
-      date: attendanceDate.value,
-      grade,
-      group,
-    };
-    const result = await store.dispatch("attendance/fetchAttendances", params);
-    finalResult.value.push(...result.studentAttendances);
+  // finalResult.value = [];
+  // for (let { grade, group } of totalClasses) {
+  //   const params = {
+  //     date: attendanceDate.value,
+  //     grade,
+  //     group,
+  //   };
+  //   const result = await store.dispatch("attendance/fetchAttendances", params);
+  //   finalResult.value.push(...result.studentAttendances);
+  // }
+
+  const result1 = await store.dispatch("attendance/fetchAllStudents");
+  const result2 = await store.dispatch("attendance/testCode", { date: attendanceDate.value });
+
+  for (let temp of result2) {
+    for (let data of result1) {
+      if (temp.grade == data.grade && temp.group == data.group && temp.name == data.name) {
+        data.attendance = temp.attendance;
+        break;
+      }
+    }
   }
+
+  const sortByTeacher = (array) => {
+    array.sort((a, b) => (a.teacher > b.teacher ? 1 : b.teacher > a.teacher ? -1 : 0));
+    return array;
+  };
+
+  finalResult.value = sortByTeacher(result1);
+
   isLoading.value = false;
 };
 
