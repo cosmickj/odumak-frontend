@@ -10,10 +10,7 @@
       v-model="students[i].attendance"
       class="attendance__input"
     />
-    <label
-      :for="`absence-${student.name}`"
-      class="attendance__label attendance__label__absence"
-    >
+    <label :for="`absence-${student.name}`" class="attendance__label attendance__label__absence">
       <span>결석</span>
     </label>
     <input
@@ -23,10 +20,7 @@
       v-model="students[i].attendance"
       class="attendance__input"
     />
-    <label
-      :for="`online-${student.name}`"
-      class="attendance__label attendance__label__online"
-    >
+    <label :for="`online-${student.name}`" class="attendance__label attendance__label__online">
       <span>온라인</span>
     </label>
     <input
@@ -36,10 +30,7 @@
       v-model="students[i].attendance"
       class="attendance__input"
     />
-    <label
-      :for="`offline-${student.name}`"
-      class="attendance__label attendance__label__offline"
-    >
+    <label :for="`offline-${student.name}`" class="attendance__label attendance__label__offline">
       <span>현장</span>
     </label>
   </div>
@@ -47,7 +38,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, PropType } from "vue";
-import { Student } from "@/store/types";
+import type { Student } from "@/types";
 
 export default defineComponent({
   name: "StudentsAttendanceStatus",

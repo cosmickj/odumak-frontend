@@ -30,10 +30,10 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { useStore } from "vuex";
-import { Student } from "@/store/types";
 import AppFingerUpper from "@/components/AppFingerUpper.vue";
 import AttendanceInputTeacher from "@/components/AttendanceInputTeacher.vue";
 import AttendanceInputStudents from "@/components/AttendanceInputStudents.vue";
+import type { Student } from "@/types";
 
 const store = useStore();
 const authIsReady = computed(() => store.state.account.authIsReady);
