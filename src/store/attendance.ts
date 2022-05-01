@@ -16,18 +16,6 @@ export const attendance: Module<AttendanceState, RootState> = {
   },
 
   actions: {
-    async addAttendance(context, payload) {
-      if (payload.recordId) {
-        const docId = payload.recordId;
-        delete payload.recordId;
-        await setDoc(doc(db, "attendances", docId), payload);
-      } else {
-        delete payload.recordId;
-        const result = await addDoc(attendancesCol, payload);
-        return result;
-      }
-    },
-
     async fetchAttendances(context, payload) {
       const q = query(
         attendancesCol,
@@ -37,7 +25,7 @@ export const attendance: Module<AttendanceState, RootState> = {
       );
       const fetchAttendancesResponse = await getDocs(q);
 
-      // 입력된 출석현황이 있어서 그 결과를 붙여줌
+      // 입력된 출석현황 있음
       if (fetchAttendancesResponse.docs.length > 0) {
         context.commit("SET_TEACHER_ATTENDANCE", fetchAttendancesResponse.docs[0].data().teacherAttendance);
         const fetchAttendancesResult = {
@@ -46,7 +34,7 @@ export const attendance: Module<AttendanceState, RootState> = {
         };
         return fetchAttendancesResult;
       }
-      // 입력된 출석현황이 없기에 그 결과를 담아줄 템플릿을 건네줌
+      // 입력된 출석현황 없음
       else {
         const fetchStudentsByClassResponse = await context.dispatch("fetchStudentsByClass", payload);
 
@@ -71,6 +59,18 @@ export const attendance: Module<AttendanceState, RootState> = {
       const q = query(studentsCol, where("grade", "==", payload.grade), where("group", "==", payload.group));
       const fetchStudentsByClassResponse = await getDocs(q);
       return fetchStudentsByClassResponse;
+    },
+
+    async addAttendance(context, payload) {
+      if (payload.recordId) {
+        const docId = payload.recordId;
+        delete payload.recordId;
+        await setDoc(doc(db, "attendances", docId), payload);
+      } else {
+        delete payload.recordId;
+        const result = await addDoc(attendancesCol, payload);
+        return result;
+      }
     },
   },
 };
