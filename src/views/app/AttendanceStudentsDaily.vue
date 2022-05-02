@@ -11,6 +11,9 @@
       @date-select="onAttendanceDateSelect"
     />
 
+    <!-- sortMode="single"
+      sortField="group"
+      :sortOrder="1" -->
     <DataTable
       class="p-datatable-sm pt-5"
       v-if="attendanceDate && !isLoading"
@@ -18,9 +21,6 @@
       :value="finalResult"
       rowGroupMode="subheader"
       groupRowsBy="teacher"
-      sortMode="single"
-      sortField="group"
-      :sortOrder="1"
       scrollable
     >
       <template #header>
@@ -110,7 +110,7 @@ const finalResult = ref<StudentAttendance[]>([]);
 const onAttendanceDateSelect = async () => {
   isLoading.value = true;
 
-  const allStudents = await store.dispatch("attendance/fetchAllStudents");
+  const allStudents: StudentAttendance[] = await store.dispatch("attendance/fetchAllStudents");
   const studentAttendances = await store.dispatch("attendance/fetchStudentAttendancesByDate", {
     date: attendanceDate.value,
   });
@@ -128,15 +128,11 @@ const onAttendanceDateSelect = async () => {
     }
   }
 
-  // finalResult.value = sortByTeacher(allStudents);
+  allStudents.sort((a, b) => ~~a.grade - ~~b.grade || ~~a.group - ~~b.group || a.name.localeCompare(b.name));
   finalResult.value = allStudents;
+
   isLoading.value = false;
 };
-
-// const sortByTeacher = (studentAttendance: StudentAttendance[]) => {
-//   studentAttendance.sort((a, b) => (a.teacher > b.teacher ? 1 : b.teacher > a.teacher ? -1 : 0));
-//   return studentAttendance;
-// };
 
 const translateAttendance = (attendance: string) => {
   if (attendance === "online") return "온라인";
