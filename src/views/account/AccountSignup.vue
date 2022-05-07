@@ -63,27 +63,43 @@
         />
       </div>
 
-      <div class="mx-7 mb-2 flex justify-content-between align-items-center text-lg">
-        <div class="flex-shrink-0">
-          <RadioButton v-model="signupForm.grade" id="third-grade" name="grade" value="3" />
-          <label class="ml-2" for="third-grade">3학년</label>
-        </div>
-
-        <div class="flex-shrink-0">
-          <RadioButton v-model="signupForm.grade" id="forth-grade" name="grade" value="4" />
-          <label class="ml-2" for="forth-grade">4학년</label>
-        </div>
-
-        <div>
-          <Dropdown
-            v-model="signupForm.group"
-            :options="group"
-            optionLabel="name"
-            optionValue="value"
-            placeholder="학급 선택"
-          />
+      <div class="mx-7 mb-2 text-lg">
+        <div class="flex justify-content-around align-items-center">
+          <div>담당 학급이 있으신가요?</div>
+          <div>
+            <RadioButton v-model="signupForm.isTeahcer" id="teacher" name="isTeacher" :value="true" />
+            <label class="ml-2" for="teacher">네</label>
+          </div>
+          <div>
+            <RadioButton v-model="signupForm.isTeahcer" id="normal" name="isTeacher" :value="false" />
+            <label class="ml-2" for="normal">아니요</label>
+          </div>
         </div>
       </div>
+
+      <template v-if="signupForm.isTeahcer">
+        <div class="mx-7 mb-2 flex justify-content-between align-items-center text-lg">
+          <div class="flex-shrink-0">
+            <RadioButton v-model="signupForm.grade" id="third-grade" name="grade" value="3" />
+            <label class="ml-2" for="third-grade">3학년</label>
+          </div>
+
+          <div class="flex-shrink-0">
+            <RadioButton v-model="signupForm.grade" id="forth-grade" name="grade" value="4" />
+            <label class="ml-2" for="forth-grade">4학년</label>
+          </div>
+
+          <div>
+            <Dropdown
+              v-model="signupForm.group"
+              :options="group"
+              optionLabel="name"
+              optionValue="value"
+              placeholder="학급 선택"
+            />
+          </div>
+        </div>
+      </template>
 
       <div class="mx-7 my-3">
         <Button type="submit" class="p-button-warning w-full justify-content-center">
@@ -107,7 +123,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
+import { computed, reactive, ref, watch } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import RadioButton from "primevue/radiobutton";
@@ -121,7 +137,8 @@ const initSignupForm = {
   email: "",
   password: "",
   name: "",
-  grade: "3",
+  isTeahcer: false,
+  grade: "",
   group: "",
 };
 const signupForm = reactive({ ...initSignupForm });
@@ -133,6 +150,14 @@ const isPasswordSame = computed(() => {
   else return true;
 });
 const isAllFilled = ref(true);
+
+watch(
+  () => signupForm.isTeahcer,
+  () => {
+    signupForm.grade = "";
+    signupForm.group = "";
+  }
+);
 
 const onSubmit = async () => {
   if (!Object.values(signupForm).every((value) => value)) {
@@ -146,12 +171,13 @@ const onSubmit = async () => {
 
   try {
     isLoading.value = true;
-
     const signupResult = await store.dispatch("account/signup", signupForm);
+
     await store.dispatch("account/createUser", {
       uid: signupResult.user.uid,
       ...signupForm,
     });
+
     await store.dispatch("account/login", {
       email: signupForm.email,
       password: signupForm.password,
