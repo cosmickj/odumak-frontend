@@ -33,7 +33,8 @@ export const account: Module<AccountState, RootState> = {
         await updateProfile(signupResponse.user, { displayName: name });
         return signupResponse;
       } catch (error) {
-        throw new Error("could not complete signup");
+        // throw new Error("could not complete signup");
+        console.log(error);
       }
     },
 

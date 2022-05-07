@@ -29,13 +29,14 @@
           v-model="signupForm.password"
           class="w-full"
           toggleMask
+          :feedback="false"
           placeholder="비밀번호를 입력하세요."
-          required
-        >
-          <template #footer>
-            <div class="mt-3">영문 대소문자+숫자를 조합하여 8자리 이상 입력하세요.</div>
-          </template>
-        </Password>
+          inputStyle="width:inherit; border-radius:var(--border-radius);"
+        />
+
+        <div v-if="!isPasswordLongerThanSix && signupForm.password">
+          <span class="text-pink-500">비밀번호를 6글자 이상 입력하세요.</span>
+        </div>
       </div>
 
       <div class="mx-7 mb-2">
@@ -44,13 +45,13 @@
           class="w-full"
           toggleMask
           :feedback="false"
-          placeholder="비밀번호를 한 번 더 입력하세요."
-          required
+          placeholder="비밀번호를 다시 한번 입력하세요."
+          inputStyle="width:inherit; border-radius:var(--border-radius);"
         />
-      </div>
 
-      <div v-if="isPasswordSame && confirmedPassword" class="mx-7 mb-2">
-        <span class="text-pink-500">새 비밀번호가 일치하지 않습니다.</span>
+        <div v-if="!isPasswordSame && confirmedPassword">
+          <span class="text-pink-500">새 비밀번호가 일치하지 않습니다.</span>
+        </div>
       </div>
 
       <div class="mx-7 mb-2">
@@ -58,33 +59,34 @@
           v-model="signupForm.name"
           class="w-full border-round"
           type="text"
-          placeholder="성함을 입력하세요."
-          required
+          placeholder="이름을 입력하세요."
         />
       </div>
 
-      <div class="mx-7 mb-2 text-lg">
+      <div class="mx-7 mb-2">
         <div class="flex justify-content-around align-items-center">
           <div>담당 학급이 있으신가요?</div>
-          <div>
-            <RadioButton v-model="signupForm.isTeahcer" id="teacher" name="isTeacher" :value="true" />
+
+          <div class="flex align-items-center">
+            <RadioButton v-model="signupForm.role" id="teacher" name="role" value="teacher" />
             <label class="ml-2" for="teacher">네</label>
           </div>
-          <div>
-            <RadioButton v-model="signupForm.isTeahcer" id="normal" name="isTeacher" :value="false" />
-            <label class="ml-2" for="normal">아니요</label>
+
+          <div class="flex align-items-center">
+            <RadioButton v-model="signupForm.role" id="common" name="role" value="common" />
+            <label class="ml-2" for="common">아니요</label>
           </div>
         </div>
       </div>
 
-      <template v-if="signupForm.isTeahcer">
-        <div class="mx-7 mb-2 flex justify-content-between align-items-center text-lg">
-          <div class="flex-shrink-0">
+      <template v-if="signupForm.role === 'teacher'">
+        <div class="mx-7 mb-2 flex justify-content-between align-items-center">
+          <div class="flex-shrink-0 flex align-items-center">
             <RadioButton v-model="signupForm.grade" id="third-grade" name="grade" value="3" />
             <label class="ml-2" for="third-grade">3학년</label>
           </div>
 
-          <div class="flex-shrink-0">
+          <div class="flex-shrink-0 flex align-items-center">
             <RadioButton v-model="signupForm.grade" id="forth-grade" name="grade" value="4" />
             <label class="ml-2" for="forth-grade">4학년</label>
           </div>
@@ -108,7 +110,7 @@
         </Button>
       </div>
 
-      <div v-if="!isAllFilled" class="mx-7 my-3">
+      <div v-if="!isAllFilled" class="mx-7">
         <span class="text-pink-500">위 입력사항을 모두 입력해주세요.</span>
       </div>
 
@@ -137,53 +139,65 @@ const initSignupForm = {
   email: "",
   password: "",
   name: "",
-  isTeahcer: false,
-  grade: "",
-  group: "",
+  role: "common",
+  grade: "none",
+  group: "none",
 };
 const signupForm = reactive({ ...initSignupForm });
-
-const isLoading = ref(false);
 const confirmedPassword = ref("");
-const isPasswordSame = computed(() => {
-  if (signupForm.password === confirmedPassword.value) return false;
-  else return true;
+
+const isPasswordLongerThanSix = computed(() => {
+  const regex = new RegExp("(?=.{6,})");
+  if (regex.test(signupForm.password)) return true;
+  else return false;
 });
-const isAllFilled = ref(true);
+const isPasswordSame = computed(() => {
+  if (!signupForm.password && !confirmedPassword.value) return false;
+  else if (signupForm.password === confirmedPassword.value) return true;
+  else return false;
+});
 
 watch(
-  () => signupForm.isTeahcer,
-  () => {
-    signupForm.grade = "";
-    signupForm.group = "";
+  () => signupForm.role,
+  (newValue) => {
+    if (newValue) {
+      signupForm.grade = "";
+      signupForm.group = "";
+    } else {
+      signupForm.grade = "none";
+      signupForm.group = "none";
+    }
   }
 );
+
+const isLoading = ref(false);
+const isAllFilled = ref(true);
 
 const onSubmit = async () => {
   if (!Object.values(signupForm).every((value) => value)) {
     isAllFilled.value = false;
-    return false;
+    return;
   }
 
-  if (isPasswordSame.value) {
-    return false;
+  if (!isPasswordSame.value) {
+    return;
   }
 
   try {
     isLoading.value = true;
-    const signupResult = await store.dispatch("account/signup", signupForm);
+    // const signupResult = await store.dispatch("account/signup", signupForm);
 
-    await store.dispatch("account/createUser", {
-      uid: signupResult.user.uid,
-      ...signupForm,
-    });
+    // await store.dispatch("account/createUser", {
+    //   uid: signupResult.user.uid,
+    //   ...signupForm,
+    // });
 
-    await store.dispatch("account/login", {
-      email: signupForm.email,
-      password: signupForm.password,
-    });
+    // await store.dispatch("account/login", {
+    //   email: signupForm.email,
+    //   password: signupForm.password,
+    // });
 
-    router.push({ name: "AppHome" });
+    // router.push({ name: "AppHome" });
   } catch (error) {
     isAllFilled.value = true;
     isLoading.value = false;
@@ -217,10 +231,6 @@ const appendEmail = (email: string) => {
 </script>
 
 <style>
-.p-password > input {
-  width: inherit;
-  border-radius: var(--border-radius);
-}
 .p-dropdown {
   width: 80px;
 }
