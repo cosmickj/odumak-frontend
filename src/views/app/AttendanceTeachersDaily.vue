@@ -35,7 +35,7 @@
 
       <Column field="grade" header="학년" class="justify-content-center"></Column>
       <Column field="group" header="학급" class="justify-content-center"></Column>
-      <Column field="name" header="이름" class="justify-content-center"></Column>
+      <Column field="teacher" header="이름" class="justify-content-center"></Column>
       <Column field="attendance" header="출석현황" class="justify-content-center">
         <template #body="slotProps">
           <span :class="`attendance-${slotProps.data.attendance}`">
@@ -50,22 +50,42 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useStore } from "vuex";
-import type { StudentAttendance } from "@/types";
 
 const store = useStore();
 const attendanceDate = ref<Date>();
-const finalResult = ref<StudentAttendance[]>([]);
+const finalResult = ref([]);
 
 const onAttendanceDateSelect = async () => {
   const result = await store.dispatch("attendance/fetchAllStudents");
-  const unique = [...new Map(result.map((item: any) => [item["teacher"], item])).values()];
+  const unique = [
+    ...new Map(
+      result.map((item: any) => [
+        item["teacher"],
+        { grade: item.grade, group: item.group, teacher: item.teacher, attendance: item.attendance },
+      ])
+    ).values(),
+  ];
 
   const result2 = await store.dispatch("attendance/fetchTeacherAttendancesByDate", {
     date: attendanceDate.value,
   });
 
-  console.log(unique);
-  console.log(result2);
+  for (let teacherAttendance of result2) {
+    for (let teacher of unique) {
+      if (
+        teacher.grade === teacherAttendance.grade &&
+        teacher.group === teacherAttendance.group &&
+        teacher.name === teacherAttendance.teacher
+      ) {
+        teacher.attendance = teacherAttendance.attendance;
+        break;
+      }
+    }
+  }
+
+  unique.sort((a, b) => ~~a.grade - ~~b.grade || ~~a.group - ~~b.group);
+
+  finalResult.value = unique;
 };
 
 const translateAttendance = (attendance: string) => {
