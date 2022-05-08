@@ -111,11 +111,11 @@ const onAttendanceDateSelect = async () => {
   isLoading.value = true;
 
   const allStudents: StudentAttendance[] = await store.dispatch("attendance/fetchAllStudents");
-  const studentAttendances = await store.dispatch("attendance/fetchStudentAttendancesByDate", {
+  const studentsAttendance = await store.dispatch("attendance/fetchStudentAttendancesByDate", {
     date: attendanceDate.value,
   });
 
-  for (let studentAttendance of studentAttendances) {
+  for (let studentAttendance of studentsAttendance) {
     for (let student of allStudents) {
       if (
         student.grade === studentAttendance.grade &&

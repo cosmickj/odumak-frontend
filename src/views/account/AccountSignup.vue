@@ -41,7 +41,7 @@
 
       <div class="mx-7 mb-2">
         <Password
-          v-model="confirmedPassword"
+          v-model="signupForm.confirmedPassword"
           class="w-full"
           toggleMask
           :feedback="false"
@@ -49,7 +49,7 @@
           inputStyle="width:inherit; border-radius:var(--border-radius);"
         />
 
-        <div v-if="!isPasswordSame && confirmedPassword">
+        <div v-if="!isPasswordSame && signupForm.confirmedPassword">
           <span class="text-pink-500">새 비밀번호가 일치하지 않습니다.</span>
         </div>
       </div>
@@ -68,12 +68,12 @@
           <div>담당 학급이 있으신가요?</div>
 
           <div class="flex align-items-center">
-            <RadioButton v-model="signupForm.role" id="teacher" name="role" value="teacher" />
+            <RadioButton v-model="signupForm.role" name="role" id="teacher" value="teacher" />
             <label class="ml-2" for="teacher">네</label>
           </div>
 
           <div class="flex align-items-center">
-            <RadioButton v-model="signupForm.role" id="common" name="role" value="common" />
+            <RadioButton v-model="signupForm.role" name="role" id="common" value="common" />
             <label class="ml-2" for="common">아니요</label>
           </div>
         </div>
@@ -138,13 +138,14 @@ const router = useRouter();
 const initSignupForm = {
   email: "",
   password: "",
+  confirmedPassword: "",
   name: "",
   role: "common",
-  grade: "none",
-  group: "none",
+  grade: "n/a",
+  group: "n/a",
 };
 const signupForm = reactive({ ...initSignupForm });
-const confirmedPassword = ref("");
+// const confirmedPassword = ref("");
 
 const isPasswordLongerThanSix = computed(() => {
   const regex = new RegExp("(?=.{6,})");
@@ -152,20 +153,20 @@ const isPasswordLongerThanSix = computed(() => {
   else return false;
 });
 const isPasswordSame = computed(() => {
-  if (!signupForm.password && !confirmedPassword.value) return false;
-  else if (signupForm.password === confirmedPassword.value) return true;
+  if (!signupForm.password && !signupForm.confirmedPassword) return false;
+  else if (signupForm.password === signupForm.confirmedPassword) return true;
   else return false;
 });
 
 watch(
   () => signupForm.role,
   (newValue) => {
-    if (newValue) {
+    if (newValue === "teacher") {
       signupForm.grade = "";
       signupForm.group = "";
     } else {
-      signupForm.grade = "none";
-      signupForm.group = "none";
+      signupForm.grade = "n/a";
+      signupForm.group = "n/a";
     }
   }
 );
@@ -179,25 +180,24 @@ const onSubmit = async () => {
     return;
   }
 
+  if (!isPasswordLongerThanSix.value) {
+    return;
+  }
+
   if (!isPasswordSame.value) {
     return;
   }
 
   try {
     isLoading.value = true;
-    // const signupResult = await store.dispatch("account/signup", signupForm);
 
-    // await store.dispatch("account/createUser", {
-    //   uid: signupResult.user.uid,
-    //   ...signupForm,
-    // });
+    const signupResult = await store.dispatch("account/signup", signupForm);
 
-    // await store.dispatch("account/login", {
-    //   email: signupForm.email,
-    //   password: signupForm.password,
-    // });
+    await store.dispatch("account/createUser", { uid: signupResult.user.uid, ...signupForm });
 
-    // router.push({ name: "AppHome" });
+    await store.dispatch("account/login", { email: signupForm.email, password: signupForm.password });
+
+    router.push({ name: "AppHome" });
   } catch (error) {
     isAllFilled.value = true;
     isLoading.value = false;
