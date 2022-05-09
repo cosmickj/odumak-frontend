@@ -65,7 +65,7 @@ import { useStore } from "vuex";
 import AppFingerUpper from "@/components/AppFingerUpper.vue";
 import AttendanceInputTeachers from "@/components/AttendanceInputTeachers.vue";
 import AttendanceInputStudents from "@/components/AttendanceInputStudents.vue";
-import type { Student } from "@/types";
+import type { Student, TeacherAttendance } from "@/types";
 
 const store = useStore();
 const user = computed(() => store.state.account.user);
@@ -74,7 +74,7 @@ const authIsReady = computed(() => store.state.account.authIsReady);
 const recordId = ref("");
 const attendanceDate = ref<Date>();
 const studentsAttendanceStatus = ref<Student[]>([]);
-const teachersAttendanceStatus = ref([]);
+const teachersAttendanceStatus = ref<TeacherAttendance[]>([]);
 
 const requestStudentsAttendance = async () => {
   const result = await store.dispatch("attendance/fetchStudentsAttendance", {
@@ -118,18 +118,29 @@ const requestTeacherAttendances = async () => {
     date: attendanceDate.value,
   });
 
-  result.forEach((teacher: any) => {
+  result.teachersAttendance.forEach((teacher: any) => {
     if (!teacher.attendance) {
       teacher.attendance = "offline";
     }
   });
 
-  teachersAttendanceStatus.value = result;
-
-  // recordId.value = result.recordId;
-  // studentsAttendanceStatus.value = result.studentsAttendance;
+  recordId.value = result.recordId;
+  teachersAttendanceStatus.value = result.teachersAttendance;
 };
-const submitTeachersAttendance = () => {
-  console.log("submitTeachersAttendance");
+
+const submitTeachersAttendance = async () => {
+  const params = {
+    date: attendanceDate.value,
+    teachersAttendance: teachersAttendanceStatus.value,
+    recordId: recordId.value,
+  };
+  const result = await store.dispatch("attendance/addTeachersAttendance", params);
+
+  if (!recordId.value) {
+    recordId.value = result.id;
+    alert("제출되었습니다.");
+  } else {
+    alert("수정되었습니다.");
+  }
 };
 </script>

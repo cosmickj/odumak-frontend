@@ -1,6 +1,6 @@
 import { Module } from "vuex";
-import { db, studentsAttendanceCol, studentsCol, teacherAttendanceCol, teachersCol } from "@/firebase/config";
-import { addDoc, doc, getDocs, query, setDoc, where } from "firebase/firestore";
+import { db, studentsAttendanceCol, studentsCol, teachersAttendanceCol, teachersCol } from "@/firebase/config";
+import { addDoc, doc, getDocs, orderBy, query, setDoc, where } from "firebase/firestore";
 import { RootState, AttendanceState } from "@/store/types";
 
 export const attendance: Module<AttendanceState, RootState> = {
@@ -97,18 +97,37 @@ export const attendance: Module<AttendanceState, RootState> = {
     },
 
     async fetchTeachersAttendance(context, payload) {
-      const q = query(teacherAttendanceCol, where("date", "==", payload.date));
+      const q = query(teachersAttendanceCol, where("date", "==", payload.date));
       const fetchTeachersAttendanceResponse = await getDocs(q);
 
       if (fetchTeachersAttendanceResponse.docs.length > 0) {
-        console.log("저장된 데이터 있음");
+        const result = {
+          recordId: fetchTeachersAttendanceResponse.docs[0].id,
+          ...fetchTeachersAttendanceResponse.docs[0].data(),
+        };
+
+        return result;
       } else {
         // ALL TEACHERS
-        const querySnapshot = await getDocs(teachersCol);
-        const result = querySnapshot.docs.map((doc) => ({
+        const q = query(teachersCol, orderBy("name"));
+        const querySnapshot = await getDocs(q);
+        const initTeachersAttendance = querySnapshot.docs.map((doc) => ({
           name: doc.data().name,
           attendance: "",
         }));
+        const result = { result: "", teachersAttendance: [...initTeachersAttendance] };
+        return result;
+      }
+    },
+
+    async addTeachersAttendance(context, payload) {
+      if (payload.recordId) {
+        const docId = payload.recordId;
+        delete payload.recordId;
+        await setDoc(doc(db, "teachersAttendance", docId), payload);
+      } else {
+        delete payload.recordId;
+        const result = await addDoc(studentsAttendanceCol, payload);
         return result;
       }
     },

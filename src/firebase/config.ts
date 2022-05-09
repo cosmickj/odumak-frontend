@@ -28,5 +28,4 @@ export const usersCol = collection(db, "users");
 export const studentsCol = collection(db, "students");
 export const studentsAttendanceCol = collection(db, "studentsAttendance");
 export const teachersCol = collection(db, "teachers");
-export const teacherAttendanceCol = collection(db, "teacherAttendance");
-// export const attendancesCol = collection(db, "attendances");
+export const teachersAttendanceCol = collection(db, "teachersAttendance");

@@ -81,6 +81,7 @@
 import { ref } from "vue";
 import { useStore } from "vuex";
 import AppFingerUpper from "@/components/AppFingerUpper.vue";
+import type { StudentAttendance } from "@/types";
 
 // import { FilterMatchMode } from "primevue/api";
 // interface Filter {
@@ -92,14 +93,6 @@ import AppFingerUpper from "@/components/AppFingerUpper.vue";
 // const filter = ref<Filter>({
 //   global: { value: "", matchMode: FilterMatchMode.CONTAINS },
 // });
-
-interface StudentAttendance {
-  grade: string;
-  group: string;
-  name: string;
-  teacher: string;
-  attendance: string;
-}
 
 const store = useStore();
 

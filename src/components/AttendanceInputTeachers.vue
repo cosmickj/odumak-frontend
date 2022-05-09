@@ -37,11 +37,14 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
+import type { TeacherAttendance } from "@/types";
 
-const props = defineProps(["modelValue"]);
+const props = defineProps<{
+  modelValue: TeacherAttendance[];
+}>();
 const emits = defineEmits(["update:modelValue"]);
 
-const teachersAttendance = computed({
+const teachersAttendance = computed<TeacherAttendance[]>({
   get() {
     return props.modelValue;
   },
