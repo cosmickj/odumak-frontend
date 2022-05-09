@@ -2,7 +2,7 @@
   <!-- 학생 출석체크 -->
   <div v-for="(student, i) in students" :key="i" class="attendance student">
     <div class="student__name">{{ student.name }}</div>
-    <div class="student__birth">{{ student.birth }}</div>
+    <!-- <div class="student__birth">{{ student.birth }}</div> -->
     <input
       type="radio"
       :id="`absence-${student.name}`"
@@ -36,29 +36,21 @@
   </div>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, PropType } from "vue";
+<script setup lang="ts">
+import { computed } from "vue";
 import type { Student } from "@/types";
 
-export default defineComponent({
-  name: "StudentsAttendanceStatus",
-  props: {
-    modelValue: {
-      type: Array as PropType<Student[]>,
-      required: true,
-    },
+const props = defineProps<{
+  modelValue: Student[];
+}>();
+const emits = defineEmits(["update:modelValue"]);
+
+const students = computed<Student[]>({
+  get() {
+    return props.modelValue;
   },
-  emits: ["update:modelValue"],
-  setup(props, { emit }) {
-    const students = computed<Student[]>({
-      get() {
-        return props.modelValue;
-      },
-      set(students) {
-        emit("update:modelValue", students);
-      },
-    });
-    return { students };
+  set(students) {
+    emits("update:modelValue", students);
   },
 });
 </script>
