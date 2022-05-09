@@ -18,7 +18,6 @@
       />
 
       <form v-if="attendanceDate && studentsAttendanceStatus" @submit.prevent="submitStudentsAttendance">
-        <!-- <AttendanceInputTeacher v-model="teacherAttendanceStatus" /> -->
         <AttendanceInputStudents v-model="studentsAttendanceStatus" />
 
         <Button v-if="!recordId" class="p-button-warning w-full mb-5" type="submit" label="제출하기" />
@@ -43,8 +42,7 @@
       />
 
       <form v-if="attendanceDate && studentsAttendanceStatus" @submit.prevent="submitTeachersAttendance">
-        <AttendanceInputTeacher v-model="teacherAttendanceStatus" />
-        <!-- <AttendanceInputStudents v-model="studentsAttendanceStatus" /> -->
+        <AttendanceInputTeachers v-model="teachersAttendanceStatus" />
 
         <Button v-if="!recordId" class="p-button-warning w-full mb-5" type="submit" label="제출하기" />
         <Button v-else class="p-button-danger w-full mb-5" type="submit" label="수정하기" />
@@ -65,7 +63,7 @@
 import { computed, ref } from "vue";
 import { useStore } from "vuex";
 import AppFingerUpper from "@/components/AppFingerUpper.vue";
-import AttendanceInputTeacher from "@/components/AttendanceInputTeacher.vue";
+import AttendanceInputTeachers from "@/components/AttendanceInputTeachers.vue";
 import AttendanceInputStudents from "@/components/AttendanceInputStudents.vue";
 import type { Student } from "@/types";
 
@@ -76,7 +74,7 @@ const authIsReady = computed(() => store.state.account.authIsReady);
 const recordId = ref("");
 const attendanceDate = ref<Date>();
 const studentsAttendanceStatus = ref<Student[]>([]);
-const teacherAttendanceStatus = ref("online");
+const teachersAttendanceStatus = ref([]);
 
 const requestStudentsAttendance = async () => {
   const result = await store.dispatch("attendance/fetchStudentsAttendance", {
@@ -125,7 +123,8 @@ const requestTeacherAttendances = async () => {
       teacher.attendance = "offline";
     }
   });
-  console.log(result);
+
+  teachersAttendanceStatus.value = result;
 
   // recordId.value = result.recordId;
   // studentsAttendanceStatus.value = result.studentsAttendance;

@@ -1,25 +1,35 @@
 <template>
-  <!-- 선생님 출석체크 -->
-  <div class="attendance teacher">
-    <div>선생님께서는 어디서 예배하셨나요?</div>
+  <div v-for="(teacher, i) in teachersAttendance" :key="i" class="attendance student">
+    <div class="student__name">{{ teacher.name }}</div>
+    <!-- <div class="student__birth">{{ student.birth }}</div> -->
     <input
       type="radio"
-      id="teacher-online"
-      value="online"
-      v-model="teacherAttendance"
+      :id="`absence-${teacher.name}`"
+      value="absence"
+      v-model="teachersAttendance[i].attendance"
       class="attendance__input"
     />
-    <label for="teacher-online" class="attendance__label attendance__label__online">
+    <label :for="`absence-${teacher.name}`" class="attendance__label attendance__label__absence">
+      <span>결석</span>
+    </label>
+    <input
+      type="radio"
+      :id="`online-${teacher.name}`"
+      value="online"
+      v-model="teachersAttendance[i].attendance"
+      class="attendance__input"
+    />
+    <label :for="`online-${teacher.name}`" class="attendance__label attendance__label__online">
       <span>온라인</span>
     </label>
     <input
       type="radio"
-      id="teacher-offline"
+      :id="`offline-${teacher.name}`"
       value="offline"
-      v-model="teacherAttendance"
+      v-model="teachersAttendance[i].attendance"
       class="attendance__input"
     />
-    <label for="teacher-offline" class="attendance__label attendance__label__offline">
+    <label :for="`offline-${teacher.name}`" class="attendance__label attendance__label__offline">
       <span>현장</span>
     </label>
   </div>
@@ -31,7 +41,7 @@ import { computed } from "vue";
 const props = defineProps(["modelValue"]);
 const emits = defineEmits(["update:modelValue"]);
 
-const teacherAttendance = computed({
+const teachersAttendance = computed({
   get() {
     return props.modelValue;
   },
