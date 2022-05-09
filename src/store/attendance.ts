@@ -88,7 +88,7 @@ export const attendance: Module<AttendanceState, RootState> = {
       if (payload.recordId) {
         const docId = payload.recordId;
         delete payload.recordId;
-        await setDoc(doc(db, "attendances", docId), payload);
+        await setDoc(doc(db, "studentsAttendance", docId), payload);
       } else {
         delete payload.recordId;
         const result = await addDoc(studentsAttendanceCol, payload);
