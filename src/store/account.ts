@@ -30,23 +30,27 @@ export const account: Module<AccountState, RootState> = {
     async signup(context, { email, password, name }) {
       try {
         const signupResponse = await createUserWithEmailAndPassword(auth, email, password);
+
         await updateProfile(signupResponse.user, { displayName: name });
+
         return signupResponse;
       } catch (error) {
-        // throw new Error("could not complete signup");
         console.log(error);
       }
     },
 
-    async createUser(context, { uid, grade, group }) {
+    async createUser(context, { uid, email, name, role, grade, group }) {
       try {
         await setDoc(doc(db, "users", uid), {
+          email,
+          name,
+          role,
           grade,
           group,
           createdAt: serverTimestamp(),
         });
       } catch (error) {
-        throw new Error("could not complete creating a user");
+        console.log(error);
       }
     },
 

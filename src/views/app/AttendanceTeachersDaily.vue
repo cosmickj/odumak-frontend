@@ -33,9 +33,7 @@
         </div>
       </template>
 
-      <Column field="grade" header="학년" class="justify-content-center"></Column>
-      <Column field="group" header="학급" class="justify-content-center"></Column>
-      <Column field="teacher" header="이름" class="justify-content-center"></Column>
+      <Column field="name" header="이름" class="justify-content-center"></Column>
       <Column field="attendance" header="출석현황" class="justify-content-center">
         <template #body="slotProps">
           <span :class="`attendance-${slotProps.data.attendance}`">
@@ -56,36 +54,11 @@ const attendanceDate = ref<Date>();
 const finalResult = ref([]);
 
 const onAttendanceDateSelect = async () => {
-  const result = await store.dispatch("attendance/fetchAllStudents");
-  const unique = [
-    ...new Map(
-      result.map((item: any) => [
-        item["teacher"],
-        { grade: item.grade, group: item.group, teacher: item.teacher, attendance: item.attendance },
-      ])
-    ).values(),
-  ];
-
-  const result2 = await store.dispatch("attendance/fetchTeacherAttendancesByDate", {
+  const result = await store.dispatch("attendance/fetchTeachersAttendanceByDate", {
     date: attendanceDate.value,
   });
 
-  for (let teacherAttendance of result2) {
-    for (let teacher of unique) {
-      if (
-        teacher.grade === teacherAttendance.grade &&
-        teacher.group === teacherAttendance.group &&
-        teacher.name === teacherAttendance.teacher
-      ) {
-        teacher.attendance = teacherAttendance.attendance;
-        break;
-      }
-    }
-  }
-
-  unique.sort((a, b) => ~~a.grade - ~~b.grade || ~~a.group - ~~b.group);
-
-  finalResult.value = unique;
+  finalResult.value = result.teachersAttendance;
 };
 
 const translateAttendance = (attendance: string) => {
@@ -99,4 +72,30 @@ const table = ref();
 const exportCSV = () => table.value.exportCSV();
 </script>
 
-<style scoped></style>
+<style scoped>
+.attendance-online {
+  background-color: #fbc02d;
+  border-radius: 3px;
+  font-weight: bold;
+  padding: 0.5rem;
+}
+.attendance-offline {
+  background-color: #4caf50;
+  border-radius: 3px;
+  font-weight: bold;
+  padding: 0.5rem;
+}
+.attendance-absence {
+  background-color: #ff4032;
+  border-radius: 3px;
+  font-weight: bold;
+  padding: 0.5rem;
+}
+/* .attendance-none { */
+.attendance- {
+  background-color: #cccccc;
+  border-radius: 3px;
+  font-weight: bold;
+  padding: 0.5rem;
+}
+</style>

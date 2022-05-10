@@ -1,9 +1,3 @@
-export interface StudentAttendance {
-  name: string;
-  birth: string;
-  attendance: string;
-}
-
 export interface UserInfo {
   name: string;
   email: string;
@@ -19,4 +13,17 @@ export interface Student {
   grade?: string;
   group?: string;
   date?: Date | string;
+}
+
+export interface StudentAttendance {
+  grade: string;
+  group: string;
+  name: string;
+  teacher: string;
+  attendance: string;
+}
+
+export interface TeacherAttendance {
+  name: string;
+  attendance: string;
 }

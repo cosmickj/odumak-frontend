@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="z-5 flex justify-content-evenly align-items-center h-5rem border-round shadow"
-  >
+  <div class="z-5 flex justify-content-evenly align-items-center h-5rem border-round shadow">
     <router-link :to="{ name: 'AppHome' }">
       <div class="p-2">
         <i class="pi pi-home" style="font-size: 2rem"></i>

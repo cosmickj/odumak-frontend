@@ -1,6 +1,6 @@
 import { Module } from "vuex";
-import { db, attendancesCol, studentsCol } from "@/firebase/config";
-import { addDoc, doc, getDocs, query, setDoc, where } from "firebase/firestore";
+import { db, studentsAttendanceCol, studentsCol, teachersAttendanceCol, teachersCol } from "@/firebase/config";
+import { addDoc, doc, getDocs, orderBy, query, setDoc, where } from "firebase/firestore";
 import { RootState, AttendanceState } from "@/store/types";
 
 export const attendance: Module<AttendanceState, RootState> = {
@@ -28,61 +28,60 @@ export const attendance: Module<AttendanceState, RootState> = {
       return result;
     },
 
+    // TODO: 함수명 바꿔야함
     async fetchStudentAttendancesByDate(context, payload) {
-      const q = query(attendancesCol, where("date", "==", payload.date));
+      const q = query(studentsAttendanceCol, where("date", "==", payload.date));
       const res = await getDocs(q);
-      const result = res.docs.map((value) => value.data().studentAttendances);
+      const result = res.docs.map((value) => value.data().studentsAttendance);
       return result.flat();
     },
 
-    async fetchTeacherAttendancesByDate(context, payload) {
-      const q = query(attendancesCol, where("date", "==", payload.date));
+    async fetchTeachersAttendanceByDate(context, payload) {
+      const q = query(teachersAttendanceCol, where("date", "==", payload.date));
       const res = await getDocs(q);
-      const result = res.docs.map((value) => ({
-        grade: value.data().grade,
-        group: value.data().group,
-        name: value.data().teacher,
-        attendance: value.data().teacherAttendance,
-      }));
-      return result;
+      if (res.docs.length > 0) {
+        return res.docs[0].data();
+      } else {
+        // ALL TEACHERS
+        const q = query(teachersCol, orderBy("name"));
+        const querySnapshot = await getDocs(q);
+        const initTeachersAttendance = querySnapshot.docs.map((doc) => ({
+          name: doc.data().name,
+          attendance: "",
+        }));
+        const result = { result: "", teachersAttendance: [...initTeachersAttendance] };
+        return result;
+      }
     },
 
-    async fetchAttendances(context, payload) {
+    async fetchStudentsAttendance(context, payload) {
       const q = query(
-        attendancesCol,
+        studentsAttendanceCol,
         where("date", "==", payload.date),
         where("grade", "==", payload.grade),
         where("group", "==", payload.group)
       );
-      const fetchAttendancesResponse = await getDocs(q);
+      const fetchStudentsAttendanceResponse = await getDocs(q);
 
-      // 입력된 출석현황 있음
-      if (fetchAttendancesResponse.docs.length > 0) {
-        context.commit("SET_TEACHER_ATTENDANCE", fetchAttendancesResponse.docs[0].data().teacherAttendance);
-        const fetchAttendancesResult = {
-          recordId: fetchAttendancesResponse.docs[0].id,
-          ...fetchAttendancesResponse.docs[0].data(),
+      if (fetchStudentsAttendanceResponse.docs.length > 0) {
+        const result = {
+          recordId: fetchStudentsAttendanceResponse.docs[0].id,
+          ...fetchStudentsAttendanceResponse.docs[0].data(),
         };
-        return fetchAttendancesResult;
-      }
-      // 입력된 출석현황 없음
-      else {
+        return result;
+      } else {
         const fetchStudentsByClassResponse = await context.dispatch("fetchStudentsByClass", payload);
 
-        // 템플릿 만들어주기
-        const initAttendances = fetchStudentsByClassResponse.docs.map((doc: any) => ({
+        const initStudentsAttendance = fetchStudentsByClassResponse.docs.map((doc: any) => ({
           teacher: doc.data().teacher,
           grade: doc.data().grade,
           group: doc.data().group,
           name: doc.data().name,
           attendance: "",
         }));
-        const fetchAttendancesResult = {
-          recordId: "",
-          teacherAttendance: "online",
-          studentAttendances: [...initAttendances],
-        };
-        return fetchAttendancesResult;
+
+        const result = { recordId: "", studentsAttendance: [...initStudentsAttendance] };
+        return result;
       }
     },
 
@@ -92,14 +91,50 @@ export const attendance: Module<AttendanceState, RootState> = {
       return fetchStudentsByClassResponse;
     },
 
-    async addAttendance(context, payload) {
+    async addStudentsAttendance(context, payload) {
       if (payload.recordId) {
         const docId = payload.recordId;
         delete payload.recordId;
-        await setDoc(doc(db, "attendances", docId), payload);
+        await setDoc(doc(db, "studentsAttendance", docId), payload);
       } else {
         delete payload.recordId;
-        const result = await addDoc(attendancesCol, payload);
+        const result = await addDoc(studentsAttendanceCol, payload);
+        return result;
+      }
+    },
+
+    async fetchTeachersAttendance(context, payload) {
+      const q = query(teachersAttendanceCol, where("date", "==", payload.date));
+      const fetchTeachersAttendanceResponse = await getDocs(q);
+
+      if (fetchTeachersAttendanceResponse.docs.length > 0) {
+        const result = {
+          recordId: fetchTeachersAttendanceResponse.docs[0].id,
+          ...fetchTeachersAttendanceResponse.docs[0].data(),
+        };
+
+        return result;
+      } else {
+        // ALL TEACHERS
+        const q = query(teachersCol, orderBy("name"));
+        const querySnapshot = await getDocs(q);
+        const initTeachersAttendance = querySnapshot.docs.map((doc) => ({
+          name: doc.data().name,
+          attendance: "",
+        }));
+        const result = { result: "", teachersAttendance: [...initTeachersAttendance] };
+        return result;
+      }
+    },
+
+    async addTeachersAttendance(context, payload) {
+      if (payload.recordId) {
+        const docId = payload.recordId;
+        delete payload.recordId;
+        await setDoc(doc(db, "teachersAttendance", docId), payload);
+      } else {
+        delete payload.recordId;
+        const result = await addDoc(studentsAttendanceCol, payload);
         return result;
       }
     },

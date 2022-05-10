@@ -11,9 +11,6 @@
       @date-select="onAttendanceDateSelect"
     />
 
-    <!-- sortMode="single"
-      sortField="group"
-      :sortOrder="1" -->
     <DataTable
       class="p-datatable-sm pt-5"
       v-if="attendanceDate && !isLoading"
@@ -33,7 +30,8 @@
               @click="exportCSV"
             />
           </div>
-          <!-- <div class="flex justify-content-end align-items-center">
+          <!-- 검색기능 추가하기
+          <div class="flex justify-content-end align-items-center">
             <span class="p-input-icon-left">
               <i class="pi pi-search" />
               <InputText v-model="filter.global.value" class="p-inputtext-sm" placeholder="검색하기" />
@@ -81,25 +79,20 @@
 import { ref } from "vue";
 import { useStore } from "vuex";
 import AppFingerUpper from "@/components/AppFingerUpper.vue";
+import type { StudentAttendance } from "@/types";
 
-// import { FilterMatchMode } from "primevue/api";
-// interface Filter {
-//   global: {
-//     value: string;
-//     matchMode: string;
-//   };
-// }
-// const filter = ref<Filter>({
-//   global: { value: "", matchMode: FilterMatchMode.CONTAINS },
-// });
-
-interface StudentAttendance {
-  grade: string;
-  group: string;
-  name: string;
-  teacher: string;
-  attendance: string;
+/** 검색 기능 추가하기
+import { FilterMatchMode } from "primevue/api";
+interface Filter {
+  global: {
+    value: string;
+    matchMode: string;
+  };
 }
+const filter = ref<Filter>({
+  global: { value: "", matchMode: FilterMatchMode.CONTAINS },
+});
+ */
 
 const store = useStore();
 
@@ -111,11 +104,11 @@ const onAttendanceDateSelect = async () => {
   isLoading.value = true;
 
   const allStudents: StudentAttendance[] = await store.dispatch("attendance/fetchAllStudents");
-  const studentAttendances = await store.dispatch("attendance/fetchStudentAttendancesByDate", {
+  const studentsAttendance = await store.dispatch("attendance/fetchStudentAttendancesByDate", {
     date: attendanceDate.value,
   });
 
-  for (let studentAttendance of studentAttendances) {
+  for (let studentAttendance of studentsAttendance) {
     for (let student of allStudents) {
       if (
         student.grade === studentAttendance.grade &&
