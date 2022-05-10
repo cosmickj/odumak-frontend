@@ -28,6 +28,7 @@ export const attendance: Module<AttendanceState, RootState> = {
       return result;
     },
 
+    // TODO: 함수명 바꿔야함
     async fetchStudentAttendancesByDate(context, payload) {
       const q = query(studentsAttendanceCol, where("date", "==", payload.date));
       const res = await getDocs(q);
@@ -35,17 +36,23 @@ export const attendance: Module<AttendanceState, RootState> = {
       return result.flat();
     },
 
-    // async fetchTeacherAttendancesByDate(context, payload) {
-    //   const q = query(attendancesCol, where("date", "==", payload.date));
-    //   const res = await getDocs(q);
-    //   const result = res.docs.map((value) => ({
-    //     grade: value.data().grade,
-    //     group: value.data().group,
-    //     name: value.data().teacher,
-    //     attendance: value.data().teacherAttendance,
-    //   }));
-    //   return result;
-    // },
+    async fetchTeachersAttendanceByDate(context, payload) {
+      const q = query(teachersAttendanceCol, where("date", "==", payload.date));
+      const res = await getDocs(q);
+      if (res.docs.length > 0) {
+        return res.docs[0].data();
+      } else {
+        // ALL TEACHERS
+        const q = query(teachersCol, orderBy("name"));
+        const querySnapshot = await getDocs(q);
+        const initTeachersAttendance = querySnapshot.docs.map((doc) => ({
+          name: doc.data().name,
+          attendance: "",
+        }));
+        const result = { result: "", teachersAttendance: [...initTeachersAttendance] };
+        return result;
+      }
+    },
 
     async fetchStudentsAttendance(context, payload) {
       const q = query(
