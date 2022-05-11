@@ -62,13 +62,31 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from "vue";
+import { inject, onMounted, reactive, ref } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
+import { VueCookies } from "vue-cookies/types/index";
 import AppYoungeunBasic from "@/components/AppYoungeunBasic.vue";
 
 const store = useStore();
 const router = useRouter();
+const $cookies = inject<VueCookies>("$cookies");
+
+const isPopup = ref(false);
+
+onMounted(() => {
+  if (!$cookies?.get("popup_checked")) {
+    setTimeout(() => {
+      isPopup.value = !isPopup.value;
+    }, 1000);
+  }
+});
+
+const togglePopup = () => {
+  $cookies?.set("popup_checked", true);
+
+  isPopup.value = false;
+};
 
 const initLoginForm = {
   email: "",
@@ -88,18 +106,6 @@ const onSubmit = async () => {
     isLoading.value = false;
     errorMessage.value = true;
   }
-};
-
-const isPopup = ref(false);
-
-onMounted(() => {
-  setTimeout(() => {
-    isPopup.value = !isPopup.value;
-  }, 1000);
-});
-
-const togglePopup = () => {
-  isPopup.value = false;
 };
 </script>
 
