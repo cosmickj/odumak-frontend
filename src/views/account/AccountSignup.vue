@@ -1,4 +1,5 @@
 <template>
+  <AppYoungeunBasic />
   <div class="mt-5">
     <form @submit.prevent="onSubmit">
       <div class="mx-7 mb-2">
@@ -128,6 +129,7 @@
 import { computed, reactive, ref, watch } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
+import AppYoungeunBasic from "@/components/AppYoungeunBasic.vue";
 import RadioButton from "primevue/radiobutton";
 import Dropdown from "primevue/dropdown";
 import Password from "primevue/password";
