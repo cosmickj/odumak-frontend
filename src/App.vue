@@ -2,7 +2,7 @@
   <main class="min-h-screen flex">
     <section class="flex-grow-1 flex justify-content-center align-items-center">
       <div
-        class="wrapper flex-grow-1 flex flex-column justify-content-center w-screen h-screen surface-0 border-round"
+        class="wrapper relative flex-grow-1 flex flex-column justify-content-center w-screen h-screen surface-0 border-round"
       >
         <router-view></router-view>
       </div>

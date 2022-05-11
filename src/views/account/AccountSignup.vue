@@ -145,7 +145,6 @@ const initSignupForm = {
   group: "n/a",
 };
 const signupForm = reactive({ ...initSignupForm });
-// const confirmedPassword = ref("");
 
 const isPasswordLongerThanSix = computed(() => {
   const regex = new RegExp("(?=.{6,})");
