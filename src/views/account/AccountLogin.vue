@@ -48,6 +48,7 @@
       </form>
     </div>
   </div>
+
   <div class="popup" :class="isPopup ? 'popup--show' : ''">
     <div class="text-2xl">
       <p>안녕하세요 선생님!</p>
@@ -56,7 +57,11 @@
     </div>
 
     <router-link :to="{ name: 'AccountSignup' }" @click="togglePopup">
-      <Button label="좋아요 :)" type="button" class="p-button-warning"></Button>
+      <Button label="좋아요" type="button" class="p-button-warning"></Button>
+    </router-link>
+
+    <router-link :to="{ name: 'AccountLogin' }" @click="togglePopup">
+      <span class="underline text-yellow-600">이미 계정이 있어요</span>
     </router-link>
   </div>
 </template>
