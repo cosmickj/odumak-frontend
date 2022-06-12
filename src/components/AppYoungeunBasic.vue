@@ -1,18 +1,12 @@
 <template>
-  <InlineSVG
-    class="svg"
-    :src="require('@/assets/youngeun_basic.svg')"
-  ></InlineSVG>
+  <div class="mx-7">
+    <InlineSVG class="svg" :src="require('@/assets/youngeun_basic.svg')" />
+  </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
 import InlineSVG from "vue-inline-svg";
 import "animate.css";
-
-export default defineComponent({
-  components: { InlineSVG },
-});
 </script>
 
 <style scoped>

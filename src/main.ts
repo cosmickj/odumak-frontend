@@ -20,6 +20,8 @@ import TabView from "primevue/tabview";
 import TabPanel from "primevue/tabpanel";
 // PrimeFlex
 import "/node_modules/primeflex/primeflex.css";
+// Vue Cookies
+import VueCookies from "vue-cookies";
 
 createApp(App)
   .use(PrimeVue)
@@ -32,4 +34,5 @@ createApp(App)
   .component("TabPanel", TabPanel)
   .use(store)
   .use(router)
+  .use(VueCookies)
   .mount("#app");

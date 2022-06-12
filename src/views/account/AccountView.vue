@@ -1,10 +1,20 @@
 <template>
-  <div class="mx-7">
-    <AppYoungeunBasic></AppYoungeunBasic>
-  </div>
-  <router-view></router-view>
+  <router-view v-slot="{ Component, route }">
+    <Transition name="fade" mode="out-in">
+      <div :key="route.name">
+        <component :is="Component"></component>
+      </div>
+    </Transition>
+  </router-view>
 </template>
 
-<script setup lang="ts">
-import AppYoungeunBasic from "@/components/AppYoungeunBasic.vue";
-</script>
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>
