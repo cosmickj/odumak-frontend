@@ -1,7 +1,7 @@
 <template>
   <div v-for="(teacher, i) in teachersAttendance" :key="i" class="attendance student">
     <div class="student__name">{{ teacher.name }}</div>
-    <!-- <div class="student__birth">{{ student.birth }}</div> -->
+
     <input
       type="radio"
       :id="`absence-${teacher.name}`"
@@ -12,6 +12,7 @@
     <label :for="`absence-${teacher.name}`" class="attendance__label attendance__label__absence">
       <span>결석</span>
     </label>
+
     <input
       type="radio"
       :id="`online-${teacher.name}`"
@@ -22,6 +23,7 @@
     <label :for="`online-${teacher.name}`" class="attendance__label attendance__label__online">
       <span>온라인</span>
     </label>
+
     <input
       type="radio"
       :id="`offline-${teacher.name}`"
@@ -32,6 +34,13 @@
     <label :for="`offline-${teacher.name}`" class="attendance__label attendance__label__offline">
       <span>현장</span>
     </label>
+
+    <div
+      class="w-3rem h-3rem flex justify-content-center align-items-center cursor-pointer"
+      @click="onClick(teacher.name)"
+    >
+      <i class="pi pi-angle-double-right" style="font-size: 1.5rem"></i>
+    </div>
   </div>
 </template>
 
@@ -41,6 +50,7 @@ import type { TeacherAttendance } from "@/types";
 
 const props = defineProps<{
   modelValue: TeacherAttendance[];
+  attendanceDate: Date;
 }>();
 const emits = defineEmits(["update:modelValue"]);
 
@@ -52,6 +62,10 @@ const teachersAttendance = computed<TeacherAttendance[]>({
     emits("update:modelValue", newValue);
   },
 });
+
+const onClick = (teacherName: string) => {
+  console.log(teacherName, props.attendanceDate);
+};
 </script>
 
 <style scoped>
