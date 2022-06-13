@@ -1,5 +1,6 @@
 <template>
-  <AppYoungeunBasic />
+  <AppYoungeunBasic></AppYoungeunBasic>
+
   <div class="mt-5">
     <form @submit.prevent="onSubmit">
       <div class="mx-7 mb-2">
@@ -80,29 +81,30 @@
         </div>
       </div>
 
-      <template v-if="signupForm.role === 'teacher'">
-        <div class="mx-7 mb-2 flex justify-content-between align-items-center">
-          <div class="flex-shrink-0 flex align-items-center">
-            <RadioButton v-model="signupForm.grade" id="third-grade" name="grade" value="3" />
-            <label class="ml-2" for="third-grade">3학년</label>
-          </div>
-
-          <div class="flex-shrink-0 flex align-items-center">
-            <RadioButton v-model="signupForm.grade" id="forth-grade" name="grade" value="4" />
-            <label class="ml-2" for="forth-grade">4학년</label>
-          </div>
-
-          <div>
-            <Dropdown
-              v-model="signupForm.group"
-              :options="group"
-              optionLabel="name"
-              optionValue="value"
-              placeholder="학급 선택"
-            />
-          </div>
+      <div
+        v-if="signupForm.role === 'teacher'"
+        class="mx-7 mb-2 flex justify-content-between align-items-center"
+      >
+        <div class="flex-shrink-0 flex align-items-center">
+          <RadioButton v-model="signupForm.grade" id="third-grade" name="grade" value="3" />
+          <label class="ml-2" for="third-grade">3학년</label>
         </div>
-      </template>
+
+        <div class="flex-shrink-0 flex align-items-center">
+          <RadioButton v-model="signupForm.grade" id="forth-grade" name="grade" value="4" />
+          <label class="ml-2" for="forth-grade">4학년</label>
+        </div>
+
+        <div>
+          <Dropdown
+            v-model="signupForm.group"
+            :options="group"
+            optionLabel="name"
+            optionValue="value"
+            placeholder="학급 선택"
+          />
+        </div>
+      </div>
 
       <div class="mx-7 my-3">
         <Button type="submit" class="p-button-warning w-full justify-content-center">
@@ -194,15 +196,18 @@ const onSubmit = async () => {
 
     const signupResult = await store.dispatch("account/signup", signupForm);
 
-    await store.dispatch("account/createUser", { uid: signupResult.user.uid, ...signupForm });
+    console.log(signupResult);
 
-    await store.dispatch("account/login", { email: signupForm.email, password: signupForm.password });
+    // await store.dispatch("account/createUser", { uid: signupResult.user.uid, ...signupForm });
 
-    router.push({ name: "AppHome" });
+    // await store.dispatch("account/login", { email: signupForm.email, password: signupForm.password });
+
+    // router.push({ name: "AppHome" });
   } catch (error) {
+    console.log(error);
+  } finally {
     isAllFilled.value = true;
     isLoading.value = false;
-    console.log(error);
   }
 };
 
@@ -221,9 +226,9 @@ const group = [
 const emails = ["@gmail.com", "@naver.com", "@hotmail.com", "@yahoo.com", "@outlook.com"];
 
 const appendEmail = (email: string) => {
-  const asperand = signupForm.email.indexOf("@");
-  if (asperand > -1) {
-    const emailHead = signupForm.email.slice(0, asperand);
+  const targetIndex = signupForm.email.indexOf("@");
+  if (targetIndex > -1) {
+    const emailHead = signupForm.email.slice(0, targetIndex);
     signupForm.email = emailHead + email;
   } else {
     signupForm.email = signupForm.email + email;
