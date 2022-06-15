@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full p-5" v-if="authIsReady">
+  <div v-if="authIsReady" class="h-full p-5">
     <div class="relative flex justify-content-center align-items-center">
       <div class="h-full w-3rem absolute left-0 cursor-pointer">
         <router-link
@@ -55,7 +55,7 @@
         @date-select="requestTeacherAttendances"
       />
 
-      <div class="form-container" v-if="attendanceDate && studentsAttendanceStatus">
+      <div v-if="attendanceDate && studentsAttendanceStatus" class="form-container">
         <form @submit.prevent="submitTeachersAttendance">
           <AttendanceInputTeachers v-model="teachersAttendanceStatus" :attendance-date="attendanceDate" />
 
@@ -136,9 +136,7 @@ const requestTeacherAttendances = async () => {
   });
 
   result.teachersAttendance.forEach((teacher: any) => {
-    if (!teacher.attendance) {
-      teacher.attendance = "offline";
-    }
+    if (!teacher.attendance) teacher.attendance = "offline";
   });
 
   recordId.value = result.recordId;
