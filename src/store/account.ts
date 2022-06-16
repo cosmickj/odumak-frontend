@@ -40,11 +40,11 @@ export const account: Module<AccountState, RootState> = {
           };
         }
 
-        // #002 해당 이름으로 가입하려는 사람의 역할이 선생님이 맞는가?
+        // #002 해당 이름으로 가입하려는 사람의 역할이 맞는가?
         const registeredRole = response.docs[0].data().role;
         if (payload.role !== registeredRole) {
           return {
-            message: "등록된 담임 선생님이 아닙니다. 관리자에게 문의해주세요.",
+            message: "담당 학급 여부를 한 번 더 확인해주시거나 관리자에게 문의해주세요.",
           };
         }
 
@@ -53,7 +53,7 @@ export const account: Module<AccountState, RootState> = {
         const registeredGroup = response.docs[0].data().group;
         if (payload.grade !== registeredGrade || payload.group !== registeredGroup) {
           return {
-            message: "입력하신 학년과 반을 다시 확인해주세요.",
+            message: "입력하신 학년과 반을 한 번 더 확인해주시거나 관리자에게 문의해주세요.",
           };
         }
 

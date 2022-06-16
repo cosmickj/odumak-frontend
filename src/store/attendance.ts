@@ -5,18 +5,27 @@ import { RootState, AttendanceState } from "@/store/types";
 
 export const attendance: Module<AttendanceState, RootState> = {
   namespaced: true,
+
   state: () => ({
     teacherAttendance: "online",
+    totalStudents: [],
+    totalTeachers: [],
   }),
 
   mutations: {
     SET_TEACHER_ATTENDANCE(state, payload) {
       state.teacherAttendance = payload;
     },
+    SET_TOTAL_STUDENTS(state, payload) {
+      state.totalStudents = payload.totalStudents;
+    },
+    SET_TOTAL_TEACHERS(state, payload) {
+      state.totalTeachers = payload.totalTeachers;
+    },
   },
 
   actions: {
-    async fetchAllStudents() {
+    async fetchAllStudents(context) {
       const querySnapshot = await getDocs(studentsCol);
       const result = querySnapshot.docs.map((doc) => ({
         grade: doc.data().grade,
@@ -25,6 +34,28 @@ export const attendance: Module<AttendanceState, RootState> = {
         teacher: doc.data().teacher,
         attendance: "",
       }));
+
+      context.commit("SET_TOTAL_STUDENTS", {
+        totalStudents: result,
+      });
+
+      return result;
+    },
+
+    async fetchTotalTeachers(context) {
+      const querySnapshot = await getDocs(teachersCol);
+      const result = querySnapshot.docs.map((doc) => ({
+        grade: doc.data().grade,
+        group: doc.data().group,
+        name: doc.data().name,
+        role: doc.data().role,
+        attendance: "",
+      }));
+
+      context.commit("SET_TOTAL_TEACHERS", {
+        totalTeachers: result,
+      });
+
       return result;
     },
 
@@ -70,15 +101,16 @@ export const attendance: Module<AttendanceState, RootState> = {
         };
         return result;
       } else {
-        const fetchStudentsByClassResponse = await context.dispatch("fetchStudentsByClass", payload);
+        // const fetchStudentsByClassResponse = await context.dispatch("fetchStudentsByClass", payload);
+        // const initStudentsAttendance = fetchStudentsByClassResponse.docs.map((doc: any) => ({
+        //   teacher: doc.data().teacher,
+        //   grade: doc.data().grade,
+        //   group: doc.data().group,
+        //   name: doc.data().name,
+        //   attendance: "",
+        // }));
 
-        const initStudentsAttendance = fetchStudentsByClassResponse.docs.map((doc: any) => ({
-          teacher: doc.data().teacher,
-          grade: doc.data().grade,
-          group: doc.data().group,
-          name: doc.data().name,
-          attendance: "",
-        }));
+        const initStudentsAttendance = context.state.totalStudents;
 
         const result = { recordId: "", studentsAttendance: [...initStudentsAttendance] };
         return result;
@@ -115,15 +147,8 @@ export const attendance: Module<AttendanceState, RootState> = {
 
         return result;
       } else {
-        // ALL TEACHERS
-        const q = query(teachersCol, orderBy("name"));
-        const querySnapshot = await getDocs(q);
-        const initTeachersAttendance = querySnapshot.docs.map((doc) => ({
-          name: doc.data().name,
-          attendance: "",
-        }));
-        const result = { result: "", teachersAttendance: [...initTeachersAttendance] };
-        return result;
+        const initTeachersAttendance = context.state.totalTeachers;
+        return { result: "", teachersAttendance: [...initTeachersAttendance] };
       }
     },
 

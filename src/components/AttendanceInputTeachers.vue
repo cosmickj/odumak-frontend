@@ -1,53 +1,63 @@
 <template>
-  <div v-for="(teacher, i) in teachersAttendance" :key="i" class="attendance student">
-    <div class="student__name">{{ teacher.name }}</div>
+  <div v-for="(teacher, i) in teachersAttendance" :key="i" class="student">
+    <div class="attendance">
+      <div class="student__name">{{ teacher.name }}</div>
 
-    <input
-      type="radio"
-      :id="`absence-${teacher.name}`"
-      value="absence"
-      v-model="teachersAttendance[i].attendance"
-      class="attendance__input"
-    />
-    <label :for="`absence-${teacher.name}`" class="attendance__label attendance__label__absence">
-      <span>결석</span>
-    </label>
+      <input
+        type="radio"
+        :id="`absence-${teacher.name}`"
+        value="absence"
+        v-model="teachersAttendance[i].attendance"
+        class="attendance__input"
+      />
+      <label :for="`absence-${teacher.name}`" class="attendance__label attendance__label__absence">
+        <span>결석</span>
+      </label>
 
-    <input
-      type="radio"
-      :id="`online-${teacher.name}`"
-      value="online"
-      v-model="teachersAttendance[i].attendance"
-      class="attendance__input"
-    />
-    <label :for="`online-${teacher.name}`" class="attendance__label attendance__label__online">
-      <span>온라인</span>
-    </label>
+      <input
+        type="radio"
+        :id="`online-${teacher.name}`"
+        value="online"
+        v-model="teachersAttendance[i].attendance"
+        class="attendance__input"
+      />
+      <label :for="`online-${teacher.name}`" class="attendance__label attendance__label__online">
+        <span>온라인</span>
+      </label>
 
-    <input
-      type="radio"
-      :id="`offline-${teacher.name}`"
-      value="offline"
-      v-model="teachersAttendance[i].attendance"
-      class="attendance__input"
-    />
-    <label :for="`offline-${teacher.name}`" class="attendance__label attendance__label__offline">
-      <span>현장</span>
-    </label>
+      <input
+        type="radio"
+        :id="`offline-${teacher.name}`"
+        value="offline"
+        v-model="teachersAttendance[i].attendance"
+        class="attendance__input"
+      />
+      <label :for="`offline-${teacher.name}`" class="attendance__label attendance__label__offline">
+        <span>현장</span>
+      </label>
 
-    <div
-      class="w-3rem h-3rem flex justify-content-center align-items-center cursor-pointer"
-      @click="onClick(teacher.name)"
-    >
-      <i class="pi pi-angle-double-right" style="font-size: 1.5rem"></i>
+      <div
+        class="w-3rem h-3rem flex justify-content-center align-items-center cursor-pointer"
+        @click="onClick(teacher, i)"
+      >
+        <i class="pi pi-angle-double-down" style="font-size: 1.5rem"></i>
+      </div>
+    </div>
+
+    <div v-if="isOpen && i === currnetIndex">
+      <div v-if="teacher.role === 'common'">담임 선생님이 아닙니다.</div>
+      <AttendanceInputStudents v-else v-model="studentsAttendance"></AttendanceInputStudents>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-import type { TeacherAttendance } from "@/types";
+import { computed, ref } from "vue";
+import { TeacherAttendance } from "@/types";
+import AttendanceInputStudents from "@/components/AttendanceInputStudents.vue";
+import { useStore } from "vuex";
 
+const store = useStore();
 const props = defineProps<{
   modelValue: TeacherAttendance[];
   attendanceDate: Date;
@@ -63,8 +73,24 @@ const teachersAttendance = computed<TeacherAttendance[]>({
   },
 });
 
-const onClick = (teacherName: string) => {
-  console.log(teacherName, props.attendanceDate);
+const studentsAttendance = ref([]);
+
+const isOpen = ref(false);
+const currnetIndex = ref<null | number>(null);
+
+const onClick = async (teacher: any, index: number) => {
+  if (teacher.role === "teacher") {
+    const result = await store.dispatch("attendance/fetchStudentsAttendance", {
+      date: props.attendanceDate,
+      grade: teacher.grade,
+      group: teacher.group,
+    });
+
+    studentsAttendance.value = result;
+  }
+
+  currnetIndex.value = index;
+  isOpen.value = !isOpen.value;
 };
 </script>
 
