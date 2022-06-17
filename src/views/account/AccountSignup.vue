@@ -143,10 +143,10 @@ const initSignupForm = {
   email: "",
   password: "",
   confirmedPassword: "",
-  name: "",
   role: "common",
   grade: "n/a",
   group: "n/a",
+  name: "",
 };
 const signupForm = reactive({ ...initSignupForm });
 
@@ -182,21 +182,16 @@ const onSubmit = async () => {
     isAllFilled.value = false;
     return;
   }
-
   if (!isPasswordLongerThanSix.value) {
     return;
   }
-
   if (!isPasswordSame.value) {
     return;
   }
-
   try {
     isLoading.value = true;
 
     const signupResult = await store.dispatch("account/signup", signupForm);
-
-    console.log(signupResult);
 
     // await store.dispatch("account/createUser", { uid: signupResult.user.uid, ...signupForm });
 
