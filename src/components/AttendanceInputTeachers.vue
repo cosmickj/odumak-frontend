@@ -1,5 +1,5 @@
 <template>
-  <div v-for="(teacher, i) in teachersAttendance" :key="i" class="student">
+  <div v-for="(teacher, idx) in teachersAttendance" :key="idx" class="student">
     <div class="attendance">
       <div class="student__name">{{ teacher.name }}</div>
 
@@ -7,7 +7,7 @@
         type="radio"
         :id="`absence-${teacher.name}`"
         value="absence"
-        v-model="teachersAttendance[i].attendance"
+        v-model="teachersAttendance[idx].attendance"
         class="attendance__input"
       />
       <label :for="`absence-${teacher.name}`" class="attendance__label attendance__label__absence">
@@ -18,7 +18,7 @@
         type="radio"
         :id="`online-${teacher.name}`"
         value="online"
-        v-model="teachersAttendance[i].attendance"
+        v-model="teachersAttendance[idx].attendance"
         class="attendance__input"
       />
       <label :for="`online-${teacher.name}`" class="attendance__label attendance__label__online">
@@ -29,7 +29,7 @@
         type="radio"
         :id="`offline-${teacher.name}`"
         value="offline"
-        v-model="teachersAttendance[i].attendance"
+        v-model="teachersAttendance[idx].attendance"
         class="attendance__input"
       />
       <label :for="`offline-${teacher.name}`" class="attendance__label attendance__label__offline">
@@ -38,15 +38,18 @@
 
       <div
         class="w-3rem h-3rem flex align-items-center justify-content-center cursor-pointer"
-        @click="onClick(teacher, i)"
+        @click="onClick(teacher, idx)"
       >
-        <i class="pi pi-angle-double-down" style="font-size: 1.5rem"></i>
+        <i class="pi pi-angle-double-down" :class="{ 'pi--open': currnetIndexList.includes(idx) }"> </i>
       </div>
     </div>
 
-    <div v-if="isOpen && i === currnetIndex">
-      <AttendanceInputStudents v-if="teacher.role === 'common'" v-model="studentsAttendance" />
-      <div v-else>담임 선생님이 아닙니다.</div>
+    <div class="extra" v-if="currnetIndexList.includes(idx)">
+      <AttendanceInputStudents
+        v-if="teacher.role === 'teacher' && !isLoading"
+        v-model="studentsAttendanceList[teacher.name]"
+      />
+      <div v-else-if="teacher.role === 'common' && !isLoading">담임 선생님이 아닙니다.</div>
     </div>
   </div>
 </template>
@@ -55,7 +58,7 @@
 import { computed, ref } from "vue";
 import AttendanceInputStudents from "@/components/AttendanceInputStudents.vue";
 import { useStore } from "vuex";
-import { Teacher } from "@/types";
+import { Teacher, Student } from "@/types";
 
 const props = defineProps<{
   modelValue: Teacher[];
@@ -74,11 +77,21 @@ const teachersAttendance = computed<Teacher[]>({
   },
 });
 
-const isOpen = ref(false);
-const currnetIndex = ref<null | number>(null);
-const studentsAttendance = ref([]);
+const isLoading = ref(false);
+const currnetIndexList = ref<number[]>([]);
+// TODO: 타입 정의 다시하기
+const studentsAttendanceList = ref<{ name: Student | any } | any>({});
 
-const onClick = async (teacher: Teacher, index: number) => {
+const onClick = async (teacher: Teacher, currentIndex: number) => {
+  isLoading.value = true;
+
+  const targetIndex = currnetIndexList.value.indexOf(currentIndex);
+  if (targetIndex === -1) {
+    currnetIndexList.value.push(currentIndex);
+  } else {
+    currnetIndexList.value.splice(targetIndex, 1);
+  }
+
   if (teacher.role === "teacher") {
     const result = await store.dispatch("attendance/fetchStudentsAttendance", {
       date: props.attendanceDate,
@@ -86,12 +99,9 @@ const onClick = async (teacher: Teacher, index: number) => {
       group: teacher.group,
       teacher: teacher.name,
     });
-
-    studentsAttendance.value = result.studentsAttendance;
+    studentsAttendanceList.value[teacher.name] = result.studentsAttendance;
   }
-
-  currnetIndex.value = index;
-  isOpen.value = !isOpen.value;
+  isLoading.value = false;
 };
 </script>
 
@@ -140,5 +150,15 @@ const onClick = async (teacher: Teacher, index: number) => {
 .attendance__label__absence {
   background-color: #ff4032;
   color: #28334aff;
+}
+.pi {
+  font-size: 1.5rem;
+  transition: all 0.3s;
+}
+.pi--open {
+  transform: rotate(180deg);
+}
+.extra {
+  background-color: orange;
 }
 </style>
