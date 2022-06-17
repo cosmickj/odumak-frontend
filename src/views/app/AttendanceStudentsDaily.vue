@@ -12,44 +12,25 @@
     />
 
     <DataTable
-      class="p-datatable-sm pt-5"
       v-if="attendanceDate && !isLoading"
-      ref="table"
-      :value="finalResult"
+      ref="dataTableElement"
+      class="p-datatable-sm pt-5"
+      :value="studentsAttendance"
       rowGroupMode="subheader"
       groupRowsBy="teacher"
       scrollable
     >
       <template #header>
-        <div class="flex justify-content-between">
-          <div style="text-align: left">
-            <Button
-              icon="pi pi-external-link"
-              class="p-button-sm p-button-secondary"
-              label="엑셀저장"
-              @click="exportCSV"
-            />
-          </div>
-          <!-- 검색기능 추가하기
-          <div class="flex justify-content-end align-items-center">
-            <span class="p-input-icon-left">
-              <i class="pi pi-search" />
-              <InputText v-model="filter.global.value" class="p-inputtext-sm" placeholder="검색하기" />
-            </span>
-          </div> -->
+        <div class="flex align-items-center justify-content-between">
+          <!-- 저장하기 -->
+          <Button
+            class="p-button-sm p-button-secondary"
+            icon="pi pi-download"
+            label="저장하기"
+            @click="exportCSV"
+          />
         </div>
       </template>
-
-      <Column field="grade" header="학년" class="justify-content-center"></Column>
-      <Column field="group" header="학급" class="justify-content-center"></Column>
-      <Column field="name" header="이름" class="justify-content-center"></Column>
-      <Column field="attendance" header="출석현황" class="justify-content-center">
-        <template #body="slotProps">
-          <span :class="`attendance-${slotProps.data.attendance}`">
-            {{ translateAttendance(slotProps.data.attendance) }}
-          </span>
-        </template>
-      </Column>
 
       <template #groupheader="slotProps">
         <span class="text-yellow-500 font-bold">
@@ -57,74 +38,60 @@
         </span>
       </template>
 
+      <Column field="grade" header="학년" class="justify-content-center" />
+      <Column field="group" header="학급" class="justify-content-center" />
+      <Column field="name" header="이름" class="justify-content-center" />
+      <Column field="attendance" header="출석현황" class="justify-content-center">
+        <template #body="slotProps">
+          <span
+            class="flex align-items-center justify-content-center"
+            :class="`attendance-${slotProps.data.attendance}`"
+          >
+            {{ translateAttendance(slotProps.data.attendance) }}
+          </span>
+        </template>
+      </Column>
+
       <template #groupfooter="slotProps">
         <td style="min-width: 80%">
           <div style="text-align: right; width: 100%">총 학생수:</div>
         </td>
-        <td style="width: 20%">
-          {{ calculateStudentTotal(slotProps.data.teacher) }}
-        </td>
+        <td style="width: 20%">{{ countStudents(slotProps.data.teacher) }}명</td>
       </template>
     </DataTable>
+
+    <AppFingerUpper v-else-if="!attendanceDate && isLoading" class="pt-5" />
 
     <div class="spinner" v-else-if="attendanceDate && isLoading">
       <i class="pi pi-spin pi-spinner" style="font-size: 3rem"></i>
     </div>
-
-    <AppFingerUpper v-else-if="!attendanceDate && isLoading" class="pt-5" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { useStore } from "vuex";
 import AppFingerUpper from "@/components/AppFingerUpper.vue";
-import type { StudentAttendance } from "@/types";
-
-/** 검색 기능 추가하기
-import { FilterMatchMode } from "primevue/api";
-interface Filter {
-  global: {
-    value: string;
-    matchMode: string;
-  };
-}
-const filter = ref<Filter>({
-  global: { value: "", matchMode: FilterMatchMode.CONTAINS },
-});
- */
+import { useStore } from "vuex";
+import { Student } from "@/types";
 
 const store = useStore();
 
 const isLoading = ref(true);
 const attendanceDate = ref<Date>();
-const finalResult = ref<StudentAttendance[]>([]);
+const studentsAttendance = ref<Student[]>([]);
 
 const onAttendanceDateSelect = async () => {
-  isLoading.value = true;
-
-  const allStudents: StudentAttendance[] = await store.dispatch("attendance/fetchAllStudents");
-  const studentsAttendance = await store.dispatch("attendance/fetchStudentAttendancesByDate", {
-    date: attendanceDate.value,
-  });
-
-  for (let studentAttendance of studentsAttendance) {
-    for (let student of allStudents) {
-      if (
-        student.grade === studentAttendance.grade &&
-        student.group === studentAttendance.group &&
-        student.name === studentAttendance.name
-      ) {
-        student.attendance = studentAttendance.attendance;
-        break;
-      }
-    }
+  try {
+    isLoading.value = true;
+    const result = await store.dispatch("attendance/fetchStudentsAttendanceByDate", {
+      date: attendanceDate.value,
+    });
+    studentsAttendance.value = result;
+  } catch (error) {
+    console.log(error);
+  } finally {
+    isLoading.value = false;
   }
-
-  allStudents.sort((a, b) => ~~a.grade - ~~b.grade || ~~a.group - ~~b.group || a.name.localeCompare(b.name));
-  finalResult.value = allStudents;
-
-  isLoading.value = false;
 };
 
 const translateAttendance = (attendance: string) => {
@@ -134,41 +101,46 @@ const translateAttendance = (attendance: string) => {
   else return "미입력";
 };
 
-const calculateStudentTotal = (name: string) => {
+const countStudents = (name: string) => {
   let total = 0;
-  if (finalResult.value) {
-    for (let result of finalResult.value) {
-      if (result.teacher === name) total++;
-    }
+  for (let result of studentsAttendance.value) {
+    if (result.teacher === name) total++;
   }
   return total;
 };
 
-const table = ref();
-const exportCSV = () => table.value.exportCSV();
+const dataTableElement = ref();
+const exportCSV = () => dataTableElement.value.exportCSV();
 </script>
 
 <style scoped>
 .attendance-online {
+  width: 36px;
+  height: 24px;
   background-color: #fbc02d;
   border-radius: 3px;
   font-weight: bold;
   padding: 0.5rem;
 }
 .attendance-offline {
+  width: 36px;
+  height: 24px;
   background-color: #4caf50;
   border-radius: 3px;
   font-weight: bold;
   padding: 0.5rem;
 }
 .attendance-absence {
+  width: 36px;
+  height: 24px;
   background-color: #ff4032;
   border-radius: 3px;
   font-weight: bold;
   padding: 0.5rem;
 }
-/* .attendance-none { */
-.attendance- {
+.attendance-undefined {
+  width: 36px;
+  height: 24px;
   background-color: #cccccc;
   border-radius: 3px;
   font-weight: bold;

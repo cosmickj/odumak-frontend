@@ -1,6 +1,7 @@
 import { Module } from "vuex";
 import { db, studentsAttendanceCol, teachersAttendanceCol } from "@/firebase/config";
-import { addDoc, doc, getDocs, orderBy, query, setDoc, where } from "firebase/firestore";
+import { addDoc, doc, getDocs, query, setDoc, where } from "firebase/firestore";
+import { Student } from "@/types";
 import { RootState, AttendanceState } from "@/store/types";
 import teacherList from "@/data/teacher_list.json";
 import studentList from "@/data/student_list.json";
@@ -8,24 +9,11 @@ import studentList from "@/data/student_list.json";
 export const attendance: Module<AttendanceState, RootState> = {
   namespaced: true,
 
-  state: () => ({
-    // teacherAttendance: "online",
-  }),
+  state: () => ({}),
 
-  mutations: {
-    // SET_TEACHER_ATTENDANCE(state, payload) {
-    //   state.teacherAttendance = payload;
-    // },
-  },
+  mutations: {},
 
   actions: {
-    // async fetchStudentAttendancesByDate(context, payload) {
-    //   const q = query(studentsAttendanceCol, where("date", "==", payload.date));
-    //   const res = await getDocs(q);
-    //   const result = res.docs.map((value) => value.data().studentsAttendance);
-    //   return result.flat();
-    // },
-
     // async fetchTeachersAttendanceByDate(context, payload) {
     //   const q = query(teachersAttendanceCol, where("date", "==", payload.date));
     //   const res = await getDocs(q);
@@ -99,6 +87,25 @@ export const attendance: Module<AttendanceState, RootState> = {
         const result = studentList.filter((student) => student.teacher === payload.teacher);
         return { recordId: "", studentsAttendance: result };
       }
+    },
+    async fetchStudentsAttendanceByDate(context, payload) {
+      const q = query(studentsAttendanceCol, where("date", "==", payload.date));
+      const querySnapshot = await getDocs(q);
+      const attendanceList = querySnapshot.docs.map((value) => value.data().studentsAttendance).flat();
+
+      const studentListTemplate = JSON.parse(
+        JSON.stringify(studentList.filter((student) => student.teacher !== "테스트 계정"))
+      );
+      // TODO: 알고리즘 개선 필요
+      for (const attendance of attendanceList) {
+        for (const student of studentListTemplate as Student[]) {
+          if (student.name === attendance.name) {
+            student.attendance = attendance.attendance;
+            break;
+          }
+        }
+      }
+      return studentListTemplate;
     },
     async addStudentsAttendance(context, payload) {
       // 수정
