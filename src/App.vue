@@ -10,18 +10,6 @@
   </main>
 </template>
 
-<script setup lang="ts">
-import { onMounted } from "vue";
-import { useStore } from "vuex";
-
-const store = useStore();
-
-onMounted(async () => {
-  await store.dispatch("attendance/fetchAllStudents");
-  await store.dispatch("attendance/fetchTotalTeachers");
-});
-</script>
-
 <style scoped>
 @media (min-width: 450px) {
   main {

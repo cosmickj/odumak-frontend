@@ -1,14 +1,17 @@
 <template>
   <div v-if="authIsReady" class="h-full p-5">
     <div class="relative flex justify-content-center align-items-center">
+      <!-- 뒤로 가기 버튼 -->
       <div class="h-full w-3rem absolute left-0 cursor-pointer">
         <router-link
-          :to="{ name: 'AppHome' }"
           class="h-full w-full flex justify-content-center align-items-center"
+          :to="{ name: 'AppHome' }"
         >
           <i class="pi pi-arrow-left text-3xl"></i>
         </router-link>
       </div>
+
+      <!-- 메뉴 제목 -->
       <span class="text-3xl">출석 입력하기</span>
     </div>
 
@@ -52,10 +55,10 @@
         :touchUI="true"
         :showIcon="true"
         :disabledDays="[1, 2, 3, 4, 5, 6]"
-        @date-select="requestTeacherAttendances"
+        @date-select="requestTeachersAttendance"
       />
 
-      <div v-if="attendanceDate && studentsAttendanceStatus" class="form-container">
+      <div v-if="attendanceDate && teachersAttendanceStatus" class="form-container">
         <form @submit.prevent="submitTeachersAttendance">
           <AttendanceInputTeachers v-model="teachersAttendanceStatus" :attendance-date="attendanceDate" />
 
@@ -78,11 +81,11 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { useStore } from "vuex";
-import AppFingerUpper from "@/components/AppFingerUpper.vue";
-import AttendanceInputTeachers from "@/components/AttendanceInputTeachers.vue";
 import AttendanceInputStudents from "@/components/AttendanceInputStudents.vue";
-import type { Student, TeacherAttendance } from "@/types";
+import AttendanceInputTeachers from "@/components/AttendanceInputTeachers.vue";
+import AppFingerUpper from "@/components/AppFingerUpper.vue";
+import { useStore } from "vuex";
+import { Student, Teacher } from "@/types";
 
 const store = useStore();
 const user = computed(() => store.state.account.user);
@@ -91,51 +94,51 @@ const authIsReady = computed(() => store.state.account.authIsReady);
 const recordId = ref("");
 const attendanceDate = ref<Date>();
 const studentsAttendanceStatus = ref<Student[]>([]);
-const teachersAttendanceStatus = ref<TeacherAttendance[]>([]);
+const teachersAttendanceStatus = ref<Teacher[]>([]);
 
+/** ABOUT STUDENTS */
 const requestStudentsAttendance = async () => {
   const result = await store.dispatch("attendance/fetchStudentsAttendance", {
-    name: user.value.name,
+    date: attendanceDate.value,
     grade: user.value.grade,
     group: user.value.group,
-    date: attendanceDate.value,
+    teacher: user.value.name,
   });
 
   result.studentsAttendance.forEach((student: Student) => {
-    if (!student.attendance) {
-      student.attendance = "offline";
-    }
+    if (!student.attendance) student.attendance = "offline";
   });
 
   recordId.value = result.recordId;
   studentsAttendanceStatus.value = result.studentsAttendance;
 };
-
 const submitStudentsAttendance = async () => {
   const params = {
+    recordId: recordId.value,
     date: attendanceDate.value,
     grade: user.value.grade,
     group: user.value.group,
     teacher: user.value.name,
     studentsAttendance: studentsAttendanceStatus.value,
-    recordId: recordId.value,
   };
-  const result = await store.dispatch("attendance/addStudentsAttendance", params);
+
+  const { id } = await store.dispatch("attendance/addStudentsAttendance", params);
 
   if (!recordId.value) {
-    recordId.value = result.id;
+    recordId.value = id;
     alert("제출되었습니다.");
   } else {
     alert("수정되었습니다.");
   }
 };
 
-const requestTeacherAttendances = async () => {
+/** ABOUT TEACHERS */
+const requestTeachersAttendance = async () => {
   const result = await store.dispatch("attendance/fetchTeachersAttendance", {
     date: attendanceDate.value,
   });
 
-  result.teachersAttendance.forEach((teacher: any) => {
+  result.teachersAttendance.forEach((teacher: Teacher) => {
     if (!teacher.attendance) teacher.attendance = "offline";
   });
 
@@ -149,10 +152,10 @@ const submitTeachersAttendance = async () => {
     teachersAttendance: teachersAttendanceStatus.value,
     recordId: recordId.value,
   };
-  const result = await store.dispatch("attendance/addTeachersAttendance", params);
+  const { id } = await store.dispatch("attendance/addTeachersAttendance", params);
 
   if (!recordId.value) {
-    recordId.value = result.id;
+    recordId.value = id;
     alert("제출되었습니다.");
   } else {
     alert("수정되었습니다.");

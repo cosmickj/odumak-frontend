@@ -15,5 +15,5 @@ export interface Teacher {
 }
 
 export interface AttendanceState {
-  teacherAttendance: "online" | "offline";
+  teacherAttendance?: "online" | "offline";
 }

@@ -37,7 +37,7 @@
       </label>
 
       <div
-        class="w-3rem h-3rem flex justify-content-center align-items-center cursor-pointer"
+        class="w-3rem h-3rem flex align-items-center justify-content-center cursor-pointer"
         @click="onClick(teacher, i)"
       >
         <i class="pi pi-angle-double-down" style="font-size: 1.5rem"></i>
@@ -45,26 +45,27 @@
     </div>
 
     <div v-if="isOpen && i === currnetIndex">
-      <div v-if="teacher.role === 'common'">담임 선생님이 아닙니다.</div>
-      <AttendanceInputStudents v-else v-model="studentsAttendance"></AttendanceInputStudents>
+      <AttendanceInputStudents v-if="teacher.role === 'common'" v-model="studentsAttendance" />
+      <div v-else>담임 선생님이 아닙니다.</div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { TeacherAttendance } from "@/types";
 import AttendanceInputStudents from "@/components/AttendanceInputStudents.vue";
 import { useStore } from "vuex";
+import { Teacher } from "@/types";
 
-const store = useStore();
 const props = defineProps<{
-  modelValue: TeacherAttendance[];
+  modelValue: Teacher[];
   attendanceDate: Date;
 }>();
 const emits = defineEmits(["update:modelValue"]);
 
-const teachersAttendance = computed<TeacherAttendance[]>({
+const store = useStore();
+
+const teachersAttendance = computed<Teacher[]>({
   get() {
     return props.modelValue;
   },
@@ -73,20 +74,20 @@ const teachersAttendance = computed<TeacherAttendance[]>({
   },
 });
 
-const studentsAttendance = ref([]);
-
 const isOpen = ref(false);
 const currnetIndex = ref<null | number>(null);
+const studentsAttendance = ref([]);
 
-const onClick = async (teacher: any, index: number) => {
+const onClick = async (teacher: Teacher, index: number) => {
   if (teacher.role === "teacher") {
     const result = await store.dispatch("attendance/fetchStudentsAttendance", {
       date: props.attendanceDate,
       grade: teacher.grade,
       group: teacher.group,
+      teacher: teacher.name,
     });
 
-    studentsAttendance.value = result;
+    studentsAttendance.value = result.studentsAttendance;
   }
 
   currnetIndex.value = index;

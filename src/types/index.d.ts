@@ -4,6 +4,14 @@ export interface UserInfo {
   createdAt: Date;
 }
 
+export interface Teacher {
+  role: "teacher" | "common";
+  grade: string;
+  group: string;
+  name: string;
+  attendance?: string;
+}
+
 export interface Student {
   id?: string;
   name: string;
@@ -23,7 +31,7 @@ export interface StudentAttendance {
   attendance: string;
 }
 
-export interface TeacherAttendance {
-  name: string;
-  attendance: string;
-}
+// export interface TeacherAttendance {
+//   name: string;
+//   attendance: string;
+// }

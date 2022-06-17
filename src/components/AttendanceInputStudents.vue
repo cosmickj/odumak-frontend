@@ -2,7 +2,6 @@
   <!-- 학생 출석체크 -->
   <div v-for="(student, i) in students" :key="i" class="attendance student">
     <div class="student__name">{{ student.name }}</div>
-    <!-- <div class="student__birth">{{ student.birth }}</div> -->
     <input
       type="radio"
       :id="`absence-${student.name}`"
@@ -13,6 +12,7 @@
     <label :for="`absence-${student.name}`" class="attendance__label attendance__label__absence">
       <span>결석</span>
     </label>
+
     <input
       type="radio"
       :id="`online-${student.name}`"
@@ -23,6 +23,7 @@
     <label :for="`online-${student.name}`" class="attendance__label attendance__label__online">
       <span>온라인</span>
     </label>
+
     <input
       type="radio"
       :id="`offline-${student.name}`"
@@ -38,7 +39,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import type { Student } from "@/types";
+import { Student } from "@/types";
 
 const props = defineProps<{
   modelValue: Student[];
