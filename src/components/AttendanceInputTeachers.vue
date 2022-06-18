@@ -39,19 +39,24 @@
       <!-- 선생님별 학생 출석 조회 버튼 -->
       <div
         class="w-3rem h-3rem flex align-items-center justify-content-center cursor-pointer"
+        v-if="teacher.role === 'teacher'"
         @click="onClick(teacher, idx)"
       >
-        <i class="pi pi-angle-double-down" :class="{ 'pi--open': currnetIndexList.includes(idx) }"> </i>
+        <i class="pi pi-sort-down" :class="{ 'pi--open': currnetIndexList.includes(idx) }"></i>
+      </div>
+
+      <div v-else class="w-3rem h-3rem flex align-items-center justify-content-center cursor-pointer">
+        <i class="pi pi-minus"></i>
       </div>
     </div>
 
     <!-- 선생님별 학생 출석 리스트 -->
     <div class="extra" v-if="currnetIndexList.includes(idx)">
-      <AttendanceInputStudents
-        v-if="!isLoading[idx] && teacher.role === 'teacher'"
-        v-model="studentsAttendanceList[teacher.name]"
-      />
-      <div v-else-if="!isLoading[idx] && teacher.role === 'common'">담임 선생님이 아닙니다.</div>
+      <div v-if="!isLoading[idx] && teacher.role === 'teacher'">
+        <AttendanceInputStudents v-model="studentsAttendanceList[teacher.name]" />
+
+        <Button class="w-full p-button-warning p-button-sm p-button-rounded" type="submit" label="제출하기" />
+      </div>
     </div>
   </div>
 </template>
@@ -96,6 +101,8 @@ const onClick = async (teacher: Teacher, currentIndex: number) => {
       group: teacher.group,
       teacher: teacher.name,
     });
+
+    // recordId: result.recordId,
     studentsAttendanceList.value[teacher.name] = result.studentsAttendance;
   }
 
@@ -157,6 +164,10 @@ const onClick = async (teacher: Teacher, currentIndex: number) => {
   transform: rotate(180deg);
 }
 .extra {
-  background-color: orange;
+  width: 95%;
+  margin-left: auto;
+}
+.extra :deep(.attendance) {
+  background-color: #cccccc80;
 }
 </style>

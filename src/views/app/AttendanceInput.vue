@@ -123,16 +123,14 @@ const submitStudentsAttendance = async () => {
   };
 
   const { id } = await store.dispatch("attendance/addStudentsAttendance", params);
+  recordId.value = id;
 
-  if (!recordId.value) {
-    recordId.value = id;
-    alert("제출되었습니다.");
-  } else {
-    alert("수정되었습니다.");
-  }
+  if (!recordId.value) alert("제출되었습니다.");
+  else alert("수정되었습니다.");
 };
 
 /** ABOUT TEACHERS */
+// TODO: 날짜가 바뀔 때 데이터 초기화 시키기
 const requestTeachersAttendance = async () => {
   const result = await store.dispatch("attendance/fetchTeachersAttendance", {
     date: attendanceDate.value,
@@ -148,18 +146,16 @@ const requestTeachersAttendance = async () => {
 
 const submitTeachersAttendance = async () => {
   const params = {
+    recordId: recordId.value,
     date: attendanceDate.value,
     teachersAttendance: teachersAttendanceStatus.value,
-    recordId: recordId.value,
   };
-  const { id } = await store.dispatch("attendance/addTeachersAttendance", params);
 
-  if (!recordId.value) {
-    recordId.value = id;
-    alert("제출되었습니다.");
-  } else {
-    alert("수정되었습니다.");
-  }
+  const { id } = await store.dispatch("attendance/addTeachersAttendance", params);
+  recordId.value = id;
+
+  if (!recordId.value) alert("제출되었습니다.");
+  else alert("수정되었습니다.");
 };
 </script>
 

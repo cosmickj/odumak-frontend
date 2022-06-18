@@ -32,12 +32,6 @@ export const attendance: Module<AttendanceState, RootState> = {
     //   }
     // },
 
-    // async fetchStudentsByClass(context, payload) {
-    //   const q = query(studentsCol, where("grade", "==", payload.grade), where("group", "==", payload.group));
-    //   const fetchStudentsByClassResponse = await getDocs(q);
-    //   return fetchStudentsByClassResponse;
-    // },
-
     /** ABOUT TEACHERS */
     async fetchTeachersAttendance(context, payload) {
       const q = query(teachersAttendanceCol, where("date", "==", payload.date));
@@ -59,11 +53,12 @@ export const attendance: Module<AttendanceState, RootState> = {
         const docId = payload.recordId;
         delete payload.recordId;
         await setDoc(doc(db, "teachersAttendance", docId), payload);
+        return { id: docId };
       }
       // 제출
       else {
         delete payload.recordId;
-        const result = await addDoc(studentsAttendanceCol, payload);
+        const result = await addDoc(teachersAttendanceCol, payload);
         return result;
       }
     },
@@ -113,6 +108,7 @@ export const attendance: Module<AttendanceState, RootState> = {
         const docId = payload.recordId;
         delete payload.recordId;
         await setDoc(doc(db, "studentsAttendance", docId), payload);
+        return { id: docId };
       }
       // 제출
       else {
