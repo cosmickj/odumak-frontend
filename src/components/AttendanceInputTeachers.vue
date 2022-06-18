@@ -36,6 +36,7 @@
         <span>현장</span>
       </label>
 
+      <!-- 선생님별 학생 출석 조회 버튼 -->
       <div
         class="w-3rem h-3rem flex align-items-center justify-content-center cursor-pointer"
         @click="onClick(teacher, idx)"
@@ -44,12 +45,13 @@
       </div>
     </div>
 
+    <!-- 선생님별 학생 출석 리스트 -->
     <div class="extra" v-if="currnetIndexList.includes(idx)">
       <AttendanceInputStudents
-        v-if="teacher.role === 'teacher' && !isLoading"
+        v-if="!isLoading[idx] && teacher.role === 'teacher'"
         v-model="studentsAttendanceList[teacher.name]"
       />
-      <div v-else-if="teacher.role === 'common' && !isLoading">담임 선생님이 아닙니다.</div>
+      <div v-else-if="!isLoading[idx] && teacher.role === 'common'">담임 선생님이 아닙니다.</div>
     </div>
   </div>
 </template>
@@ -60,30 +62,25 @@ import AttendanceInputStudents from "@/components/AttendanceInputStudents.vue";
 import { useStore } from "vuex";
 import { Teacher, Student } from "@/types";
 
+const store = useStore();
 const props = defineProps<{
   modelValue: Teacher[];
   attendanceDate: Date;
 }>();
 const emits = defineEmits(["update:modelValue"]);
 
-const store = useStore();
-
 const teachersAttendance = computed<Teacher[]>({
-  get() {
-    return props.modelValue;
-  },
-  set(newValue) {
-    emits("update:modelValue", newValue);
-  },
+  get: () => props.modelValue,
+  set: (newValue) => emits("update:modelValue", newValue),
 });
-
-const isLoading = ref(false);
+const isLoading = ref<boolean[]>([]);
 const currnetIndexList = ref<number[]>([]);
 // TODO: 타입 정의 다시하기
 const studentsAttendanceList = ref<{ name: Student | any } | any>({});
 
 const onClick = async (teacher: Teacher, currentIndex: number) => {
-  isLoading.value = true;
+  isLoading.value = Array(currentIndex).fill(false);
+  isLoading.value[currentIndex] = true;
 
   const targetIndex = currnetIndexList.value.indexOf(currentIndex);
   if (targetIndex === -1) {
@@ -101,7 +98,8 @@ const onClick = async (teacher: Teacher, currentIndex: number) => {
     });
     studentsAttendanceList.value[teacher.name] = result.studentsAttendance;
   }
-  isLoading.value = false;
+
+  isLoading.value[currentIndex] = false;
 };
 </script>
 
