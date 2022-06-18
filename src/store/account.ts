@@ -49,6 +49,8 @@ export const account: Module<AccountState, RootState> = {
             message: "입력하신 학년과 반을 한 번 더 확인해주시거나 관리자에게 문의해주세요.",
           };
         }
+        // #004 이미 해당 이름으로 가입되어 있는 회원이 있는가?
+
         // const signupResponse = await createUserWithEmailAndPassword(auth, email, password);
         // await updateProfile(signupResponse.user, { displayName: name });
         // return signupResponse;
