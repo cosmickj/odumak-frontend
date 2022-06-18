@@ -1,40 +1,45 @@
 <template>
-  <!-- 학생 출석체크 -->
-  <div v-for="(student, i) in students" :key="i" class="attendance student">
-    <div class="student__name">{{ student.name }}</div>
-    <input
-      type="radio"
-      :id="`absence-${student.name}`"
-      value="absence"
-      v-model="students[i].attendance"
-      class="attendance__input"
-    />
-    <label :for="`absence-${student.name}`" class="attendance__label attendance__label__absence">
-      <span>결석</span>
-    </label>
+  <form @submit.prevent="handleSubmitStudents">
+    <!-- 학생 출석체크 -->
+    <div v-for="(student, i) in students" :key="i" class="attendance student">
+      <div class="student__name">{{ student.name }}</div>
+      <input
+        type="radio"
+        :id="`absence-${student.name}`"
+        value="absence"
+        v-model="students[i].attendance"
+        class="attendance__input"
+      />
+      <label :for="`absence-${student.name}`" class="attendance__label attendance__label__absence">
+        <span>결석</span>
+      </label>
 
-    <input
-      type="radio"
-      :id="`online-${student.name}`"
-      value="online"
-      v-model="students[i].attendance"
-      class="attendance__input"
-    />
-    <label :for="`online-${student.name}`" class="attendance__label attendance__label__online">
-      <span>온라인</span>
-    </label>
+      <input
+        type="radio"
+        :id="`online-${student.name}`"
+        value="online"
+        v-model="students[i].attendance"
+        class="attendance__input"
+      />
+      <label :for="`online-${student.name}`" class="attendance__label attendance__label__online">
+        <span>온라인</span>
+      </label>
 
-    <input
-      type="radio"
-      :id="`offline-${student.name}`"
-      value="offline"
-      v-model="students[i].attendance"
-      class="attendance__input"
-    />
-    <label :for="`offline-${student.name}`" class="attendance__label attendance__label__offline">
-      <span>현장</span>
-    </label>
-  </div>
+      <input
+        type="radio"
+        :id="`offline-${student.name}`"
+        value="offline"
+        v-model="students[i].attendance"
+        class="attendance__input"
+      />
+      <label :for="`offline-${student.name}`" class="attendance__label attendance__label__offline">
+        <span>현장</span>
+      </label>
+    </div>
+
+    <Button v-if="!recordId" class="w-full p-button-warning p-button-lg" type="submit" label="제출하기" />
+    <Button v-else class="w-full p-button-danger p-button-lg" type="submit" label="수정하기" />
+  </form>
 </template>
 
 <script setup lang="ts">
@@ -43,17 +48,16 @@ import { Student } from "@/types";
 
 const props = defineProps<{
   modelValue: Student[];
+  recordId?: string;
 }>();
-const emits = defineEmits(["update:modelValue"]);
+const emit = defineEmits(["update:modelValue", "submitStudents"]);
 
 const students = computed<Student[]>({
-  get() {
-    return props.modelValue;
-  },
-  set(students) {
-    emits("update:modelValue", students);
-  },
+  get: () => props.modelValue,
+  set: (students) => emit("update:modelValue", students),
 });
+
+const handleSubmitStudents = () => emit("submitStudents");
 </script>
 
 <style scoped>

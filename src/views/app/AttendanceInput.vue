@@ -32,12 +32,11 @@
       />
 
       <div v-if="attendanceDate && studentsAttendanceStatus">
-        <form @submit.prevent="submitStudentsAttendance">
-          <AttendanceInputStudents v-model="studentsAttendanceStatus" />
-
-          <Button v-if="!recordId" class="w-full p-button-warning p-button-lg" type="submit" label="제출하기" />
-          <Button v-else class="w-full p-button-danger p-button-lg" type="submit" label="수정하기" />
-        </form>
+        <AttendanceInputStudents
+          v-model="studentsAttendanceStatus"
+          :record-id="recordId"
+          @submit-students="submitStudentsAttendance"
+        />
       </div>
 
       <AppFingerUpper v-else class="pt-5" />
@@ -58,14 +57,14 @@
         @date-select="requestTeachersAttendance"
       />
 
-      <div v-if="attendanceDate && teachersAttendanceStatus" class="form-container">
-        <form @submit.prevent="submitTeachersAttendance">
-          <AttendanceInputTeachers v-model="teachersAttendanceStatus" :attendance-date="attendanceDate" />
-
-          <Button v-if="!recordId" class="w-full p-button-warning p-button-lg" type="submit" label="제출하기" />
-          <Button v-else class="w-full p-button-danger p-button-lg" type="submit" label="수정하기" />
-        </form>
-      </div>
+      <AttendanceInputTeachers
+        v-if="attendanceDate && teachersAttendanceStatus"
+        v-model="teachersAttendanceStatus"
+        :record-id="recordId"
+        :attendance-date="attendanceDate"
+        @submit-teachers="submitTeachersAttendance"
+        @submit-students="submitStudentsAttendance"
+      />
 
       <AppFingerUpper v-else class="pt-5" />
     </template>
@@ -123,10 +122,11 @@ const submitStudentsAttendance = async () => {
   };
 
   const { id } = await store.dispatch("attendance/addStudentsAttendance", params);
-  recordId.value = id;
 
   if (!recordId.value) alert("제출되었습니다.");
   else alert("수정되었습니다.");
+
+  recordId.value = id;
 };
 
 /** ABOUT TEACHERS */
@@ -152,21 +152,10 @@ const submitTeachersAttendance = async () => {
   };
 
   const { id } = await store.dispatch("attendance/addTeachersAttendance", params);
-  recordId.value = id;
 
   if (!recordId.value) alert("제출되었습니다.");
   else alert("수정되었습니다.");
+
+  recordId.value = id;
 };
 </script>
-
-<style scoped>
-.form-container {
-  position: relative;
-  height: calc(100% - 100px);
-  overflow: auto;
-}
-button[class^="p-button"] {
-  position: sticky;
-  bottom: 0;
-}
-</style>
