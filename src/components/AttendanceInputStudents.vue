@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="handleSubmitStudents">
+  <form @submit.prevent="submitStudentsAttendance">
     <!-- 학생 출석체크 -->
     <div v-for="(student, i) in students" :key="i" class="attendance student">
       <div class="student__name">{{ student.name }}</div>
@@ -57,7 +57,25 @@ const students = computed<Student[]>({
   set: (students) => emit("update:modelValue", students),
 });
 
-const handleSubmitStudents = () => emit("submitStudents");
+// const handleSubmitStudents = () => emit("submitStudents");
+
+// const submitStudentsAttendance = async () => {
+//   const params = {
+//     recordId: recordId.value,
+//     date: attendanceDate.value,
+//     grade: user.value.grade,
+//     group: user.value.group,
+//     teacher: user.value.name,
+//     studentsAttendance: studentsAttendanceStatus.value,
+//   };
+
+//   const { id } = await store.dispatch("attendance/addStudentsAttendance", params);
+
+//   if (!recordId.value) alert("제출되었습니다.");
+//   else alert("수정되었습니다.");
+
+//   recordId.value = id;
+// };
 </script>
 
 <style scoped>

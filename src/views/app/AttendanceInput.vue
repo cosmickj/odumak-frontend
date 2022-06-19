@@ -32,11 +32,7 @@
       />
 
       <div v-if="attendanceDate && studentsAttendanceStatus">
-        <AttendanceInputStudents
-          v-model="studentsAttendanceStatus"
-          :record-id="recordId"
-          @submit-students="submitStudentsAttendance"
-        />
+        <AttendanceInputStudents v-model="studentsAttendanceStatus" :record-id="recordId" />
       </div>
 
       <AppFingerUpper v-else class="pt-5" />
@@ -62,8 +58,6 @@
         v-model="teachersAttendanceStatus"
         :record-id="recordId"
         :attendance-date="attendanceDate"
-        @submit-teachers="submitTeachersAttendance"
-        @submit-students="submitStudentsAttendance"
       />
 
       <AppFingerUpper v-else class="pt-5" />

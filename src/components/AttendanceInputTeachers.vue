@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="handleSubmitTeachers">
+  <form @submit.prevent="submitTeachersAttendance">
     <div v-for="(teacher, idx) in teachersAttendance" :key="idx" class="student">
       <div class="attendance">
         <div class="student__name">{{ teacher.name }}</div>
@@ -57,7 +57,6 @@
           <AttendanceInputStudents
             v-model="studentsAttendanceList[teacher.name].studentsAttendance"
             :record-id="studentsAttendanceList[teacher.name].recordId"
-            @submit-students="handleSubmitStudents"
           />
         </div>
       </div>
@@ -118,8 +117,24 @@ const onClick = async (teacher: Teacher, currentIndex: number) => {
   isLoading.value[currentIndex] = false;
 };
 
-const handleSubmitTeachers = () => emit("submitTeachers");
+// const handleSubmitTeachers = () => emit("submitTeachers");
 const handleSubmitStudents = () => emit("submitStudents");
+
+const submitTeachersAttendance = async () => {
+  const params = {
+    recordId: props.recordId,
+    date: props.attendanceDate,
+    teachersAttendance: teachersAttendance.value,
+  };
+
+  const { id } = await store.dispatch("attendance/addTeachersAttendance", params);
+
+  if (!props.recordId) alert("제출되었습니다.");
+  else alert("수정되었습니다.");
+
+  // TODO: 첫 제출 이후 ID 붙여주기
+  // recordId.value = id;
+};
 </script>
 
 <style scoped>
