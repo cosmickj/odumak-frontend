@@ -1,13 +1,13 @@
 <template>
   <form @submit.prevent="submitStudentsAttendance">
     <!-- 학생 출석체크 -->
-    <div v-for="(student, i) in students" :key="i" class="attendance student">
+    <div v-for="(student, i) in studentsAttendance" :key="i" class="attendance student">
       <div class="student__name">{{ student.name }}</div>
       <input
         type="radio"
         :id="`absence-${student.name}`"
         value="absence"
-        v-model="students[i].attendance"
+        v-model="studentsAttendance[i].attendance"
         class="attendance__input"
       />
       <label :for="`absence-${student.name}`" class="attendance__label attendance__label__absence">
@@ -18,7 +18,7 @@
         type="radio"
         :id="`online-${student.name}`"
         value="online"
-        v-model="students[i].attendance"
+        v-model="studentsAttendance[i].attendance"
         class="attendance__input"
       />
       <label :for="`online-${student.name}`" class="attendance__label attendance__label__online">
@@ -29,7 +29,7 @@
         type="radio"
         :id="`offline-${student.name}`"
         value="offline"
-        v-model="students[i].attendance"
+        v-model="studentsAttendance[i].attendance"
         class="attendance__input"
       />
       <label :for="`offline-${student.name}`" class="attendance__label attendance__label__offline">
@@ -44,38 +44,39 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { Student } from "@/types";
+import { Student, Teacher } from "@/types";
+import { useStore } from "vuex";
 
+const store = useStore();
 const props = defineProps<{
   modelValue: Student[];
-  recordId?: string;
+  recordId: string;
+  writer: Teacher;
+  attendanceDate: Date;
 }>();
-const emit = defineEmits(["update:modelValue", "submitStudents"]);
+const emit = defineEmits(["update:modelValue", "onUploaded:studentsAttendance"]);
 
-const students = computed<Student[]>({
+const studentsAttendance = computed<Student[]>({
   get: () => props.modelValue,
-  set: (students) => emit("update:modelValue", students),
+  set: (studentsAttendance) => emit("update:modelValue", studentsAttendance),
 });
 
-// const handleSubmitStudents = () => emit("submitStudents");
+const submitStudentsAttendance = async () => {
+  const params = {
+    recordId: props.recordId,
+    date: props.attendanceDate,
+    grade: props.writer.grade,
+    group: props.writer.group,
+    teacher: props.writer.name,
+    studentsAttendance: studentsAttendance.value,
+  };
 
-// const submitStudentsAttendance = async () => {
-//   const params = {
-//     recordId: recordId.value,
-//     date: attendanceDate.value,
-//     grade: user.value.grade,
-//     group: user.value.group,
-//     teacher: user.value.name,
-//     studentsAttendance: studentsAttendanceStatus.value,
-//   };
+  const { id } = await store.dispatch("attendance/addStudentsAttendance", params);
+  emit("onUploaded:studentsAttendance", { id, teacher: props.writer.name });
 
-//   const { id } = await store.dispatch("attendance/addStudentsAttendance", params);
-
-//   if (!recordId.value) alert("제출되었습니다.");
-//   else alert("수정되었습니다.");
-
-//   recordId.value = id;
-// };
+  if (!props.recordId) alert("제출되었습니다.");
+  else alert("수정되었습니다.");
+};
 </script>
 
 <style scoped>

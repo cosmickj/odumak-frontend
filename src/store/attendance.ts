@@ -14,24 +14,6 @@ export const attendance: Module<AttendanceState, RootState> = {
   mutations: {},
 
   actions: {
-    // async fetchTeachersAttendanceByDate(context, payload) {
-    //   const q = query(teachersAttendanceCol, where("date", "==", payload.date));
-    //   const res = await getDocs(q);
-    //   if (res.docs.length > 0) {
-    //     return res.docs[0].data();
-    //   } else {
-    //     // ALL TEACHERS
-    //     const q = query(teachersCol, orderBy("name"));
-    //     const querySnapshot = await getDocs(q);
-    //     const initTeachersAttendance = querySnapshot.docs.map((doc) => ({
-    //       name: doc.data().name,
-    //       attendance: "",
-    //     }));
-    //     const result = { result: "", teachersAttendance: [...initTeachersAttendance] };
-    //     return result;
-    //   }
-    // },
-
     /** ABOUT TEACHERS */
     async fetchTeachersAttendance(context, payload) {
       const q = query(teachersAttendanceCol, where("date", "==", payload.date));
@@ -64,6 +46,7 @@ export const attendance: Module<AttendanceState, RootState> = {
     },
 
     /** ABOUT STUDENTS */
+    // 학생 출석 입력
     async fetchStudentsAttendance(context, payload) {
       const q = query(
         studentsAttendanceCol,
@@ -79,28 +62,30 @@ export const attendance: Module<AttendanceState, RootState> = {
           ...querySnapshot.docs[0].data(),
         };
       } else {
-        const result = studentList.filter((student) => student.teacher === payload.teacher);
+        const studentListClone: Student[] = JSON.parse(JSON.stringify(studentList));
+        const result = studentListClone.filter((student) => student.teacher === payload.teacher);
         return { recordId: "", studentsAttendance: result };
       }
     },
+    // 학생 일일 출석 현황
     async fetchStudentsAttendanceByDate(context, payload) {
       const q = query(studentsAttendanceCol, where("date", "==", payload.date));
       const querySnapshot = await getDocs(q);
       const attendanceList = querySnapshot.docs.map((value) => value.data().studentsAttendance).flat();
 
-      const studentListTemplate = JSON.parse(
+      const studentListClone: Student[] = JSON.parse(
         JSON.stringify(studentList.filter((student) => student.teacher !== "테스트 계정"))
       );
       // TODO: 알고리즘 개선 필요
       for (const attendance of attendanceList) {
-        for (const student of studentListTemplate as Student[]) {
+        for (const student of studentListClone) {
           if (student.name === attendance.name) {
             student.attendance = attendance.attendance;
             break;
           }
         }
       }
-      return studentListTemplate;
+      return studentListClone;
     },
     async addStudentsAttendance(context, payload) {
       // 수정
@@ -113,8 +98,8 @@ export const attendance: Module<AttendanceState, RootState> = {
       // 제출
       else {
         delete payload.recordId;
-        const result = await addDoc(studentsAttendanceCol, payload);
-        return result;
+        const ret = await addDoc(studentsAttendanceCol, payload);
+        return ret;
       }
     },
   },

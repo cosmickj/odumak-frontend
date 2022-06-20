@@ -41,7 +41,7 @@
         <div
           class="w-3rem h-3rem flex align-items-center justify-content-center cursor-pointer"
           v-if="teacher.role === 'teacher'"
-          @click="onClick(teacher, idx)"
+          @click="requestStudentsAttendance(teacher, idx)"
         >
           <i class="pi pi-sort-down" :class="{ 'pi--open': currnetIndexList.includes(idx) }"></i>
         </div>
@@ -55,8 +55,11 @@
       <div class="extra" v-if="currnetIndexList.includes(idx)">
         <div v-if="!isLoading[idx] && teacher.role === 'teacher'">
           <AttendanceInputStudents
-            v-model="studentsAttendanceList[teacher.name].studentsAttendance"
-            :record-id="studentsAttendanceList[teacher.name].recordId"
+            v-model="studentsAttendanceByTeacher[teacher.name].studentsAttendance"
+            :record-id="studentsAttendanceByTeacher[teacher.name].recordId"
+            :attendance-date="attendanceDate"
+            :writer="teacher"
+            @on-uploaded:students-attendance="setRecordIdByTeacher"
           />
         </div>
       </div>
@@ -79,7 +82,7 @@ const props = defineProps<{
   recordId: string;
   attendanceDate: Date;
 }>();
-const emit = defineEmits(["update:modelValue", "submitTeachers", "submitStudents"]);
+const emit = defineEmits(["update:modelValue", "onUploaded:teachersAttendance"]);
 
 const teachersAttendance = computed<Teacher[]>({
   get: () => props.modelValue,
@@ -87,10 +90,9 @@ const teachersAttendance = computed<Teacher[]>({
 });
 const isLoading = ref<boolean[]>([]);
 const currnetIndexList = ref<number[]>([]);
-// TODO: 타입 정의 다시하기
-const studentsAttendanceList = ref<any>({});
+const studentsAttendanceByTeacher = ref<any>({}); // TODO: 타입 정의 다시하기
 
-const onClick = async (teacher: Teacher, currentIndex: number) => {
+const requestStudentsAttendance = async (teacher: Teacher, currentIndex: number) => {
   isLoading.value = Array(currentIndex).fill(false);
   isLoading.value[currentIndex] = true;
 
@@ -109,16 +111,13 @@ const onClick = async (teacher: Teacher, currentIndex: number) => {
       teacher: teacher.name,
     });
 
-    studentsAttendanceList.value[teacher.name] = {
+    studentsAttendanceByTeacher.value[teacher.name] = {
       recordId: result.recordId,
       studentsAttendance: result.studentsAttendance,
     };
   }
   isLoading.value[currentIndex] = false;
 };
-
-// const handleSubmitTeachers = () => emit("submitTeachers");
-const handleSubmitStudents = () => emit("submitStudents");
 
 const submitTeachersAttendance = async () => {
   const params = {
@@ -128,12 +127,14 @@ const submitTeachersAttendance = async () => {
   };
 
   const { id } = await store.dispatch("attendance/addTeachersAttendance", params);
+  emit("onUploaded:teachersAttendance", { id });
 
   if (!props.recordId) alert("제출되었습니다.");
   else alert("수정되었습니다.");
+};
 
-  // TODO: 첫 제출 이후 ID 붙여주기
-  // recordId.value = id;
+const setRecordIdByTeacher = ({ id, teacher }: { id: string; teacher: string }) => {
+  studentsAttendanceByTeacher.value[teacher].recordId = id;
 };
 </script>
 

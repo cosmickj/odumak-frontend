@@ -31,9 +31,14 @@
         @date-select="requestStudentsAttendance"
       />
 
-      <div v-if="attendanceDate && studentsAttendanceStatus">
-        <AttendanceInputStudents v-model="studentsAttendanceStatus" :record-id="recordId" />
-      </div>
+      <AttendanceInputStudents
+        v-if="attendanceDate && studentsAttendanceStatus"
+        v-model="studentsAttendanceStatus"
+        :record-id="recordId"
+        :attendance-date="attendanceDate"
+        :writer="user"
+        @on-uploaded:students-attendance="setRecordId"
+      />
 
       <AppFingerUpper v-else class="pt-5" />
     </template>
@@ -58,6 +63,7 @@
         v-model="teachersAttendanceStatus"
         :record-id="recordId"
         :attendance-date="attendanceDate"
+        @on-uploaded:teachers-attendance="setRecordId"
       />
 
       <AppFingerUpper v-else class="pt-5" />
@@ -105,23 +111,6 @@ const requestStudentsAttendance = async () => {
   recordId.value = result.recordId;
   studentsAttendanceStatus.value = result.studentsAttendance;
 };
-const submitStudentsAttendance = async () => {
-  const params = {
-    recordId: recordId.value,
-    date: attendanceDate.value,
-    grade: user.value.grade,
-    group: user.value.group,
-    teacher: user.value.name,
-    studentsAttendance: studentsAttendanceStatus.value,
-  };
-
-  const { id } = await store.dispatch("attendance/addStudentsAttendance", params);
-
-  if (!recordId.value) alert("제출되었습니다.");
-  else alert("수정되었습니다.");
-
-  recordId.value = id;
-};
 
 /** ABOUT TEACHERS */
 // TODO: 날짜가 바뀔 때 데이터 초기화 시키기
@@ -138,18 +127,7 @@ const requestTeachersAttendance = async () => {
   teachersAttendanceStatus.value = result.teachersAttendance;
 };
 
-const submitTeachersAttendance = async () => {
-  const params = {
-    recordId: recordId.value,
-    date: attendanceDate.value,
-    teachersAttendance: teachersAttendanceStatus.value,
-  };
-
-  const { id } = await store.dispatch("attendance/addTeachersAttendance", params);
-
-  if (!recordId.value) alert("제출되었습니다.");
-  else alert("수정되었습니다.");
-
+const setRecordId = ({ id }: { id: string }) => {
   recordId.value = id;
 };
 </script>
