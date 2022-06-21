@@ -1,7 +1,7 @@
 import { Module } from "vuex";
 import { db, studentsAttendanceCol, teachersAttendanceCol } from "@/firebase/config";
 import { addDoc, doc, getDocs, query, setDoc, where } from "firebase/firestore";
-import { Student } from "@/types";
+import { Student, Teacher } from "@/types";
 import { RootState, AttendanceState } from "@/store/types";
 import teacherList from "@/data/teacher_list.json";
 import studentList from "@/data/student_list.json";
@@ -28,6 +28,27 @@ export const attendance: Module<AttendanceState, RootState> = {
       } else {
         return { recordId: "", teachersAttendance: teacherList };
       }
+    },
+    // 교사 일일 출석 현황
+    async fetchTeachersAttendanceByDate(context, payload) {
+      const q = query(teachersAttendanceCol, where("date", "==", payload.date));
+      const querySnapshot = await getDocs(q);
+      const attendanceList = querySnapshot.docs.map((value) => value.data().teachersAttendance).flat();
+
+      const teahcerListClone: Teacher[] = JSON.parse(
+        JSON.stringify(teacherList.filter((teacher) => teacher.name !== "테스트 계정"))
+      );
+
+      // TODO: 알고리즘 개선 필요
+      for (const attendance of attendanceList) {
+        for (const teacher of teahcerListClone) {
+          if (teacher.name === attendance.name) {
+            teacher.attendance = attendance.attendance;
+            break;
+          }
+        }
+      }
+      return teahcerListClone;
     },
     async addTeachersAttendance(context, payload) {
       // 수정

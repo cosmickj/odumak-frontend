@@ -115,40 +115,51 @@ const exportCSV = () => dataTableElement.value.exportCSV();
 
 <style scoped>
 .attendance-online {
-  width: 36px;
+  width: 40px;
   height: 24px;
   background-color: #fbc02d;
   border-radius: 3px;
   font-weight: bold;
   padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .attendance-offline {
-  width: 36px;
+  width: 40px;
   height: 24px;
   background-color: #4caf50;
   border-radius: 3px;
   font-weight: bold;
   padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .attendance-absence {
-  width: 36px;
+  width: 40px;
   height: 24px;
   background-color: #ff4032;
   border-radius: 3px;
   font-weight: bold;
   padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .attendance-undefined {
-  width: 36px;
+  width: 40px;
   height: 24px;
   background-color: #cccccc;
   border-radius: 3px;
   font-weight: bold;
   padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .spinner {
-  position: absolute;
-  top: calc(50% - 1.5rem);
-  left: calc(50% - 1.5rem);
+  margin-top: 2rem;
+  text-align: center;
 }
 </style>

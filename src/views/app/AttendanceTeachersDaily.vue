@@ -12,8 +12,9 @@
     />
 
     <DataTable
-      class="p-datatable-sm pt-5"
+      v-if="attendanceDate && !isLoading"
       ref="table"
+      class="p-datatable-sm pt-5"
       :value="finalResult"
       sortMode="single"
       sortField="group"
@@ -23,10 +24,11 @@
       <template #header>
         <div class="flex justify-content-between">
           <div style="text-align: left">
+            <!-- 저장하기 -->
             <Button
-              icon="pi pi-external-link"
               class="p-button-sm p-button-secondary"
-              label="엑셀저장"
+              icon="pi pi-download"
+              label="저장하기"
               @click="exportCSV"
             />
           </div>
@@ -42,23 +44,40 @@
         </template>
       </Column>
     </DataTable>
+
+    <AppFingerUpper v-else-if="!attendanceDate && isLoading" class="pt-5" />
+
+    <div class="spinner" v-else-if="attendanceDate && isLoading">
+      <i class="pi pi-spin pi-spinner" style="font-size: 3rem"></i>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
+import AppFingerUpper from "@/components/AppFingerUpper.vue";
 import { useStore } from "vuex";
 
 const store = useStore();
+
+const isLoading = ref(true);
 const attendanceDate = ref<Date>();
 const finalResult = ref([]);
 
 const onAttendanceDateSelect = async () => {
-  const result = await store.dispatch("attendance/fetchTeachersAttendanceByDate", {
-    date: attendanceDate.value,
-  });
+  try {
+    isLoading.value = true;
 
-  finalResult.value = result.teachersAttendance;
+    const fetchTeachersAttendanceByDateRet = await store.dispatch("attendance/fetchTeachersAttendanceByDate", {
+      date: attendanceDate.value,
+    });
+
+    finalResult.value = fetchTeachersAttendanceByDateRet;
+  } catch (error) {
+    console.log(error);
+  } finally {
+    isLoading.value = false;
+  }
 };
 
 const translateAttendance = (attendance: string) => {
@@ -74,28 +93,51 @@ const exportCSV = () => table.value.exportCSV();
 
 <style scoped>
 .attendance-online {
+  width: 40px;
+  height: 24px;
   background-color: #fbc02d;
   border-radius: 3px;
   font-weight: bold;
   padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .attendance-offline {
+  width: 40px;
+  height: 24px;
   background-color: #4caf50;
   border-radius: 3px;
   font-weight: bold;
   padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .attendance-absence {
+  width: 40px;
+  height: 24px;
   background-color: #ff4032;
   border-radius: 3px;
   font-weight: bold;
   padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-/* .attendance-none { */
-.attendance- {
+.attendance-undefined {
+  width: 40px;
+  height: 24px;
   background-color: #cccccc;
   border-radius: 3px;
   font-weight: bold;
   padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.spinner {
+  margin-top: 2rem;
+  text-align: center;
 }
 </style>
