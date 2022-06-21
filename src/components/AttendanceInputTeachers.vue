@@ -65,16 +65,16 @@
       </div>
     </div>
 
-    <Button v-if="!recordId" class="w-full p-button-warning p-button-lg" type="submit" label="제출하기" />
-    <Button v-else class="w-full p-button-danger p-button-lg" type="submit" label="수정하기" />
+    <Button v-if="!recordId" class="w-full p-button-lg" type="submit" label="제출하기" />
+    <Button v-else class="w-full p-button-secondary p-button-lg" type="submit" label="수정하기" />
   </form>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import AttendanceInputStudents from "@/components/AttendanceInputStudents.vue";
 import { useStore } from "vuex";
-import { Teacher } from "@/types";
+import { Teacher, Student } from "@/types";
 
 const store = useStore();
 const props = defineProps<{
@@ -88,15 +88,25 @@ const teachersAttendance = computed<Teacher[]>({
   get: () => props.modelValue,
   set: (newValue) => emit("update:modelValue", newValue),
 });
+
 const isLoading = ref<boolean[]>([]);
 const currnetIndexList = ref<number[]>([]);
 const studentsAttendanceByTeacher = ref<any>({}); // TODO: 타입 정의 다시하기
+
+watch(
+  () => props.attendanceDate,
+  () => {
+    currnetIndexList.value = [];
+    studentsAttendanceByTeacher.value = {};
+  }
+);
 
 const requestStudentsAttendance = async (teacher: Teacher, currentIndex: number) => {
   isLoading.value = Array(currentIndex).fill(false);
   isLoading.value[currentIndex] = true;
 
   const targetIndex = currnetIndexList.value.indexOf(currentIndex);
+
   if (targetIndex === -1) {
     currnetIndexList.value.push(currentIndex);
   } else {
@@ -104,17 +114,25 @@ const requestStudentsAttendance = async (teacher: Teacher, currentIndex: number)
   }
 
   if (teacher.role === "teacher") {
-    const result = await store.dispatch("attendance/fetchStudentsAttendance", {
-      date: props.attendanceDate,
-      grade: teacher.grade,
-      group: teacher.group,
-      teacher: teacher.name,
-    });
+    if (studentsAttendanceByTeacher.value[teacher.name]) {
+      // pass
+    } else {
+      const result = await store.dispatch("attendance/fetchStudentsAttendance", {
+        date: props.attendanceDate,
+        grade: teacher.grade,
+        group: teacher.group,
+        teacher: teacher.name,
+      });
 
-    studentsAttendanceByTeacher.value[teacher.name] = {
-      recordId: result.recordId,
-      studentsAttendance: result.studentsAttendance,
-    };
+      result.studentsAttendance.forEach((student: Student) => {
+        if (!student.attendance) student.attendance = "offline";
+      });
+
+      studentsAttendanceByTeacher.value[teacher.name] = {
+        recordId: result.recordId,
+        studentsAttendance: result.studentsAttendance,
+      };
+    }
   }
   isLoading.value[currentIndex] = false;
 };
