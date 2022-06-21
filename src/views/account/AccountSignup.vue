@@ -1,5 +1,6 @@
 <template>
-  <AppYoungeunBasic />
+  <AppYoungeunBasic></AppYoungeunBasic>
+
   <div class="mt-5">
     <form @submit.prevent="onSubmit">
       <div class="mx-7 mb-2">
@@ -80,29 +81,30 @@
         </div>
       </div>
 
-      <template v-if="signupForm.role === 'teacher'">
-        <div class="mx-7 mb-2 flex justify-content-between align-items-center">
-          <div class="flex-shrink-0 flex align-items-center">
-            <RadioButton v-model="signupForm.grade" id="third-grade" name="grade" value="3" />
-            <label class="ml-2" for="third-grade">3학년</label>
-          </div>
-
-          <div class="flex-shrink-0 flex align-items-center">
-            <RadioButton v-model="signupForm.grade" id="forth-grade" name="grade" value="4" />
-            <label class="ml-2" for="forth-grade">4학년</label>
-          </div>
-
-          <div>
-            <Dropdown
-              v-model="signupForm.group"
-              :options="group"
-              optionLabel="name"
-              optionValue="value"
-              placeholder="학급 선택"
-            />
-          </div>
+      <div
+        v-if="signupForm.role === 'teacher'"
+        class="mx-7 mb-2 flex justify-content-between align-items-center"
+      >
+        <div class="flex-shrink-0 flex align-items-center">
+          <RadioButton v-model="signupForm.grade" id="third-grade" name="grade" value="3" />
+          <label class="ml-2" for="third-grade">3학년</label>
         </div>
-      </template>
+
+        <div class="flex-shrink-0 flex align-items-center">
+          <RadioButton v-model="signupForm.grade" id="forth-grade" name="grade" value="4" />
+          <label class="ml-2" for="forth-grade">4학년</label>
+        </div>
+
+        <div>
+          <Dropdown
+            v-model="signupForm.group"
+            :options="group"
+            optionLabel="name"
+            optionValue="value"
+            placeholder="학급 선택"
+          />
+        </div>
+      </div>
 
       <div class="mx-7 my-3">
         <Button type="submit" class="p-button-warning w-full justify-content-center">
@@ -113,6 +115,10 @@
 
       <div v-if="!isAllFilled" class="mx-7">
         <span class="text-pink-500">위 입력사항을 모두 입력해주세요.</span>
+      </div>
+
+      <div v-if="!isValidated" class="mx-7">
+        <span class="text-pink-500">{{ errorMessage }}</span>
       </div>
 
       <div class="mx-7 mt-4 mb-2 flex justify-content-evenly align-items-center">
@@ -141,10 +147,10 @@ const initSignupForm = {
   email: "",
   password: "",
   confirmedPassword: "",
-  name: "",
   role: "common",
   grade: "n/a",
   group: "n/a",
+  name: "",
 };
 const signupForm = reactive({ ...initSignupForm });
 
@@ -174,35 +180,41 @@ watch(
 
 const isLoading = ref(false);
 const isAllFilled = ref(true);
+const isValidated = ref(true);
+const errorMessage = ref("");
 
 const onSubmit = async () => {
+  isValidated.value = true; // TODO: 초기화 점검하기, 또 추가되거나 깔끔하게 되어야할 로직 살피기
+
   if (!Object.values(signupForm).every((value) => value)) {
     isAllFilled.value = false;
     return;
   }
-
   if (!isPasswordLongerThanSix.value) {
     return;
   }
-
   if (!isPasswordSame.value) {
     return;
   }
-
   try {
     isLoading.value = true;
 
-    const signupResult = await store.dispatch("account/signup", signupForm);
+    const signupRet = await store.dispatch("account/signup", signupForm);
+    if (!signupRet.isSuccess) {
+      throw new Error(signupRet.message);
+    }
 
-    await store.dispatch("account/createUser", { uid: signupResult.user.uid, ...signupForm });
-
+    await store.dispatch("account/createUser", { uid: signupRet.user.uid, ...signupForm });
     await store.dispatch("account/login", { email: signupForm.email, password: signupForm.password });
-
     router.push({ name: "AppHome" });
   } catch (error) {
+    if (error instanceof Error) {
+      isValidated.value = false;
+      errorMessage.value = error.message;
+    }
+  } finally {
     isAllFilled.value = true;
     isLoading.value = false;
-    console.log(error);
   }
 };
 
@@ -221,9 +233,9 @@ const group = [
 const emails = ["@gmail.com", "@naver.com", "@hotmail.com", "@yahoo.com", "@outlook.com"];
 
 const appendEmail = (email: string) => {
-  const asperand = signupForm.email.indexOf("@");
-  if (asperand > -1) {
-    const emailHead = signupForm.email.slice(0, asperand);
+  const targetIndex = signupForm.email.indexOf("@");
+  if (targetIndex > -1) {
+    const emailHead = signupForm.email.slice(0, targetIndex);
     signupForm.email = emailHead + email;
   } else {
     signupForm.email = signupForm.email + email;

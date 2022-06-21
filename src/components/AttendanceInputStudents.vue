@@ -1,58 +1,82 @@
 <template>
-  <!-- 학생 출석체크 -->
-  <div v-for="(student, i) in students" :key="i" class="attendance student">
-    <div class="student__name">{{ student.name }}</div>
-    <!-- <div class="student__birth">{{ student.birth }}</div> -->
-    <input
-      type="radio"
-      :id="`absence-${student.name}`"
-      value="absence"
-      v-model="students[i].attendance"
-      class="attendance__input"
-    />
-    <label :for="`absence-${student.name}`" class="attendance__label attendance__label__absence">
-      <span>결석</span>
-    </label>
-    <input
-      type="radio"
-      :id="`online-${student.name}`"
-      value="online"
-      v-model="students[i].attendance"
-      class="attendance__input"
-    />
-    <label :for="`online-${student.name}`" class="attendance__label attendance__label__online">
-      <span>온라인</span>
-    </label>
-    <input
-      type="radio"
-      :id="`offline-${student.name}`"
-      value="offline"
-      v-model="students[i].attendance"
-      class="attendance__input"
-    />
-    <label :for="`offline-${student.name}`" class="attendance__label attendance__label__offline">
-      <span>현장</span>
-    </label>
-  </div>
+  <form @submit.prevent="submitStudentsAttendance">
+    <!-- 학생 출석체크 -->
+    <div v-for="(student, i) in studentsAttendance" :key="i" class="attendance student">
+      <div class="student__name">{{ student.name }}</div>
+      <input
+        type="radio"
+        :id="`absence-${student.name}`"
+        value="absence"
+        v-model="studentsAttendance[i].attendance"
+        class="attendance__input"
+      />
+      <label :for="`absence-${student.name}`" class="attendance__label attendance__label__absence">
+        <span>결석</span>
+      </label>
+
+      <input
+        type="radio"
+        :id="`online-${student.name}`"
+        value="online"
+        v-model="studentsAttendance[i].attendance"
+        class="attendance__input"
+      />
+      <label :for="`online-${student.name}`" class="attendance__label attendance__label__online">
+        <span>온라인</span>
+      </label>
+
+      <input
+        type="radio"
+        :id="`offline-${student.name}`"
+        value="offline"
+        v-model="studentsAttendance[i].attendance"
+        class="attendance__input"
+      />
+      <label :for="`offline-${student.name}`" class="attendance__label attendance__label__offline">
+        <span>현장</span>
+      </label>
+    </div>
+
+    <Button v-if="!recordId" class="w-full p-button-warning p-button-lg" type="submit" label="제출하기" />
+    <Button v-else class="w-full p-button-danger p-button-lg" type="submit" label="수정하기" />
+  </form>
 </template>
 
 <script setup lang="ts">
 import { computed } from "vue";
-import type { Student } from "@/types";
+import { Student, Teacher } from "@/types";
+import { useStore } from "vuex";
 
+const store = useStore();
 const props = defineProps<{
   modelValue: Student[];
+  recordId: string;
+  writer: Teacher;
+  attendanceDate: Date;
 }>();
-const emits = defineEmits(["update:modelValue"]);
+const emit = defineEmits(["update:modelValue", "onUploaded:studentsAttendance"]);
 
-const students = computed<Student[]>({
-  get() {
-    return props.modelValue;
-  },
-  set(students) {
-    emits("update:modelValue", students);
-  },
+const studentsAttendance = computed<Student[]>({
+  get: () => props.modelValue,
+  set: (studentsAttendance) => emit("update:modelValue", studentsAttendance),
 });
+
+const submitStudentsAttendance = async () => {
+  const params = {
+    recordId: props.recordId,
+    date: props.attendanceDate,
+    grade: props.writer.grade,
+    group: props.writer.group,
+    teacher: props.writer.name,
+    studentsAttendance: studentsAttendance.value,
+  };
+
+  const { id } = await store.dispatch("attendance/addStudentsAttendance", params);
+  emit("onUploaded:studentsAttendance", { id, teacher: props.writer.name });
+
+  if (!props.recordId) alert("제출되었습니다.");
+  else alert("수정되었습니다.");
+};
 </script>
 
 <style scoped>

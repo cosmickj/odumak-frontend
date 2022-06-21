@@ -1,6 +1,6 @@
 import { createStore } from "vuex";
-import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/firebase/config";
+import { onAuthStateChanged } from "firebase/auth";
 // Modules
 import { account } from "./account";
 import { attendance } from "./attendance";

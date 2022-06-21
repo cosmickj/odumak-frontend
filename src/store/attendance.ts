@@ -1,59 +1,73 @@
 import { Module } from "vuex";
-import { db, studentsAttendanceCol, studentsCol, teachersAttendanceCol, teachersCol } from "@/firebase/config";
-import { addDoc, doc, getDocs, orderBy, query, setDoc, where } from "firebase/firestore";
+import { db, studentsAttendanceCol, teachersAttendanceCol } from "@/firebase/config";
+import { addDoc, doc, getDocs, query, setDoc, where } from "firebase/firestore";
+import { Student, Teacher } from "@/types";
 import { RootState, AttendanceState } from "@/store/types";
+import teacherList from "@/data/teacher_list.json";
+import studentList from "@/data/student_list.json";
 
 export const attendance: Module<AttendanceState, RootState> = {
   namespaced: true,
-  state: () => ({
-    teacherAttendance: "online",
-  }),
 
-  mutations: {
-    SET_TEACHER_ATTENDANCE(state, payload) {
-      state.teacherAttendance = payload;
-    },
-  },
+  state: () => ({}),
+
+  mutations: {},
 
   actions: {
-    async fetchAllStudents() {
-      const querySnapshot = await getDocs(studentsCol);
-      const result = querySnapshot.docs.map((doc) => ({
-        grade: doc.data().grade,
-        group: doc.data().group,
-        name: doc.data().name,
-        teacher: doc.data().teacher,
-        attendance: "",
-      }));
-      return result;
-    },
+    /** ABOUT TEACHERS */
+    async fetchTeachersAttendance(context, payload) {
+      const q = query(teachersAttendanceCol, where("date", "==", payload.date));
+      const querySnapshot = await getDocs(q);
 
-    // TODO: 함수명 바꿔야함
-    async fetchStudentAttendancesByDate(context, payload) {
-      const q = query(studentsAttendanceCol, where("date", "==", payload.date));
-      const res = await getDocs(q);
-      const result = res.docs.map((value) => value.data().studentsAttendance);
-      return result.flat();
+      if (querySnapshot.docs.length > 0) {
+        const result = {
+          recordId: querySnapshot.docs[0].id,
+          ...querySnapshot.docs[0].data(),
+        };
+        return result;
+      } else {
+        return { recordId: "", teachersAttendance: teacherList };
+      }
     },
-
+    // 교사 일일 출석 현황
     async fetchTeachersAttendanceByDate(context, payload) {
       const q = query(teachersAttendanceCol, where("date", "==", payload.date));
-      const res = await getDocs(q);
-      if (res.docs.length > 0) {
-        return res.docs[0].data();
-      } else {
-        // ALL TEACHERS
-        const q = query(teachersCol, orderBy("name"));
-        const querySnapshot = await getDocs(q);
-        const initTeachersAttendance = querySnapshot.docs.map((doc) => ({
-          name: doc.data().name,
-          attendance: "",
-        }));
-        const result = { result: "", teachersAttendance: [...initTeachersAttendance] };
+      const querySnapshot = await getDocs(q);
+      const attendanceList = querySnapshot.docs.map((value) => value.data().teachersAttendance).flat();
+
+      const teahcerListClone: Teacher[] = JSON.parse(
+        JSON.stringify(teacherList.filter((teacher) => teacher.name !== "테스트 계정"))
+      );
+
+      // TODO: 알고리즘 개선 필요
+      for (const attendance of attendanceList) {
+        for (const teacher of teahcerListClone) {
+          if (teacher.name === attendance.name) {
+            teacher.attendance = attendance.attendance;
+            break;
+          }
+        }
+      }
+      return teahcerListClone;
+    },
+    async addTeachersAttendance(context, payload) {
+      // 수정
+      if (payload.recordId) {
+        const docId = payload.recordId;
+        delete payload.recordId;
+        await setDoc(doc(db, "teachersAttendance", docId), payload);
+        return { id: docId };
+      }
+      // 제출
+      else {
+        delete payload.recordId;
+        const result = await addDoc(teachersAttendanceCol, payload);
         return result;
       }
     },
 
+    /** ABOUT STUDENTS */
+    // 학생 출석 입력
     async fetchStudentsAttendance(context, payload) {
       const q = query(
         studentsAttendanceCol,
@@ -61,81 +75,52 @@ export const attendance: Module<AttendanceState, RootState> = {
         where("grade", "==", payload.grade),
         where("group", "==", payload.group)
       );
-      const fetchStudentsAttendanceResponse = await getDocs(q);
+      const querySnapshot = await getDocs(q);
 
-      if (fetchStudentsAttendanceResponse.docs.length > 0) {
-        const result = {
-          recordId: fetchStudentsAttendanceResponse.docs[0].id,
-          ...fetchStudentsAttendanceResponse.docs[0].data(),
+      if (querySnapshot.docs.length > 0) {
+        return {
+          recordId: querySnapshot.docs[0].id,
+          ...querySnapshot.docs[0].data(),
         };
-        return result;
       } else {
-        const fetchStudentsByClassResponse = await context.dispatch("fetchStudentsByClass", payload);
-
-        const initStudentsAttendance = fetchStudentsByClassResponse.docs.map((doc: any) => ({
-          teacher: doc.data().teacher,
-          grade: doc.data().grade,
-          group: doc.data().group,
-          name: doc.data().name,
-          attendance: "",
-        }));
-
-        const result = { recordId: "", studentsAttendance: [...initStudentsAttendance] };
-        return result;
+        const studentListClone: Student[] = JSON.parse(JSON.stringify(studentList));
+        const result = studentListClone.filter((student) => student.teacher === payload.teacher);
+        return { recordId: "", studentsAttendance: result };
       }
     },
+    // 학생 일일 출석 현황
+    async fetchStudentsAttendanceByDate(context, payload) {
+      const q = query(studentsAttendanceCol, where("date", "==", payload.date));
+      const querySnapshot = await getDocs(q);
+      const attendanceList = querySnapshot.docs.map((value) => value.data().studentsAttendance).flat();
 
-    async fetchStudentsByClass(context, payload) {
-      const q = query(studentsCol, where("grade", "==", payload.grade), where("group", "==", payload.group));
-      const fetchStudentsByClassResponse = await getDocs(q);
-      return fetchStudentsByClassResponse;
+      const studentListClone: Student[] = JSON.parse(
+        JSON.stringify(studentList.filter((student) => student.teacher !== "테스트 계정"))
+      );
+      // TODO: 알고리즘 개선 필요
+      for (const attendance of attendanceList) {
+        for (const student of studentListClone) {
+          if (student.name === attendance.name) {
+            student.attendance = attendance.attendance;
+            break;
+          }
+        }
+      }
+      return studentListClone;
     },
-
     async addStudentsAttendance(context, payload) {
+      // 수정
       if (payload.recordId) {
         const docId = payload.recordId;
         delete payload.recordId;
         await setDoc(doc(db, "studentsAttendance", docId), payload);
-      } else {
-        delete payload.recordId;
-        const result = await addDoc(studentsAttendanceCol, payload);
-        return result;
+        return { id: docId };
       }
-    },
-
-    async fetchTeachersAttendance(context, payload) {
-      const q = query(teachersAttendanceCol, where("date", "==", payload.date));
-      const fetchTeachersAttendanceResponse = await getDocs(q);
-
-      if (fetchTeachersAttendanceResponse.docs.length > 0) {
-        const result = {
-          recordId: fetchTeachersAttendanceResponse.docs[0].id,
-          ...fetchTeachersAttendanceResponse.docs[0].data(),
-        };
-
-        return result;
-      } else {
-        // ALL TEACHERS
-        const q = query(teachersCol, orderBy("name"));
-        const querySnapshot = await getDocs(q);
-        const initTeachersAttendance = querySnapshot.docs.map((doc) => ({
-          name: doc.data().name,
-          attendance: "",
-        }));
-        const result = { result: "", teachersAttendance: [...initTeachersAttendance] };
-        return result;
-      }
-    },
-
-    async addTeachersAttendance(context, payload) {
-      if (payload.recordId) {
-        const docId = payload.recordId;
+      // 제출
+      else {
         delete payload.recordId;
-        await setDoc(doc(db, "teachersAttendance", docId), payload);
-      } else {
-        delete payload.recordId;
-        const result = await addDoc(studentsAttendanceCol, payload);
-        return result;
+        const ret = await addDoc(studentsAttendanceCol, payload);
+        return ret;
       }
     },
   },

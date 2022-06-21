@@ -8,7 +8,7 @@
     </div>
 
     <div class="flex flex-column justify-content-center align-items-center">
-      <router-link :to="{ name: 'AttendanceInput' }" class="p-2 bg-yellow-500 border-round shadow">
+      <router-link :to="{ name: 'AttendanceInput' }" class="p-2 bg-yellow-500 border-circle shadow">
         <i class="pi pi-plus" style="font-size: 2rem"></i>
       </router-link>
       <div>출석 입력</div>
