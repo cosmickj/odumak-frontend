@@ -4,7 +4,7 @@ interface BaseResponse {
   message: string;
 }
 
-const response = ({ isSuccess, code, message }: BaseResponse, result: any) => {
+export const response = ({ isSuccess, code, message }: BaseResponse, result: any) => {
   return {
     isSuccess,
     code,
@@ -13,12 +13,10 @@ const response = ({ isSuccess, code, message }: BaseResponse, result: any) => {
   };
 };
 
-const errResponse = ({ isSuccess, code, message }: BaseResponse) => {
+export const errResponse = ({ isSuccess, code, message }: BaseResponse) => {
   return {
     isSuccess,
     code,
     message,
   };
 };
-
-module.exports = { response, errResponse };

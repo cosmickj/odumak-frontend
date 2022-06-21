@@ -117,6 +117,10 @@
         <span class="text-pink-500">위 입력사항을 모두 입력해주세요.</span>
       </div>
 
+      <div v-if="!isValidated" class="mx-7">
+        <span class="text-pink-500">{{ errorMessage }}</span>
+      </div>
+
       <div class="mx-7 mt-4 mb-2 flex justify-content-evenly align-items-center">
         <span>계정이 있으신가요?</span>
         <router-link :to="{ name: 'AccountLogin' }">
@@ -176,8 +180,12 @@ watch(
 
 const isLoading = ref(false);
 const isAllFilled = ref(true);
+const isValidated = ref(true);
+const errorMessage = ref("");
 
 const onSubmit = async () => {
+  isValidated.value = true; // TODO: 초기화 점검하기, 또 추가되거나 깔끔하게 되어야할 로직 살피기
+
   if (!Object.values(signupForm).every((value) => value)) {
     isAllFilled.value = false;
     return;
@@ -191,15 +199,19 @@ const onSubmit = async () => {
   try {
     isLoading.value = true;
 
-    const signupResult = await store.dispatch("account/signup", signupForm);
+    const signupRet = await store.dispatch("account/signup", signupForm);
+    if (!signupRet.isSuccess) {
+      throw new Error(signupRet.message);
+    }
 
-    // await store.dispatch("account/createUser", { uid: signupResult.user.uid, ...signupForm });
-
-    // await store.dispatch("account/login", { email: signupForm.email, password: signupForm.password });
-
-    // router.push({ name: "AppHome" });
+    await store.dispatch("account/createUser", { uid: signupRet.user.uid, ...signupForm });
+    await store.dispatch("account/login", { email: signupForm.email, password: signupForm.password });
+    router.push({ name: "AppHome" });
   } catch (error) {
-    console.log(error);
+    if (error instanceof Error) {
+      isValidated.value = false;
+      errorMessage.value = error.message;
+    }
   } finally {
     isAllFilled.value = true;
     isLoading.value = false;

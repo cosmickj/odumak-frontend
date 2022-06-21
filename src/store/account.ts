@@ -5,9 +5,11 @@ import {
   signOut,
   updateProfile,
 } from "firebase/auth";
-import { auth, db } from "@/firebase/config";
-import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
+import { auth, db, usersCol } from "@/firebase/config";
+import { doc, getDoc, getDocs, query, serverTimestamp, setDoc, where } from "firebase/firestore";
 import { AccountState, RootState } from "@/store/types";
+import baseResponse from "@/config/baseResponseStatus";
+import { errResponse, response } from "@/config/response";
 import teacherList from "@/data/teacher_list.json";
 
 export const account: Module<AccountState, RootState> = {
@@ -31,31 +33,30 @@ export const account: Module<AccountState, RootState> = {
     async signup(context, payload) {
       try {
         const target = teacherList.filter((teacher) => teacher.name === payload.name);
-        // #001 해당 이름을 가진 사람이 선생님으로 등록되어 있는가?
+        // 해당 이름을 가진 사람이 선생님으로 등록되어 있는가?
         if (target.length === 0) {
-          return {
-            message: "등록되지 않은 이름입니다. 이름을 한 번 더 확인해주시거나 관리자에게 문의해주세요.",
-          };
+          return errResponse(baseResponse.NAME_UNKNOWN);
         }
-        // #002 해당 이름으로 가입하려는 사람의 역할이 맞는가?
+        // 해당 이름으로 가입하려는 사람의 역할이 맞는가?
         if (payload.role !== target[0].role) {
-          return {
-            message: "담당 학급 여부를 한 번 더 확인해주시거나 관리자에게 문의해주세요.",
-          };
+          return errResponse(baseResponse.ROLE_UNMATCHED);
         }
-        // #003 입력된 담당 학급 내용이 맞는가?
+        // 입력된 담당 학급 내용이 맞는가?
         if (payload.grade !== target[0].grade || payload.group !== target[0].group) {
-          return {
-            message: "입력하신 학년과 반을 한 번 더 확인해주시거나 관리자에게 문의해주세요.",
-          };
+          return errResponse(baseResponse.CLASS_UNMATCHED);
         }
-        // #004 이미 해당 이름으로 가입되어 있는 회원이 있는가?
+        // 이미 해당 이름으로 가입되어 있는 회원이 있는가?
+        const q = query(usersCol, where("name", "==", payload.name));
+        const querySnapshot = await getDocs(q);
+        if (querySnapshot.docs.length === 1) {
+          return errResponse(baseResponse.NAME_DUPLICATED);
+        }
 
-        // const signupResponse = await createUserWithEmailAndPassword(auth, email, password);
-        // await updateProfile(signupResponse.user, { displayName: name });
-        // return signupResponse;
+        const signupRes = await createUserWithEmailAndPassword(auth, payload.email, payload.password);
+        await updateProfile(signupRes.user, { displayName: payload.name });
+        return response(baseResponse.SUCCESS, signupRes);
       } catch (error) {
-        console.log(error);
+        console.log(error); // TODO: firebase 자체에서 생기는 오류에 대한 것도 처리하자
       }
     },
 
