@@ -27,7 +27,7 @@
 
         <div class="mx-7 my-3">
           <Button type="submit" class="p-button-warning w-full justify-content-center">
-            <span v-if="!isLoading">로그인</span>
+            <span v-if="!isLoading" class="text-xl">로그인</span>
             <i v-else class="pi pi-spin pi-spinner"></i>
           </Button>
         </div>
@@ -40,9 +40,9 @@
         </div>
 
         <div class="mx-7 mt-4 mb-2 flex justify-content-evenly align-items-center">
-          <span>계정이 없으신가요?</span>
+          <span class="text-xl">계정이 없으신가요?</span>
           <router-link :to="{ name: 'AccountSignup' }">
-            <span class="text-yellow-500 font-bold">회원가입</span>
+            <span class="text-yellow-500 text-xl font-bold">회원가입</span>
           </router-link>
         </div>
       </form>
