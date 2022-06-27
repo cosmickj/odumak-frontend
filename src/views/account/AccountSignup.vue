@@ -16,7 +16,7 @@
       <div class="mx-7 mb-2">
         <div class="flex overflow-auto">
           <span
-            class="border-1 border-400 border-round mr-2 px-2"
+            class="border-1 border-400 border-round mr-2 px-2 text-lg"
             v-for="(email, i) in emails"
             :key="i"
             @click="appendEmail(email)"
@@ -67,16 +67,16 @@
 
       <div class="mx-7 mb-2">
         <div class="flex justify-content-around align-items-center">
-          <div>담당 학급이 있으신가요?</div>
+          <div class="text-xl">담당 학급이 있으신가요?</div>
 
           <div class="flex align-items-center">
             <RadioButton v-model="signupForm.role" name="role" id="teacher" value="teacher" />
-            <label class="ml-2" for="teacher">네</label>
+            <label class="ml-2 text-xl" for="teacher">네</label>
           </div>
 
           <div class="flex align-items-center">
             <RadioButton v-model="signupForm.role" name="role" id="common" value="common" />
-            <label class="ml-2" for="common">아니요</label>
+            <label class="ml-2 text-xl" for="common">아니요</label>
           </div>
         </div>
       </div>
@@ -87,12 +87,12 @@
       >
         <div class="flex-shrink-0 flex align-items-center">
           <RadioButton v-model="signupForm.grade" id="third-grade" name="grade" value="3" />
-          <label class="ml-2" for="third-grade">3학년</label>
+          <label class="ml-2 text-xl" for="third-grade">3학년</label>
         </div>
 
         <div class="flex-shrink-0 flex align-items-center">
           <RadioButton v-model="signupForm.grade" id="forth-grade" name="grade" value="4" />
-          <label class="ml-2" for="forth-grade">4학년</label>
+          <label class="ml-2 text-xl" for="forth-grade">4학년</label>
         </div>
 
         <div>
@@ -108,7 +108,7 @@
 
       <div class="mx-7 my-3">
         <Button type="submit" class="p-button-warning w-full justify-content-center">
-          <span v-if="!isLoading">회원가입</span>
+          <span v-if="!isLoading" class="text-xl">회원가입</span>
           <i v-else class="pi pi-spin pi-spinner"></i>
         </Button>
       </div>
@@ -122,9 +122,9 @@
       </div>
 
       <div class="mx-7 mt-4 mb-2 flex justify-content-evenly align-items-center">
-        <span>계정이 있으신가요?</span>
+        <span class="text-xl">계정이 있으신가요?</span>
         <router-link :to="{ name: 'AccountLogin' }">
-          <span class="text-yellow-500 font-bold">로그인</span>
+          <span class="text-yellow-500 text-xl font-bold">로그인</span>
         </router-link>
       </div>
     </form>

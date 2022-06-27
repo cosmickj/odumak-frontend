@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-yellow-500 h-full">
+  <div class="content h-full">
     <div class="p-5">
       <div class="text-2xl">안녕하세요,</div>
       <div class="text-4xl" v-if="authIsReady">{{ userName }} 선생님!</div>
@@ -76,6 +76,9 @@ const userName = computed(() => store.state.account.user.name);
 </script>
 
 <style>
+.content {
+  background-color: #dfe0df;
+}
 .p-card {
   aspect-ratio: 1/1;
 }
