@@ -4,4 +4,9 @@ module.exports = defineConfig({
   devServer: {
     client: { overlay: false },
   },
+  pwa: {
+    workboxOptions: {
+      exclude: ["_redirects"],
+    },
+  },
 });
