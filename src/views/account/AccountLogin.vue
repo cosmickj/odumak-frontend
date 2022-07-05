@@ -51,18 +51,19 @@
 
   <div class="popup" :class="isPopup ? 'popup--show' : ''">
     <div class="text-2xl">
-      <p>안녕하세요 선생님!</p>
       <p>원할한 출석 관리를 위해</p>
       <p><span>회원가입</span>을 진행해주세요.</p>
     </div>
 
-    <router-link :to="{ name: 'AccountSignup' }" @click="togglePopup">
-      <Button label="좋아요" type="button" class="p-button-warning"></Button>
-    </router-link>
+    <div class="w-full flex align-items-center justify-content-end mt-5">
+      <router-link :to="{ name: 'AccountLogin' }" @click="togglePopup">
+        <Button label="이미 계정이 있어요" class="p-button-text p-button-plain" />
+      </router-link>
 
-    <router-link :to="{ name: 'AccountLogin' }" @click="togglePopup">
-      <span class="underline text-yellow-600">이미 계정이 있어요</span>
-    </router-link>
+      <router-link :to="{ name: 'AccountSignup' }" @click="togglePopup">
+        <Button label="좋아요" type="button" class="p-button-warning"></Button>
+      </router-link>
+    </div>
   </div>
 </template>
 
@@ -70,7 +71,7 @@
 import { inject, onMounted, reactive, ref } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
-import { VueCookies } from "vue-cookies/types/index";
+import type { VueCookies } from "vue-cookies/types/index";
 import AppYoungeunBasic from "@/components/AppYoungeunBasic.vue";
 
 const store = useStore();
@@ -83,7 +84,7 @@ onMounted(() => {
   if (!$cookies?.get("popup_checked")) {
     setTimeout(() => {
       isPopup.value = !isPopup.value;
-    }, 1000);
+    }, 800);
   }
 });
 
@@ -121,14 +122,14 @@ const onSubmit = async () => {
   left: 50%;
   transform: translate(-50%, -50%);
   width: 90%;
-  height: 160px;
+  padding: 1.5rem;
   background-color: #fff;
-  border: 3px solid var(--yellow-500);
+  border: 2px solid var(--yellow-500);
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
   border-radius: 8px;
   display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
   align-items: center;
+  flex-direction: column;
   visibility: hidden;
   opacity: 0;
   transition: 0.3s;

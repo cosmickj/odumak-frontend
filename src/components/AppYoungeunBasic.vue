@@ -6,7 +6,6 @@
 
 <script setup lang="ts">
 import InlineSVG from "vue-inline-svg";
-import "animate.css";
 </script>
 
 <style scoped>

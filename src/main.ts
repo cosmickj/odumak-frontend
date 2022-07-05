@@ -6,6 +6,8 @@ import "./registerServiceWorker";
 // Global Styles
 import "@/assets/css/reset.css";
 import "@/assets/css/style.css";
+// Animate CSS
+import "animate.css";
 // PrimeVue
 import PrimeVue from "primevue/config";
 import "primevue/resources/themes/saga-blue/theme.css";

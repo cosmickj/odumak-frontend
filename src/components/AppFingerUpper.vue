@@ -10,7 +10,6 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import InlineSVG from "vue-inline-svg";
-import "animate.css";
 
 export default defineComponent({
   components: { InlineSVG },
