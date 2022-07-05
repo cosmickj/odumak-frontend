@@ -85,23 +85,30 @@
         v-if="signupForm.role === 'teacher'"
         class="mx-7 mb-2 flex justify-content-between align-items-center"
       >
-        <div class="flex-shrink-0 flex align-items-center">
+        <div class="flex-shrink-0 flex align-items-center" @click="setDisabled(false)">
           <RadioButton v-model="signupForm.grade" id="third-grade" name="grade" value="3" />
           <label class="ml-2 text-xl" for="third-grade">3학년</label>
         </div>
 
-        <div class="flex-shrink-0 flex align-items-center">
+        <div class="flex-shrink-0 flex align-items-center" @click="setDisabled(false)">
           <RadioButton v-model="signupForm.grade" id="forth-grade" name="grade" value="4" />
           <label class="ml-2 text-xl" for="forth-grade">4학년</label>
         </div>
 
+        <div class="flex-shrink-0 flex align-items-center" @click="setDisabled(true)">
+          <RadioButton v-model="signupForm.grade" id="new-face" name="grade" value="0" />
+          <label class="ml-2 text-xl" for="new-face">새친구</label>
+        </div>
+
         <div>
           <Dropdown
+            ref="dropdownElement"
             v-model="signupForm.group"
             :options="group"
             optionLabel="name"
             optionValue="value"
             placeholder="학급 선택"
+            :disabled="isDisabled"
           />
         </div>
       </div>
@@ -204,8 +211,15 @@ const onSubmit = async () => {
       throw new Error(signupRet.message);
     }
 
-    await store.dispatch("account/createUser", { uid: signupRet.user.uid, ...signupForm });
-    await store.dispatch("account/login", { email: signupForm.email, password: signupForm.password });
+    await store.dispatch("account/createUser", {
+      uid: signupRet.result.user.uid,
+      ...signupForm,
+    });
+    await store.dispatch("account/login", {
+      email: signupForm.email,
+      password: signupForm.password,
+    });
+
     router.push({ name: "AppHome" });
   } catch (error) {
     if (error instanceof Error) {
@@ -239,6 +253,17 @@ const appendEmail = (email: string) => {
     signupForm.email = emailHead + email;
   } else {
     signupForm.email = signupForm.email + email;
+  }
+};
+
+const isDisabled = ref(false);
+const setDisabled = (bool: boolean) => {
+  if (bool) {
+    isDisabled.value = bool;
+    signupForm.group = "0";
+  } else {
+    isDisabled.value = bool;
+    signupForm.group = "";
   }
 };
 </script>
