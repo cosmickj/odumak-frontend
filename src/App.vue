@@ -1,55 +1,12 @@
 <template>
-  <main class="min-h-screen flex">
-    <section class="flex-grow-1 flex align-items-center justify-content-center">
-      <div
-        class="wrapper relative flex-grow-1 flex justify-content-center flex-column w-screen h-screen surface-0 border-round"
-      >
+  <main class="min-h-screen flex items-center justify-center sm:bg-gray-200">
+    <!-- 450px 이상에서는 아래의 어플 크기로 보이게 한다. -->
+    <section
+      class="relative flex items-center justify-center w-screen h-screen sm:max-w-xl sm:max-h-240 bg-white shadow-lg"
+    >
+      <div class="h-full grow flex flex-col justify-center">
         <router-view></router-view>
-
-        <TheModalDownload :deferred-prompt="deferredPrompt" @dismiss="dismiss" @download="download" />
       </div>
     </section>
   </main>
 </template>
-
-<script setup lang="ts">
-import { inject, onMounted, ref } from "vue";
-import TheModalDownload from "@/components/TheModalDownload.vue";
-import type { VueCookies } from "vue-cookies/types/index";
-
-const $cookies = inject<VueCookies>("$cookies");
-const deferredPrompt = ref<Event | null>(null);
-
-onMounted(() => {
-  if (!$cookies?.get("download_later")) {
-    window.addEventListener("beforeinstallprompt", (e) => {
-      e.preventDefault();
-      deferredPrompt.value = e;
-    });
-    window.addEventListener("appinstalled", () => {
-      deferredPrompt.value = null;
-    });
-  }
-});
-
-const dismiss = () => {
-  setTimeout(() => (deferredPrompt.value = null), 800);
-  $cookies?.set("download_later", true, "1d");
-};
-const download = () => {
-  deferredPrompt.value?.prompt();
-  deferredPrompt.value = null;
-};
-</script>
-
-<style scoped>
-@media (min-width: 450px) {
-  main {
-    background-color: var(--surface-200) !important;
-  }
-  .wrapper {
-    max-width: 350px !important;
-    max-height: 600px !important;
-  }
-}
-</style>

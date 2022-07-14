@@ -4,18 +4,18 @@ export interface UserInfo {
   createdAt: Date;
 }
 
-export interface Teacher {
-  role: "teacher" | "common";
-  grade: string;
-  group: string;
-  name: string;
-  attendance?: string;
-}
-
 export interface Student {
+  attendance?: string;
   grade: string;
   group: string;
   name: string;
   teacher: string;
+}
+export interface Teacher {
   attendance?: string;
+  grade: string;
+  group: string;
+  name: string;
+  // role: 'teacher' | 'common';
+  role: string;
 }

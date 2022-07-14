@@ -1,40 +1,42 @@
-import { createApp } from "vue";
-import App from "./App.vue";
-import store from "./store";
-import router from "./router";
-import "./registerServiceWorker";
-// Global Styles
-import "@/assets/css/reset.css";
-import "@/assets/css/style.css";
-// Animate CSS
-import "animate.css";
-// PrimeVue
-import PrimeVue from "primevue/config";
-import "primevue/resources/themes/saga-blue/theme.css";
-import "primevue/resources/primevue.min.css";
-import "primeicons/primeicons.css";
-import Button from "primevue/button";
-import InputText from "primevue/inputtext";
-import Calendar from "primevue/calendar";
-import DataTable from "primevue/datatable";
-import Column from "primevue/column";
-import TabView from "primevue/tabview";
-import TabPanel from "primevue/tabpanel";
-// PrimeFlex
-import "/node_modules/primeflex/primeflex.css";
-// Vue Cookies
-import VueCookies from "vue-cookies";
+import '@/styles/reset.css'; // Reset CSS
+import 'animate.css'; // Animate.css
+import 'primevue/resources/themes/saga-blue/theme.css';
+import 'primevue/resources/primevue.min.css';
+import 'primeicons/primeicons.css';
+import '@/index.css'; // Tailwind CSS
 
-createApp(App)
-  .use(PrimeVue)
-  .component("Button", Button)
-  .component("InputText", InputText)
-  .component("Calendar", Calendar)
-  .component("DataTable", DataTable)
-  .component("Column", Column)
-  .component("TabView", TabView)
-  .component("TabPanel", TabPanel)
-  .use(store)
-  .use(router)
-  .use(VueCookies)
-  .mount("#app");
+import { createApp } from 'vue';
+import { createPinia } from 'pinia';
+import App from '@/App.vue';
+import router from '@/router';
+const pinia = createPinia();
+import VueCookies from 'vue-cookies'; // Vue Cookies
+import PrimeVue from 'primevue/config'; // PrimeVue
+import Button from 'primevue/button';
+import Card from 'primevue/card';
+import Calendar from 'primevue/calendar';
+import Column from 'primevue/column';
+import DataTable from 'primevue/datatable';
+import Dropdown from 'primevue/dropdown';
+import InputText from 'primevue/inputtext';
+import Password from 'primevue/password';
+import RadioButton from 'primevue/radiobutton';
+
+const app = createApp(App);
+
+app.use(router);
+app.use(pinia);
+app.use(VueCookies);
+app.use(PrimeVue);
+
+app.component('Button', Button);
+app.component('Card', Card);
+app.component('Calendar', Calendar);
+app.component('Column', Column);
+app.component('DataTable', DataTable);
+app.component('Dropdown', Dropdown);
+app.component('InputText', InputText);
+app.component('Password', Password);
+app.component('RadioButton', RadioButton);
+
+app.mount('#app');

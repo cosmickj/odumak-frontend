@@ -1,90 +1,59 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
-import { getUserState } from "@/firebase/config";
+import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: "/account",
-    name: "AccountView",
-    redirect: "/account/login",
-    component: () => import("@/views/account/AccountView.vue"),
+    path: '/',
+    component: () => import('@/layouts/DefaultLayout.vue'),
     children: [
       {
-        path: "/account/login",
-        name: "AccountLogin",
-        component: () => import("@/views/account/AccountLogin.vue"),
-        meta: { requiresAuth: false },
+        path: '',
+        name: 'HomeView',
+        component: () => import('@/views/Home/index.vue'),
       },
       {
-        path: "/account/signup",
-        name: "AccountSignup",
-        component: () => import("@/views/account/AccountSignup.vue"),
-        meta: { requiresAuth: false },
+        path: 'user',
+        name: 'UserView',
+        component: () => import('@/views/User/index.vue'),
       },
     ],
   },
   {
-    path: "/",
-    name: "AppView",
-    component: () => import("@/views/app/AppView.vue"),
+    path: '/account',
+    component: () => import('@/layouts/AccountLayout.vue'),
     children: [
       {
-        path: "",
-        name: "AppHome",
-        component: () => import("@/views/app/AppHome.vue"),
-        meta: { requiresAuth: true },
+        path: 'login',
+        name: 'AccountLogin',
+        component: () => import('@/views/Account/Login/index.vue'),
+        // meta: { requiresAuth: false },
       },
       {
-        path: "/user",
-        name: "AppUser",
-        component: () => import("@/views/app/AppUser.vue"),
-        meta: { requiresAuth: true },
+        path: 'signup',
+        name: 'AccountSignup',
+        component: () => import('@/views/Account/Signup/index.vue'),
+        // meta: { requiresAuth: false },
+      },
+    ],
+  },
+  {
+    path: '/attendance',
+    component: () => import('@/layouts/AttendanceLayout.vue'),
+    children: [
+      {
+        path: 'checker/:position',
+        name: 'AttendanceChecker',
+        component: () => import('@/views/Attendance/Checker/index.vue'),
       },
       {
-        path: "/attendance/input",
-        name: "AttendanceInput",
-        component: () => import("@/views/app/AttendanceInput.vue"),
-        meta: { requiresAuth: true },
-      },
-      {
-        path: "/attendance/student/daily",
-        name: "AttendanceStudentDaily",
-        component: () => import("@/views/app/AttendanceStudentsDaily.vue"),
-        meta: { requiresAuth: true },
-      },
-      {
-        path: "/attendance/student/total",
-        name: "AttendanceStudentTotal",
-        component: () => import("@/views/app/AttendanceStudentsTotal.vue"),
-        meta: { requiresAuth: true },
-      },
-      {
-        path: "/attendance/teacher/daily",
-        name: "AttendanceTeacherDaily",
-        component: () => import("@/views/app/AttendanceTeachersDaily.vue"),
-        meta: { requiresAuth: true },
-      },
-      {
-        path: "/attendance/teacher/total",
-        name: "AttendanceTeacherTotal",
-        component: () => import("@/views/app/AttendanceTeachersTotal.vue"),
-        meta: { requiresAuth: true },
+        path: 'tracker/:position/:type',
+        name: 'AttendanceTracker',
+        component: () => import('@/views/Attendance/Tracker/index.vue'),
       },
     ],
   },
 ];
 
-const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+export default createRouter({
+  history: createWebHistory(),
   routes,
 });
-
-router.beforeEach(async (to, from, next) => {
-  const isAuth = await getUserState();
-  const requiresAuth = to.meta.requiresAuth;
-
-  if (requiresAuth && !isAuth) next({ name: "AccountLogin" });
-  else if (!requiresAuth && isAuth) next({ name: "AppHome" });
-  else next();
-});
-
-export default router;
