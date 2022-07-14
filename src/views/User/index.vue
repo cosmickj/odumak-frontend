@@ -9,13 +9,14 @@
 </template>
 
 <script setup lang="ts">
+import { useAccountStore } from '@/store/account';
 import { useRouter } from 'vue-router';
-// import { useStore } from "vuex";
 
-// const store = useStore();
+const account = useAccountStore();
 const router = useRouter();
+
 const logout = async () => {
-  //   await store.dispatch("account/logout");
+  await account.logoutAccount();
   router.push({ name: 'AccountLogin' });
 };
 </script>

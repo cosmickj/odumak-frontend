@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { getAuth } from 'firebase/auth';
 import { collection, getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -15,15 +15,13 @@ const firebaseConfig = {
 // init firebase
 initializeApp(firebaseConfig);
 
-// init firebase auth
+// get firebase auth
 export const auth = getAuth();
 
-// router auth checker
-export const getUserState = () => new Promise((resolve, reject) => onAuthStateChanged(auth, resolve, reject));
-
-// init service
+// connect firebase database
 export const db = getFirestore();
-// collection ref
+
+// connect firebase database collections
 export const usersCol = collection(db, 'users');
 export const studentsAttendanceCol = collection(db, 'studentsAttendance');
 export const teachersAttendanceCol = collection(db, 'teachersAttendance');
