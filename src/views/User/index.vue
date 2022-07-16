@@ -1,10 +1,12 @@
 <template>
-  <div class="p-5 h-full flex flex-col justify-center items-center">
-    <div class="pb-5 text-center">
-      <h1>마이 페이지</h1>
-      <div>아직 준비중입니다</div>
+  <div class="overflow-auto h-[calc(100%_-_6rem)]">
+    <div class="p-5 h-full flex flex-col justify-center items-center">
+      <div class="pb-5 text-center">
+        <p>마이 페이지</p>
+        <p>현재 준비중 입니다</p>
+      </div>
+      <Button class="p-button-danger" label="로그아웃" @click="logout" />
     </div>
-    <Button class="p-button-danger" label="로그아웃" @click="logout" />
   </div>
 </template>
 
@@ -20,5 +22,3 @@ const logout = async () => {
   router.push({ name: 'AccountLogin' });
 };
 </script>
-
-<style scoped></style>
