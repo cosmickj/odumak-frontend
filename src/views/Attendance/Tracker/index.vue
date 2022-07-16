@@ -2,7 +2,9 @@
   <div class="overflow-auto h-[calc(100%_-_6rem)] p-8 bg-slate-100">
     <div class="text-3xl text-center">{{ title }} 출석현황</div>
 
+    <!-- TODO: 누적 현황 작업 이후에 v-if 제거 -->
     <Calendar
+      v-if="type === 'daily'"
       v-model="attendanceDate"
       class="w-full pt-5"
       :touchUI="true"
@@ -12,25 +14,30 @@
       @date-select="onAttendanceDateSelect"
     />
 
-    <TheFinger v-if="!attendanceDate" />
+    <!-- TODO: 누적 현황 작업 이후에 v-if 제거 -->
+    <TheFinger v-if="!attendanceDate && type === 'daily'" />
 
-    <div class="mt-8 text-center" v-else-if="attendanceDate && isLoading">
+    <div v-else-if="attendanceDate && isLoading" class="mt-8 text-center">
       <i class="pi pi-spin pi-spinner" style="font-size: 3rem"></i>
     </div>
 
     <TrackerStudentsDaily
-      v-if="position === 'students'"
+      v-if="position === 'students' && type === 'daily'"
       :attendance-date="attendanceDate"
       :is-loading="isLoading"
       :students-attendance="studentsAttendance"
     />
 
     <TrackerTeachersDaily
-      v-if="position === 'teachers'"
+      v-if="position === 'teachers' && type === 'daily'"
       :attendance-date="attendanceDate"
       :is-loading="isLoading"
       :teachers-attendance="teachersAttendance"
     />
+
+    <TrackerStudentsTotal v-if="position === 'students' && type === 'total'" />
+
+    <TrackerTeachersTotal v-if="position === 'teachers' && type === 'total'" />
   </div>
 </template>
 
@@ -42,6 +49,8 @@ import { useAttendanceStore } from '@/store/attendance';
 import TheFinger from '@/components/TheFinger.vue';
 import TrackerStudentsDaily from './components/TrackerStudentsDaily.vue';
 import TrackerTeachersDaily from './components/TrackerTeachersDaily.vue';
+import TrackerStudentsTotal from './components/TrackerStudentsTotal.vue';
+import TrackerTeachersTotal from './components/TrackerTeachersTotal.vue';
 
 import type { Student, Teacher } from '@/types';
 
@@ -50,9 +59,9 @@ const attendance = useAttendanceStore();
 
 const position = computed(() => route.params.position);
 const type = computed(() => route.params.type);
+
 const title = computed(() => {
   let result = [];
-
   if (position.value === 'students') {
     result.push('학생');
   } else if (position.value === 'teachers') {

@@ -15,14 +15,14 @@
       </div>
     </template>
 
+    <Column field="name" header="이름" bodyStyle="text-align:center" />
+
     <Column field="class" header="담당학급" bodyStyle="text-align:center">
       <template #body="slotProps">
         <!-- <span>{{ slotProps.data.grade }}, {{ slotProps.data.group }}</span> -->
         <span>{{ translateAssignedClass(slotProps.data.grade, slotProps.data.group) }}</span>
       </template>
     </Column>
-
-    <Column field="name" header="이름" bodyStyle="text-align:center" />
 
     <Column field="attendance" header="출석현황" bodyClass="flex justify-center">
       <template #body="slotProps">
