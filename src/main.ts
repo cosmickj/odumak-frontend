@@ -5,11 +5,11 @@ import 'primevue/resources/primevue.min.css';
 import 'primeicons/primeicons.css';
 import '@/index.css'; // Tailwind CSS
 
-import { createApp } from 'vue';
 import { createPinia } from 'pinia';
+import { createApp } from 'vue';
 import App from '@/App.vue';
 import router from '@/router';
-const pinia = createPinia();
+
 import VueCookies from 'vue-cookies'; // Vue Cookies
 import PrimeVue from 'primevue/config'; // PrimeVue
 import Button from 'primevue/button';
@@ -22,10 +22,33 @@ import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
 import RadioButton from 'primevue/radiobutton';
 
+const pinia = createPinia();
 const app = createApp(App);
 
 app.use(router);
 app.use(pinia);
+
+import { getCurrentUser } from '@/router';
+import { useAccountStore } from './store/account';
+import type { User } from 'firebase/auth/dist/auth';
+import type { AccountData } from '@/types/store';
+
+// Waiting for Auth to be Ready
+(async () => {
+  const account = useAccountStore();
+  const currentUser = (await getCurrentUser()) as User;
+  if (currentUser) {
+    const result = (await account.fetchAccount({ uid: currentUser.uid })) as AccountData;
+    account.userData = {
+      email: currentUser.email!,
+      name: currentUser.displayName!,
+      uid: currentUser.uid,
+      ...result,
+    };
+    account.isAuthReady = true;
+  }
+})();
+
 app.use(VueCookies);
 app.use(PrimeVue);
 

@@ -29,13 +29,11 @@ const routes: Array<RouteRecordRaw> = [
         path: 'login',
         name: 'AccountLogin',
         component: () => import('@/views/Account/Login/index.vue'),
-        // meta: { requiresAuth: false },
       },
       {
         path: 'signup',
         name: 'AccountSignup',
         component: () => import('@/views/Account/Signup/index.vue'),
-        // meta: { requiresAuth: false },
       },
     ],
   },
@@ -64,6 +62,18 @@ const router = createRouter({
   routes,
 });
 
+router.beforeEach(async (to, from, next) => {
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
+    if (await getCurrentUser()) {
+      next();
+    } else {
+      next('/account/login');
+    }
+  } else {
+    next();
+  }
+});
+
 // router auth checker
 export const getCurrentUser = () => {
   return new Promise((resolve, reject) => {
@@ -77,18 +87,5 @@ export const getCurrentUser = () => {
     );
   });
 };
-
-router.beforeEach(async (to, from, next) => {
-  if (to.matched.some((record) => record.meta.requiresAuth)) {
-    if (await getCurrentUser()) {
-      next();
-    } else {
-      alert('회원가입을 진행해주세요.');
-      next('/account/login');
-    }
-  } else {
-    next();
-  }
-});
 
 export default router;

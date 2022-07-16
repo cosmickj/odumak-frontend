@@ -1,7 +1,7 @@
+import { defineStore } from 'pinia';
 import { auth, db } from '@/firebase/config';
 import { doc, getDoc } from 'firebase/firestore';
 import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import { defineStore } from 'pinia';
 import type { AccountData, UserData } from '@/types/store';
 
 interface AccountState {
@@ -27,6 +27,7 @@ export const useAccountStore = defineStore('account', {
           name: loginAccountRes.user.displayName!,
           ...(fetchAccountRes as AccountData),
         };
+        this.isAuthReady = true;
       } catch (error) {
         throw new Error('could not complete login');
       }

@@ -112,8 +112,8 @@ const onSubmit = async () => {
     isLoading.value = true;
     isError.value = false;
     await account.loginAccount(loginForm);
-    // router.push({ name: "AppHome" });
-  } catch (error: any) {
+    router.push({ name: 'HomeView' });
+  } catch (error) {
     isLoading.value = false;
     isError.value = true;
   }
