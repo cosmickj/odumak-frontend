@@ -53,13 +53,13 @@
 import { computed } from 'vue';
 import { Student, Teacher } from '@/types';
 // import { useStore } from "vuex";
-
 // const store = useStore();
+
 const props = defineProps<{
   modelValue: Student[] | Teacher[];
   documentId: string;
-  // writer: Teacher;
   attendanceDate: Date;
+  // writer: Teacher;
 }>();
 const emit = defineEmits(['update:modelValue', 'onUploaded:studentsAttendance']);
 

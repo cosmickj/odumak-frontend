@@ -54,9 +54,9 @@
       <!-- 선생님별 학생 출석 리스트 -->
       <div class="extra" v-if="currnetIndexList.includes(idx)">
         <div v-if="!isLoading[idx] && teacher.role === 'teacher'">
-          <AttendanceInputStudents
+          <CheckerStudents
             v-model="studentsAttendanceByTeacher[teacher.name].studentsAttendance"
-            :record-id="studentsAttendanceByTeacher[teacher.name].recordId"
+            :document-id="studentsAttendanceByTeacher[teacher.name].recordId"
             :attendance-date="attendanceDate"
             :writer="teacher"
             @on-uploaded:students-attendance="setRecordIdByTeacher"
@@ -65,28 +65,28 @@
       </div>
     </div>
 
-    <Button v-if="!recordId" class="w-full p-button-lg" type="submit" label="제출하기" />
+    <Button v-if="!documentId" class="w-full p-button-lg" type="submit" label="제출하기" />
     <Button v-else class="w-full p-button-secondary p-button-lg" type="submit" label="수정하기" />
   </form>
 </template>
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import AttendanceInputStudents from '@/components/AttendanceInputStudents.vue';
+import { Student, Teacher } from '@/types';
+import CheckerStudents from './CheckerStudents.vue';
 // import { useStore } from "vuex";
-import { Teacher, Student } from '@/types';
-
 // const store = useStore();
+
 const props = defineProps<{
-  modelValue: Teacher[];
-  recordId: string;
+  modelValue: Student[] | Teacher[];
+  documentId: string;
   attendanceDate: Date;
 }>();
 const emit = defineEmits(['update:modelValue', 'onUploaded:teachersAttendance']);
 
-const teachersAttendance = computed<Teacher[]>({
+const teachersAttendance = computed<Student[] | Teacher[]>({
   get: () => props.modelValue,
-  set: (newValue) => emit('update:modelValue', newValue),
+  set: (teachersAttendance) => emit('update:modelValue', teachersAttendance),
 });
 
 const isLoading = ref<boolean[]>([]);
