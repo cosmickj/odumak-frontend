@@ -1,7 +1,7 @@
-import { studentsAttendanceCol, teachersAttendanceCol } from '@/firebase/config';
-import { getDocs, query, where } from 'firebase/firestore';
 import { defineStore } from 'pinia';
-import { Student, Teacher } from '@/types';
+import { db, studentsAttendanceCol, teachersAttendanceCol } from '@/firebase/config';
+import { addDoc, doc, getDocs, query, setDoc, where } from 'firebase/firestore';
+import type { Student, Teacher } from '@/types';
 import teacherList from '@/database/teacher_list.json';
 import studentList from '@/database/student_list.json';
 
@@ -23,7 +23,6 @@ export const useAttendanceStore = defineStore('attendance', {
     return {};
   },
   actions: {
-    // 학생 출석 입력하기
     async fetchStudentsAttendance(payload: any) {
       const q = query(
         studentsAttendanceCol,
@@ -45,7 +44,6 @@ export const useAttendanceStore = defineStore('attendance', {
         return { documentId: '', studentsAttendance: result };
       }
     },
-    // 교사 출석 입력하기
     async fetchTeachersAttendance(payload: any) {
       const q = query(teachersAttendanceCol, where('date', '==', payload.date));
       const querySnapshot = await getDocs(q);
@@ -60,6 +58,7 @@ export const useAttendanceStore = defineStore('attendance', {
         return { documentId: '', teachersAttendance: teacherList };
       }
     },
+
     // 학생 일일 출석 확인하기
     async fetchStudentsAttendanceByDate(payload: any) {
       const q = query(studentsAttendanceCol, where('date', '==', payload.date));
@@ -100,6 +99,22 @@ export const useAttendanceStore = defineStore('attendance', {
         }
       }
       return teahcerListClone;
+    },
+
+    async addTeachersAttendance(payload: any) {
+      // 수정
+      if (payload.documentId) {
+        const docId = payload.documentId;
+        delete payload.documentId;
+        await setDoc(doc(db, 'teachersAttendance', docId), payload);
+        return { id: docId };
+      }
+      // 제출
+      else {
+        delete payload.documentId;
+        const result = await addDoc(teachersAttendanceCol, payload);
+        return result;
+      }
     },
   },
 });

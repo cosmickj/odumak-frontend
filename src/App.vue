@@ -4,7 +4,7 @@
     <section
       class="relative flex items-center justify-center w-screen h-screen sm:max-w-xl sm:max-h-240 bg-white shadow-lg"
     >
-      <div class="h-full grow flex flex-col justify-center">
+      <div class="grow h-full flex flex-col">
         <router-view></router-view>
       </div>
     </section>

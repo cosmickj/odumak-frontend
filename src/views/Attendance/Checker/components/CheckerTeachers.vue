@@ -1,66 +1,66 @@
 <template>
-  <form @submit.prevent="submitTeachersAttendance">
-    <div v-for="(teacher, idx) in teachersAttendance" :key="idx" class="student">
-      <div class="attendance">
-        <div class="student__name">{{ teacher.name }}</div>
+  <form class="grow flex flex-col" @submit.prevent="submitTeachersAttendance">
+    <div class="overflow-auto h-0 grow">
+      <div v-for="(teacher, idx) in teachersAttendance" :key="idx">
+        <div class="attendance">
+          <div class="student__name">{{ teacher.name }}</div>
 
-        <input
-          type="radio"
-          :id="`absence-${teacher.name}`"
-          value="absence"
-          v-model="teachersAttendance[idx].attendance"
-          class="attendance__input"
-        />
-        <label :for="`absence-${teacher.name}`" class="attendance__label attendance__label__absence">
-          <span>결석</span>
-        </label>
-
-        <input
-          type="radio"
-          :id="`online-${teacher.name}`"
-          value="online"
-          v-model="teachersAttendance[idx].attendance"
-          class="attendance__input"
-        />
-        <label :for="`online-${teacher.name}`" class="attendance__label attendance__label__online">
-          <span>온라인</span>
-        </label>
-
-        <input
-          type="radio"
-          :id="`offline-${teacher.name}`"
-          value="offline"
-          v-model="teachersAttendance[idx].attendance"
-          class="attendance__input"
-        />
-        <label :for="`offline-${teacher.name}`" class="attendance__label attendance__label__offline">
-          <span>현장</span>
-        </label>
-
-        <!-- 선생님별 학생 출석 조회 버튼 -->
-        <div
-          class="w-3rem h-3rem flex align-items-center justify-content-center cursor-pointer"
-          v-if="teacher.role === 'teacher'"
-          @click="requestStudentsAttendance(teacher, idx)"
-        >
-          <i class="pi pi-sort-down" :class="{ 'pi--open': currnetIndexList.includes(idx) }"></i>
-        </div>
-
-        <div v-else class="w-3rem h-3rem flex align-items-center justify-content-center cursor-pointer">
-          <i class="pi pi-minus"></i>
-        </div>
-      </div>
-
-      <!-- 선생님별 학생 출석 리스트 -->
-      <div class="extra" v-if="currnetIndexList.includes(idx)">
-        <div v-if="!isLoading[idx] && teacher.role === 'teacher'">
-          <CheckerStudents
-            v-model="studentsAttendanceByTeacher[teacher.name].studentsAttendance"
-            :document-id="studentsAttendanceByTeacher[teacher.name].recordId"
-            :attendance-date="attendanceDate"
-            :writer="teacher"
-            @on-uploaded:students-attendance="setRecordIdByTeacher"
+          <input
+            type="radio"
+            :id="`absence-${teacher.name}`"
+            value="absence"
+            v-model="teachersAttendance[idx].attendance"
+            class="attendance__input"
           />
+          <label :for="`absence-${teacher.name}`" class="attendance__label attendance__label__absence">
+            <span>결석</span>
+          </label>
+
+          <input
+            type="radio"
+            :id="`online-${teacher.name}`"
+            value="online"
+            v-model="teachersAttendance[idx].attendance"
+            class="attendance__input"
+          />
+          <label :for="`online-${teacher.name}`" class="attendance__label attendance__label__online">
+            <span>온라인</span>
+          </label>
+
+          <input
+            type="radio"
+            :id="`offline-${teacher.name}`"
+            value="offline"
+            v-model="teachersAttendance[idx].attendance"
+            class="attendance__input"
+          />
+          <label :for="`offline-${teacher.name}`" class="attendance__label attendance__label__offline">
+            <span>현장</span>
+          </label>
+
+          <div
+            class="w-3rem h-3rem flex align-items-center justify-content-center cursor-pointer"
+            v-if="teacher.role === 'teacher'"
+            @click="requestStudentsAttendance(teacher, idx)"
+          >
+            <i class="pi pi-sort-down" :class="{ 'pi--open': currnetIndexList.includes(idx) }"></i>
+          </div>
+
+          <div v-else class="w-3rem h-3rem flex align-items-center justify-content-center cursor-pointer">
+            <i class="pi pi-minus"></i>
+          </div>
+        </div>
+
+        <div class="extra" v-if="currnetIndexList.includes(idx)">
+          <div v-if="!isLoading[idx] && teacher.role === 'teacher'">
+            <CheckerStudents
+              v-model="studentsAttendanceByTeacher[teacher.name].studentsAttendance"
+              :document-id="studentsAttendanceByTeacher[teacher.name].recordId"
+              :attendance-date="attendanceDate"
+              :writer="teacher"
+              @on-uploaded:students-attendance="setRecordIdByTeacher"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -74,17 +74,18 @@
 import { computed, ref, watch } from 'vue';
 import { Student, Teacher } from '@/types';
 import CheckerStudents from './CheckerStudents.vue';
-// import { useStore } from "vuex";
-// const store = useStore();
+import { useAttendanceStore } from '@/store/attendance';
+
+const attendance = useAttendanceStore();
 
 const props = defineProps<{
-  modelValue: Student[] | Teacher[];
+  modelValue: Teacher[];
   documentId: string;
   attendanceDate: Date;
 }>();
 const emit = defineEmits(['update:modelValue', 'onUploaded:teachersAttendance']);
 
-const teachersAttendance = computed<Student[] | Teacher[]>({
+const teachersAttendance = computed<Teacher[]>({
   get: () => props.modelValue,
   set: (teachersAttendance) => emit('update:modelValue', teachersAttendance),
 });
@@ -102,46 +103,52 @@ watch(
 );
 
 const requestStudentsAttendance = async (teacher: Teacher, currentIndex: number) => {
-  // isLoading.value = Array(currentIndex).fill(false);
-  // isLoading.value[currentIndex] = true;
-  // const targetIndex = currnetIndexList.value.indexOf(currentIndex);
-  // if (targetIndex === -1) {
-  //   currnetIndexList.value.push(currentIndex);
-  // } else {
-  //   currnetIndexList.value.splice(targetIndex, 1);
-  // }
-  // if (teacher.role === "teacher") {
-  //   if (studentsAttendanceByTeacher.value[teacher.name]) {
-  //     // pass
-  //   } else {
-  //     const result = await store.dispatch("attendance/fetchStudentsAttendance", {
-  //       date: props.attendanceDate,
-  //       grade: teacher.grade,
-  //       group: teacher.group,
-  //       teacher: teacher.name,
-  //     });
-  //     result.studentsAttendance.forEach((student: Student) => {
-  //       if (!student.attendance) student.attendance = "offline";
-  //     });
-  //     studentsAttendanceByTeacher.value[teacher.name] = {
-  //       recordId: result.recordId,
-  //       studentsAttendance: result.studentsAttendance,
-  //     };
-  //   }
-  // }
-  // isLoading.value[currentIndex] = false;
+  isLoading.value = Array(currentIndex).fill(false);
+  isLoading.value[currentIndex] = true;
+  const targetIndex = currnetIndexList.value.indexOf(currentIndex);
+  if (targetIndex === -1) {
+    currnetIndexList.value.push(currentIndex);
+  } else {
+    currnetIndexList.value.splice(targetIndex, 1);
+  }
+
+  if (teacher.role === 'teacher') {
+    if (studentsAttendanceByTeacher.value[teacher.name]) {
+      // pass
+    } else {
+      const result = await attendance.fetchStudentsAttendance({
+        date: props.attendanceDate,
+        grade: teacher.grade,
+        group: teacher.group,
+        teacher: teacher.name,
+      });
+      result.studentsAttendance.forEach((student: Student) => {
+        if (!student.attendance) student.attendance = 'offline';
+      });
+      studentsAttendanceByTeacher.value[teacher.name] = {
+        documentId: result.documentId,
+        studentsAttendance: result.studentsAttendance,
+      };
+    }
+  }
+
+  isLoading.value[currentIndex] = false;
 };
 
 const submitTeachersAttendance = async () => {
-  // const params = {
-  //   recordId: props.recordId,
-  //   date: props.attendanceDate,
-  //   teachersAttendance: teachersAttendance.value,
-  // };
-  // const { id } = await store.dispatch("attendance/addTeachersAttendance", params);
-  // emit("onUploaded:teachersAttendance", { id });
-  // if (!props.recordId) alert("제출되었습니다.");
-  // else alert("수정되었습니다.");
+  const params = {
+    documentId: props.documentId,
+    date: props.attendanceDate,
+    teachersAttendance: teachersAttendance.value,
+  };
+  const { id } = await attendance.addTeachersAttendance(params);
+  emit('onUploaded:teachersAttendance', { id });
+
+  if (!props.documentId) {
+    alert('제출되었습니다.');
+  } else {
+    alert('수정되었습니다.');
+  }
 };
 
 const setRecordIdByTeacher = ({ id, teacher }: { id: string; teacher: string }) => {
@@ -155,10 +162,10 @@ const setRecordIdByTeacher = ({ id, teacher }: { id: string; teacher: string }) 
   display: flex;
   justify-content: space-evenly;
   align-items: center;
-  margin: 10px 0;
+  margin: 1rem 0;
   border-radius: 3px;
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
-  background: #efefef95;
+  background: white;
 }
 .attendance__input {
   display: none;
@@ -209,8 +216,8 @@ const setRecordIdByTeacher = ({ id, teacher }: { id: string; teacher: string }) 
 .extra :deep(.attendance) {
   background-color: #cccccc80;
 }
-button[class^='p-button'] {
+/* button[class^='p-button'] {
   position: sticky;
-  bottom: 0.5rem;
-}
+  bottom: -2rem;
+} */
 </style>

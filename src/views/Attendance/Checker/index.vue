@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full p-5 flex flex-col">
+  <div class="h-screen flex flex-col p-8 bg-slate-100">
     <div class="relative flex justify-center items-center">
       <!-- 뒤로 가기 -->
       <button class="h-full w-12 absolute left-0 cursor-pointer">
@@ -35,10 +35,10 @@
         :attendance-date="attendanceDate"
         @on-uploaded:data-source="setDocumentId"
       />
+      <!-- :writer="user" -->
 
       <TheFinger v-else class="pt-5" />
     </template>
-    <!-- :writer="user" -->
 
     <!-- 관리자일 때 -->
     <template v-else-if="userData?.role === 'admin'">
@@ -57,7 +57,7 @@
 
       <CheckerTeachers
         v-if="attendanceDate"
-        v-model="dataSource"
+        v-model="(dataSource as Teacher[])"
         :document-id="documentId"
         :attendance-date="attendanceDate"
         @on-uploaded:teachers-attendance="setDocumentId"
