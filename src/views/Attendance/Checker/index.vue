@@ -3,7 +3,10 @@
     <div class="relative flex justify-center items-center">
       <!-- 뒤로 가기 -->
       <button class="h-full w-12 absolute left-0 cursor-pointer">
-        <router-link class="h-full w-full flex justify-center items-center" :to="{ name: 'HomeView' }">
+        <router-link
+          class="h-full w-full flex justify-center items-center"
+          :to="{ name: 'HomeView' }"
+        >
           <i class="pi pi-arrow-left text-3xl"></i>
         </router-link>
       </button>
@@ -21,10 +24,11 @@
 
       <Calendar
         v-model="attendanceDate"
-        class="w-full pt-5"
+        class="pt-5"
         :touchUI="true"
-        :showIcon="true"
         :disabledDays="[1, 2, 3, 4, 5, 6]"
+        :placeholder="'날짜를 선택해주세요'"
+        input-class="text-center"
         @date-select="requestAttendance('student')"
       />
 
@@ -48,10 +52,11 @@
 
       <Calendar
         v-model="attendanceDate"
-        class="w-full pt-5 border-round"
+        class="pt-5"
         :touchUI="true"
-        :showIcon="true"
         :disabledDays="[1, 2, 3, 4, 5, 6]"
+        :placeholder="'날짜를 선택해주세요'"
+        input-class="text-center"
         @date-select="requestAttendance('teahcer')"
       />
 

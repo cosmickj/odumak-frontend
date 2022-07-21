@@ -1,50 +1,76 @@
 <template>
-  <div class="overflow-auto h-[calc(100%_-_10rem)]">
-    <form class="" @submit.prevent="submitStudentsAttendance">
-      <!-- 학생 출석체크 -->
-      <div v-for="(student, i) in studentsAttendance" :key="i" class="attendance student">
-        <div class="student__name">{{ student.name }}</div>
+  <div class="overflow-auto h-[calc(100%_-_10rem)] select-none">
+    <form
+      @submit.prevent="submitStudentsAttendance"
+      :class="{
+        'border-x-4 border-b-4 border-slate-200 rounded-b-lg bg-slate-200': isSub,
+      }"
+    >
+      <div
+        class="attendance bg-white shadow"
+        v-for="(student, i) in studentsAttendance"
+        :key="i"
+      >
+        <div class="student__name" :class="$attrs.class">{{ student.name }}</div>
+
         <input
-          type="radio"
-          :id="`absence-${student.name}`"
-          value="absence"
           v-model="studentsAttendance[i].attendance"
           class="attendance__input"
+          type="radio"
+          value="absence"
+          :id="`absence-${student.name}`"
         />
-        <label :for="`absence-${student.name}`" class="attendance__label attendance__label__absence">
+        <label
+          class="shadow-md attendance__label attendance__label__absence"
+          :for="`absence-${student.name}`"
+        >
           <span>결석</span>
         </label>
 
         <input
-          type="radio"
-          :id="`online-${student.name}`"
-          value="online"
           v-model="studentsAttendance[i].attendance"
           class="attendance__input"
+          type="radio"
+          value="online"
+          :id="`online-${student.name}`"
         />
-        <label :for="`online-${student.name}`" class="attendance__label attendance__label__online">
+        <label
+          class="shadow-md attendance__label attendance__label__online"
+          :for="`online-${student.name}`"
+        >
           <span>온라인</span>
         </label>
 
         <input
-          type="radio"
-          :id="`offline-${student.name}`"
-          value="offline"
           v-model="studentsAttendance[i].attendance"
           class="attendance__input"
+          type="radio"
+          value="offline"
+          :id="`offline-${student.name}`"
         />
-        <label :for="`offline-${student.name}`" class="attendance__label attendance__label__offline">
+        <label
+          class="shadow-md attendance__label attendance__label__offline"
+          :for="`offline-${student.name}`"
+        >
           <span>현장</span>
         </label>
       </div>
 
-      <Button
-        v-if="!documentId"
-        class="sticky bottom-0 w-full p-button-warning p-button-lg"
-        type="submit"
-        label="제출하기"
-      />
-      <Button v-else class="w-full p-button-danger p-button-lg" type="submit" label="수정하기" />
+      <div v-if="!documentId" class="flex justify-end">
+        <Button
+          class="w-2/6 p-button-warning p-button-lg"
+          label="제출하기"
+          type="submit"
+        />
+      </div>
+
+      <div v-else class="flex justify-end">
+        <Button
+          class="w-2/6 p-button-danger p-button-lg"
+          label="수정하기"
+          type="submit"
+        />
+      </div>
     </form>
   </div>
 </template>
@@ -60,6 +86,7 @@ const props = defineProps<{
   documentId: string;
   attendanceDate: Date;
   // writer: Teacher;
+  isSub?: boolean;
 }>();
 const emit = defineEmits(['update:modelValue', 'onUploaded:studentsAttendance']);
 
@@ -87,13 +114,11 @@ const submitStudentsAttendance = async () => {
 <style scoped>
 .attendance {
   padding: 1rem;
-  display: flex;
-  justify-content: space-evenly;
-  align-items: center;
-  margin: 10px 0;
+  margin: 0.5rem 0;
   border-radius: 3px;
-  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
-  background: #efefef95;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
 }
 .attendance__input {
   display: none;
@@ -101,33 +126,61 @@ const submitStudentsAttendance = async () => {
   width: 0;
 }
 .attendance__label {
-  height: 48px;
-  width: 48px;
-  font-size: 0.6rem;
-  margin: 0 4px 0 4px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0px 2px 4px #00000029;
-  border-radius: 5px;
-  cursor: pointer;
   opacity: 0.4;
+  height: 40px;
+  width: 40px;
+  border-radius: 0.8rem;
+  font-size: 0.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.5s;
+}
+.attendance__label__offline {
+  border: 2px solid #4caf50;
+}
+.attendance__label__online {
+  border: 2px solid #fbc02d;
+}
+.attendance__label__absence {
+  border: 2px solid #ff4032;
 }
 .attendance__input:checked + .attendance__label {
   opacity: 1;
   animation: jelly 0.6s ease;
-  font-weight: bold;
 }
-.attendance__label__offline {
+.attendance__input:checked + .attendance__label.attendance__label__offline {
   background-color: #4caf50;
-  color: #28334aff;
+  color: white;
 }
-.attendance__label__online {
+.attendance__input:checked + .attendance__label.attendance__label__online {
   background-color: #fbc02d;
-  color: #28334aff;
 }
-.attendance__label__absence {
+.attendance__input:checked + .attendance__label.attendance__label__absence {
   background-color: #ff4032;
-  color: #28334aff;
+}
+@keyframes jelly {
+  from {
+    transform: scale(1, 1);
+  }
+  30% {
+    transform: scale(1.25, 0.75);
+  }
+  40% {
+    transform: scale(0.75, 1.25);
+  }
+  50% {
+    transform: scale(1.15, 0.85);
+  }
+  65% {
+    transform: scale(0.95, 1.05);
+  }
+  75% {
+    transform: scale(1.05, 0.95);
+  }
+  to {
+    transform: scale(1, 1);
+  }
 }
 </style>
