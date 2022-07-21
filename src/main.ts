@@ -38,15 +38,17 @@ import type { AccountData } from '@/types/store';
   const account = useAccountStore();
   const currentUser = (await getCurrentUser()) as User;
   if (currentUser) {
-    const result = (await account.fetchAccount({ uid: currentUser.uid })) as AccountData;
+    const result = (await account.fetchAccount({
+      uid: currentUser.uid,
+    })) as AccountData;
     account.userData = {
       email: currentUser.email!,
       name: currentUser.displayName!,
       uid: currentUser.uid,
       ...result,
     };
-    account.isAuthReady = true;
   }
+  account.isAuthReady = true;
 })();
 
 app.use(VueCookies);
