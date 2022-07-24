@@ -1,9 +1,12 @@
 import { defineStore } from 'pinia';
-import { db, studentsAttendanceCol, teachersAttendanceCol } from '@/firebase/config';
+import {
+  db,
+  membersCol,
+  studentsAttendanceCol,
+  teachersAttendanceCol,
+} from '@/firebase/config';
 import { addDoc, doc, getDocs, query, setDoc, where } from 'firebase/firestore';
 import type { Student, Teacher } from '@/types';
-import teacherList from '@/database/teacher_list.json';
-import studentList from '@/database/student_list.json';
 
 interface StudentsAttendance {
   date: Date;
@@ -16,6 +19,17 @@ interface StudentsAttendance {
 interface TeachersAttendance {
   date: Date;
   teachersAttendance: Teacher[];
+}
+
+interface Members {
+  church: string;
+  createdAt: {
+    seconds: number;
+    nanoseconds: number;
+  };
+  department: string;
+  members: Teacher[] | Student[];
+  position: string;
 }
 
 export const useAttendanceStore = defineStore('attendance', {
@@ -39,11 +53,14 @@ export const useAttendanceStore = defineStore('attendance', {
         };
         return result;
       } else {
-        const studentListClone: Student[] = JSON.parse(JSON.stringify(studentList));
-        const result = studentListClone.filter((student) => student.teacher === payload.teacher);
+        const studentListClone = (await this.fetchStudentList()).members as Student[];
+        const result = studentListClone.filter(
+          (student) => student.teacher === payload.teacher
+        );
         return { documentId: '', studentsAttendance: result };
       }
     },
+
     async fetchTeachersAttendance(payload: any) {
       const q = query(teachersAttendanceCol, where('date', '==', payload.date));
       const querySnapshot = await getDocs(q);
@@ -55,19 +72,45 @@ export const useAttendanceStore = defineStore('attendance', {
         };
         return result;
       } else {
-        return { documentId: '', teachersAttendance: teacherList };
+        const teachers = (await this.fetchTeacherList()).members as Teacher[];
+        return { documentId: '', teachersAttendance: teachers };
       }
+    },
+
+    async fetchStudentList() {
+      const q = query(
+        membersCol,
+        where('church', '==', '영은교회'),
+        where('department', '==', '초등부'),
+        where('position', '==', 'student')
+      );
+      const querySnapshot = await getDocs(q);
+      const members = querySnapshot.docs[0].data() as Members;
+      return members;
+    },
+
+    async fetchTeacherList() {
+      const q = query(
+        membersCol,
+        where('church', '==', '영은교회'),
+        where('department', '==', '초등부'),
+        where('position', '==', 'teacher')
+      );
+      const querySnapshot = await getDocs(q);
+      const members = querySnapshot.docs[0].data() as Members;
+      return members;
     },
 
     // 학생 일일 출석 확인하기
     async fetchStudentsAttendanceByDate(payload: any) {
       const q = query(studentsAttendanceCol, where('date', '==', payload.date));
       const querySnapshot = await getDocs(q);
-      const attendanceList = querySnapshot.docs.map((value) => value.data().studentsAttendance).flat();
+      const attendanceList = querySnapshot.docs
+        .map((value) => value.data().studentsAttendance)
+        .flat();
 
-      const studentListClone: Student[] = JSON.parse(
-        JSON.stringify(studentList.filter((student) => student.teacher !== '테스트 계정'))
-      );
+      const studentListClone = (await this.fetchStudentList()).members as Student[];
+
       // TODO: 알고리즘 개선 필요
       for (const attendance of attendanceList) {
         for (const student of studentListClone) {
@@ -83,11 +126,11 @@ export const useAttendanceStore = defineStore('attendance', {
     async fetchTeachersAttendanceByDate(payload: any) {
       const q = query(teachersAttendanceCol, where('date', '==', payload.date));
       const querySnapshot = await getDocs(q);
-      const attendanceList = querySnapshot.docs.map((value) => value.data().teachersAttendance).flat();
+      const attendanceList = querySnapshot.docs
+        .map((value) => value.data().teachersAttendance)
+        .flat();
 
-      const teahcerListClone: Teacher[] = JSON.parse(
-        JSON.stringify(teacherList.filter((teacher) => teacher.name !== '테스트 계정'))
-      );
+      const teahcerListClone = (await this.fetchTeacherList()).members as Teacher[];
 
       // TODO: 알고리즘 개선 필요
       for (const attendance of attendanceList) {

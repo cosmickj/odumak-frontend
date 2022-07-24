@@ -20,7 +20,9 @@ export const useAccountStore = defineStore('account', {
     async loginAccount({ email, password }: { email: string; password: string }) {
       try {
         const loginAccountRes = await signInWithEmailAndPassword(auth, email, password);
-        const fetchAccountRes = await this.fetchAccount({ uid: loginAccountRes.user.uid });
+        const fetchAccountRes = await this.fetchAccount({
+          uid: loginAccountRes.user.uid,
+        });
         this.userData = {
           uid: loginAccountRes.user.uid,
           email: loginAccountRes.user.email!,
@@ -44,6 +46,7 @@ export const useAccountStore = defineStore('account', {
       this.userData = null;
     },
 
+    // TODO: 회원가입 로직: 선생님 리스트를 파이어베이스에서 불러오기
     // async signup(context, payload) {
     //   try {
     //     const target = teacherList.filter((teacher) => teacher.name === payload.name);
