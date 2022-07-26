@@ -23,7 +23,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/account',
-    component: () => import('@/layouts/AccountLayout.vue'),
+    component: () => import('@/layouts/DefaultLayout.vue'),
     children: [
       {
         path: 'login',
@@ -39,7 +39,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/attendance',
-    component: () => import('@/layouts/AttendanceLayout.vue'),
+    component: () => import('@/layouts/DefaultLayout.vue'),
     children: [
       {
         path: 'checker/:position',
