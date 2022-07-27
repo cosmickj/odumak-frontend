@@ -107,6 +107,8 @@ export const useAccountStore = defineStore('account', {
     async createUser(payload: any) {
       try {
         await setDoc(doc(db, 'users', payload.uid), {
+          church: payload.church,
+          department: payload.department,
           email: payload.email,
           name: payload.name,
           role: payload.role,

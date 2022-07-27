@@ -164,13 +164,15 @@ const account = useAccountStore();
 const router = useRouter();
 
 const initSignupForm = {
+  church: '영은교회',
+  department: '초등부',
   email: '',
   password: '',
   confirmedPassword: '',
+  name: '',
   role: 'common',
   grade: '-1',
   group: '-1',
-  name: '',
 };
 const signupForm = reactive({ ...initSignupForm });
 
@@ -202,8 +204,6 @@ const isLoading = ref(false);
 const isAllFilled = ref(true);
 const isValidated = ref(true);
 const errorMessage = ref('');
-
-interface Response {}
 
 const onSubmit = async () => {
   isValidated.value = true; // TODO: 초기화 점검하기, 또 추가되거나 깔끔하게 되어야할 로직 살피기
