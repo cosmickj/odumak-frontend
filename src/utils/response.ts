@@ -4,7 +4,14 @@ interface BaseResponse {
   message: string;
 }
 
-const response = ({ isSuccess, code, message }: BaseResponse, result: any) => {
+interface ReturnResponse extends BaseResponse {
+  result?: any;
+}
+
+const response = (
+  { isSuccess, code, message }: BaseResponse,
+  result: any
+): ReturnResponse => {
   return {
     isSuccess,
     code,
@@ -13,7 +20,7 @@ const response = ({ isSuccess, code, message }: BaseResponse, result: any) => {
   };
 };
 
-const errResponse = ({ isSuccess, code, message }: BaseResponse) => {
+const errResponse = ({ isSuccess, code, message }: BaseResponse): ReturnResponse => {
   return {
     isSuccess,
     code,
