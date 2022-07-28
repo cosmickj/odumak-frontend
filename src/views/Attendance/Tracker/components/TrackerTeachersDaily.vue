@@ -11,7 +11,12 @@
     <!-- 저장하기 -->
     <template #header>
       <div class="flex items-center justify-between">
-        <Button class="p-button-sm p-button-secondary" icon="pi pi-download" label="저장하기" @click="exportCSV" />
+        <Button
+          class="p-button-sm p-button-secondary"
+          icon="pi pi-download"
+          label="저장하기"
+          @click="exportCSV"
+        />
       </div>
     </template>
 
@@ -19,8 +24,9 @@
 
     <Column field="class" header="담당학급" bodyStyle="text-align:center">
       <template #body="slotProps">
-        <!-- <span>{{ slotProps.data.grade }}, {{ slotProps.data.group }}</span> -->
-        <span>{{ translateAssignedClass(slotProps.data.grade, slotProps.data.group) }}</span>
+        <span>
+          {{ translateAssignedClass(slotProps.data.grade, slotProps.data.group) }}
+        </span>
       </template>
     </Column>
 
@@ -66,7 +72,7 @@ const translateAttendance = (attendance: string) => {
 const translateAssignedClass = (grade: string, group: string) => {
   if (grade === '0') {
     return '새친구';
-  } else if (grade === 'n/a') {
+  } else if (grade === 'n/a' || grade === '-1') {
     return '-';
   } else {
     return `${grade}학년 ${group}반`;
