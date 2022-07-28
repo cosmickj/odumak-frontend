@@ -85,8 +85,12 @@ export const useAttendanceStore = defineStore('attendance', {
         where('position', '==', 'student')
       );
       const querySnapshot = await getDocs(q);
+
       const members = querySnapshot.docs[0].data() as Members;
-      return members;
+      return {
+        documentId: querySnapshot.docs[0].id,
+        ...members,
+      };
     },
 
     async fetchTeacherList() {

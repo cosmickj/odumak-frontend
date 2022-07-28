@@ -9,7 +9,7 @@ export interface Student {
   grade: string;
   group: string;
   name: string;
-  teacher: string;
+  teacher?: string;
 }
 export interface Teacher {
   attendance?: string;
