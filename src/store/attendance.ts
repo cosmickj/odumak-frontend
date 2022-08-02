@@ -1,36 +1,9 @@
 import { defineStore } from 'pinia';
-import {
-  db,
-  membersCol,
-  studentsAttendanceCol,
-  teachersAttendanceCol,
-} from '@/firebase/config';
+import { db, studentsAttendanceColl, teachersAttendanceColl } from '@/firebase/config';
 import { addDoc, doc, getDocs, query, setDoc, where } from 'firebase/firestore';
-import type { Student, Teacher } from '@/types';
-
-interface StudentsAttendance {
-  date: Date;
-  grade: string;
-  group: string;
-  studentsAttendance: Student[];
-  teacher: string;
-}
-
-interface TeachersAttendance {
-  date: Date;
-  teachersAttendance: Teacher[];
-}
-
-interface Members {
-  church: string;
-  createdAt: {
-    seconds: number;
-    nanoseconds: number;
-  };
-  department: string;
-  members: Teacher[] | Student[];
-  position: string;
-}
+import type { Student } from '@/types';
+import type { StudentsAttendance, TeachersAttendance } from '@/types/store';
+import { fetchStudents, fetchTeachers } from '@/api/members';
 
 export const useAttendanceStore = defineStore('attendance', {
   state: () => {
@@ -39,7 +12,7 @@ export const useAttendanceStore = defineStore('attendance', {
   actions: {
     async fetchStudentsAttendance(payload: any) {
       const q = query(
-        studentsAttendanceCol,
+        studentsAttendanceColl,
         where('date', '==', payload.date),
         where('grade', '==', payload.grade),
         where('group', '==', payload.group)
@@ -53,16 +26,17 @@ export const useAttendanceStore = defineStore('attendance', {
         };
         return result;
       } else {
-        const studentListClone = (await this.fetchStudentList()).members as Student[];
-        const result = studentListClone.filter(
-          (student) => student.teacher === payload.teacher
+        const result = await fetchStudents();
+        let studentListClone = result.data;
+        studentListClone = studentListClone.filter(
+          (student: Student) => student.teacher === payload.teacher
         );
-        return { documentId: '', studentsAttendance: result };
+        return { documentId: '', studentsAttendance: studentListClone };
       }
     },
 
     async fetchTeachersAttendance(payload: any) {
-      const q = query(teachersAttendanceCol, where('date', '==', payload.date));
+      const q = query(teachersAttendanceColl, where('date', '==', payload.date));
       const querySnapshot = await getDocs(q);
 
       if (querySnapshot.docs.length > 0) {
@@ -72,48 +46,21 @@ export const useAttendanceStore = defineStore('attendance', {
         };
         return result;
       } else {
-        const teachers = (await this.fetchTeacherList()).members as Teacher[];
-        return { documentId: '', teachersAttendance: teachers };
+        const result = await fetchTeachers();
+        return { documentId: '', teachersAttendance: result.data };
       }
-    },
-
-    async fetchStudentList() {
-      const q = query(
-        membersCol,
-        where('church', '==', '영은교회'),
-        where('department', '==', '초등부'),
-        where('position', '==', 'student')
-      );
-      const querySnapshot = await getDocs(q);
-
-      const members = querySnapshot.docs[0].data() as Members;
-      return {
-        documentId: querySnapshot.docs[0].id,
-        ...members,
-      };
-    },
-
-    async fetchTeacherList() {
-      const q = query(
-        membersCol,
-        where('church', '==', '영은교회'),
-        where('department', '==', '초등부'),
-        where('position', '==', 'teacher')
-      );
-      const querySnapshot = await getDocs(q);
-      const members = querySnapshot.docs[0].data() as Members;
-      return members;
     },
 
     // 학생 일일 출석 확인하기
     async fetchStudentsAttendanceByDate(payload: any) {
-      const q = query(studentsAttendanceCol, where('date', '==', payload.date));
+      const q = query(studentsAttendanceColl, where('date', '==', payload.date));
       const querySnapshot = await getDocs(q);
       const attendanceList = querySnapshot.docs
         .map((value) => value.data().studentsAttendance)
         .flat();
 
-      const studentListClone = (await this.fetchStudentList()).members as Student[];
+      const result = await fetchStudents();
+      const studentListClone = result.data;
 
       // TODO: 알고리즘 개선 필요
       for (const attendance of attendanceList) {
@@ -128,13 +75,14 @@ export const useAttendanceStore = defineStore('attendance', {
     },
     // 교사 일일 출석 확인하기
     async fetchTeachersAttendanceByDate(payload: any) {
-      const q = query(teachersAttendanceCol, where('date', '==', payload.date));
+      const q = query(teachersAttendanceColl, where('date', '==', payload.date));
       const querySnapshot = await getDocs(q);
       const attendanceList = querySnapshot.docs
         .map((value) => value.data().teachersAttendance)
         .flat();
 
-      const teahcerListClone = (await this.fetchTeacherList()).members as Teacher[];
+      const result = await fetchTeachers();
+      const teahcerListClone = result.data;
 
       // TODO: 알고리즘 개선 필요
       for (const attendance of attendanceList) {
@@ -159,7 +107,7 @@ export const useAttendanceStore = defineStore('attendance', {
       // 제출
       else {
         delete payload.documentId;
-        const result = await addDoc(teachersAttendanceCol, payload);
+        const result = await addDoc(teachersAttendanceColl, payload);
         return result;
       }
     },

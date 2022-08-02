@@ -81,13 +81,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import TheFinger from '@/components/TheFinger.vue';
 import CheckerStudents from './components/CheckerStudents.vue';
 import CheckerTeachers from './components/CheckerTeachers.vue';
+
 import { useAccountStore } from '@/store/account';
 import { useAttendanceStore } from '@/store/attendance';
 import type { Student, Teacher } from '@/types';
+
+import { fetchTeachers } from '@/api/members';
 
 const account = useAccountStore();
 const attendance = useAttendanceStore();
@@ -113,7 +116,9 @@ const requestAttendance = async (type: 'student' | 'teahcer') => {
 
     documentId.value = result.documentId;
     dataSource.value = result.studentsAttendance;
-  } else {
+  }
+  // teacher
+  else {
     const result = await attendance.fetchTeachersAttendance({
       date: attendanceDate.value,
     });

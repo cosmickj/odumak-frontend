@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { useAttendanceStore } from './attendance';
-import { auth, db, usersCol } from '@/firebase/config';
+import { auth, db, usersColl } from '@/firebase/config';
 import {
   doc,
   getDoc,
@@ -16,10 +16,11 @@ import {
   signOut,
   updateProfile,
 } from 'firebase/auth';
-import type { AccountData, UserData } from '@/types/store';
 import type { Teacher } from '@/types';
-import { errResponse, response } from '@/utils/response';
+import type { AccountData, UserData } from '@/types/store';
 import baseResponse from '@/utils/baseResponseStatus';
+import { errResponse, response } from '@/utils/response';
+import { fetchTeachers } from '@/api/members';
 
 interface AccountState {
   userData: UserData | null;
@@ -65,11 +66,14 @@ export const useAccountStore = defineStore('account', {
 
     async signup(payload: any) {
       const attendance = useAttendanceStore();
-      const result = await attendance.fetchTeacherList();
-      const teacherList = result.members as Teacher[];
+      const result = await fetchTeachers();
+      // const result = await attendance.fetchTeacherList();
+      const teacherList = result.data;
 
       try {
-        const target = teacherList.filter((teacher) => teacher.name === payload.name);
+        const target = teacherList.filter(
+          (teacher: Teacher) => teacher.name === payload.name
+        );
         // 해당 이름을 가진 사람이 선생님으로 등록되어 있는가?
         if (target.length === 0) {
           return errResponse(baseResponse.NAME_UNKNOWN);
@@ -83,7 +87,7 @@ export const useAccountStore = defineStore('account', {
           return errResponse(baseResponse.CLASS_UNMATCHED);
         }
         // 이미 해당 이름으로 가입되어 있는 회원이 있는가?
-        const q = query(usersCol, where('name', '==', payload.name));
+        const q = query(usersColl, where('name', '==', payload.name));
         const querySnapshot = await getDocs(q);
         if (querySnapshot.docs.length === 1) {
           return errResponse(baseResponse.NAME_DUPLICATED);

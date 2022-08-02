@@ -5,11 +5,16 @@ export interface UserInfo {
 }
 
 export interface Student {
-  attendance?: string;
   grade: string;
   group: string;
-  name: string;
   teacher?: string;
+  name: string;
+  gender?: string;
+  birth?: string;
+  phone?: string;
+  address?: string;
+  remark?: string;
+  attendance?: string;
 }
 export interface Teacher {
   attendance?: string;

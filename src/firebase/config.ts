@@ -22,7 +22,6 @@ export const auth = getAuth();
 export const db = getFirestore();
 
 // connect firebase database collections
-export const usersCol = collection(db, 'users');
-export const membersCol = collection(db, 'members');
-export const studentsAttendanceCol = collection(db, 'studentsAttendance');
-export const teachersAttendanceCol = collection(db, 'teachersAttendance');
+export const usersColl = collection(db, 'users');
+export const studentsAttendanceColl = collection(db, 'studentsAttendance');
+export const teachersAttendanceColl = collection(db, 'teachersAttendance');
