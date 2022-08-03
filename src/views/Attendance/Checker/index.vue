@@ -32,14 +32,17 @@
         @date-select="requestAttendance('student')"
       />
 
-      <CheckerStudents
-        v-if="attendanceDate"
-        v-model="dataSource"
-        :document-id="documentId"
-        :attendance-date="attendanceDate"
-        @on-uploaded:data-source="setDocumentId"
-      />
-      <!-- :writer="user" -->
+      <Suspense v-if="attendanceDate">
+        <CheckerStudents
+          v-model="dataSource"
+          :document-id="documentId"
+          :attendance-date="attendanceDate"
+          @on-uploaded:data-source="setDocumentId"
+        />
+        <!-- :writer="user" -->
+
+        <template #fallback> Loading... </template>
+      </Suspense>
 
       <TheFinger v-else class="pt-5" />
     </template>
@@ -59,7 +62,6 @@
         input-class="text-center"
         @date-select="requestAttendance('teahcer')"
       />
-
       <CheckerTeachers
         v-if="attendanceDate"
         v-model="(dataSource as Teacher[])"
@@ -77,12 +79,15 @@
         <p class="text-xl">담당 학급이 있는 선생님만 이용할 수 있습니다.</p>
       </div>
     </template>
+
+    <TheLoader :is-loading="isLoading" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import TheFinger from '@/components/TheFinger.vue';
+import TheLoader from '@/components/TheLoader.vue';
 import CheckerStudents from './components/CheckerStudents.vue';
 import CheckerTeachers from './components/CheckerTeachers.vue';
 
@@ -90,16 +95,21 @@ import { useAccountStore } from '@/store/account';
 import { useAttendanceStore } from '@/store/attendance';
 import type { Student, Teacher } from '@/types';
 
-import { fetchTeachers } from '@/api/members';
-
 const account = useAccountStore();
 const attendance = useAttendanceStore();
 
 const userData = computed(() => account.userData);
 
 const attendanceDate = ref<Date>();
+const isLoading = ref(false);
+
 const documentId = ref('');
 const dataSource = ref<Student[] | Teacher[]>([]);
+
+watch(attendanceDate, () => {
+  dataSource.value = [];
+  isLoading.value = true;
+});
 
 const requestAttendance = async (type: 'student' | 'teahcer') => {
   if (type === 'student') {
@@ -130,6 +140,8 @@ const requestAttendance = async (type: 'student' | 'teahcer') => {
     documentId.value = result.documentId;
     dataSource.value = result.teachersAttendance;
   }
+
+  isLoading.value = false;
 };
 
 const setDocumentId = ({ id }: { id: string }) => {

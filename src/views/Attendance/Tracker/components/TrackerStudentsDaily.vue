@@ -1,6 +1,6 @@
 <template>
   <DataTable
-    v-if="attendanceDate && !isLoading"
+    v-if="attendanceDate"
     ref="dataTable"
     class="p-datatable-sm mt-5 shadow"
     :value="studentsAttendance"
@@ -13,11 +13,21 @@
     <!-- 저장하기 -->
     <template #header>
       <div class="flex items-center justify-between">
-        <Button class="p-button-sm p-button-secondary" icon="pi pi-download" label="저장하기" @click="exportCSV" />
+        <Button
+          class="p-button-sm p-button-secondary"
+          icon="pi pi-download"
+          label="저장하기"
+          @click="exportCSV"
+        />
       </div>
     </template>
 
-    <Column field="teacher" header="선생님" headerClass="flex justify-center" bodyStyle="text-align:center">
+    <Column
+      field="teacher"
+      header="선생님"
+      headerClass="flex justify-center"
+      bodyStyle="text-align:center"
+    >
       <template #body="slotProps">
         <p class="text-xl">{{ slotProps.data.teacher }}</p>
         <p>({{ countStudents(slotProps.data.teacher) }}명)</p>
@@ -30,7 +40,12 @@
 
     <Column field="name" header="이름" bodyStyle="text-align:center" />
 
-    <Column field="attendance" header="출석현황" headerClass="flex justify-center" bodyClass="flex justify-center">
+    <Column
+      field="attendance"
+      header="출석현황"
+      headerClass="flex justify-center"
+      bodyClass="flex justify-center"
+    >
       <template #body="slotProps">
         <span :class="`attendance-${slotProps.data.attendance}`">
           {{ translateAttendance(slotProps.data.attendance) }}
@@ -53,7 +68,6 @@ import { multiSortMeta } from '../data';
 
 interface Props {
   attendanceDate: Date | undefined | null;
-  isLoading: boolean;
   studentsAttendance: Student[];
 }
 

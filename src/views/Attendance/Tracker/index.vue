@@ -17,21 +17,15 @@
     <!-- TODO: 누적 현황 작업 이후에 v-if 제거 -->
     <TheFinger v-if="!attendanceDate && type === 'daily'" />
 
-    <div v-else-if="attendanceDate && isLoading" class="mt-8 text-center">
-      <i class="pi pi-spin pi-spinner" style="font-size: 3rem"></i>
-    </div>
-
     <TrackerStudentsDaily
       v-if="position === 'students' && type === 'daily'"
       :attendance-date="attendanceDate"
-      :is-loading="isLoading"
       :students-attendance="studentsAttendance"
     />
 
     <TrackerTeachersDaily
       v-if="position === 'teachers' && type === 'daily'"
       :attendance-date="attendanceDate"
-      :is-loading="isLoading"
       :teachers-attendance="teachersAttendance"
     />
 
@@ -39,6 +33,8 @@
 
     <TrackerTeachersTotal v-if="position === 'teachers' && type === 'total'" />
   </div>
+
+  <TheLoader :is-loading="isLoading" />
 </template>
 
 <script setup lang="ts">
@@ -47,6 +43,7 @@ import { useRoute } from 'vue-router';
 import { useAttendanceStore } from '@/store/attendance';
 
 import TheFinger from '@/components/TheFinger.vue';
+import TheLoader from '@/components/TheLoader.vue';
 import TrackerStudentsDaily from './components/TrackerStudentsDaily.vue';
 import TrackerTeachersDaily from './components/TrackerTeachersDaily.vue';
 import TrackerStudentsTotal from './components/TrackerStudentsTotal.vue';

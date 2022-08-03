@@ -111,13 +111,16 @@
       />
     </div>
   </form>
+
+  <TheLoader :is-loading="isLoader" />
 </template>
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { Student, Teacher } from '@/types';
 import CheckerStudents from './CheckerStudents.vue';
+import TheLoader from '@/components/TheLoader.vue';
 import { useAttendanceStore } from '@/store/attendance';
+import type { Student, Teacher } from '@/types';
 
 const attendance = useAttendanceStore();
 
@@ -137,6 +140,8 @@ const isLoading = ref<boolean[]>([]);
 const currnetIndexList = ref<number[]>([]);
 const studentsAttendanceByTeacher = ref<any>({}); // TODO: 타입 정의 다시하기
 
+const isLoader = ref(false);
+
 watch(
   () => props.attendanceDate,
   () => {
@@ -146,8 +151,10 @@ watch(
 );
 
 const requestStudentsAttendance = async (teacher: Teacher, currentIndex: number) => {
+  isLoader.value = true;
   isLoading.value = Array(currentIndex).fill(false);
   isLoading.value[currentIndex] = true;
+
   const targetIndex = currnetIndexList.value.indexOf(currentIndex);
   if (targetIndex === -1) {
     currnetIndexList.value.push(currentIndex);
@@ -175,6 +182,7 @@ const requestStudentsAttendance = async (teacher: Teacher, currentIndex: number)
     }
   }
 
+  isLoader.value = false;
   isLoading.value[currentIndex] = false;
 };
 
@@ -184,8 +192,11 @@ const submitTeachersAttendance = async () => {
     date: props.attendanceDate,
     teachersAttendance: teachersAttendance.value,
   };
+
   const { id } = await attendance.addTeachersAttendance(params);
+
   emit('onUploaded:teachersAttendance', { id });
+
   if (!props.documentId) {
     alert('교사 출석 현황이 제출되었습니다.');
   } else {

@@ -1,6 +1,6 @@
 <template>
   <DataTable
-    v-if="attendanceDate && !isLoading"
+    v-if="attendanceDate"
     ref="dataTable"
     class="p-datatable-sm mt-5 shadow"
     :value="teachersAttendance"
@@ -52,7 +52,6 @@ import type { Teacher } from '@/types';
 
 interface Props {
   attendanceDate: Date | undefined | null;
-  isLoading: boolean;
   teachersAttendance: Teacher[];
 }
 
@@ -71,7 +70,7 @@ const translateAttendance = (attendance: string) => {
 
 const translateAssignedClass = (grade: string, group: string) => {
   if (grade === '0') {
-    return '새친구';
+    return '새친구 학급';
   } else if (grade === 'n/a' || grade === '-1') {
     return '-';
   } else {
