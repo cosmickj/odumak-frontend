@@ -1,72 +1,56 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
-import { getUserState } from "@/firebase/config";
+import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+import { auth } from '@/firebase/config';
+import { onAuthStateChanged } from 'firebase/auth';
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: "/account",
-    name: "AccountView",
-    redirect: "/account/login",
-    component: () => import("@/views/account/AccountView.vue"),
+    path: '/',
+    component: () => import('@/layouts/DefaultLayout.vue'),
     children: [
       {
-        path: "/account/login",
-        name: "AccountLogin",
-        component: () => import("@/views/account/AccountLogin.vue"),
-        meta: { requiresAuth: false },
+        path: '',
+        name: 'HomeView',
+        component: () => import('@/views/Home/index.vue'),
+        meta: { requiresAuth: true },
       },
       {
-        path: "/account/signup",
-        name: "AccountSignup",
-        component: () => import("@/views/account/AccountSignup.vue"),
-        meta: { requiresAuth: false },
+        path: 'user',
+        name: 'UserView',
+        component: () => import('@/views/User/index.vue'),
+        meta: { requiresAuth: true },
       },
     ],
   },
   {
-    path: "/",
-    name: "AppView",
-    component: () => import("@/views/app/AppView.vue"),
+    path: '/account',
+    component: () => import('@/layouts/DefaultLayout.vue'),
     children: [
       {
-        path: "",
-        name: "AppHome",
-        component: () => import("@/views/app/AppHome.vue"),
+        path: 'login',
+        name: 'AccountLogin',
+        component: () => import('@/views/Account/Login/index.vue'),
+      },
+      {
+        path: 'signup',
+        name: 'AccountSignup',
+        component: () => import('@/views/Account/Signup/index.vue'),
+      },
+    ],
+  },
+  {
+    path: '/attendance',
+    component: () => import('@/layouts/DefaultLayout.vue'),
+    children: [
+      {
+        path: 'checker/:position',
+        name: 'AttendanceChecker',
+        component: () => import('@/views/Attendance/Checker/index.vue'),
         meta: { requiresAuth: true },
       },
       {
-        path: "/user",
-        name: "AppUser",
-        component: () => import("@/views/app/AppUser.vue"),
-        meta: { requiresAuth: true },
-      },
-      {
-        path: "/attendance/input",
-        name: "AttendanceInput",
-        component: () => import("@/views/app/AttendanceInput.vue"),
-        meta: { requiresAuth: true },
-      },
-      {
-        path: "/attendance/student/daily",
-        name: "AttendanceStudentDaily",
-        component: () => import("@/views/app/AttendanceStudentsDaily.vue"),
-        meta: { requiresAuth: true },
-      },
-      {
-        path: "/attendance/student/total",
-        name: "AttendanceStudentTotal",
-        component: () => import("@/views/app/AttendanceStudentsTotal.vue"),
-        meta: { requiresAuth: true },
-      },
-      {
-        path: "/attendance/teacher/daily",
-        name: "AttendanceTeacherDaily",
-        component: () => import("@/views/app/AttendanceTeachersDaily.vue"),
-        meta: { requiresAuth: true },
-      },
-      {
-        path: "/attendance/teacher/total",
-        name: "AttendanceTeacherTotal",
-        component: () => import("@/views/app/AttendanceTeachersTotal.vue"),
+        path: 'tracker/:position/:type',
+        name: 'AttendanceTracker',
+        component: () => import('@/views/Attendance/Tracker/index.vue'),
         meta: { requiresAuth: true },
       },
     ],
@@ -74,17 +58,34 @@ const routes: Array<RouteRecordRaw> = [
 ];
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory(),
   routes,
 });
 
 router.beforeEach(async (to, from, next) => {
-  const isAuth = await getUserState();
-  const requiresAuth = to.meta.requiresAuth;
-
-  if (requiresAuth && !isAuth) next({ name: "AccountLogin" });
-  else if (!requiresAuth && isAuth) next({ name: "AppHome" });
-  else next();
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
+    if (await getCurrentUser()) {
+      next();
+    } else {
+      next('/account/login');
+    }
+  } else {
+    next();
+  }
 });
+
+// router auth checker
+export const getCurrentUser = () => {
+  return new Promise((resolve, reject) => {
+    const removeListener = onAuthStateChanged(
+      auth,
+      (user) => {
+        removeListener();
+        resolve(user);
+      },
+      reject
+    );
+  });
+};
 
 export default router;
