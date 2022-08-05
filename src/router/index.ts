@@ -55,6 +55,22 @@ const routes: Array<RouteRecordRaw> = [
       },
     ],
   },
+  {
+    path: '/admin',
+    component: () => import('@/layouts/AdminLayout.vue'),
+    children: [
+      {
+        path: 'students/list',
+        name: 'StudentList',
+        component: () => import('@/views/Admin/Table/index.vue'),
+      },
+      {
+        path: 'students/add',
+        name: 'StudentAdd',
+        component: () => import('@/views/Admin/Form/index.vue'),
+      },
+    ],
+  },
 ];
 
 const router = createRouter({

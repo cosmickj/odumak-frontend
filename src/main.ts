@@ -12,6 +12,8 @@ import Dropdown from 'primevue/dropdown';
 import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
 import RadioButton from 'primevue/radiobutton';
+import SelectButton from 'primevue/selectbutton';
+import Tree from 'primevue/tree';
 import '@/index.css'; // Tailwind CSS
 
 import { createPinia } from 'pinia';
@@ -63,5 +65,7 @@ app.component('Dropdown', Dropdown);
 app.component('InputText', InputText);
 app.component('Password', Password);
 app.component('RadioButton', RadioButton);
+app.component('SelectButton', SelectButton);
+app.component('Tree', Tree);
 
 app.mount('#app');
