@@ -2,25 +2,37 @@
   <section class="overflow-auto flex-auto">
     <DataTable
       class="overflow-auto w-[860px] h-[90vh] mt-[5vh] mx-auto drop-shadow-lg"
-      :value="students"
+      :value="dataSource"
       :lazy="true"
       :loading="isLoading"
       :rowHover="true"
       responsiveLayout="scroll"
     >
-      <Column field="grade" header="grade" />
-      <Column field="group" header="group" />
-      <Column field="name" header="name" />
-      <Column field="gender" header="gender" />
-      <Column field="phone" header="phone" />
-      <Column field="teacher" header="teacher" />
-      <Column field="address" header="address" headerStyle="min-width: 30rem" />
-      <Column field="birth" header="birth">
-        <template #body="{ data }">
-          {{ translateBirth(data.birth?.seconds) }}
-        </template>
-      </Column>
-      <Column field="remark" header="remark" />
+      <!-- TODO : 더 깔끔한 분기 처리 방법 생각하기 -->
+      <template v-if="membersPosition === 'student'">
+        <Column field="grade" header="grade" />
+        <Column field="group" header="group" />
+        <Column field="name" header="name" />
+        <Column field="gender" header="gender" />
+        <Column field="phone" header="phone" />
+        <Column field="teacher" header="teacher" />
+        <Column field="address" header="address" headerStyle="min-width: 30rem" />
+        <Column field="birth" header="birth">
+          <template #body="{ data }">
+            {{ translateBirth(data.birth?.seconds) }}
+          </template>
+        </Column>
+        <Column field="remark" header="remark" />
+      </template>
+
+      <!-- TODO : 더 깔끔한 분기 처리 방법 생각하기 -->
+      <template v-else>
+        <Column field="grade" header="grade" />
+        <Column field="group" header="group" />
+        <Column field="name" header="name" />
+        <Column field="role" header="role" />
+        <Column field="remark" header="remark" />
+      </template>
     </DataTable>
   </section>
 
@@ -30,7 +42,11 @@
       @click="openModal"
     >
       <div class="p-5 text-xl">
-        <span>학생 추가하기</span>
+        <!-- TODO : 더 깔끔한 분기 처리 방법 생각하기 -->
+        <span v-if="membersPosition === 'student'">학생 추가하기</span>
+        <!-- TODO : 더 깔끔한 분기 처리 방법 생각하기 -->
+        <span v-else>교사 추가하기</span>
+
         <i class="pi pi-plus-circle ml-3 text-xl"></i>
       </div>
     </div>
@@ -41,15 +57,27 @@
       v-if="isOpened"
       class="absolute inset-0 bg-slate-100/80 flex justify-center items-center"
     >
-      <StudentAdd @close="closeModal" @submit="addStudent" />
+      <!-- TODO : 더 깔끔한 분기 처리 방법 생각하기 -->
+      <StudentAdd
+        v-if="membersPosition === 'student'"
+        @close="closeModal"
+        @submit="addMember"
+      />
+      <!-- TODO : 더 깔끔한 분기 처리 방법 생각하기 -->
+      <TeacherAdd
+        v-if="membersPosition === 'teacher'"
+        @close="closeModal"
+        @submit="addMember"
+      />
     </div>
   </Teleport>
 </template>
 
 <script setup lang="ts">
+import StudentAdd from './StudentAdd.vue';
+import TeacherAdd from './TeacherAdd.vue';
 import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import StudentAdd from './StudentAdd.vue';
 import { useAccountStore } from '@/store/account';
 import { useMemberStore } from '@/store/member';
 import type { Position, State } from '@/types';
@@ -59,7 +87,7 @@ const route = useRoute();
 const member = useMemberStore();
 const account = useAccountStore();
 
-const students = ref();
+const dataSource = ref();
 const userChurch = computed(() => account.userData?.church);
 const userDepartment = computed(() => account.userData?.department);
 const membersPosition = computed(() => route.params.position as Position);
@@ -68,7 +96,7 @@ const isLoading = ref(true);
 
 onMounted(async () => {
   try {
-    students.value = await member.fetchMembers({
+    dataSource.value = await member.fetchMembers({
       church: userChurch.value,
       department: userDepartment.value,
       position: membersPosition.value,
@@ -91,7 +119,8 @@ const closeModal = () => {
   }
 };
 
-const addStudent = async (payload: State) => {
+// const addMember = async (payload: State) => {
+const addMember = async (payload: any) => {
   try {
     await member.createMember({
       church: userChurch.value!,
@@ -100,7 +129,7 @@ const addStudent = async (payload: State) => {
       ...payload,
     });
 
-    students.value = await member.fetchMembers({
+    dataSource.value = await member.fetchMembers({
       church: userChurch.value,
       department: userDepartment.value,
       position: membersPosition.value,

@@ -28,7 +28,8 @@ export const useMemberStore = defineStore('member', {
       const q = query(
         membersColl,
         where('church', '==', church),
-        where('department', '==', department)
+        where('department', '==', department),
+        where('position', '==', position)
       );
       const querySnapshot = await getDocs(q);
 
@@ -64,13 +65,14 @@ export const useMemberStore = defineStore('member', {
       );
       const querySnapshot = await getDocs(q);
 
+      // 등록된 멤버 있음
       if (querySnapshot.docs.length) {
         const members = querySnapshot.docs[0].data().members;
         return arraySort(members, ['grade', 'group', 'name']);
       }
-      // 등록된 학생 없음
+      // 등록된 멤버 없음
       else {
-        return { message: '학생을 등록해주세요.' };
+        return [];
       }
     },
   },

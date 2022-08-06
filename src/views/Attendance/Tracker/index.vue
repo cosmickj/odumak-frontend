@@ -18,30 +18,26 @@
     <TheFinger v-if="!attendanceDate && type === 'daily'" />
 
     <TrackerStudentsDaily
-      v-if="position === 'students' && type === 'daily'"
+      v-if="position === 'student' && type === 'daily'"
       :attendance-date="attendanceDate"
       :students-attendance="studentsAttendance"
     />
 
     <TrackerTeachersDaily
-      v-if="position === 'teachers' && type === 'daily'"
+      v-else-if="position === 'teacher' && type === 'daily'"
       :attendance-date="attendanceDate"
       :teachers-attendance="teachersAttendance"
     />
 
-    <TrackerStudentsTotal v-if="position === 'students' && type === 'total'" />
+    <TrackerStudentsTotal v-else-if="position === 'student' && type === 'total'" />
 
-    <TrackerTeachersTotal v-if="position === 'teachers' && type === 'total'" />
+    <TrackerTeachersTotal v-else-if="position === 'teacher' && type === 'total'" />
   </div>
 
   <TheLoader :is-loading="isLoading" />
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import { useRoute } from 'vue-router';
-import { useAttendanceStore } from '@/store/attendance';
-
 import TheFinger from '@/components/TheFinger.vue';
 import TheLoader from '@/components/TheLoader.vue';
 import TrackerStudentsDaily from './components/TrackerStudentsDaily.vue';
@@ -49,26 +45,37 @@ import TrackerTeachersDaily from './components/TrackerTeachersDaily.vue';
 import TrackerStudentsTotal from './components/TrackerStudentsTotal.vue';
 import TrackerTeachersTotal from './components/TrackerTeachersTotal.vue';
 
-import type { Student, Teacher } from '@/types';
+import { computed, ref } from 'vue';
+import { useRoute } from 'vue-router';
+import { useAttendanceStore } from '@/store/attendance';
+
+import type { Position, Student, Teacher } from '@/types';
 
 const route = useRoute();
 const attendance = useAttendanceStore();
 
-const position = computed(() => route.params.position);
+const position = computed(() => route.params.position as Position);
 const type = computed(() => route.params.type);
 
 const title = computed(() => {
   let result = [];
-  if (position.value === 'students') {
+
+  if (position.value === 'student') {
     result.push('학생');
-  } else if (position.value === 'teachers') {
+  }
+  //
+  else if (position.value === 'teacher') {
     result.push('교사');
   }
+
   if (type.value === 'daily') {
     result.push('일일');
-  } else if (type.value === 'total') {
+  }
+  //
+  else if (type.value === 'total') {
     result.push('누적');
   }
+
   return result.join(' ');
 });
 
@@ -81,9 +88,9 @@ const teachersAttendance = ref<Teacher[]>([]);
 const onAttendanceDateSelect = async () => {
   try {
     isLoading.value = true;
-    const params = { date: attendanceDate.value };
+    const params = { date: attendanceDate.value! };
 
-    if (position.value === 'students') {
+    if (position.value === 'student') {
       const result = await attendance.fetchStudentsAttendanceByDate(params);
       studentsAttendance.value = result;
     } else {

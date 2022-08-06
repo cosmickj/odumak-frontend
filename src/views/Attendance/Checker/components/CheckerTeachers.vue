@@ -116,17 +116,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
 import CheckerStudents from './CheckerStudents.vue';
 import TheLoader from '@/components/TheLoader.vue';
+
+import { computed, ref, watch } from 'vue';
 import { useAttendanceStore } from '@/store/attendance';
 import type { Student, Teacher } from '@/types';
 
 const attendance = useAttendanceStore();
 
 const props = defineProps<{
-  modelValue: Teacher[];
   documentId: string;
+  modelValue: any;
   attendanceDate: Date;
 }>();
 const emit = defineEmits(['update:modelValue', 'onUploaded:teachersAttendance']);

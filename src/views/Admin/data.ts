@@ -23,4 +23,10 @@ const gender: Option[] = [
   { label: '여자', value: 'female' },
 ];
 
-export { gender, grade, group };
+const teacherRole: Option[] = [
+  { label: '담임', value: 'main' },
+  { label: '부담임', value: 'sub' },
+  { label: '일반교사', value: 'common' },
+];
+
+export { gender, grade, group, teacherRole };
