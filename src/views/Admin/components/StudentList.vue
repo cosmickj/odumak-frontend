@@ -48,7 +48,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import StudentAdd from '../../Form/components/StudentAdd.vue';
+import StudentAdd from './StudentAdd.vue';
 import { useAccountStore } from '@/store/account';
 import { useMemberStore } from '@/store/member';
 import type { Position, State } from '@/types';

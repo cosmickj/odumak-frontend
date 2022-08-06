@@ -60,15 +60,10 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/layouts/AdminLayout.vue'),
     children: [
       {
-        path: 'students/list',
-        name: 'StudentList',
-        component: () => import('@/views/Admin/Table/index.vue'),
+        path: ':position',
+        name: 'AdminView',
+        component: () => import('@/views/Admin/index.vue'),
       },
-      // {
-      //   path: 'students/add',
-      //   name: 'StudentAdd',
-      //   component: () => import('@/views/Admin/Form/index.vue'),
-      // },
     ],
   },
 ];
