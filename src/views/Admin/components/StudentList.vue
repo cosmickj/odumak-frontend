@@ -17,7 +17,7 @@
       <Column field="address" header="address" headerStyle="min-width: 30rem" />
       <Column field="birth" header="birth">
         <template #body="{ data }">
-          {{ new Date(data.birth.seconds * 1000) }}
+          {{ translateBirth(data.birth?.seconds) }}
         </template>
       </Column>
       <Column field="remark" header="remark" />
@@ -48,10 +48,13 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
+import { useRoute } from 'vue-router';
 import StudentAdd from './StudentAdd.vue';
 import { useAccountStore } from '@/store/account';
 import { useMemberStore } from '@/store/member';
 import type { Position, State } from '@/types';
+
+const route = useRoute();
 
 const member = useMemberStore();
 const account = useAccountStore();
@@ -59,21 +62,25 @@ const account = useAccountStore();
 const students = ref();
 const userChurch = computed(() => account.userData?.church);
 const userDepartment = computed(() => account.userData?.department);
-// const userChurch = ref('테스트');
-// const userDepartment = ref('테스트');
-const membersPosition = ref<Position>('student');
+const membersPosition = computed(() => route.params.position as Position);
 
 const isLoading = ref(true);
 
 onMounted(async () => {
-  const result = await member.fetchMembers({
-    church: userChurch.value,
-    department: userDepartment.value,
-    position: membersPosition.value,
-  });
-  students.value = result;
+  try {
+    const result = await member.fetchMembers({
+      church: userChurch.value,
+      department: userDepartment.value,
+      position: membersPosition.value,
+    });
+    console.log(result);
 
-  isLoading.value = false;
+    students.value = result;
+  } catch (error) {
+    console.log(error);
+  } finally {
+    isLoading.value = false;
+  }
 });
 
 const isOpened = ref(false);
@@ -88,14 +95,25 @@ const closeModal = () => {
 };
 
 const addStudent = async (payload: State) => {
-  const result = await member.createMember({
-    church: userChurch.value!,
-    department: userDepartment.value!,
-    position: membersPosition.value,
-    ...payload,
-  });
-  console.log(result);
+  try {
+    await member.createMember({
+      church: userChurch.value!,
+      department: userDepartment.value!,
+      position: membersPosition.value,
+      ...payload,
+    });
+  } catch (error) {
+    console.log(error);
+  } finally {
+    isOpened.value = false;
+  }
+};
 
-  isOpened.value = false;
+const translateBirth = (seconds: number | undefined) => {
+  if (seconds) {
+    return new Date(seconds * 1000);
+  } else {
+    return;
+  }
 };
 </script>

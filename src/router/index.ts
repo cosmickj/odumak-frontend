@@ -60,7 +60,7 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/layouts/AdminLayout.vue'),
     children: [
       {
-        path: ':position',
+        path: ':position/table',
         name: 'AdminView',
         component: () => import('@/views/Admin/index.vue'),
       },

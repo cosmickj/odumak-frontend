@@ -8,5 +8,5 @@ import { useRoute } from 'vue-router';
 import StudentList from './components/StudentList.vue';
 
 const route = useRoute();
-onMounted(() => console.log(route));
+// onMounted(() => console.log(route));
 </script>
