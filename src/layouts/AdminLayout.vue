@@ -1,5 +1,5 @@
 <template>
-  <main class="flex">
+  <main v-if="account.isAuthReady" class="flex">
     <aside class="overflow-y-auto shrink-0 h-screen w-72">
       <Tree class="h-full bg-yellow-100" :value="menus"></Tree>
     </aside>
@@ -9,6 +9,10 @@
 </template>
 
 <script setup lang="ts">
+import { useAccountStore } from '@/store/account.js';
+
+const account = useAccountStore();
+
 const menus = [
   {
     key: '0',

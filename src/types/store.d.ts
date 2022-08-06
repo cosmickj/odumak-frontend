@@ -7,6 +7,8 @@ export interface AccountData {
   grade: string;
   group: string;
   role: string;
+  church?: string;
+  department?: string;
 }
 
 export interface UserData extends AccountData {

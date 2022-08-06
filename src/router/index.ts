@@ -64,11 +64,11 @@ const routes: Array<RouteRecordRaw> = [
         name: 'StudentList',
         component: () => import('@/views/Admin/Table/index.vue'),
       },
-      {
-        path: 'students/add',
-        name: 'StudentAdd',
-        component: () => import('@/views/Admin/Form/index.vue'),
-      },
+      // {
+      //   path: 'students/add',
+      //   name: 'StudentAdd',
+      //   component: () => import('@/views/Admin/Form/index.vue'),
+      // },
     ],
   },
 ];

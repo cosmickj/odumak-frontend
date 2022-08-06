@@ -24,3 +24,22 @@ export interface Teacher {
   // role: 'teacher' | 'common';
   role: string;
 }
+
+export interface Option {
+  label: string;
+  value: string;
+}
+
+export interface State {
+  grade: string | null;
+  group: string | null;
+  name: string;
+  gender: string | null;
+  birth: Date | null;
+  phone: string;
+  teacher: string;
+  address: string;
+  remark: string;
+}
+
+export type Position = 'student' | 'teacher';
