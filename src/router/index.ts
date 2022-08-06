@@ -42,7 +42,7 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/layouts/DefaultLayout.vue'),
     children: [
       {
-        path: 'checker/:position',
+        path: 'checker/',
         name: 'AttendanceChecker',
         component: () => import('@/views/Attendance/Checker/index.vue'),
         meta: { requiresAuth: true },

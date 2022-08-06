@@ -8,24 +8,44 @@
     <div class="p-5">
       <div class="flex pb-2">
         <!-- 학생 일일 출석 현황 -->
-        <HomeMenu :icon="'pi-users'" :route-name="'AttendanceTracker'" :position="'students'" :type="'daily'" />
+        <HomeMenu
+          icon="pi-users"
+          route-name="AttendanceTracker"
+          position="student"
+          type="daily"
+        />
         <!-- 학생 누적 출석 현황 -->
-        <HomeMenu :icon="'pi-users'" :route-name="'AttendanceTracker'" :position="'students'" :type="'total'" />
+        <HomeMenu
+          icon="pi-users"
+          route-name="AttendanceTracker"
+          position="student"
+          type="total"
+        />
       </div>
 
       <div class="flex pt-2">
         <!-- 교사 일일 출석 현황 -->
-        <HomeMenu :icon="'pi-heart'" :route-name="'AttendanceTracker'" :position="'teachers'" :type="'daily'" />
+        <HomeMenu
+          icon="pi-heart"
+          route-name="AttendanceTracker"
+          position="teacher"
+          type="daily"
+        />
         <!-- 교사 누적 출석 현황 -->
-        <HomeMenu :icon="'pi-heart'" :route-name="'AttendanceTracker'" :position="'teachers'" :type="'total'" />
+        <HomeMenu
+          icon="pi-heart"
+          route-name="AttendanceTracker"
+          position="teacher"
+          type="total"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
 import HomeMenu from './components/HomeMenu.vue';
+import { computed } from 'vue';
 import { useAccountStore } from '@/store/account';
 
 const account = useAccountStore();

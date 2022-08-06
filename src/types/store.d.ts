@@ -6,7 +6,7 @@ export interface AccountData {
   };
   grade: string;
   group: string;
-  role: string;
+  role: 'teacher' | 'common' | 'admin';
   church?: string;
   department?: string;
 }

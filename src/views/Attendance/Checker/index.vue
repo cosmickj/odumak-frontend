@@ -27,22 +27,18 @@
         class="pt-5"
         :touchUI="true"
         :disabledDays="[1, 2, 3, 4, 5, 6]"
-        :placeholder="'날짜를 선택해주세요'"
+        placeholder="날짜를 선택해주세요"
         input-class="text-center"
-        @date-select="requestAttendance('student')"
+        @date-select="requestAttendance"
       />
 
-      <Suspense v-if="attendanceDate">
-        <CheckerStudents
-          v-model="dataSource"
-          :document-id="documentId"
-          :attendance-date="attendanceDate"
-          @on-uploaded:data-source="setDocumentId"
-        />
-        <!-- :writer="user" -->
-
-        <template #fallback> Loading... </template>
-      </Suspense>
+      <CheckerStudents
+        v-if="attendanceDate"
+        v-model="dataSource"
+        :document-id="documentId"
+        :attendance-date="attendanceDate"
+        @submit="submitAttendance"
+      />
 
       <TheFinger v-else class="pt-5" />
     </template>
@@ -58,16 +54,16 @@
         class="pt-5"
         :touchUI="true"
         :disabledDays="[1, 2, 3, 4, 5, 6]"
-        :placeholder="'날짜를 선택해주세요'"
+        placeholder="날짜를 선택해주세요"
         input-class="text-center"
-        @date-select="requestAttendance('teahcer')"
+        @date-select="requestAttendance"
       />
+
       <CheckerTeachers
         v-if="attendanceDate"
-        v-model="(dataSource as Teacher[])"
+        v-model="dataSource"
         :document-id="documentId"
         :attendance-date="attendanceDate"
-        @on-uploaded:teachers-attendance="setDocumentId"
       />
 
       <TheFinger v-else class="pt-5" />
@@ -85,66 +81,101 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
 import TheFinger from '@/components/TheFinger.vue';
 import TheLoader from '@/components/TheLoader.vue';
 import CheckerStudents from './components/CheckerStudents.vue';
 import CheckerTeachers from './components/CheckerTeachers.vue';
 
+import { computed, ref, watch } from 'vue';
 import { useAccountStore } from '@/store/account';
 import { useAttendanceStore } from '@/store/attendance';
+import { useMemberStore } from '@/store/member';
 import type { Student, Teacher } from '@/types';
 
 const account = useAccountStore();
 const attendance = useAttendanceStore();
+const member = useMemberStore();
 
 const userData = computed(() => account.userData);
 
-const attendanceDate = ref<Date>();
 const isLoading = ref(false);
 
 const documentId = ref('');
+
 const dataSource = ref<Student[] | Teacher[]>([]);
+
+const attendanceDate = ref<Date>();
 
 watch(attendanceDate, () => {
   dataSource.value = [];
   isLoading.value = true;
 });
 
-const requestAttendance = async (type: 'student' | 'teahcer') => {
-  if (type === 'student') {
-    const result = await attendance.fetchStudentsAttendance({
-      date: attendanceDate.value,
-      grade: userData.value?.grade,
-      group: userData.value?.group,
-      teacher: userData.value?.name,
-    });
+const requestAttendance = async () => {
+  const role = userData.value?.role;
 
-    result.studentsAttendance.forEach((student: Student) => {
-      if (!student.attendance) student.attendance = 'offline';
-    });
+  try {
+    // 학생 출석 입력
+    if (role === 'teacher') {
+      const members = await member.fetchMembers({
+        church: userData.value?.church,
+        department: userData.value?.department,
+        position: 'student',
+      });
 
-    documentId.value = result.documentId;
-    dataSource.value = result.studentsAttendance;
+      const result = await attendance.fetchAttendance({
+        attendanceDate: attendanceDate.value,
+        church: userData.value?.church,
+        department: userData.value?.department,
+        position: 'student',
+        members,
+      });
+
+      documentId.value = result!.documentId;
+      dataSource.value = result!.attendanceRecord;
+    }
+    // 교사 출석 입력
+    else if (role === 'admin') {
+      const members = await member.fetchMembers({
+        church: userData.value?.church,
+        department: userData.value?.department,
+        position: 'teacher',
+      });
+
+      const result = await attendance.fetchAttendance({
+        attendanceDate: attendanceDate.value,
+        church: userData.value?.church,
+        department: userData.value?.department,
+        position: 'teacher',
+        members,
+      });
+
+      documentId.value = result!.documentId;
+      dataSource.value = result!.attendanceRecord;
+    }
+  } catch (error) {
+    console.log(error);
+  } finally {
+    isLoading.value = false;
   }
-  // teacher
-  else {
-    const result = await attendance.fetchTeachersAttendance({
-      date: attendanceDate.value,
-    });
-
-    result.teachersAttendance.forEach((teacher: Teacher) => {
-      if (!teacher.attendance) teacher.attendance = 'offline';
-    });
-
-    documentId.value = result.documentId;
-    dataSource.value = result.teachersAttendance;
-  }
-
-  isLoading.value = false;
 };
 
-const setDocumentId = ({ id }: { id: string }) => {
-  documentId.value = id;
+const submitAttendance = async () => {
+  try {
+    const response = await attendance.addAttendance({
+      documentId: documentId.value,
+      attendanceDate: attendanceDate.value,
+      createUser: userData.value?.name,
+      church: userData.value?.church,
+      department: userData.value?.department,
+      position: 'student',
+      records: dataSource.value,
+    });
+
+    documentId.value = response.documentId;
+    alert(response.message);
+  } catch (error) {
+    console.log(error);
+  }
 };
 </script>

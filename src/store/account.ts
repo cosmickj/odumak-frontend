@@ -16,11 +16,11 @@ import {
   signOut,
   updateProfile,
 } from 'firebase/auth';
-import type { Teacher } from '@/types';
-import type { AccountData, UserData } from '@/types/store';
 import baseResponse from '@/utils/baseResponseStatus';
 import { errResponse, response } from '@/utils/response';
 import { fetchTeachers } from '@/api/members';
+import type { Teacher } from '@/types';
+import type { AccountData, UserData } from '@/types/store';
 
 interface AccountState {
   userData: UserData | null;

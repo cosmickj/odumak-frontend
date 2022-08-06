@@ -1,7 +1,7 @@
 <template>
   <div class="overflow-auto h-[calc(100%_-_10rem)] select-none">
     <form
-      @submit.prevent="submitStudentsAttendance"
+      @submit.prevent="handleSubmit"
       :class="{
         'border-x-4 border-b-4 border-slate-200 rounded-b-lg bg-slate-200': isSub,
       }"
@@ -77,38 +77,22 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { Student, Teacher } from '@/types';
-// import { useStore } from "vuex";
-// const store = useStore();
 
 const props = defineProps<{
-  modelValue: Student[] | Teacher[];
   documentId: string;
+  modelValue: any;
   attendanceDate: Date;
-  // writer: Teacher;
   isSub?: boolean;
 }>();
-const emit = defineEmits(['update:modelValue', 'onUploaded:studentsAttendance']);
 
-const studentsAttendance = computed<Student[] | Teacher[]>({
+const emit = defineEmits(['submit', 'update:modelValue']);
+
+const studentsAttendance = computed({
   get: () => props.modelValue,
   set: (studentsAttendance) => emit('update:modelValue', studentsAttendance),
 });
 
-const submitStudentsAttendance = async () => {
-  // const params = {
-  //   recordId: props.recordId,
-  //   date: props.attendanceDate,
-  //   grade: props.writer.grade,
-  //   group: props.writer.group,
-  //   teacher: props.writer.name,
-  //   studentsAttendance: studentsAttendance.value,
-  // };
-  // const { id } = await store.dispatch("attendance/addStudentsAttendance", params);
-  // emit("onUploaded:studentsAttendance", { id, teacher: props.writer.name });
-  // if (!props.recordId) alert("제출되었습니다.");
-  // else alert("수정되었습니다.");
-};
+const handleSubmit = async () => emit('submit');
 </script>
 
 <style scoped>
