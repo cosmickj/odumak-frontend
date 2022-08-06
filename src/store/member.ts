@@ -11,6 +11,7 @@ import {
   where,
 } from 'firebase/firestore';
 import { db, membersColl } from '@/firebase/config';
+import arraySort from 'array-sort';
 
 interface DefaultPayload extends State, Pick<AccountData, 'church' | 'department'> {
   position: Position;
@@ -64,7 +65,8 @@ export const useMemberStore = defineStore('member', {
       const querySnapshot = await getDocs(q);
 
       if (querySnapshot.docs.length) {
-        return querySnapshot.docs[0].data().members;
+        const members = querySnapshot.docs[0].data().members;
+        return arraySort(members, ['grade', 'group', 'name']);
       }
       // 등록된 학생 없음
       else {

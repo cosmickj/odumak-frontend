@@ -68,14 +68,11 @@ const isLoading = ref(true);
 
 onMounted(async () => {
   try {
-    const result = await member.fetchMembers({
+    students.value = await member.fetchMembers({
       church: userChurch.value,
       department: userDepartment.value,
       position: membersPosition.value,
     });
-    console.log(result);
-
-    students.value = result;
   } catch (error) {
     console.log(error);
   } finally {
@@ -101,6 +98,12 @@ const addStudent = async (payload: State) => {
       department: userDepartment.value!,
       position: membersPosition.value,
       ...payload,
+    });
+
+    students.value = await member.fetchMembers({
+      church: userChurch.value,
+      department: userDepartment.value,
+      position: membersPosition.value,
     });
   } catch (error) {
     console.log(error);
