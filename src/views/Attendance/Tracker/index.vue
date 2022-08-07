@@ -29,12 +29,16 @@
       :teachers-attendance="teachersAttendance"
     />
 
-    <TrackerStudentsTotal v-else-if="position === 'student' && type === 'total'" />
+    <TrackerStudentsTotal
+      v-else-if="position === 'student' && type === 'total'"
+    />
 
-    <TrackerTeachersTotal v-else-if="position === 'teacher' && type === 'total'" />
+    <TrackerTeachersTotal
+      v-else-if="position === 'teacher' && type === 'total'"
+    />
   </div>
 
-  <TheLoader :is-loading="isLoading" />
+  <the-loader v-if="isLoading" />
 </template>
 
 <script setup lang="ts">
@@ -50,10 +54,14 @@ import { useRoute } from 'vue-router';
 import { useAttendanceStore } from '@/store/attendance';
 
 import type { Position, Student, Teacher } from '@/types';
+import { useAccountStore } from '@/store/account';
 
 const route = useRoute();
+
+const account = useAccountStore();
 const attendance = useAttendanceStore();
 
+const userData = computed(() => account.userData);
 const position = computed(() => route.params.position as Position);
 const type = computed(() => route.params.type);
 
@@ -88,7 +96,11 @@ const teachersAttendance = ref<Teacher[]>([]);
 const onAttendanceDateSelect = async () => {
   try {
     isLoading.value = true;
-    const params = { date: attendanceDate.value! };
+    const params = {
+      attendanceDate: attendanceDate.value!,
+      church: userData.value?.church!,
+      department: userData.value?.department!,
+    };
 
     if (position.value === 'student') {
       const result = await attendance.fetchStudentsAttendanceByDate(params);

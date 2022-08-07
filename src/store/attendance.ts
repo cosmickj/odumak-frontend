@@ -1,10 +1,5 @@
 import { defineStore } from 'pinia';
-import {
-  db,
-  attendancesColl,
-  studentsAttendanceColl,
-  teachersAttendanceColl,
-} from '@/firebase/config';
+import { db, attendancesColl } from '@/firebase/config';
 import {
   addDoc,
   doc,
@@ -14,112 +9,88 @@ import {
   updateDoc,
   where,
 } from 'firebase/firestore';
-import { fetchStudents, fetchTeachers } from '@/api/members';
-import type { Student } from '@/types';
-import type { StudentsAttendance, TeachersAttendance } from '@/types/store';
+import type { Student, Teacher } from '@/types';
+import { useMemberStore } from './member';
 
 export const useAttendanceStore = defineStore('attendance', {
   state: () => {
     return {};
   },
   actions: {
-    async fetchStudentsAttendance(payload: any) {
-      const q = query(
-        studentsAttendanceColl,
-        where('date', '==', payload.date),
-        where('grade', '==', payload.grade),
-        where('group', '==', payload.group)
-      );
-      const querySnapshot = await getDocs(q);
-
-      if (querySnapshot.docs.length > 0) {
-        const result = {
-          documentId: querySnapshot.docs[0].id,
-          ...(querySnapshot.docs[0].data() as StudentsAttendance),
-        };
-        return result;
-      } else {
-        const result = await fetchStudents();
-        let studentListClone = result.data;
-        studentListClone = studentListClone.filter(
-          (student: Student) => student.teacher === payload.teacher
-        );
-        return { documentId: '', studentsAttendance: studentListClone };
-      }
-    },
-
-    async fetchTeachersAttendance(payload: any) {
-      const q = query(
-        teachersAttendanceColl,
-        where('date', '==', payload.date)
-      );
-
-      const querySnapshot = await getDocs(q);
-
-      if (querySnapshot.docs.length) {
-        const result = {
-          documentId: querySnapshot.docs[0].id,
-          ...(querySnapshot.docs[0].data() as TeachersAttendance),
-        };
-        return result;
-      } else {
-        const result = await fetchTeachers();
-        return { documentId: '', teachersAttendance: result.data };
-      }
-    },
-
     // 학생 일일 출석 확인하기
-    async fetchStudentsAttendanceByDate(payload: { date: Date }) {
+    async fetchStudentsAttendanceByDate(payload: {
+      attendanceDate: Date;
+      church: string;
+      department: string;
+    }) {
       const q = query(
-        studentsAttendanceColl,
-        where('date', '==', payload.date)
+        attendancesColl,
+        where('attendanceDate', '==', payload.attendanceDate),
+        where('church', '==', payload.church),
+        where('department', '==', payload.department)
       );
 
       const querySnapshot = await getDocs(q);
 
       const attendanceList = querySnapshot.docs
-        .map((value) => value.data().studentsAttendance)
+        .map((doc) => doc.data().records)
         .flat();
 
-      const result = await fetchStudents();
-      const studentListClone = result.data;
+      const member = useMemberStore();
+      let studentList = (await member.fetchMembers({
+        church: payload.church,
+        department: payload.department,
+        position: 'student',
+      })) as Student[];
 
-      // TODO: 알고리즘 개선 필요
+      // // TODO: 알고리즘 개선 필요
       for (const attendance of attendanceList) {
-        for (const student of studentListClone) {
+        for (const student of studentList) {
           if (student.name === attendance.name) {
             student.attendance = attendance.attendance;
             break;
           }
         }
       }
-      return studentListClone;
+      return studentList;
     },
 
     // 교사 일일 출석 확인하기
-    async fetchTeachersAttendanceByDate(payload: { date: Date }) {
+    async fetchTeachersAttendanceByDate(payload: {
+      attendanceDate: Date;
+      church: string;
+      department: string;
+    }) {
       const q = query(
-        teachersAttendanceColl,
-        where('date', '==', payload.date)
+        attendancesColl,
+        where('attendanceDate', '==', payload.attendanceDate),
+        where('church', '==', payload.church),
+        where('department', '==', payload.department)
       );
+
       const querySnapshot = await getDocs(q);
+
       const attendanceList = querySnapshot.docs
-        .map((value) => value.data().teachersAttendance)
+        .map((docs) => docs.data().records)
         .flat();
 
-      const result = await fetchTeachers();
-      const teahcerListClone = result.data;
+      const member = useMemberStore();
+      let teahcerList = (await member.fetchMembers({
+        church: payload.church,
+        department: payload.department,
+        position: 'teacher',
+      })) as Teacher[];
 
       // TODO: 알고리즘 개선 필요
       for (const attendance of attendanceList) {
-        for (const teacher of teahcerListClone) {
+        for (const teacher of teahcerList) {
           if (teacher.name === attendance.name) {
             teacher.attendance = attendance.attendance;
             break;
           }
         }
       }
-      return teahcerListClone;
+      return teahcerList;
     },
 
     /** NEW LOGIC */
