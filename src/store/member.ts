@@ -63,7 +63,7 @@ export const useMemberStore = defineStore('member', {
       grade?: string;
       group?: string;
       position: 'student' | 'teacher';
-      role: 'admin' | 'teacher';
+      role?: 'admin' | 'teacher';
     }) {
       try {
         const { church, department, grade, group, position, role } = payload;

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import {
-  attendancesColl,
   db,
+  attendancesColl,
   studentsAttendanceColl,
   teachersAttendanceColl,
 } from '@/firebase/config';
@@ -11,17 +11,12 @@ import {
   getDocs,
   query,
   serverTimestamp,
-  setDoc,
   updateDoc,
   where,
 } from 'firebase/firestore';
+import { fetchStudents, fetchTeachers } from '@/api/members';
 import type { Student } from '@/types';
 import type { StudentsAttendance, TeachersAttendance } from '@/types/store';
-import { fetchStudents, fetchTeachers } from '@/api/members';
-
-interface AttendanceByDatePayload {
-  date: Date;
-}
 
 export const useAttendanceStore = defineStore('attendance', {
   state: () => {
@@ -74,7 +69,7 @@ export const useAttendanceStore = defineStore('attendance', {
     },
 
     // 학생 일일 출석 확인하기
-    async fetchStudentsAttendanceByDate(payload: AttendanceByDatePayload) {
+    async fetchStudentsAttendanceByDate(payload: { date: Date }) {
       const q = query(
         studentsAttendanceColl,
         where('date', '==', payload.date)
@@ -100,8 +95,9 @@ export const useAttendanceStore = defineStore('attendance', {
       }
       return studentListClone;
     },
+
     // 교사 일일 출석 확인하기
-    async fetchTeachersAttendanceByDate(payload: AttendanceByDatePayload) {
+    async fetchTeachersAttendanceByDate(payload: { date: Date }) {
       const q = query(
         teachersAttendanceColl,
         where('date', '==', payload.date)
@@ -124,22 +120,6 @@ export const useAttendanceStore = defineStore('attendance', {
         }
       }
       return teahcerListClone;
-    },
-
-    async addTeachersAttendance(payload: any) {
-      // 수정
-      if (payload.documentId) {
-        const docId = payload.documentId;
-        delete payload.documentId;
-        await setDoc(doc(db, 'teachersAttendance', docId), payload);
-        return { id: docId };
-      }
-      // 제출
-      else {
-        delete payload.documentId;
-        const result = await addDoc(teachersAttendanceColl, payload);
-        return result;
-      }
     },
 
     /** NEW LOGIC */
