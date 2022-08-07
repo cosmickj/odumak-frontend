@@ -17,6 +17,9 @@ export default defineConfig({
       strategies: 'generateSW',
       injectRegister: 'script',
       registerType: 'autoUpdate',
+      workbox: {
+        cleanupOutdatedCaches: false,
+      },
       manifest: {
         lang: 'kr',
         name: '오두막',
