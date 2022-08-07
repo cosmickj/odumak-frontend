@@ -18,7 +18,7 @@ export default defineConfig({
       injectRegister: 'script',
       registerType: 'autoUpdate',
       workbox: {
-        sourcemap: true,
+        cleanupOutdatedCaches: false,
       },
       manifest: {
         lang: 'kr',
