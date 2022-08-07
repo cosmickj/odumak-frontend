@@ -4,6 +4,10 @@ import { onAuthStateChanged } from 'firebase/auth';
 
 const routes: Array<RouteRecordRaw> = [
   {
+    path: '/error',
+    component: () => import('@/views/ErrorView.vue'),
+  },
+  {
     path: '/',
     component: () => import('@/layouts/DefaultLayout.vue'),
     children: [
@@ -63,15 +67,20 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-  if (to.matched.some((record) => record.meta.requiresAuth)) {
-    if (await getCurrentUser()) {
-      next();
-    } else {
-      next('/account/login');
-    }
+  if (to.path !== '/error') {
+    next('/error');
   } else {
     next();
   }
+  // if (to.matched.some((record) => record.meta.requiresAuth)) {
+  //   if (await getCurrentUser()) {
+  //     next();
+  //   } else {
+  //     next('/account/login');
+  //   }
+  // } else {
+  //   next();
+  // }
 });
 
 // router auth checker
