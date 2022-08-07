@@ -1,8 +1,5 @@
 <template>
-  <form
-    class="grow flex flex-col select-none"
-    @submit.prevent="submitTeachersAttendance"
-  >
+  <form class="grow flex flex-col select-none" @submit.prevent="handleSubmit">
     <div class="overflow-auto h-0 grow">
       <div v-for="(teacher, idx) in teachersAttendance" :key="idx">
         <div class="attendance bg-white shadow">
@@ -61,8 +58,8 @@
 
           <!-- 선생님별 학생 출석 현황 -->
           <div
+            v-if="teacher.role === 'main'"
             class="w-8 h-8 flex items-center justify-center cursor-pointer"
-            v-if="teacher.role === 'teacher'"
             @click="requestStudentsAttendance(teacher, idx)"
           >
             <i
@@ -89,7 +86,6 @@
             :attendance-date="attendanceDate"
             :writer="teacher.name"
             :is-sub="true"
-            @on-uploaded:students-attendance="setDocumentIdByTeacher"
           />
         </div>
       </div>
@@ -127,10 +123,11 @@ const attendance = useAttendanceStore();
 
 const props = defineProps<{
   documentId: string;
-  modelValue: any;
   attendanceDate: Date;
+  modelValue: any;
 }>();
-const emit = defineEmits(['update:modelValue', 'onUploaded:teachersAttendance']);
+
+const emit = defineEmits(['submit', 'update:modelValue']);
 
 const teachersAttendance = computed<Teacher[]>({
   get: () => props.modelValue,
@@ -187,27 +184,19 @@ const requestStudentsAttendance = async (teacher: Teacher, currentIndex: number)
   isLoading.value[currentIndex] = false;
 };
 
-const submitTeachersAttendance = async () => {
-  const params = {
-    documentId: props.documentId,
-    date: props.attendanceDate,
-    teachersAttendance: teachersAttendance.value,
-  };
-
-  const { id } = await attendance.addTeachersAttendance(params);
-
-  emit('onUploaded:teachersAttendance', { id });
-
-  if (!props.documentId) {
-    alert('교사 출석 현황이 제출되었습니다.');
-  } else {
-    alert('교사 출석 현황이 수정되었습니다.');
-  }
-};
-
-const setDocumentIdByTeacher = ({ id, teacher }: { id: string; teacher: string }) => {
-  studentsAttendanceByTeacher.value[teacher].documentId = id;
-};
+// const params = {
+//   documentId: props.documentId,
+//   date: props.attendanceDate,
+//   teachersAttendance: teachersAttendance.value,
+// };
+// const { id } = await attendance.addTeachersAttendance(params);
+// emit('onUploaded:teachersAttendance', { id });
+// if (!props.documentId) {
+//   alert('교사 출석 현황이 제출되었습니다.');
+// } else {
+//   alert('교사 출석 현황이 수정되었습니다.');
+// }
+const handleSubmit = () => emit('submit');
 </script>
 
 <style scoped>

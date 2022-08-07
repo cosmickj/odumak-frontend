@@ -64,6 +64,7 @@
         v-model="dataSource"
         :document-id="documentId"
         :attendance-date="attendanceDate"
+        @submit="submitAttendance"
       />
 
       <TheFinger v-else class="pt-5" />
@@ -161,6 +162,15 @@ const requestAttendance = async () => {
 };
 
 const submitAttendance = async () => {
+  const role = userData.value?.role;
+
+  let position = '';
+  if (role === 'admin') {
+    position = 'teacher';
+  } else if (role === 'teacher') {
+    position = 'student';
+  }
+
   try {
     const response = await attendance.addAttendance({
       documentId: documentId.value,
@@ -168,10 +178,10 @@ const submitAttendance = async () => {
       createUser: userData.value?.name,
       church: userData.value?.church,
       department: userData.value?.department,
-      position: 'student',
+      position,
+      //
       records: dataSource.value,
     });
-
     documentId.value = response.documentId;
     alert(response.message);
   } catch (error) {

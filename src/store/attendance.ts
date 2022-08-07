@@ -133,7 +133,9 @@ export const useAttendanceStore = defineStore('attendance', {
       }
     },
 
-    // NEW LOGIC
+    /**
+     *  NEW LOGIC
+     */
     async fetchAttendance(payload: any) {
       const q = query(
         attendancesColl,
@@ -156,16 +158,31 @@ export const useAttendanceStore = defineStore('attendance', {
       else {
         let attendanceRecord = [];
 
-        payload.members.forEach((member) => {
-          const { grade, group, name, teacher } = member;
-          attendanceRecord.push({
-            grade,
-            group,
-            name,
-            teacher,
-            attendance: 'offline',
+        if (payload.position === 'student') {
+          payload.members.forEach((member) => {
+            const { grade, group, name, teacher } = member;
+            attendanceRecord.push({
+              grade,
+              group,
+              name,
+              teacher,
+              attendance: 'offline',
+            });
           });
-        });
+        }
+        //
+        else if (payload.position === 'teacher') {
+          payload.members.forEach((member) => {
+            const { grade, group, name, role } = member;
+            attendanceRecord.push({
+              grade,
+              group,
+              name,
+              role,
+              attendance: 'offline',
+            });
+          });
+        }
 
         return { documentId: '', attendanceRecord };
       }
