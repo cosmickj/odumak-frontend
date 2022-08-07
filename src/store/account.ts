@@ -34,10 +34,21 @@ export const useAccountStore = defineStore('account', {
       isAuthReady: false,
     };
   },
+
   actions: {
-    async loginAccount({ email, password }: { email: string; password: string }) {
+    async loginAccount({
+      email,
+      password,
+    }: {
+      email: string;
+      password: string;
+    }) {
       try {
-        const loginAccountRes = await signInWithEmailAndPassword(auth, email, password);
+        const loginAccountRes = await signInWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
         const fetchAccountRes = await this.fetchAccount({
           uid: loginAccountRes.user.uid,
         });
@@ -83,7 +94,10 @@ export const useAccountStore = defineStore('account', {
           return errResponse(baseResponse.ROLE_UNMATCHED);
         }
         // 입력된 담당 학급 내용이 맞는가?
-        if (target[0].grade !== payload.grade || target[0].group !== payload.group) {
+        if (
+          target[0].grade !== payload.grade ||
+          target[0].group !== payload.group
+        ) {
           return errResponse(baseResponse.CLASS_UNMATCHED);
         }
         // 이미 해당 이름으로 가입되어 있는 회원이 있는가?

@@ -13,7 +13,9 @@ import {
 import { db, membersColl } from '@/firebase/config';
 import arraySort from 'array-sort';
 
-interface DefaultPayload extends State, Pick<AccountData, 'church' | 'department'> {
+interface DefaultPayload
+  extends State,
+    Pick<AccountData, 'church' | 'department'> {
   position: Position;
 }
 
@@ -54,25 +56,44 @@ export const useMemberStore = defineStore('member', {
       }
     },
 
-    async fetchMembers(payload: Omit<DefaultPayload, keyof State>) {
-      const { church, department, position } = payload;
+    // async fetchMembers(payload: Omit<DefaultPayload, keyof State>) {
+    async fetchMembers(payload: {
+      church: string | undefined;
+      department: string | undefined;
+      grade?: string;
+      group?: string;
+      position: 'student' | 'teacher';
+      role: 'admin' | 'teacher';
+    }) {
+      try {
+        const { church, department, grade, group, position, role } = payload;
 
-      const q = query(
-        membersColl,
-        where('church', '==', church),
-        where('department', '==', department),
-        where('position', '==', position)
-      );
-      const querySnapshot = await getDocs(q);
+        const q = query(
+          membersColl,
+          where('church', '==', church),
+          where('department', '==', department),
+          where('position', '==', position)
+        );
 
-      // 등록된 멤버 있음
-      if (querySnapshot.docs.length) {
-        const members = querySnapshot.docs[0].data().members;
-        return arraySort(members, ['grade', 'group', 'name']);
-      }
-      // 등록된 멤버 없음
-      else {
-        return [];
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.docs.length) {
+          let members = querySnapshot.docs[0].data().members;
+
+          if (role === 'admin') {
+            // pass
+          } else if (role === 'teacher') {
+            /** TODO : any 타입 정리하기 */
+            members = members.filter(
+              (member: any) => member.grade === grade && member.group === group
+            );
+          }
+          return arraySort(members, ['grade', 'group', 'name']);
+        } else {
+          return [];
+        }
+      } catch (error) {
+        console.log(error);
       }
     },
   },

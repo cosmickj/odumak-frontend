@@ -1,16 +1,16 @@
 <template>
   <div class="overflow-auto h-[calc(100%_-_10rem)] select-none">
     <form
-      @submit.prevent="handleSubmit"
       :class="{
         'border-x-4 border-b-4 border-slate-200 rounded-b-lg bg-slate-200':
           isSub,
       }"
+      @submit.prevent="handleSubmit"
     >
       <div
-        class="attendance bg-white shadow"
         v-for="(student, i) in studentsAttendance"
         :key="i"
+        class="attendance bg-white shadow"
       >
         <div class="student__name" :class="$attrs.class">
           {{ student.name }}
@@ -146,28 +146,5 @@ const handleSubmit = async () => emit('submit');
 }
 .attendance__input:checked + .attendance__label.attendance__label__absence {
   background-color: #ff4032;
-}
-@keyframes jelly {
-  from {
-    transform: scale(1, 1);
-  }
-  30% {
-    transform: scale(1.25, 0.75);
-  }
-  40% {
-    transform: scale(0.75, 1.25);
-  }
-  50% {
-    transform: scale(1.15, 0.85);
-  }
-  65% {
-    transform: scale(0.95, 1.05);
-  }
-  75% {
-    transform: scale(1.05, 0.95);
-  }
-  to {
-    transform: scale(1, 1);
-  }
 }
 </style>

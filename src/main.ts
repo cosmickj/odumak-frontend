@@ -1,5 +1,6 @@
-import '@/styles/reset.css'; // Reset CSS
-import 'animate.css'; // Animate.css
+import '@/styles/reset.css';
+import '@/styles/global.css';
+import 'animate.css';
 import 'primevue/resources/themes/saga-blue/theme.css';
 import 'primevue/resources/primevue.min.css';
 import 'primeicons/primeicons.css';
@@ -21,8 +22,8 @@ import { createApp } from 'vue';
 import App from '@/App.vue';
 import router from '@/router';
 
-import VueCookies from 'vue-cookies'; // Vue Cookies
-import PrimeVue from 'primevue/config'; // PrimeVue
+import VueCookies from 'vue-cookies';
+import PrimeVue from 'primevue/config';
 
 const pinia = createPinia();
 const app = createApp(App);

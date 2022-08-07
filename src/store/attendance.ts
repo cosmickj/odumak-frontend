@@ -54,7 +54,10 @@ export const useAttendanceStore = defineStore('attendance', {
     },
 
     async fetchTeachersAttendance(payload: any) {
-      const q = query(teachersAttendanceColl, where('date', '==', payload.date));
+      const q = query(
+        teachersAttendanceColl,
+        where('date', '==', payload.date)
+      );
 
       const querySnapshot = await getDocs(q);
 
@@ -72,7 +75,10 @@ export const useAttendanceStore = defineStore('attendance', {
 
     // 학생 일일 출석 확인하기
     async fetchStudentsAttendanceByDate(payload: AttendanceByDatePayload) {
-      const q = query(studentsAttendanceColl, where('date', '==', payload.date));
+      const q = query(
+        studentsAttendanceColl,
+        where('date', '==', payload.date)
+      );
 
       const querySnapshot = await getDocs(q);
 
@@ -96,7 +102,10 @@ export const useAttendanceStore = defineStore('attendance', {
     },
     // 교사 일일 출석 확인하기
     async fetchTeachersAttendanceByDate(payload: AttendanceByDatePayload) {
-      const q = query(teachersAttendanceColl, where('date', '==', payload.date));
+      const q = query(
+        teachersAttendanceColl,
+        where('date', '==', payload.date)
+      );
       const querySnapshot = await getDocs(q);
       const attendanceList = querySnapshot.docs
         .map((value) => value.data().teachersAttendance)
@@ -133,20 +142,54 @@ export const useAttendanceStore = defineStore('attendance', {
       }
     },
 
-    /**
-     *  NEW LOGIC
-     */
-    async fetchAttendance(payload: any) {
-      const q = query(
-        attendancesColl,
-        where('attendanceDate', '==', payload.attendanceDate),
-        where('church', '==', payload.church),
-        where('department', '==', payload.department),
-        where('position', '==', payload.position)
-      );
+    /** NEW LOGIC */
+    async fetchAttendance(payload: {
+      attendanceDate: Date | undefined;
+      church: string | undefined;
+      department: string | undefined;
+      grade?: string;
+      group?: string;
+      members: any;
+      position: 'student' | 'teacher';
+      role: 'admin' | 'teacher';
+    }) {
+      const {
+        attendanceDate,
+        church,
+        department,
+        grade,
+        group,
+        members,
+        position,
+        role,
+      } = payload;
 
-      const querySnapshot = await getDocs(q);
+      let querySnapshot;
+      if (role === 'admin') {
+        const q = query(
+          attendancesColl,
+          where('attendanceDate', '==', attendanceDate),
+          where('church', '==', church),
+          where('department', '==', department),
+          where('position', '==', position)
+        );
+        querySnapshot = await getDocs(q);
+      }
+      // role === 'teacher'
+      else {
+        const q = query(
+          attendancesColl,
+          where('attendanceDate', '==', attendanceDate),
+          where('church', '==', church),
+          where('department', '==', department),
+          where('grade', '==', grade),
+          where('group', '==', group),
+          where('position', '==', position)
+        );
+        querySnapshot = await getDocs(q);
+      }
 
+      /** TODO : 이 부분에서 함수 나누기 */
       // 출석 기록 O
       if (querySnapshot.docs.length) {
         return {
@@ -154,12 +197,13 @@ export const useAttendanceStore = defineStore('attendance', {
           attendanceRecord: querySnapshot.docs[0].data().records,
         };
       }
-      // 출석 기록 X
+      // 최초 등록
       else {
-        let attendanceRecord = [];
-
-        if (payload.position === 'student') {
-          payload.members.forEach((member) => {
+        /** TODO : any 타입 정리하기 */
+        let attendanceRecord: any[] = [];
+        if (position === 'student') {
+          /** TODO : any 타입 정리하기 */
+          members.forEach((member: any) => {
             const { grade, group, name, teacher } = member;
             attendanceRecord.push({
               grade,
@@ -169,10 +213,9 @@ export const useAttendanceStore = defineStore('attendance', {
               attendance: 'offline',
             });
           });
-        }
-        //
-        else if (payload.position === 'teacher') {
-          payload.members.forEach((member) => {
+        } else if (position === 'teacher') {
+          /** TODO : any 타입 정리하기 */
+          members.forEach((member: any) => {
             const { grade, group, name, role } = member;
             attendanceRecord.push({
               grade,
@@ -183,14 +226,22 @@ export const useAttendanceStore = defineStore('attendance', {
             });
           });
         }
-
         return { documentId: '', attendanceRecord };
       }
     },
 
-    async addAttendance(payload: any) {
+    async addAttendance(payload: {
+      documentId: string;
+      attendanceDate: Date | undefined;
+      createUser: string | undefined;
+      church: string | undefined;
+      department: string | undefined;
+      grade?: string | undefined;
+      group?: string | undefined;
+      position: 'student' | 'teacher';
+      records: any;
+    }) {
       const { documentId, ...info } = payload;
-
       // 문서 수정
       if (documentId) {
         await updateDoc(doc(db, 'attendances', documentId), {
@@ -198,7 +249,6 @@ export const useAttendanceStore = defineStore('attendance', {
           updateUser: info.createUser,
           updatedAt: serverTimestamp(),
         });
-
         return { message: '수정되었습니다.', documentId };
       }
       // 문서 제출
@@ -209,9 +259,7 @@ export const useAttendanceStore = defineStore('attendance', {
           updateUser: info.createUser,
           updatedAt: serverTimestamp(),
         };
-
         const result = await addDoc(attendancesColl, params);
-
         return { message: '제출되었습니다.', documentId: result.id };
       }
     },

@@ -56,10 +56,11 @@ import CheckerHeader from './components/CheckerHeader.vue';
 import CheckerStudents from './components/CheckerStudents.vue';
 import CheckerTeachers from './components/CheckerTeachers.vue';
 
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import { useAccountStore } from '@/store/account';
 import { useAttendanceStore } from '@/store/attendance';
 import { useMemberStore } from '@/store/member';
+import { getPositionFromRole } from '@/utils/position';
 import type { Student, Teacher } from '@/types';
 
 const account = useAccountStore();
@@ -76,51 +77,53 @@ const dataSource = ref<Student[] | Teacher[]>([]);
 
 const attendanceDate = ref<Date>();
 
-watch(attendanceDate, () => {
-  isLoading.value = true;
-  documentId.value = '';
-  dataSource.value = [];
-});
-
 const requestAttendance = async () => {
-  const role = userData.value?.role;
-
   try {
-    // 학생 출석 입력
+    documentId.value = '';
+    dataSource.value = [];
+    const role = userData.value?.role;
+    // 교사의 학생 출석 입력
     if (role === 'teacher') {
       const members = await member.fetchMembers({
         church: userData.value?.church,
         department: userData.value?.department,
+        grade: userData.value?.grade,
+        group: userData.value?.group,
         position: 'student',
+        role,
       });
 
       const result = await attendance.fetchAttendance({
         attendanceDate: attendanceDate.value,
         church: userData.value?.church,
         department: userData.value?.department,
-        position: 'student',
+        grade: userData.value?.grade,
+        group: userData.value?.group,
         members,
+        position: 'student',
+        role,
       });
 
       documentId.value = result!.documentId;
       dataSource.value = result!.attendanceRecord;
     }
-    // 교사 출석 입력
+    // 관리자의 교사 출석 입력
     else if (role === 'admin') {
       const members = await member.fetchMembers({
         church: userData.value?.church,
         department: userData.value?.department,
         position: 'teacher',
+        role,
       });
 
       const result = await attendance.fetchAttendance({
         attendanceDate: attendanceDate.value,
         church: userData.value?.church,
         department: userData.value?.department,
-        position: 'teacher',
         members,
+        position: 'teacher',
+        role,
       });
-
       documentId.value = result!.documentId;
       dataSource.value = result!.attendanceRecord;
     }
@@ -132,26 +135,37 @@ const requestAttendance = async () => {
 };
 
 const submitAttendance = async () => {
-  const role = userData.value?.role;
-
-  let position = '';
-  if (role === 'admin') {
-    position = 'teacher';
-  } else if (role === 'teacher') {
-    position = 'student';
-  }
-
   try {
-    const response = await attendance.addAttendance({
-      documentId: documentId.value,
-      attendanceDate: attendanceDate.value,
-      createUser: userData.value?.name,
-      church: userData.value?.church,
-      department: userData.value?.department,
-      position,
-      //
-      records: dataSource.value,
-    });
+    const role = userData.value?.role!;
+    const position = getPositionFromRole(role);
+
+    let response;
+    if (role === 'admin') {
+      response = await attendance.addAttendance({
+        documentId: documentId.value,
+        attendanceDate: attendanceDate.value,
+        createUser: userData.value?.name,
+        church: userData.value?.church,
+        department: userData.value?.department,
+        position,
+        records: dataSource.value,
+      });
+    }
+    // role === 'teacher'
+    else {
+      response = await attendance.addAttendance({
+        documentId: documentId.value,
+        attendanceDate: attendanceDate.value,
+        createUser: userData.value?.name,
+        church: userData.value?.church,
+        department: userData.value?.department,
+        grade: userData.value?.grade,
+        group: userData.value?.group,
+        position,
+        records: dataSource.value,
+      });
+    }
+
     documentId.value = response.documentId;
     alert(response.message);
   } catch (error) {

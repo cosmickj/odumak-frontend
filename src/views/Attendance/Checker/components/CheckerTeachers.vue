@@ -1,6 +1,6 @@
 <template>
   <form class="grow flex flex-col select-none" @submit.prevent="handleSubmit">
-    <div class="overflow-auto h-0 grow">
+    <div class="grow overflow-auto h-0">
       <div v-for="(teacher, idx) in teachersAttendance" :key="idx">
         <div class="attendance bg-white shadow">
           <div class="flex flex-col items-center">
@@ -22,10 +22,10 @@
             :id="`absence-${teacher.name}`"
           />
           <label
-            :for="`absence-${teacher.name}`"
             class="shadow-md attendance__label attendance__label__absence"
+            :for="`absence-${teacher.name}`"
           >
-            <span>결석</span>
+            결석
           </label>
 
           <input
@@ -36,10 +36,10 @@
             :id="`online-${teacher.name}`"
           />
           <label
-            :for="`online-${teacher.name}`"
             class="shadow-md attendance__label attendance__label__online"
+            :for="`online-${teacher.name}`"
           >
-            <span>온라인</span>
+            온라인
           </label>
 
           <input
@@ -50,10 +50,10 @@
             :id="`offline-${teacher.name}`"
           />
           <label
-            :for="`offline-${teacher.name}`"
             class="shadow-md attendance__label attendance__label__offline"
+            :for="`offline-${teacher.name}`"
           >
-            <span>현장</span>
+            현장
           </label>
 
           <!-- 선생님별 학생 출석 현황 -->
@@ -79,18 +79,16 @@
         <div
           v-if="
             !isLoading[idx] &&
-            teacher.role === 'teacher' &&
+            teacher.role === 'main' &&
             currnetIndexList.includes(idx)
           "
         >
-          <CheckerStudents
-            v-model="
-              studentsAttendanceByTeacher[teacher.name].studentsAttendance
-            "
+          <checker-students
+            v-model="studentsAttendanceByTeacher[teacher.name].attendanceRecord"
             :document-id="studentsAttendanceByTeacher[teacher.name].documentId"
             :attendance-date="attendanceDate"
-            :writer="teacher.name"
             :is-sub="true"
+            @submit="submitStudentAttendance(teacher, idx)"
           />
         </div>
       </div>
@@ -118,10 +116,10 @@
 import CheckerStudents from './CheckerStudents.vue';
 
 import { computed, ref, watch } from 'vue';
+import { useAccountStore } from '@/store/account';
 import { useAttendanceStore } from '@/store/attendance';
-import type { Student, Teacher } from '@/types';
-
-const attendance = useAttendanceStore();
+import { useMemberStore } from '@/store/member';
+import type { Teacher } from '@/types';
 
 const props = defineProps<{
   documentId: string;
@@ -131,13 +129,21 @@ const props = defineProps<{
 
 const emit = defineEmits(['submit', 'update:modelValue']);
 
+const account = useAccountStore();
+const attendance = useAttendanceStore();
+const member = useMemberStore();
+
 const teachersAttendance = computed<Teacher[]>({
   get: () => props.modelValue,
   set: (teachersAttendance) => emit('update:modelValue', teachersAttendance),
 });
 
+const userData = computed(() => account.userData);
+
 const isLoading = ref<boolean[]>([]);
+
 const currnetIndexList = ref<number[]>([]);
+
 const studentsAttendanceByTeacher = ref<any>({}); // TODO: 타입 정의 다시하기
 
 watch(
@@ -147,6 +153,8 @@ watch(
     studentsAttendanceByTeacher.value = {};
   }
 );
+
+const handleSubmit = () => emit('submit');
 
 const requestStudentsAttendance = async (
   teacher: Teacher,
@@ -162,22 +170,35 @@ const requestStudentsAttendance = async (
     currnetIndexList.value.splice(targetIndex, 1);
   }
 
-  if (teacher.role === 'teacher') {
+  if (teacher.role === 'main') {
     if (studentsAttendanceByTeacher.value[teacher.name]) {
-      // ignore
-    } else {
-      const result = await attendance.fetchStudentsAttendance({
-        date: props.attendanceDate,
+      // 조회한 기록이 있음
+    }
+    // 관리자가 교사가 되어 학생 출석 입력
+    else {
+      const members = await member.fetchMembers({
+        church: userData.value?.church,
+        department: userData.value?.department,
         grade: teacher.grade,
         group: teacher.group,
-        teacher: teacher.name,
+        position: 'student',
+        role: 'teacher',
       });
-      result.studentsAttendance.forEach((student: Student) => {
-        if (!student.attendance) student.attendance = 'offline';
+
+      const result = await attendance.fetchAttendance({
+        attendanceDate: props.attendanceDate,
+        church: userData.value?.church,
+        department: userData.value?.department,
+        grade: teacher.grade,
+        group: teacher.group,
+        members,
+        position: 'student',
+        role: 'teacher',
       });
+
       studentsAttendanceByTeacher.value[teacher.name] = {
-        documentId: result.documentId,
-        studentsAttendance: result.studentsAttendance,
+        documentId: result!.documentId,
+        attendanceRecord: result!.attendanceRecord,
       };
     }
   }
@@ -185,19 +206,24 @@ const requestStudentsAttendance = async (
   isLoading.value[currentIndex] = false;
 };
 
-// const params = {
-//   documentId: props.documentId,
-//   date: props.attendanceDate,
-//   teachersAttendance: teachersAttendance.value,
-// };
-// const { id } = await attendance.addTeachersAttendance(params);
-// emit('onUploaded:teachersAttendance', { id });
-// if (!props.documentId) {
-//   alert('교사 출석 현황이 제출되었습니다.');
-// } else {
-//   alert('교사 출석 현황이 수정되었습니다.');
-// }
-const handleSubmit = () => emit('submit');
+// 관리자가 교사를 대신해서 학생 출석을 기입
+const submitStudentAttendance = async (teacher: Teacher, idx: number) => {
+  const response = await attendance.addAttendance({
+    documentId: studentsAttendanceByTeacher.value[teacher.name].documentId,
+    attendanceDate: props.attendanceDate,
+    createUser: userData.value?.name,
+    church: userData.value?.church,
+    department: userData.value?.department,
+    grade: teacher.grade,
+    group: teacher.group,
+    position: 'student',
+    records: studentsAttendanceByTeacher.value[teacher.name].attendanceRecord,
+  });
+
+  studentsAttendanceByTeacher.value[teacher.name].documentId =
+    response.documentId;
+  alert(response.message);
+};
 </script>
 
 <style scoped>
@@ -248,29 +274,6 @@ const handleSubmit = () => emit('submit');
 }
 .attendance__input:checked + .attendance__label.attendance__label__absence {
   background-color: #ff4032;
-}
-@keyframes jelly {
-  from {
-    transform: scale(1, 1);
-  }
-  30% {
-    transform: scale(1.25, 0.75);
-  }
-  40% {
-    transform: scale(0.75, 1.25);
-  }
-  50% {
-    transform: scale(1.15, 0.85);
-  }
-  65% {
-    transform: scale(0.95, 1.05);
-  }
-  75% {
-    transform: scale(1.05, 0.95);
-  }
-  to {
-    transform: scale(1, 1);
-  }
 }
 .pi {
   font-size: 1.5rem;
