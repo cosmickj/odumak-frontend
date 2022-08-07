@@ -3,7 +3,8 @@
     <form
       @submit.prevent="handleSubmit"
       :class="{
-        'border-x-4 border-b-4 border-slate-200 rounded-b-lg bg-slate-200': isSub,
+        'border-x-4 border-b-4 border-slate-200 rounded-b-lg bg-slate-200':
+          isSub,
       }"
     >
       <div
@@ -11,7 +12,9 @@
         v-for="(student, i) in studentsAttendance"
         :key="i"
       >
-        <div class="student__name" :class="$attrs.class">{{ student.name }}</div>
+        <div class="student__name" :class="$attrs.class">
+          {{ student.name }}
+        </div>
 
         <input
           v-model="studentsAttendance[i].attendance"

@@ -68,7 +68,10 @@
             ></i>
           </div>
 
-          <div v-else class="w-8 h-8 flex items-center justify-center cursor-pointer">
+          <div
+            v-else
+            class="w-8 h-8 flex items-center justify-center cursor-pointer"
+          >
             <i class="pi pi-minus"></i>
           </div>
         </div>
@@ -81,7 +84,9 @@
           "
         >
           <CheckerStudents
-            v-model="studentsAttendanceByTeacher[teacher.name].studentsAttendance"
+            v-model="
+              studentsAttendanceByTeacher[teacher.name].studentsAttendance
+            "
             :document-id="studentsAttendanceByTeacher[teacher.name].documentId"
             :attendance-date="attendanceDate"
             :writer="teacher.name"
@@ -107,13 +112,10 @@
       />
     </div>
   </form>
-
-  <TheLoader :is-loading="isLoader" />
 </template>
 
 <script setup lang="ts">
 import CheckerStudents from './CheckerStudents.vue';
-import TheLoader from '@/components/TheLoader.vue';
 
 import { computed, ref, watch } from 'vue';
 import { useAttendanceStore } from '@/store/attendance';
@@ -138,8 +140,6 @@ const isLoading = ref<boolean[]>([]);
 const currnetIndexList = ref<number[]>([]);
 const studentsAttendanceByTeacher = ref<any>({}); // TODO: 타입 정의 다시하기
 
-const isLoader = ref(false);
-
 watch(
   () => props.attendanceDate,
   () => {
@@ -148,8 +148,10 @@ watch(
   }
 );
 
-const requestStudentsAttendance = async (teacher: Teacher, currentIndex: number) => {
-  isLoader.value = true;
+const requestStudentsAttendance = async (
+  teacher: Teacher,
+  currentIndex: number
+) => {
   isLoading.value = Array(currentIndex).fill(false);
   isLoading.value[currentIndex] = true;
 
@@ -180,7 +182,6 @@ const requestStudentsAttendance = async (teacher: Teacher, currentIndex: number)
     }
   }
 
-  isLoader.value = false;
   isLoading.value[currentIndex] = false;
 };
 

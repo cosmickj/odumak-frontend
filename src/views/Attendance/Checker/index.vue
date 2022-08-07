@@ -1,89 +1,58 @@
 <template>
-  <div class="h-screen flex flex-col p-8 bg-slate-100">
-    <div class="relative flex justify-center items-center">
-      <!-- 뒤로 가기 -->
-      <button class="h-full w-12 absolute left-0 cursor-pointer">
-        <router-link
-          class="h-full w-full flex justify-center items-center"
-          :to="{ name: 'HomeView' }"
-        >
-          <i class="pi pi-arrow-left text-3xl"></i>
-        </router-link>
-      </button>
+  <section class="h-screen p-8 bg-slate-100 flex flex-col">
+    <checker-header :user-data="userData" />
 
-      <!-- 메뉴 제목 -->
-      <span class="text-3xl">출석 입력하기</span>
-    </div>
+    <calendar
+      v-if="userData?.role === 'teacher' || userData?.role === 'admin'"
+      v-model="attendanceDate"
+      class="pt-5"
+      :touchUI="true"
+      :disabledDays="[1, 2, 3, 4, 5, 6]"
+      placeholder="날짜를 선택해주세요"
+      input-class="text-center"
+      @date-select="requestAttendance"
+    />
+
+    <the-finger
+      v-if="userData?.role !== 'common' && !attendanceDate"
+      class="pt-5"
+    />
+
+    <the-loader v-if="isLoading" />
 
     <!-- 선생님일 때 -->
-    <template v-if="userData?.role === 'teacher'">
-      <div class="flex justify-around text-2xl mt-5">
-        <div>{{ userData?.grade }}학년 {{ userData?.group }}반</div>
-        <div>{{ userData?.name }} 선생님</div>
-      </div>
-
-      <Calendar
-        v-model="attendanceDate"
-        class="pt-5"
-        :touchUI="true"
-        :disabledDays="[1, 2, 3, 4, 5, 6]"
-        placeholder="날짜를 선택해주세요"
-        input-class="text-center"
-        @date-select="requestAttendance"
-      />
-
-      <CheckerStudents
-        v-if="attendanceDate"
-        v-model="dataSource"
-        :document-id="documentId"
-        :attendance-date="attendanceDate"
-        @submit="submitAttendance"
-      />
-
-      <TheFinger v-else class="pt-5" />
-    </template>
+    <!-- TODO: 이 부분을 담임(main)과 부담임(sub) 모두로 설정하자 -->
+    <checker-students
+      v-if="userData?.role === 'teacher' && attendanceDate"
+      v-model="dataSource"
+      :document-id="documentId"
+      :attendance-date="attendanceDate"
+      @submit="submitAttendance"
+    />
 
     <!-- 관리자일 때 -->
-    <template v-else-if="userData?.role === 'admin'">
-      <div class="flex justify-center text-2xl mt-5">
-        <div>{{ userData?.name }}</div>
-      </div>
+    <checker-teachers
+      v-else-if="userData?.role === 'admin' && attendanceDate"
+      v-model="dataSource"
+      :document-id="documentId"
+      :attendance-date="attendanceDate"
+      @submit="submitAttendance"
+    />
 
-      <Calendar
-        v-model="attendanceDate"
-        class="pt-5"
-        :touchUI="true"
-        :disabledDays="[1, 2, 3, 4, 5, 6]"
-        placeholder="날짜를 선택해주세요"
-        input-class="text-center"
-        @date-select="requestAttendance"
-      />
-
-      <CheckerTeachers
-        v-if="attendanceDate"
-        v-model="dataSource"
-        :document-id="documentId"
-        :attendance-date="attendanceDate"
-        @submit="submitAttendance"
-      />
-
-      <TheFinger v-else class="pt-5" />
-    </template>
-
-    <!-- 일반 회원일 때 -->
-    <template v-else>
-      <div class="grow flex justify-center items-center">
-        <p class="text-xl">담당 학급이 있는 선생님만 이용할 수 있습니다.</p>
-      </div>
-    </template>
-
-    <TheLoader :is-loading="isLoading" />
-  </div>
+    <!-- 일반교사일 때 -->
+    <div
+      v-else-if="userData?.role === 'common'"
+      class="grow flex justify-center items-center"
+    >
+      <p class="text-xl">담당 학급이 있는 선생님만 이용할 수 있습니다.</p>
+    </div>
+  </section>
 </template>
 
 <script setup lang="ts">
 import TheFinger from '@/components/TheFinger.vue';
 import TheLoader from '@/components/TheLoader.vue';
+import CheckerHeader from './components/CheckerHeader.vue';
 import CheckerStudents from './components/CheckerStudents.vue';
 import CheckerTeachers from './components/CheckerTeachers.vue';
 
@@ -108,8 +77,9 @@ const dataSource = ref<Student[] | Teacher[]>([]);
 const attendanceDate = ref<Date>();
 
 watch(attendanceDate, () => {
-  dataSource.value = [];
   isLoading.value = true;
+  documentId.value = '';
+  dataSource.value = [];
 });
 
 const requestAttendance = async () => {
