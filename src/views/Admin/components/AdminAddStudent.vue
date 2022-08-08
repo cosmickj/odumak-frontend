@@ -19,6 +19,7 @@
         v-model="selectedGrade"
         :options="grade"
         option-label="label"
+        option-value="value"
         placeholder="학년을 선택해주세요."
         @click="v$.selectedGrade.$reset"
       />
@@ -35,6 +36,7 @@
         v-model="selectedGroup"
         :options="group"
         option-label="label"
+        option-value="value"
         placeholder="학급을 선택해주세요."
         @click="v$.selectedGroup.$reset"
       />
@@ -64,7 +66,8 @@
         :class="{ 'p-invalid': error.gender.status }"
         v-model="selectedGender"
         :options="gender"
-        optionLabel="label"
+        option-label="label"
+        option-value="value"
         @click="v$.selectedGender.$reset"
       />
     </div>
@@ -74,6 +77,7 @@
       <Calendar
         class="grow"
         v-model="selectedBirth"
+        date-format="yy/mm/dd"
         placeholder="생년월일을 선택해주세요."
       />
     </div>
@@ -132,19 +136,23 @@ import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import { gender, grade, group } from '../data';
 
-import type { AddStudentParams, Option } from '@/types';
+import type { AddStudentParams } from '@/types';
+
+const props = defineProps<{
+  params?: AddStudentParams;
+}>();
 
 const emit = defineEmits(['close', 'submit']);
 
-const selectedGrade = ref<Option>();
-const selectedGroup = ref<Option>();
-const inputtedName = ref('');
-const selectedGender = ref<Option>();
-const selectedBirth = ref<Date>();
-const inputtedPhone = ref('');
-const selectedTeacher = ref('');
-const inputtedAddress = ref('');
-const inputtedRemark = ref('');
+const selectedGrade = ref(props.params?.grade || '');
+const selectedGroup = ref(props.params?.group || '');
+const inputtedName = ref(props.params?.name || '');
+const selectedGender = ref(props.params?.gender || '');
+const selectedBirth = ref<Date | undefined>(props.params?.birth || undefined);
+const inputtedPhone = ref(props.params?.phone || '');
+const selectedTeacher = ref(props.params?.teacher || '');
+const inputtedAddress = ref(props.params?.address || '');
+const inputtedRemark = ref(props.params?.remark || '');
 
 const rules = computed(() => ({
   selectedGrade: { required },
@@ -190,10 +198,10 @@ const handleSubmit = async () => {
   }
 
   const params: AddStudentParams = {
-    grade: selectedGrade.value?.value || null,
-    group: selectedGroup.value?.value || null,
+    grade: selectedGrade.value || null,
+    group: selectedGroup.value || null,
     name: inputtedName.value,
-    gender: selectedGender.value?.value || null,
+    gender: selectedGender.value || null,
     birth: selectedBirth.value || null,
     phone: inputtedPhone.value,
     teacher: selectedTeacher.value,

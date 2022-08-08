@@ -4,17 +4,20 @@
       v-if="memberPosition === 'student'"
       :data-source="dataSource"
       :is-loading="isLoading"
+      @row-click="editMember"
     />
 
     <AdminTeacher
       v-else-if="memberPosition === 'teacher'"
       :data-source="dataSource"
       :is-loading="isLoading"
+      @row-click="editMember"
     />
 
     <AdminAdd
       :is-opened="isOpened"
-      :member-position="'student'"
+      :member-position="memberPosition"
+      :params="params"
       @open="openModal"
       @close="closeModal"
       @submit="addMember"
@@ -92,5 +95,12 @@ const addMember = async (payload: AddStudentParams) => {
   } finally {
     isOpened.value = false;
   }
+};
+
+const params = ref();
+
+const editMember = (payload: any) => {
+  params.value = payload;
+  isOpened.value = true;
 };
 </script>

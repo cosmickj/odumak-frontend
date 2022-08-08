@@ -18,12 +18,14 @@
     >
       <AdminAddStudent
         v-if="memberPosition === 'student'"
+        :params="(params as AddStudentParams)"
         @close="handleClose"
         @submit="handleSubmit"
       />
 
       <AdminAddTeacher
         v-if="memberPosition === 'teacher'"
+        :params="(params as AddTeacherParams)"
         @close="handleClose"
         @submit="handleSubmit"
       />
@@ -33,15 +35,20 @@
 
 <script setup lang="ts">
 import AdminAddStudent from './AdminAddStudent.vue';
-import AdminAddTeacher from './AdminAddStudent.vue';
+import AdminAddTeacher from './AdminAddTeacher.vue';
 
 import { computed } from 'vue';
 
-import type { AddStudentParams, MemberPosition } from '@/types';
+import type {
+  AddStudentParams,
+  AddTeacherParams,
+  MemberPosition,
+} from '@/types';
 
 const props = defineProps<{
   isOpened: boolean;
   memberPosition: MemberPosition;
+  params?: AddStudentParams | AddTeacherParams;
 }>();
 
 const emit = defineEmits(['open', 'close', 'submit']);

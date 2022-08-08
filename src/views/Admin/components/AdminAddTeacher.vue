@@ -19,6 +19,7 @@
         v-model="selectedGrade"
         :options="grade"
         option-label="label"
+        option-value="value"
         placeholder="담당 학년을 선택해주세요."
         @click="v$.selectedGrade.$reset"
       />
@@ -35,6 +36,7 @@
         v-model="selectedGroup"
         :options="group"
         option-label="label"
+        option-value="value"
         placeholder="담당 학급을 선택해주세요."
         @click="v$.selectedGroup.$reset"
       />
@@ -64,7 +66,8 @@
         :class="{ 'p-invalid': error.selectedRole.status }"
         v-model="selectedRole"
         :options="teacherRole"
-        optionLabel="label"
+        option-label="label"
+        option-value="value"
         @click="v$.selectedRole.$reset"
       />
     </div>
@@ -88,15 +91,19 @@ import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import { grade, group, teacherRole } from '../data';
 
-import type { AddTeacherParams, Option } from '@/types/index.js';
+import type { AddTeacherParams } from '@/types/index.js';
+
+const props = defineProps<{
+  params?: AddTeacherParams;
+}>();
 
 const emit = defineEmits(['close', 'submit']);
 
-const selectedGrade = ref<Option>();
-const selectedGroup = ref<Option>();
-const inputtedName = ref('');
-const selectedRole = ref<Option>();
-const inputtedRemark = ref('');
+const selectedGrade = ref(props.params?.grade || '');
+const selectedGroup = ref(props.params?.group || '');
+const inputtedName = ref(props.params?.name || '');
+const selectedRole = ref(props.params?.role || '');
+const inputtedRemark = ref(props.params?.remark || '');
 
 const rules = computed(() => ({
   selectedGrade: { required },
@@ -137,10 +144,10 @@ const handleSubmit = async () => {
   }
 
   const params: AddTeacherParams = {
-    grade: selectedGrade.value?.value || null,
-    group: selectedGroup.value?.value || null,
+    grade: selectedGrade.value || null,
+    group: selectedGroup.value || null,
     name: inputtedName.value,
-    role: selectedRole.value?.value || null,
+    role: selectedRole.value || null,
     remark: inputtedRemark.value,
   };
 

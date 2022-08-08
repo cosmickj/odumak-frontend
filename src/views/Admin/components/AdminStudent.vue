@@ -6,6 +6,7 @@
     :loading="isLoading"
     :rowHover="true"
     responsiveLayout="scroll"
+    @row-click="handleRowClick"
   >
     <Column field="grade" header="grade" />
 
@@ -32,10 +33,14 @@
 </template>
 
 <script setup lang="ts">
+import type { DataTableRowClickEvent } from 'primevue/datatable/DataTable';
+
 const props = defineProps<{
   dataSource: any;
   isLoading: boolean;
 }>();
+
+const emit = defineEmits(['rowClick']);
 
 const translateBirth = (seconds: number | undefined) => {
   if (seconds) {
@@ -43,5 +48,12 @@ const translateBirth = (seconds: number | undefined) => {
   } else {
     return;
   }
+};
+
+const handleRowClick = (ev: DataTableRowClickEvent) => {
+  if (ev.data.birth) {
+    ev.data.birth = translateBirth(ev.data.birth.seconds);
+  }
+  emit('rowClick', ev.data);
 };
 </script>
