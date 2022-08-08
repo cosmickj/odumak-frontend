@@ -21,8 +21,7 @@ export interface Teacher {
   grade: string;
   group: string;
   name: string;
-  // role: 'teacher' | 'common';
-  role: string;
+  role: TeacherRole;
 }
 
 export interface Option {
@@ -30,7 +29,7 @@ export interface Option {
   value: string;
 }
 
-export interface State {
+export interface AddStudentParams {
   grade: string | null;
   group: string | null;
   name: string;
@@ -42,4 +41,14 @@ export interface State {
   remark: string;
 }
 
-export type Position = 'student' | 'teacher';
+export interface AddTeacherParams {
+  grade: string | null;
+  group: string | null;
+  name: string;
+  role: string | null;
+  remark: string;
+}
+
+export type TeacherRole = 'admin' | 'main' | 'sub' | 'common';
+
+export type MemberPosition = 'student' | 'teacher';

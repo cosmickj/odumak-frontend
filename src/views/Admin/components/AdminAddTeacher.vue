@@ -61,11 +61,11 @@
         <span>담임 여부:</span>
       </div>
       <SelectButton
-        :class="{ 'p-invalid': error.selectedTeacherRole.status }"
-        v-model="selectedTeacherRole"
+        :class="{ 'p-invalid': error.selectedRole.status }"
+        v-model="selectedRole"
         :options="teacherRole"
         optionLabel="label"
-        @click="v$.selectedTeacherRole.$reset"
+        @click="v$.selectedRole.$reset"
       />
     </div>
 
@@ -86,29 +86,30 @@
 import { computed, ref } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
-import type { Option, State } from '@/types/index.js';
 import { grade, group, teacherRole } from '../data';
+
+import type { AddTeacherParams, Option } from '@/types/index.js';
 
 const emit = defineEmits(['close', 'submit']);
 
 const selectedGrade = ref<Option>();
 const selectedGroup = ref<Option>();
 const inputtedName = ref('');
-const selectedTeacherRole = ref<Option>();
+const selectedRole = ref<Option>();
 const inputtedRemark = ref('');
 
 const rules = computed(() => ({
   selectedGrade: { required },
   selectedGroup: { required },
   inputtedName: { required },
-  selectedTeacherRole: { required },
+  selectedRole: { required },
 }));
 
 const v$ = useVuelidate(rules, {
   selectedGrade,
   selectedGroup,
   inputtedName,
-  selectedTeacherRole,
+  selectedRole,
 });
 
 const error = computed(() => ({
@@ -121,8 +122,8 @@ const error = computed(() => ({
   name: {
     status: v$.value.inputtedName.$error,
   },
-  selectedTeacherRole: {
-    status: v$.value.selectedTeacherRole.$error,
+  selectedRole: {
+    status: v$.value.selectedRole.$error,
   },
 }));
 
@@ -135,13 +136,14 @@ const handleSubmit = async () => {
     return;
   }
 
-  const state = {
+  const params: AddTeacherParams = {
     grade: selectedGrade.value?.value || null,
     group: selectedGroup.value?.value || null,
     name: inputtedName.value,
-    role: selectedTeacherRole.value?.value || null,
+    role: selectedRole.value?.value || null,
     remark: inputtedRemark.value,
   };
-  emit('submit', state);
+
+  emit('submit', params);
 };
 </script>

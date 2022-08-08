@@ -130,8 +130,9 @@
 import { computed, ref } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
-import type { Option, State } from '@/types/index.js';
 import { gender, grade, group } from '../data';
+
+import type { AddStudentParams, Option } from '@/types';
 
 const emit = defineEmits(['close', 'submit']);
 
@@ -154,10 +155,10 @@ const rules = computed(() => ({
 }));
 
 const v$ = useVuelidate(rules, {
-  inputtedName,
-  selectedGender,
   selectedGrade,
   selectedGroup,
+  inputtedName,
+  selectedGender,
   selectedTeacher,
 });
 
@@ -188,7 +189,7 @@ const handleSubmit = async () => {
     return;
   }
 
-  const state: State = {
+  const params: AddStudentParams = {
     grade: selectedGrade.value?.value || null,
     group: selectedGroup.value?.value || null,
     name: inputtedName.value,
@@ -199,6 +200,7 @@ const handleSubmit = async () => {
     address: inputtedAddress.value,
     remark: inputtedRemark.value,
   };
-  emit('submit', state);
+
+  emit('submit', params);
 };
 </script>

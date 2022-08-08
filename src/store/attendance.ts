@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { useMemberStore } from './member';
 import { db, attendancesColl } from '@/firebase/config';
 import {
   addDoc,
@@ -9,8 +10,7 @@ import {
   updateDoc,
   where,
 } from 'firebase/firestore';
-import type { Student, Teacher } from '@/types';
-import { useMemberStore } from './member';
+import type { MemberPosition, Student, Teacher, TeacherRole } from '@/types';
 
 export const useAttendanceStore = defineStore('attendance', {
   state: () => {
@@ -43,7 +43,7 @@ export const useAttendanceStore = defineStore('attendance', {
         position: 'student',
       })) as Student[];
 
-      // // TODO: 알고리즘 개선 필요
+      // TODO: 알고리즘 개선 필요
       for (const attendance of attendanceList) {
         for (const student of studentList) {
           if (student.name === attendance.name) {
@@ -93,7 +93,6 @@ export const useAttendanceStore = defineStore('attendance', {
       return teahcerList;
     },
 
-    /** NEW LOGIC */
     async fetchAttendance(payload: {
       attendanceDate: Date | undefined;
       church: string | undefined;
@@ -101,8 +100,8 @@ export const useAttendanceStore = defineStore('attendance', {
       grade?: string;
       group?: string;
       members: any;
-      position: 'student' | 'teacher';
-      role: 'admin' | 'teacher';
+      position: MemberPosition;
+      role: TeacherRole;
     }) {
       const {
         attendanceDate,
@@ -189,7 +188,7 @@ export const useAttendanceStore = defineStore('attendance', {
       department: string | undefined;
       grade?: string | undefined;
       group?: string | undefined;
-      position: 'student' | 'teacher';
+      position: MemberPosition;
       records: any;
     }) {
       const { documentId, ...info } = payload;

@@ -1,6 +1,4 @@
 import { defineStore } from 'pinia';
-import type { Position, State } from '@/types';
-import type { AccountData } from '@/types/store';
 import {
   addDoc,
   doc,
@@ -12,11 +10,13 @@ import {
 } from 'firebase/firestore';
 import { db, membersColl } from '@/firebase/config';
 import arraySort from 'array-sort';
+import type { AddStudentParams, MemberPosition, TeacherRole } from '@/types';
+import type { AccountData } from '@/types/store';
 
 interface DefaultPayload
-  extends State,
+  extends AddStudentParams,
     Pick<AccountData, 'church' | 'department'> {
-  position: Position;
+  position: MemberPosition;
 }
 
 export const useMemberStore = defineStore('member', {
@@ -62,8 +62,8 @@ export const useMemberStore = defineStore('member', {
       department: string | undefined;
       grade?: string;
       group?: string;
-      position: 'student' | 'teacher';
-      role?: 'admin' | 'teacher';
+      position: MemberPosition;
+      role?: TeacherRole;
     }) {
       try {
         const { church, department, grade, group, position, role } = payload;
@@ -82,7 +82,7 @@ export const useMemberStore = defineStore('member', {
 
           if (role === 'admin') {
             // pass
-          } else if (role === 'teacher') {
+          } else if (role === 'main') {
             /** TODO : any 타입 정리하기 */
             members = members.filter(
               (member: any) => member.grade === grade && member.group === group
