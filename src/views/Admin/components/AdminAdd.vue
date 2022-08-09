@@ -20,14 +20,16 @@
         v-if="memberPosition === 'student'"
         :params="(params as AddStudentParams)"
         @close="handleClose"
-        @submit="handleSubmit"
+        @create="handleCreate"
+        @edit="handleEdit"
       />
 
       <AdminAddTeacher
         v-if="memberPosition === 'teacher'"
         :params="(params as AddTeacherParams)"
         @close="handleClose"
-        @submit="handleSubmit"
+        @create="handleCreate"
+        @edit="handleEdit"
       />
     </div>
   </Teleport>
@@ -51,7 +53,7 @@ const props = defineProps<{
   params?: AddStudentParams | AddTeacherParams;
 }>();
 
-const emit = defineEmits(['open', 'close', 'submit']);
+const emit = defineEmits(['open', 'close', 'create', 'edit']);
 
 const who = computed(() => {
   if (props.memberPosition === 'student') {
@@ -65,5 +67,6 @@ const who = computed(() => {
 
 const handleOpen = () => emit('open');
 const handleClose = () => emit('close');
-const handleSubmit = (params: AddStudentParams) => emit('submit', params);
+const handleCreate = (params: AddStudentParams) => emit('create', params);
+const handleEdit = (params: AddStudentParams) => emit('edit', params);
 </script>

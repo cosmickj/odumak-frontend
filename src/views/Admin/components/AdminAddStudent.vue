@@ -123,8 +123,16 @@
     </div>
 
     <div class="mt-6 flex justify-center">
-      <Button class="p-button-warning p-button-lg" @click="handleSubmit">
+      <Button
+        v-if="!params"
+        class="p-button-warning p-button-lg"
+        @click="handleCreate"
+      >
         저장하기
+      </Button>
+
+      <Button v-else class="p-button-danger p-button-lg" @click="handleEdit">
+        수정하기
       </Button>
     </div>
   </div>
@@ -142,7 +150,7 @@ const props = defineProps<{
   params?: AddStudentParams;
 }>();
 
-const emit = defineEmits(['close', 'submit']);
+const emit = defineEmits(['close', 'create', 'edit']);
 
 const selectedGrade = ref(props.params?.grade || '');
 const selectedGroup = ref(props.params?.group || '');
@@ -190,7 +198,7 @@ const error = computed(() => ({
 
 const handleClose = () => emit('close');
 
-const handleSubmit = async () => {
+const handleCreate = async () => {
   const isFormCorrect = await v$.value.$validate();
 
   if (!isFormCorrect) {
@@ -209,6 +217,28 @@ const handleSubmit = async () => {
     remark: inputtedRemark.value,
   };
 
-  emit('submit', params);
+  emit('create', params);
+};
+
+const handleEdit = async () => {
+  const isFormCorrect = await v$.value.$validate();
+
+  if (!isFormCorrect) {
+    return;
+  }
+
+  const params: AddStudentParams = {
+    grade: selectedGrade.value || null,
+    group: selectedGroup.value || null,
+    name: inputtedName.value,
+    gender: selectedGender.value || null,
+    birth: selectedBirth.value || null,
+    phone: inputtedPhone.value,
+    teacher: selectedTeacher.value,
+    address: inputtedAddress.value,
+    remark: inputtedRemark.value,
+  };
+
+  emit('edit', params);
 };
 </script>

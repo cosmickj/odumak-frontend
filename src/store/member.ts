@@ -56,6 +56,26 @@ export const useMemberStore = defineStore('member', {
       }
     },
 
+    async modifyMember(payload: any) {
+      const q = query(
+        membersColl,
+        where('church', '==', payload.church),
+        where('department', '==', payload.department),
+        where('position', '==', payload.position)
+      );
+
+      const querySnapshot = await getDocs(q);
+
+      console.log(querySnapshot.docs[0].id);
+      console.log(querySnapshot.docs[0].data());
+
+      /**
+       * TODO : 20220809
+       * 어떻게 해야지 수정이 매끄럽게 될까?
+       * 뭔가 지금은 index를 가져와서 바꿔줘야하지 않을까 싶다.
+       */
+    },
+
     // async fetchMembers(payload: Omit<DefaultPayload, keyof State>) {
     async fetchMembers(payload: {
       church: string | undefined;
