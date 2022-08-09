@@ -172,17 +172,16 @@ const requestStudentsAttendance = async (
 
   if (teacher.role === 'main') {
     if (studentsAttendanceByTeacher.value[teacher.name]) {
-      // 조회한 기록이 있음
-    }
-    // 관리자가 교사가 되어 학생 출석 입력
-    else {
+      // pass (조회한 기록이 있음)
+    } else {
+      // 관리자가 교사가 되어 학생 출석 입력
       const members = await member.fetchMembers({
         church: userData.value?.church,
         department: userData.value?.department,
         grade: teacher.grade,
         group: teacher.group,
         position: 'student',
-        role: 'teacher',
+        role: teacher.role,
       });
 
       const result = await attendance.fetchAttendance({
@@ -193,7 +192,7 @@ const requestStudentsAttendance = async (
         group: teacher.group,
         members,
         position: 'student',
-        role: 'teacher',
+        role: teacher.role,
       });
 
       studentsAttendanceByTeacher.value[teacher.name] = {

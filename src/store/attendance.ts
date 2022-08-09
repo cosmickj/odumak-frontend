@@ -124,9 +124,7 @@ export const useAttendanceStore = defineStore('attendance', {
           where('position', '==', position)
         );
         querySnapshot = await getDocs(q);
-      }
-      // role === 'teacher'
-      else {
+      } else if (role === 'main' || role === 'sub') {
         const q = query(
           attendancesColl,
           where('attendanceDate', '==', attendanceDate),
@@ -137,6 +135,8 @@ export const useAttendanceStore = defineStore('attendance', {
           where('position', '==', position)
         );
         querySnapshot = await getDocs(q);
+      } else {
+        return;
       }
 
       /** TODO : 이 부분에서 함수 나누기 */
@@ -159,7 +159,7 @@ export const useAttendanceStore = defineStore('attendance', {
               grade,
               group,
               name,
-              teacher,
+              teacher, // here
               attendance: 'offline',
             });
           });
@@ -171,7 +171,7 @@ export const useAttendanceStore = defineStore('attendance', {
               grade,
               group,
               name,
-              role,
+              role, // here
               attendance: 'offline',
             });
           });

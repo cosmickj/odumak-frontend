@@ -102,7 +102,7 @@ export const useMemberStore = defineStore('member', {
 
           if (role === 'admin') {
             // pass
-          } else if (role === 'main') {
+          } else if (role === 'main' || role === 'sub') {
             /** TODO : any 타입 정리하기 */
             members = members.filter(
               (member: any) => member.grade === grade && member.group === group

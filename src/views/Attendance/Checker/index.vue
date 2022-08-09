@@ -3,7 +3,11 @@
     <checker-header :user-data="userData" />
 
     <calendar
-      v-if="userData?.role === 'teacher' || userData?.role === 'admin'"
+      v-if="
+        userData?.role === 'main' ||
+        userData?.role === 'sub' ||
+        userData?.role === 'admin'
+      "
       v-model="attendanceDate"
       class="pt-5"
       :touchUI="true"
@@ -23,7 +27,10 @@
     <!-- 선생님일 때 -->
     <!-- TODO: 이 부분을 담임(main)과 부담임(sub) 모두로 설정하자 -->
     <checker-students
-      v-if="userData?.role === 'teacher' && attendanceDate"
+      v-if="
+        (userData?.role === 'main' || userData?.role === 'sub') &&
+        attendanceDate
+      "
       v-model="dataSource"
       :document-id="documentId"
       :attendance-date="attendanceDate"
@@ -83,7 +90,7 @@ const requestAttendance = async () => {
     dataSource.value = [];
     const role = userData.value?.role;
     // 교사의 학생 출석 입력
-    if (role === 'teacher') {
+    if (role === 'main' || role === 'sub') {
       const members = await member.fetchMembers({
         church: userData.value?.church,
         department: userData.value?.department,
