@@ -18,7 +18,7 @@ import {
 } from 'firebase/auth';
 import baseResponse from '@/utils/baseResponseStatus';
 import { errResponse, response } from '@/utils/response';
-import type { Teacher } from '@/types';
+import type { Teacher, TeacherRole } from '@/types';
 import type { AccountData, UserData } from '@/types/store';
 
 interface AccountState {
@@ -83,7 +83,7 @@ export const useAccountStore = defineStore('account', {
       password: string;
       confirmedPassword: string;
       name: string;
-      role: string; // 'main', 'sub', 'common'
+      role: TeacherRole;
       grade: string;
       group: string;
     }) {
@@ -98,8 +98,6 @@ export const useAccountStore = defineStore('account', {
         const target = teacherList.filter(
           (teacher) => teacher.name === payload.name
         );
-
-        console.log(target[0].role, payload.role);
 
         // 해당 이름을 가진 사람이 선생님으로 등록되어 있는가?
         if (!target.length) {
@@ -121,7 +119,7 @@ export const useAccountStore = defineStore('account', {
 
         const querySnapshot = await getDocs(q);
 
-        if (querySnapshot.docs.length === 1) {
+        if (querySnapshot.docs.length) {
           return errResponse(baseResponse.NAME_DUPLICATED);
         }
 
