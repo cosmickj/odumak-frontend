@@ -64,11 +64,18 @@ export const useAccountStore = defineStore('account', {
     },
 
     async fetchAccount({ uid }: { uid: string }) {
-      const docRef = doc(db, 'users', uid);
-      const docSnap = await getDoc(docRef);
+      try {
+        const docRef = doc(db, 'users', uid);
+        const docSnap = await getDoc(docRef);
 
-      if (docSnap.exists()) return docSnap.data();
-      else console.log('No such document!');
+        if (docSnap.exists()) {
+          return docSnap.data();
+        } else {
+          return [];
+        }
+      } catch (error) {
+        console.log(error);
+      }
     },
 
     async logoutAccount() {
