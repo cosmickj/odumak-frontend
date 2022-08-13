@@ -1,27 +1,23 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import { auth } from '@/firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
+import { useAccountStore } from '@/store/account';
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: '/error',
-    component: () => import('@/views/ErrorView.vue'),
-  },
-  {
     path: '/',
     component: () => import('@/layouts/DefaultLayout.vue'),
+    meta: { requiresAuth: true },
     children: [
       {
         path: '',
         name: 'HomeView',
         component: () => import('@/views/Home/index.vue'),
-        meta: { requiresAuth: true },
       },
       {
         path: 'user',
         name: 'UserView',
         component: () => import('@/views/User/index.vue'),
-        meta: { requiresAuth: true },
       },
     ],
   },
@@ -44,18 +40,29 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/attendance',
     component: () => import('@/layouts/DefaultLayout.vue'),
+    meta: { requiresAuth: true },
     children: [
       {
-        path: 'checker/:position',
+        path: 'checker/',
         name: 'AttendanceChecker',
         component: () => import('@/views/Attendance/Checker/index.vue'),
-        meta: { requiresAuth: true },
       },
       {
         path: 'tracker/:position/:type',
         name: 'AttendanceTracker',
         component: () => import('@/views/Attendance/Tracker/index.vue'),
-        meta: { requiresAuth: true },
+      },
+    ],
+  },
+  {
+    path: '/admin',
+    component: () => import('@/layouts/AdminLayout.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true },
+    children: [
+      {
+        path: ':position/table',
+        name: 'AdminView',
+        component: () => import('@/views/Admin/index.vue'),
       },
     ],
   },
@@ -67,24 +74,31 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-  if (to.path !== '/error') {
-    next('/error');
+  const user = await getCurrentUser();
+  const needAuth = to.matched.some((record) => record.meta.requiresAuth);
+  const needAdmin = to.matched.some((record) => record.meta.requiresAdmin);
+
+  if ((needAuth && user) || (!needAuth && !user)) {
+    if (needAdmin) {
+      const account = useAccountStore();
+      const userData = await account.fetchAccount({ uid: user.uid });
+      if (userData!.role !== 'admin') {
+        next('/');
+      } else {
+        next();
+      }
+    } else {
+      next();
+    }
+  } else if (!needAuth && user) {
+    next('/');
   } else {
-    next();
+    next('/account/login');
   }
-  // if (to.matched.some((record) => record.meta.requiresAuth)) {
-  //   if (await getCurrentUser()) {
-  //     next();
-  //   } else {
-  //     next('/account/login');
-  //   }
-  // } else {
-  //   next();
-  // }
 });
 
 // router auth checker
-export const getCurrentUser = () => {
+export const getCurrentUser = (): any => {
   return new Promise((resolve, reject) => {
     const removeListener = onAuthStateChanged(
       auth,

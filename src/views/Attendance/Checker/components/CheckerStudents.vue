@@ -1,17 +1,20 @@
 <template>
   <div class="overflow-auto h-[calc(100%_-_10rem)] select-none">
     <form
-      @submit.prevent="submitStudentsAttendance"
       :class="{
-        'border-x-4 border-b-4 border-slate-200 rounded-b-lg bg-slate-200': isSub,
+        'border-x-4 border-b-4 border-slate-200 rounded-b-lg bg-slate-200':
+          isSub,
       }"
+      @submit.prevent="handleSubmit"
     >
       <div
-        class="attendance bg-white shadow"
         v-for="(student, i) in studentsAttendance"
         :key="i"
+        class="attendance bg-white shadow"
       >
-        <div class="student__name" :class="$attrs.class">{{ student.name }}</div>
+        <div class="student__name" :class="$attrs.class">
+          {{ student.name }}
+        </div>
 
         <input
           v-model="studentsAttendance[i].attendance"
@@ -77,38 +80,22 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { Student, Teacher } from '@/types';
-// import { useStore } from "vuex";
-// const store = useStore();
 
 const props = defineProps<{
-  modelValue: Student[] | Teacher[];
   documentId: string;
+  modelValue: any;
   attendanceDate: Date;
-  // writer: Teacher;
   isSub?: boolean;
 }>();
-const emit = defineEmits(['update:modelValue', 'onUploaded:studentsAttendance']);
 
-const studentsAttendance = computed<Student[] | Teacher[]>({
+const emit = defineEmits(['submit', 'update:modelValue']);
+
+const studentsAttendance = computed({
   get: () => props.modelValue,
   set: (studentsAttendance) => emit('update:modelValue', studentsAttendance),
 });
 
-const submitStudentsAttendance = async () => {
-  // const params = {
-  //   recordId: props.recordId,
-  //   date: props.attendanceDate,
-  //   grade: props.writer.grade,
-  //   group: props.writer.group,
-  //   teacher: props.writer.name,
-  //   studentsAttendance: studentsAttendance.value,
-  // };
-  // const { id } = await store.dispatch("attendance/addStudentsAttendance", params);
-  // emit("onUploaded:studentsAttendance", { id, teacher: props.writer.name });
-  // if (!props.recordId) alert("제출되었습니다.");
-  // else alert("수정되었습니다.");
-};
+const handleSubmit = async () => emit('submit');
 </script>
 
 <style scoped>
@@ -159,28 +146,5 @@ const submitStudentsAttendance = async () => {
 }
 .attendance__input:checked + .attendance__label.attendance__label__absence {
   background-color: #ff4032;
-}
-@keyframes jelly {
-  from {
-    transform: scale(1, 1);
-  }
-  30% {
-    transform: scale(1.25, 0.75);
-  }
-  40% {
-    transform: scale(0.75, 1.25);
-  }
-  50% {
-    transform: scale(1.15, 0.85);
-  }
-  65% {
-    transform: scale(0.95, 1.05);
-  }
-  75% {
-    transform: scale(1.05, 0.95);
-  }
-  to {
-    transform: scale(1, 1);
-  }
 }
 </style>
