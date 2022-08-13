@@ -56,9 +56,6 @@ const handleRowClick = (ev: DataTableRowClickEvent) => {
     ev.data.birth = translateBirth(ev.data.birth.seconds);
   }
 
-  emit('rowClick', {
-    index: ev.index,
-    ...ev.data,
-  });
+  emit('rowClick', { index: ev.index, ...ev.data });
 };
 </script>

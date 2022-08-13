@@ -82,6 +82,31 @@ export const useMemberStore = defineStore('member', {
       return;
     },
 
+    async removeMember(payload: any) {
+      const { church, department, index, position } = payload;
+
+      const q = query(
+        membersColl,
+        where('church', '==', church),
+        where('department', '==', department),
+        where('position', '==', position)
+      );
+
+      const querySnapshot = await getDocs(q);
+
+      const documentId = querySnapshot.docs[0].id;
+
+      let members = querySnapshot.docs[0].data().members;
+      members.splice(index, 1);
+
+      await updateDoc(doc(db, 'members', documentId), {
+        members,
+        updatedAt: serverTimestamp(),
+      });
+
+      return;
+    },
+
     // async fetchMembers(payload: Omit<DefaultPayload, keyof State>) {
     async fetchMembers(payload: {
       church: string | undefined;

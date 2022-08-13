@@ -22,6 +22,7 @@
       @close="closeModal"
       @create="addMember"
       @edit="editMember"
+      @delete="deleteMember"
     />
   </section>
 </template>
@@ -114,12 +115,12 @@ const addMember = async (payload: any) => {
  * TODO
  * - 현재 payload와 params가 섞여있어서 굉장히 데이터 흐름을 추적하기 힘들다.
  */
-const editMember = async (params: any) => {
+const editMember = async (payload: any) => {
   await member.modifyMember({
     church: userChurch.value,
     department: userDepartment.value,
     position: memberPosition.value,
-    ...params,
+    ...payload,
   });
 
   dataSource.value = await member.fetchMembers({
@@ -128,6 +129,25 @@ const editMember = async (params: any) => {
     position: memberPosition.value,
   });
 
+  params.value = undefined;
+  isOpened.value = false;
+};
+
+const deleteMember = async (payload: any) => {
+  await member.removeMember({
+    church: userChurch.value,
+    department: userDepartment.value,
+    position: memberPosition.value,
+    ...payload,
+  });
+
+  dataSource.value = await member.fetchMembers({
+    church: userChurch.value,
+    department: userDepartment.value,
+    position: memberPosition.value,
+  });
+
+  params.value = undefined;
   isOpened.value = false;
 };
 </script>

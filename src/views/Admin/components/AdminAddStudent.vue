@@ -131,28 +131,39 @@
         저장하기
       </Button>
 
-      <Button v-else class="p-button-danger p-button-lg" @click="handleEdit">
-        수정하기
-      </Button>
+      <div v-else>
+        <Button class="p-button-danger p-button-lg" @click="handleEdit">
+          수정하기
+        </Button>
+
+        <div
+          class="mt-8 text-center text-red-500 cursor-pointer"
+          @click="handleDelete"
+        >
+          <u>학생 삭제하기</u>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
-import { gender, grade, group } from '../data';
 
+import { gender, grade, group } from '../data';
 import type { AddStudentParams } from '@/types';
 
 const props = defineProps<{
   params?: AddStudentParams;
 }>();
 
-const emit = defineEmits(['close', 'create', 'edit']);
+const emit = defineEmits(['close', 'create', 'edit', 'delete']);
 
-const selectedIndex = ref(props.params?.index || null);
+const selectedIndex = ref(props.params?.index);
+
 const selectedGrade = ref(props.params?.grade || '');
 const selectedGroup = ref(props.params?.group || '');
 const inputtedName = ref(props.params?.name || '');
@@ -243,4 +254,6 @@ const handleEdit = async () => {
 
   emit('edit', params);
 };
+
+const handleDelete = () => emit('delete', { index: selectedIndex.value });
 </script>
