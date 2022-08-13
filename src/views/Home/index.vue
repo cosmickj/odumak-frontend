@@ -2,7 +2,18 @@
   <div class="overflow-auto h-[calc(100%_-_6rem)] bg-slate-100">
     <div class="p-5">
       <div class="text-2xl">안녕하세요,</div>
-      <div class="text-3xl">{{ userName }} 선생님!</div>
+      <div class="flex mt-2 text-3xl items-baseline">
+        {{ userName }} 선생님!
+
+        <router-link
+          v-if="isAdmin"
+          :to="{ name: 'AdminView', params: { position: 'student' } }"
+        >
+          <div class="ml-5 text-lg text-amber-500 cursor-pointer">
+            <u>관리자 페이지 이동하기</u>
+          </div>
+        </router-link>
+      </div>
     </div>
 
     <div class="p-5">
@@ -49,5 +60,13 @@ import { computed } from 'vue';
 import { useAccountStore } from '@/store/account';
 
 const account = useAccountStore();
+
 const userName = computed(() => account.userData?.name);
+const isAdmin = computed(() => {
+  if (account.userData?.role === 'admin') {
+    return true;
+  } else {
+    return false;
+  }
+});
 </script>

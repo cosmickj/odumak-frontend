@@ -1,5 +1,6 @@
 <template>
-  <section class="overflow-auto max-h-screen flex-auto">
+  <!-- <section class="overflow-auto max-h-screen flex-auto"> -->
+  <section class="overflow-auto max-h-[90vh]">
     <AdminStudent
       v-if="memberPosition === 'student'"
       :data-source="dataSource"
@@ -32,7 +33,7 @@ import AdminAdd from './components/AdminAdd.vue';
 import AdminStudent from './components/AdminStudent.vue';
 import AdminTeacher from './components/AdminTeacher.vue';
 
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAccountStore } from '@/store/account';
 import { useMemberStore } from '@/store/member';
@@ -56,6 +57,20 @@ const memberPosition = computed(() => route.params.position as MemberPosition);
 const isLoading = ref(true);
 
 onMounted(async () => {
+  try {
+    dataSource.value = await member.fetchMembers({
+      church: userChurch.value,
+      department: userDepartment.value,
+      position: memberPosition.value,
+    });
+  } catch (error) {
+    console.log(error);
+  } finally {
+    isLoading.value = false;
+  }
+});
+
+watch(memberPosition, async () => {
   try {
     dataSource.value = await member.fetchMembers({
       church: userChurch.value,
