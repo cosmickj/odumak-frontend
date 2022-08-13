@@ -86,9 +86,18 @@
         저장하기
       </Button>
 
-      <Button v-else class="p-button-danger p-button-lg" @click="handleEdit">
-        수정하기
-      </Button>
+      <div v-else>
+        <Button class="p-button-danger p-button-lg" @click="handleEdit">
+          수정하기
+        </Button>
+
+        <div
+          class="mt-8 text-center text-red-500 cursor-pointer"
+          @click="handleDelete"
+        >
+          <u>교사 삭제하기</u>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -105,7 +114,9 @@ const props = defineProps<{
   params?: AddTeacherParams;
 }>();
 
-const emit = defineEmits(['close', 'create', 'edit']);
+const emit = defineEmits(['close', 'create', 'edit', 'delete']);
+
+const selectedIndex = ref(props.params?.index);
 
 const selectedGrade = ref(props.params?.grade || '');
 const selectedGroup = ref(props.params?.group || '');
@@ -170,6 +181,7 @@ const handleEdit = async () => {
   }
 
   const params: AddTeacherParams = {
+    index: selectedIndex.value,
     grade: selectedGrade.value || null,
     group: selectedGroup.value || null,
     name: inputtedName.value,
@@ -178,5 +190,8 @@ const handleEdit = async () => {
   };
 
   emit('edit', params);
+};
+const handleDelete = () => {
+  emit('delete', { ...props.params });
 };
 </script>

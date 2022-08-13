@@ -43,6 +43,7 @@ export interface AddStudentParams {
 }
 
 export interface AddTeacherParams {
+  index?: number | null;
   grade: string | null;
   group: string | null;
   name: string;

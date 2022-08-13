@@ -10,25 +10,17 @@
     @row-click="handleRowClick"
   >
     <Column field="grade" header="grade" />
-
     <Column field="group" header="group" />
-
     <Column field="name" header="name" />
-
     <Column field="gender" header="gender" />
-
     <Column field="phone" header="phone" />
-
     <Column field="teacher" header="teacher" />
-
     <!-- <Column field="birth" header="birth">
       <template #body="{ data }">
         {{ translateBirth(data.birth?.seconds) }}
       </template>
     </Column> -->
-
     <Column field="address" header="address" headerStyle="min-width: 30rem" />
-
     <Column field="remark" header="remark" />
   </DataTable>
 </template>

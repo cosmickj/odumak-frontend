@@ -31,6 +31,7 @@
         @close="handleClose"
         @create="handleCreate"
         @edit="handleEdit"
+        @delete="handleDelete"
       />
     </div>
   </Teleport>
