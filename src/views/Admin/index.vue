@@ -110,12 +110,24 @@ const addMember = async (payload: any) => {
   }
 };
 
-const editMember = async (payload: any) => {
+/**
+ * TODO
+ * - 현재 payload와 params가 섞여있어서 굉장히 데이터 흐름을 추적하기 힘들다.
+ */
+const editMember = async (params: any) => {
   await member.modifyMember({
     church: userChurch.value,
     department: userDepartment.value,
     position: memberPosition.value,
-    ...payload,
+    ...params,
   });
+
+  dataSource.value = await member.fetchMembers({
+    church: userChurch.value,
+    department: userDepartment.value,
+    position: memberPosition.value,
+  });
+
+  isOpened.value = false;
 };
 </script>

@@ -68,5 +68,9 @@ const who = computed(() => {
 const handleOpen = () => emit('open');
 const handleClose = () => emit('close');
 const handleCreate = (params: AddStudentParams) => emit('create', params);
-const handleEdit = (params: AddStudentParams) => emit('edit', params);
+/**
+ * TODO
+ * - 현재 payload와 params가 섞여있어서 굉장히 데이터 흐름을 추적하기 힘들다.
+ */
+const handleEdit = (params: any) => emit('edit', params);
 </script>

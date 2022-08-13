@@ -152,6 +152,7 @@ const props = defineProps<{
 
 const emit = defineEmits(['close', 'create', 'edit']);
 
+const selectedIndex = ref(props.params?.index || null);
 const selectedGrade = ref(props.params?.grade || '');
 const selectedGroup = ref(props.params?.group || '');
 const inputtedName = ref(props.params?.name || '');
@@ -228,6 +229,7 @@ const handleEdit = async () => {
   }
 
   const params: AddStudentParams = {
+    index: selectedIndex.value,
     grade: selectedGrade.value || null,
     group: selectedGroup.value || null,
     name: inputtedName.value,

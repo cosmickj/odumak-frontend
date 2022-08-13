@@ -30,6 +30,7 @@ export interface Option {
 }
 
 export interface AddStudentParams {
+  index?: number | null;
   grade: string | null;
   group: string | null;
   name: string;

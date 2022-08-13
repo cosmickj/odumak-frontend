@@ -5,6 +5,7 @@
     :lazy="true"
     :loading="isLoading"
     :rowHover="true"
+    :row-class="() => 'cursor-pointer'"
     responsiveLayout="scroll"
     @row-click="handleRowClick"
   >
@@ -54,6 +55,10 @@ const handleRowClick = (ev: DataTableRowClickEvent) => {
   if (ev.data.birth) {
     ev.data.birth = translateBirth(ev.data.birth.seconds);
   }
-  emit('rowClick', ev.data);
+
+  emit('rowClick', {
+    index: ev.index,
+    ...ev.data,
+  });
 };
 </script>
