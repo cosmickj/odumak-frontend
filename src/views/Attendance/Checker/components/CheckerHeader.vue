@@ -15,18 +15,15 @@
   </header>
 
   <div
-    v-if="userData?.role === 'teacher'"
-    class="flex justify-around text-2xl mt-5"
-  >
-    <div>{{ userData?.grade }}학년 {{ userData?.group }}반</div>
-    <div>{{ userData?.name }} 선생님</div>
-  </div>
-
-  <div
-    v-else-if="userData?.role === 'admin'"
+    v-if="userData?.role === 'admin'"
     class="flex justify-center text-2xl mt-5"
   >
     <div>{{ userData?.name }}</div>
+  </div>
+
+  <div v-else class="flex justify-around text-2xl mt-5">
+    <div>{{ userData?.grade }}학년 {{ userData?.group }}반</div>
+    <div>{{ userData?.name }} 선생님</div>
   </div>
 </template>
 

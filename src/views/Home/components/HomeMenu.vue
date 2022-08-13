@@ -1,5 +1,8 @@
 <template>
-  <router-link class="w-1/2" :to="{ name: routeName, params: { position, type } }">
+  <router-link
+    class="w-1/2"
+    :to="{ name: routeName, params: { position, type } }"
+  >
     <Card class="mr-2">
       <template #title>
         <div><i class="pi text-3xl" :class="icon"></i></div>
@@ -16,12 +19,12 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { Position } from '@/types/index.js';
+import type { MemberPosition } from '@/types/index.js';
 
 const props = defineProps<{
   icon: string;
   routeName: string;
-  position: Position;
+  position: MemberPosition;
   type: string;
 }>();
 

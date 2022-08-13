@@ -53,7 +53,7 @@ import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAttendanceStore } from '@/store/attendance';
 
-import type { Position, Student, Teacher } from '@/types';
+import type { MemberPosition, Student, Teacher } from '@/types';
 import { useAccountStore } from '@/store/account';
 
 const route = useRoute();
@@ -62,7 +62,7 @@ const account = useAccountStore();
 const attendance = useAttendanceStore();
 
 const userData = computed(() => account.userData);
-const position = computed(() => route.params.position as Position);
+const position = computed(() => route.params.position as MemberPosition);
 const type = computed(() => route.params.type);
 
 const title = computed(() => {

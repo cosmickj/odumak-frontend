@@ -90,7 +90,8 @@ export const useAccountStore = defineStore('account', {
       password: string;
       confirmedPassword: string;
       name: string;
-      role: TeacherRole;
+      // TODO: 타입 정리하기
+      role: TeacherRole | string;
       grade: string;
       group: string;
     }) {
