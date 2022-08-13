@@ -3,9 +3,9 @@
     <router-link
       class="p-2"
       :class="{ 'bg-yellow-500 rounded-full': isImportant }"
-      :to="{ name: routeName, params: { position } }"
+      :to="{ name: routeName }"
     >
-      <i class="pi" :class="icon" style="font-size: 2rem"></i>
+      <i class="pi text-3xl" :class="icon"></i>
     </router-link>
     <span>{{ title }}</span>
   </div>

@@ -1,5 +1,6 @@
-import '@/styles/reset.css'; // Reset CSS
-import 'animate.css'; // Animate.css
+import '@/styles/reset.css';
+import '@/styles/global.css';
+import 'animate.css';
 import 'primevue/resources/themes/saga-blue/theme.css';
 import 'primevue/resources/primevue.min.css';
 import 'primeicons/primeicons.css';
@@ -12,6 +13,8 @@ import Dropdown from 'primevue/dropdown';
 import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
 import RadioButton from 'primevue/radiobutton';
+import SelectButton from 'primevue/selectbutton';
+import Tree from 'primevue/tree';
 import '@/index.css'; // Tailwind CSS
 
 import { createPinia } from 'pinia';
@@ -19,8 +22,8 @@ import { createApp } from 'vue';
 import App from '@/App.vue';
 import router from '@/router';
 
-import VueCookies from 'vue-cookies'; // Vue Cookies
-import PrimeVue from 'primevue/config'; // PrimeVue
+import VueCookies from 'vue-cookies';
+import PrimeVue from 'primevue/config';
 
 const pinia = createPinia();
 const app = createApp(App);
@@ -63,5 +66,7 @@ app.component('Dropdown', Dropdown);
 app.component('InputText', InputText);
 app.component('Password', Password);
 app.component('RadioButton', RadioButton);
+app.component('SelectButton', SelectButton);
+app.component('Tree', Tree);
 
 app.mount('#app');

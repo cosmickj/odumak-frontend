@@ -1,150 +1,182 @@
 <template>
-  <div class="h-screen flex flex-col p-8 bg-slate-100">
-    <div class="relative flex justify-center items-center">
-      <!-- 뒤로 가기 -->
-      <button class="h-full w-12 absolute left-0 cursor-pointer">
-        <router-link
-          class="h-full w-full flex justify-center items-center"
-          :to="{ name: 'HomeView' }"
-        >
-          <i class="pi pi-arrow-left text-3xl"></i>
-        </router-link>
-      </button>
+  <section class="h-screen p-8 bg-slate-100 flex flex-col">
+    <checker-header :user-data="userData" />
 
-      <!-- 메뉴 제목 -->
-      <span class="text-3xl">출석 입력하기</span>
-    </div>
+    <calendar
+      v-if="
+        userData?.role === 'main' ||
+        userData?.role === 'sub' ||
+        userData?.role === 'admin'
+      "
+      v-model="attendanceDate"
+      class="pt-5"
+      :touchUI="true"
+      :disabledDays="[1, 2, 3, 4, 5, 6]"
+      placeholder="날짜를 선택해주세요"
+      input-class="text-center"
+      @date-select="requestAttendance"
+    />
+
+    <the-finger
+      v-if="userData?.role !== 'common' && !attendanceDate"
+      class="pt-5"
+    />
+
+    <the-loader v-if="isLoading" />
 
     <!-- 선생님일 때 -->
-    <template v-if="userData?.role === 'teacher'">
-      <div class="flex justify-around text-2xl mt-5">
-        <div>{{ userData?.grade }}학년 {{ userData?.group }}반</div>
-        <div>{{ userData?.name }} 선생님</div>
-      </div>
-
-      <Calendar
-        v-model="attendanceDate"
-        class="pt-5"
-        :touchUI="true"
-        :disabledDays="[1, 2, 3, 4, 5, 6]"
-        :placeholder="'날짜를 선택해주세요'"
-        input-class="text-center"
-        @date-select="requestAttendance('student')"
-      />
-
-      <Suspense v-if="attendanceDate">
-        <CheckerStudents
-          v-model="dataSource"
-          :document-id="documentId"
-          :attendance-date="attendanceDate"
-          @on-uploaded:data-source="setDocumentId"
-        />
-        <!-- :writer="user" -->
-
-        <template #fallback> Loading... </template>
-      </Suspense>
-
-      <TheFinger v-else class="pt-5" />
-    </template>
+    <!-- TODO: 이 부분을 담임(main)과 부담임(sub) 모두로 설정하자 -->
+    <checker-students
+      v-if="
+        (userData?.role === 'main' || userData?.role === 'sub') &&
+        attendanceDate
+      "
+      v-model="dataSource"
+      :document-id="documentId"
+      :attendance-date="attendanceDate"
+      @submit="submitAttendance"
+    />
 
     <!-- 관리자일 때 -->
-    <template v-else-if="userData?.role === 'admin'">
-      <div class="flex justify-center text-2xl mt-5">
-        <div>{{ userData?.name }}</div>
-      </div>
+    <checker-teachers
+      v-else-if="userData?.role === 'admin' && attendanceDate"
+      v-model="dataSource"
+      :document-id="documentId"
+      :attendance-date="attendanceDate"
+      @submit="submitAttendance"
+    />
 
-      <Calendar
-        v-model="attendanceDate"
-        class="pt-5"
-        :touchUI="true"
-        :disabledDays="[1, 2, 3, 4, 5, 6]"
-        :placeholder="'날짜를 선택해주세요'"
-        input-class="text-center"
-        @date-select="requestAttendance('teahcer')"
-      />
-      <CheckerTeachers
-        v-if="attendanceDate"
-        v-model="(dataSource as Teacher[])"
-        :document-id="documentId"
-        :attendance-date="attendanceDate"
-        @on-uploaded:teachers-attendance="setDocumentId"
-      />
-
-      <TheFinger v-else class="pt-5" />
-    </template>
-
-    <!-- 일반 회원일 때 -->
-    <template v-else>
-      <div class="grow flex justify-center items-center">
-        <p class="text-xl">담당 학급이 있는 선생님만 이용할 수 있습니다.</p>
-      </div>
-    </template>
-
-    <TheLoader :is-loading="isLoading" />
-  </div>
+    <!-- 일반교사일 때 -->
+    <div
+      v-else-if="userData?.role === 'common'"
+      class="grow flex justify-center items-center"
+    >
+      <p class="text-xl">담당 학급이 있는 선생님만 이용할 수 있습니다.</p>
+    </div>
+  </section>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
 import TheFinger from '@/components/TheFinger.vue';
 import TheLoader from '@/components/TheLoader.vue';
+import CheckerHeader from './components/CheckerHeader.vue';
 import CheckerStudents from './components/CheckerStudents.vue';
 import CheckerTeachers from './components/CheckerTeachers.vue';
 
+import { computed, ref } from 'vue';
 import { useAccountStore } from '@/store/account';
 import { useAttendanceStore } from '@/store/attendance';
+import { useMemberStore } from '@/store/member';
+import { getPositionFromRole } from '@/utils/position';
 import type { Student, Teacher } from '@/types';
 
 const account = useAccountStore();
 const attendance = useAttendanceStore();
+const member = useMemberStore();
 
 const userData = computed(() => account.userData);
 
-const attendanceDate = ref<Date>();
 const isLoading = ref(false);
 
 const documentId = ref('');
+
 const dataSource = ref<Student[] | Teacher[]>([]);
 
-watch(attendanceDate, () => {
-  dataSource.value = [];
-  isLoading.value = true;
-});
+const attendanceDate = ref<Date>();
 
-const requestAttendance = async (type: 'student' | 'teahcer') => {
-  if (type === 'student') {
-    const result = await attendance.fetchStudentsAttendance({
-      date: attendanceDate.value,
-      grade: userData.value?.grade,
-      group: userData.value?.group,
-      teacher: userData.value?.name,
-    });
+const requestAttendance = async () => {
+  try {
+    documentId.value = '';
+    dataSource.value = [];
+    const role = userData.value?.role;
+    // 교사의 학생 출석 입력
+    if (role === 'main' || role === 'sub') {
+      const members = await member.fetchMembers({
+        church: userData.value?.church,
+        department: userData.value?.department,
+        grade: userData.value?.grade,
+        group: userData.value?.group,
+        position: 'student',
+        role,
+      });
 
-    result.studentsAttendance.forEach((student: Student) => {
-      if (!student.attendance) student.attendance = 'offline';
-    });
+      const result = await attendance.fetchAttendance({
+        attendanceDate: attendanceDate.value,
+        church: userData.value?.church,
+        department: userData.value?.department,
+        grade: userData.value?.grade,
+        group: userData.value?.group,
+        members,
+        position: 'student',
+        role,
+      });
 
-    documentId.value = result.documentId;
-    dataSource.value = result.studentsAttendance;
+      documentId.value = result!.documentId;
+      dataSource.value = result!.attendanceRecord;
+    }
+    // 관리자의 교사 출석 입력
+    else if (role === 'admin') {
+      const members = await member.fetchMembers({
+        church: userData.value?.church,
+        department: userData.value?.department,
+        position: 'teacher',
+        role,
+      });
+
+      const result = await attendance.fetchAttendance({
+        attendanceDate: attendanceDate.value,
+        church: userData.value?.church,
+        department: userData.value?.department,
+        members,
+        position: 'teacher',
+        role,
+      });
+      documentId.value = result!.documentId;
+      dataSource.value = result!.attendanceRecord;
+    }
+  } catch (error) {
+    console.log(error);
+  } finally {
+    isLoading.value = false;
   }
-  // teacher
-  else {
-    const result = await attendance.fetchTeachersAttendance({
-      date: attendanceDate.value,
-    });
-
-    result.teachersAttendance.forEach((teacher: Teacher) => {
-      if (!teacher.attendance) teacher.attendance = 'offline';
-    });
-
-    documentId.value = result.documentId;
-    dataSource.value = result.teachersAttendance;
-  }
-
-  isLoading.value = false;
 };
 
-const setDocumentId = ({ id }: { id: string }) => {
-  documentId.value = id;
+const submitAttendance = async () => {
+  try {
+    const role = userData.value?.role!;
+    const position = getPositionFromRole(role);
+
+    let response;
+    if (role === 'admin') {
+      response = await attendance.addAttendance({
+        documentId: documentId.value,
+        attendanceDate: attendanceDate.value,
+        createUser: userData.value?.name,
+        church: userData.value?.church,
+        department: userData.value?.department,
+        position,
+        records: dataSource.value,
+      });
+    }
+    // role === 'teacher'
+    else {
+      response = await attendance.addAttendance({
+        documentId: documentId.value,
+        attendanceDate: attendanceDate.value,
+        createUser: userData.value?.name,
+        church: userData.value?.church,
+        department: userData.value?.department,
+        grade: userData.value?.grade,
+        group: userData.value?.group,
+        position,
+        records: dataSource.value,
+      });
+    }
+
+    documentId.value = response.documentId;
+    alert(response.message);
+  } catch (error) {
+    console.log(error);
+  }
 };
 </script>
