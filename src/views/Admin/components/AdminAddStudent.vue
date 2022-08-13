@@ -255,5 +255,7 @@ const handleEdit = async () => {
   emit('edit', params);
 };
 
-const handleDelete = () => emit('delete', { index: selectedIndex.value });
+const handleDelete = () => {
+  emit('delete', { ...props.params });
+};
 </script>

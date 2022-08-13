@@ -9,13 +9,9 @@
     @row-click="handleRowClick"
   >
     <Column field="grade" header="grade" />
-
     <Column field="group" header="group" />
-
     <Column field="name" header="name" />
-
     <Column field="role" header="role" />
-
     <Column field="remark" header="remark" />
   </DataTable>
 </template>

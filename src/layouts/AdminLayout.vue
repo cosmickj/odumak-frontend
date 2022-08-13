@@ -2,6 +2,10 @@
   <main v-if="account.isAuthReady">
     <div class="p-5">
       <div class="flex justify-evenly">
+        <router-link :to="{ name: 'HomeView' }">
+          <div class="text-3xl cursor-pointer">홈으로</div>
+        </router-link>
+
         <router-link
           :to="{ name: 'AdminView', params: { position: 'student' } }"
         >

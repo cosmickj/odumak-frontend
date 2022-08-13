@@ -83,7 +83,7 @@ export const useMemberStore = defineStore('member', {
     },
 
     async removeMember(payload: any) {
-      const { church, department, index, position } = payload;
+      const { church, department, index, position, ...params } = payload;
 
       const q = query(
         membersColl,
@@ -93,10 +93,10 @@ export const useMemberStore = defineStore('member', {
       );
 
       const querySnapshot = await getDocs(q);
-
       const documentId = querySnapshot.docs[0].id;
 
       let members = querySnapshot.docs[0].data().members;
+
       members.splice(index, 1);
 
       await updateDoc(doc(db, 'members', documentId), {
@@ -130,6 +130,9 @@ export const useMemberStore = defineStore('member', {
 
         if (querySnapshot.docs.length) {
           let members = querySnapshot.docs[0].data().members;
+          members.forEach(
+            (member: any, idx: number) => (member['index'] = idx)
+          );
 
           if (role === 'admin') {
             // pass

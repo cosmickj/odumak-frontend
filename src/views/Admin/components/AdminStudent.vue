@@ -21,11 +21,11 @@
 
     <Column field="teacher" header="teacher" />
 
-    <Column field="birth" header="birth">
+    <!-- <Column field="birth" header="birth">
       <template #body="{ data }">
         {{ translateBirth(data.birth?.seconds) }}
       </template>
-    </Column>
+    </Column> -->
 
     <Column field="address" header="address" headerStyle="min-width: 30rem" />
 

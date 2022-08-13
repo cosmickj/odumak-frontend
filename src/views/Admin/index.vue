@@ -1,6 +1,7 @@
 <template>
-  <!-- <section class="overflow-auto max-h-screen flex-auto"> -->
   <section class="overflow-auto max-h-[90vh]">
+    <div class="text-3xl">총 {{ dataSourceLength }}명</div>
+
     <AdminStudent
       v-if="memberPosition === 'student'"
       :data-source="dataSource"
@@ -50,6 +51,7 @@ const member = useMemberStore();
 const account = useAccountStore();
 
 const dataSource = ref();
+const dataSourceLength = computed(() => dataSource.value?.length || 0);
 const userChurch = computed(() => account.userData?.church);
 const userDepartment = computed(() => account.userData?.department);
 const memberPosition = computed(() => route.params.position as MemberPosition);
@@ -149,20 +151,22 @@ const editMember = async (payload: any) => {
 };
 
 const deleteMember = async (payload: any) => {
-  await member.removeMember({
-    church: userChurch.value,
-    department: userDepartment.value,
-    position: memberPosition.value,
-    ...payload,
-  });
+  if (confirm('정말 삭제하시겠습니까?')) {
+    await member.removeMember({
+      church: userChurch.value,
+      department: userDepartment.value,
+      position: memberPosition.value,
+      ...payload,
+    });
 
-  dataSource.value = await member.fetchMembers({
-    church: userChurch.value,
-    department: userDepartment.value,
-    position: memberPosition.value,
-  });
+    dataSource.value = await member.fetchMembers({
+      church: userChurch.value,
+      department: userDepartment.value,
+      position: memberPosition.value,
+    });
 
-  params.value = undefined;
-  isOpened.value = false;
+    params.value = undefined;
+    isOpened.value = false;
+  }
 };
 </script>
