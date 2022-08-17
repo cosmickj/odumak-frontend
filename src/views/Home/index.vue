@@ -1,7 +1,8 @@
 <template>
   <div class="overflow-auto h-[calc(100%_-_6rem)] bg-slate-100">
     <div class="p-5">
-      <div class="text-2xl">안녕하세요,</div>
+      <div class="text-2xl text-red-500">테스트 중입니다.</div>
+      <!-- <div class="text-2xl">안녕하세요,</div> -->
       <div class="flex mt-2 text-3xl items-baseline">
         {{ userName }} 선생님!
 
