@@ -27,14 +27,18 @@
       <div class="mx-7 my-3">
         <Button type="submit" class="p-button-warning w-full justify-center">
           <span v-if="!isLoading" class="text-xl">로그인</span>
-          <i v-else class="pi pi-spin pi-spinner" style="font-size: 1.25rem; line-height: 1.75rem"></i>
+          <i
+            v-else
+            class="pi pi-spin pi-spinner"
+            style="font-size: 1.25rem; line-height: 1.75rem"
+          ></i>
         </Button>
       </div>
 
       <div v-if="isError" class="mx-7 my-3">
         <span class="text-red-500">
-          이메일 또는 비밀번호를 다시 확인하세요. 등록되지 않은 이메일이거나, 이메일 또는 비밀번호를 잘못
-          입력하셨습니다.
+          이메일 또는 비밀번호를 다시 확인하세요. 등록되지 않은 이메일이거나,
+          이메일 또는 비밀번호를 잘못 입력하셨습니다.
         </span>
       </div>
 
@@ -61,7 +65,10 @@
 
           <div class="flex items-center justify-end px-10 pb-5">
             <router-link :to="{ name: 'AccountLogin' }" @click="closeModal">
-              <Button label="이미 계정이 있어요" class="p-button-text p-button-plain" />
+              <Button
+                label="이미 계정이 있어요"
+                class="p-button-text p-button-plain"
+              />
             </router-link>
 
             <router-link :to="{ name: 'AccountSignup' }">
@@ -111,7 +118,10 @@ const onSubmit = async () => {
   try {
     isLoading.value = true;
     isError.value = false;
-    await account.loginAccount(loginForm);
+    await account.loginAccount({
+      email: loginForm.email.trimEnd(),
+      password: loginForm.password.trimEnd(),
+    });
     router.push({ name: 'HomeView' });
   } catch (error) {
     isLoading.value = false;
