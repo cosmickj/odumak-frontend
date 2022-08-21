@@ -1,15 +1,14 @@
 <template>
-  <div class="z-10 h-24 bg-white flex justify-evenly items-center">
-    <TheNavbarItem icon="pi-home" title="메인 화면" route-name="HomeView" />
+  <div class="flex h-24 bg-white rounded-t-3xl items-center justify-evenly">
+    <TheNavbarItem icon="pi pi-home" route-name="HomeView" />
 
     <TheNavbarItem
-      icon="pi-plus"
-      title="출석 입력"
+      icon="pi pi-plus"
       route-name="AttendanceChecker"
       :is-important="true"
     />
 
-    <TheNavbarItem icon="pi-user" title="내 정보" route-name="UserView" />
+    <TheNavbarItem icon="pi pi-user" route-name="UserView" />
   </div>
 </template>
 
