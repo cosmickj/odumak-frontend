@@ -42,17 +42,17 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
-        path: 'attendance/checker/',
-        name: 'AttendanceChecker',
-        component: () => import('@/views/Attendance/Checker/index.vue'),
-      },
-      {
         path: 'attendance/tracker/:position/:type',
         name: 'AttendanceTracker',
         components: {
           default: () => import('@/views/Attendance/Tracker/index.vue'),
           GlobalNavbar: () => import('@/components/TheNavbar.vue'),
         },
+      },
+      {
+        path: 'attendance/checker/',
+        name: 'AttendanceChecker',
+        component: () => import('@/views/Attendance/Checker/index.vue'),
       },
     ],
   },
