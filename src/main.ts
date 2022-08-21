@@ -1,8 +1,16 @@
-import '@/styles/reset.css';
+import '@/styles/normalize.css';
 import '@/styles/global.css';
-import 'animate.css';
-import 'primevue/resources/themes/saga-blue/theme.css';
+
+import { createApp } from 'vue';
+import App from '@/App.vue';
+import router from '@/router';
+import { createPinia } from 'pinia';
+
+import VueCookies from 'vue-cookies';
+import PrimeVue from 'primevue/config';
+
 import 'primevue/resources/primevue.min.css';
+import 'primevue/resources/themes/saga-blue/theme.css';
 import 'primeicons/primeicons.css';
 import Button from 'primevue/button';
 import Card from 'primevue/card';
@@ -16,20 +24,15 @@ import RadioButton from 'primevue/radiobutton';
 import SelectButton from 'primevue/selectbutton';
 import Tree from 'primevue/tree';
 import '@/index.css'; // Tailwind CSS
-
-import { createPinia } from 'pinia';
-import { createApp } from 'vue';
-import App from '@/App.vue';
-import router from '@/router';
-
-import VueCookies from 'vue-cookies';
-import PrimeVue from 'primevue/config';
+import 'animate.css';
 
 const pinia = createPinia();
 const app = createApp(App);
 
 app.use(router);
 app.use(pinia);
+app.use(VueCookies);
+app.use(PrimeVue);
 
 import { getCurrentUser } from '@/router';
 import { useAccountStore } from './store/account';
@@ -53,9 +56,6 @@ import type { AccountData } from '@/types/store';
   }
   account.isAuthReady = true;
 })();
-
-app.use(VueCookies);
-app.use(PrimeVue);
 
 app.component('Button', Button);
 app.component('Card', Card);
