@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-24 bg-white rounded-t-3xl items-center justify-evenly">
+  <div class="flex bg-white rounded-t-3xl items-center justify-evenly">
     <TheNavbarItem icon="pi pi-home" route-name="HomeView" />
 
     <TheNavbarItem
