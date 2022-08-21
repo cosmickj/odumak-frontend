@@ -5,23 +5,6 @@ import { useAccountStore } from '@/store/account';
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: '/',
-    component: () => import('@/layouts/DefaultLayout.vue'),
-    meta: { requiresAuth: true },
-    children: [
-      {
-        path: '',
-        name: 'HomeView',
-        component: () => import('@/views/Home/index.vue'),
-      },
-      {
-        path: 'user',
-        name: 'UserView',
-        component: () => import('@/views/User/index.vue'),
-      },
-    ],
-  },
-  {
     path: '/account',
     component: () => import('@/layouts/DefaultLayout.vue'),
     children: [
@@ -38,19 +21,38 @@ const routes: Array<RouteRecordRaw> = [
     ],
   },
   {
-    path: '/attendance',
-    component: () => import('@/layouts/DefaultLayout.vue'),
+    path: '/',
     meta: { requiresAuth: true },
+    component: () => import('@/layouts/DefaultLayout.vue'),
     children: [
       {
-        path: 'checker/',
+        path: '',
+        name: 'HomeView',
+        components: {
+          default: () => import('@/views/Home/index.vue'),
+          GlobalNavbar: () => import('@/components/TheNavbar.vue'),
+        },
+      },
+      {
+        path: 'user',
+        name: 'UserView',
+        components: {
+          default: () => import('@/views/User/index.vue'),
+          GlobalNavbar: () => import('@/components/TheNavbar.vue'),
+        },
+      },
+      {
+        path: 'attendance/checker/',
         name: 'AttendanceChecker',
         component: () => import('@/views/Attendance/Checker/index.vue'),
       },
       {
-        path: 'tracker/:position/:type',
+        path: 'attendance/tracker/:position/:type',
         name: 'AttendanceTracker',
-        component: () => import('@/views/Attendance/Tracker/index.vue'),
+        components: {
+          default: () => import('@/views/Attendance/Tracker/index.vue'),
+          GlobalNavbar: () => import('@/components/TheNavbar.vue'),
+        },
       },
     ],
   },
