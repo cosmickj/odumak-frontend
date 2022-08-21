@@ -48,7 +48,7 @@
     </div>
 
     <p class="mt-20 text-2xl text-red-500 text-center">
-      22. 08. 17 기준 업데이트 완료
+      22. 08. 21 기준 업데이트 완료
     </p>
   </section>
 </template>

@@ -1,5 +1,5 @@
 <template>
-  <section class="p-8 flex flex-col">
+  <section class="flex flex-col h-full p-8">
     <CheckerHeader :user-data="userData" />
 
     <Calendar
