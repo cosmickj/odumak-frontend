@@ -1,172 +1,182 @@
 <template>
-  <the-youngeun-basic></the-youngeun-basic>
+  <section class="flex flex-col justify-center">
+    <TheYoungeunBasic />
 
-  <form @submit.prevent="onSubmit">
-    <div class="mx-7 mb-2">
-      <InputText
-        v-model="signupForm.email"
-        class="w-full"
-        type="email"
-        placeholder="이메일을 입력하세요."
-        required
-      />
-    </div>
-
-    <div class="mx-7 mb-2">
-      <Password
-        v-model="signupForm.password"
-        class="w-full"
-        toggleMask
-        :feedback="false"
-        placeholder="비밀번호를 입력하세요."
-        inputStyle="width:inherit;"
-      />
-
-      <div v-if="!isPasswordLongerThanSix && signupForm.password">
-        <span class="text-red-500">비밀번호를 6글자 이상 입력하세요.</span>
+    <form @submit.prevent="onSubmit">
+      <div class="mx-7 mb-2">
+        <InputText
+          v-model="signupForm.email"
+          class="w-full"
+          type="email"
+          placeholder="이메일을 입력하세요."
+          required
+        />
       </div>
-    </div>
 
-    <div class="mx-7 mb-2">
-      <Password
-        v-model="signupForm.confirmedPassword"
-        class="w-full"
-        toggleMask
-        :feedback="false"
-        placeholder="비밀번호를 다시 한번 입력하세요."
-        inputStyle="width:inherit;"
-      />
+      <div class="mx-7 mb-2">
+        <Password
+          v-model="signupForm.password"
+          class="w-full"
+          toggleMask
+          :feedback="false"
+          placeholder="비밀번호를 입력하세요."
+          inputStyle="width:inherit;"
+        />
 
-      <div v-if="!isPasswordSame && signupForm.confirmedPassword">
-        <span class="text-red-500">새 비밀번호가 일치하지 않습니다.</span>
+        <div v-if="!isPasswordLongerThanSix && signupForm.password">
+          <span class="text-red-500">비밀번호를 6글자 이상 입력하세요.</span>
+        </div>
       </div>
-    </div>
 
-    <div class="mx-7 mb-2">
-      <InputText
-        v-model="signupForm.name"
-        class="w-full"
-        type="text"
-        placeholder="이름을 입력하세요."
-      />
-    </div>
+      <div class="mx-7 mb-2">
+        <Password
+          v-model="signupForm.confirmedPassword"
+          class="w-full"
+          toggleMask
+          :feedback="false"
+          placeholder="비밀번호를 다시 한번 입력하세요."
+          inputStyle="width:inherit;"
+        />
 
-    <div class="mx-7 mb-2">
-      <div class="flex justify-between items-center">
-        <div class="text-xl">담당 학급이 있나요?</div>
-
-        <div class="flex items-center">
-          <RadioButton
-            v-model="signupForm.role"
-            name="role"
-            id="main"
-            value="main"
-          />
-          <label class="ml-2 text-xl cursor-pointer" for="main"> 담임 </label>
+        <div v-if="!isPasswordSame && signupForm.confirmedPassword">
+          <span class="text-red-500">새 비밀번호가 일치하지 않습니다.</span>
         </div>
+      </div>
 
-        <div class="flex items-center">
-          <RadioButton
-            v-model="signupForm.role"
-            name="role"
-            id="sub"
-            value="sub"
-          />
-          <label class="ml-2 text-xl cursor-pointer" for="sub"> 부담임 </label>
+      <div class="mx-7 mb-2">
+        <InputText
+          v-model="signupForm.name"
+          class="w-full"
+          type="text"
+          placeholder="이름을 입력하세요."
+        />
+      </div>
+
+      <div class="mx-7 mb-2">
+        <div class="flex justify-between items-center">
+          <div class="text-xl">담당 학급이 있나요?</div>
+
+          <div class="flex items-center">
+            <RadioButton
+              v-model="signupForm.role"
+              name="role"
+              id="main"
+              value="main"
+            />
+            <label class="ml-2 text-xl cursor-pointer" for="main"> 담임 </label>
+          </div>
+
+          <div class="flex items-center">
+            <RadioButton
+              v-model="signupForm.role"
+              name="role"
+              id="sub"
+              value="sub"
+            />
+            <label class="ml-2 text-xl cursor-pointer" for="sub">
+              부담임
+            </label>
+          </div>
+
+          <div class="flex items-center">
+            <RadioButton
+              v-model="signupForm.role"
+              name="role"
+              id="common"
+              value="common"
+            />
+            <label class="ml-2 text-xl cursor-pointer" for="common">
+              아니요
+            </label>
+          </div>
         </div>
+      </div>
 
-        <div class="flex items-center">
+      <div
+        v-if="signupForm.role === 'main' || signupForm.role === 'sub'"
+        class="mx-7 mb-2 flex justify-between items-center"
+      >
+        <div
+          class="flex-shrink-0 flex items-center"
+          @click="setDisabled(false)"
+        >
           <RadioButton
-            v-model="signupForm.role"
-            name="role"
-            id="common"
-            value="common"
+            v-model="signupForm.grade"
+            id="third-grade"
+            name="grade"
+            value="3"
           />
-          <label class="ml-2 text-xl cursor-pointer" for="common">
-            아니요
+          <label class="ml-2 text-xl cursor-pointer" for="third-grade">
+            3학년
           </label>
         </div>
-      </div>
-    </div>
 
-    <div
-      v-if="signupForm.role === 'main' || signupForm.role === 'sub'"
-      class="mx-7 mb-2 flex justify-between items-center"
-    >
-      <div class="flex-shrink-0 flex items-center" @click="setDisabled(false)">
-        <RadioButton
-          v-model="signupForm.grade"
-          id="third-grade"
-          name="grade"
-          value="3"
-        />
-        <label class="ml-2 text-xl cursor-pointer" for="third-grade"
-          >3학년</label
+        <div
+          class="flex-shrink-0 flex items-center"
+          @click="setDisabled(false)"
         >
+          <RadioButton
+            v-model="signupForm.grade"
+            id="forth-grade"
+            name="grade"
+            value="4"
+          />
+          <label class="ml-2 text-xl cursor-pointer" for="forth-grade">
+            4학년
+          </label>
+        </div>
+
+        <div class="flex-shrink-0 flex items-center" @click="setDisabled(true)">
+          <RadioButton
+            v-model="signupForm.grade"
+            id="new-face"
+            name="grade"
+            value="0"
+          />
+          <label class="ml-2 text-xl cursor-pointer" for="new-face">
+            새친구
+          </label>
+        </div>
+
+        <div>
+          <Dropdown
+            v-model="signupForm.group"
+            :options="group"
+            optionLabel="name"
+            optionValue="value"
+            placeholder="학급 선택"
+            :disabled="isDisabled"
+          />
+        </div>
       </div>
 
-      <div class="flex-shrink-0 flex items-center" @click="setDisabled(false)">
-        <RadioButton
-          v-model="signupForm.grade"
-          id="forth-grade"
-          name="grade"
-          value="4"
-        />
-        <label class="ml-2 text-xl cursor-pointer" for="forth-grade">
-          4학년
-        </label>
+      <div class="mx-7 my-3">
+        <Button type="submit" class="p-button-warning w-full justify-center">
+          <span v-if="!isLoading" class="text-xl">회원가입</span>
+          <i
+            v-else
+            class="pi pi-spin pi-spinner"
+            style="font-size: 1.25rem; line-height: 1.75rem"
+          ></i>
+        </Button>
       </div>
 
-      <div class="flex-shrink-0 flex items-center" @click="setDisabled(true)">
-        <RadioButton
-          v-model="signupForm.grade"
-          id="new-face"
-          name="grade"
-          value="0"
-        />
-        <label class="ml-2 text-xl cursor-pointer" for="new-face">
-          새친구
-        </label>
+      <div v-if="!isAllFilled" class="mx-7">
+        <span class="text-red-500">위 입력사항을 모두 입력해주세요.</span>
       </div>
 
-      <div>
-        <Dropdown
-          v-model="signupForm.group"
-          :options="group"
-          optionLabel="name"
-          optionValue="value"
-          placeholder="학급 선택"
-          :disabled="isDisabled"
-        />
+      <div v-if="!isValidated" class="mx-7">
+        <span class="text-red-500">{{ errorMessage }}</span>
       </div>
-    </div>
 
-    <div class="mx-7 my-3">
-      <Button type="submit" class="p-button-warning w-full justify-center">
-        <span v-if="!isLoading" class="text-xl">회원가입</span>
-        <i
-          v-else
-          class="pi pi-spin pi-spinner"
-          style="font-size: 1.25rem; line-height: 1.75rem"
-        ></i>
-      </Button>
-    </div>
-
-    <div v-if="!isAllFilled" class="mx-7">
-      <span class="text-red-500">위 입력사항을 모두 입력해주세요.</span>
-    </div>
-
-    <div v-if="!isValidated" class="mx-7">
-      <span class="text-red-500">{{ errorMessage }}</span>
-    </div>
-
-    <div class="mx-7 mt-8 flex items-center justify-evenly">
-      <span class="text-xl">계정이 있으신가요?</span>
-      <router-link :to="{ name: 'AccountLogin' }">
-        <span class="text-yellow-500 text-xl">로그인</span>
-      </router-link>
-    </div>
-  </form>
+      <div class="mx-7 mt-8 flex items-center justify-evenly">
+        <span class="text-xl">계정이 있으신가요?</span>
+        <router-link :to="{ name: 'AccountLogin' }">
+          <span class="text-yellow-500 text-xl">로그인</span>
+        </router-link>
+      </div>
+    </form>
+  </section>
 </template>
 
 <script setup lang="ts">
