@@ -1,181 +1,144 @@
 <template>
   <section class="flex flex-col justify-center">
-    <TheYoungeunBasic />
-
-    <form @submit.prevent="onSubmit">
-      <div class="mx-7 mb-2">
-        <InputText
-          v-model="signupForm.email"
+    <div class="grid grid-cols-1 gap-2 px-8">
+      <div>
+        <div>교회</div>
+        <Dropdown
           class="w-full"
-          type="email"
+          v-model="church"
+          :options="churchOptions"
+          optionLabel="name"
+          optionValue="value"
+          placeholder="교회 선택"
+          :disabled="true"
+        />
+      </div>
+
+      <div>
+        <div>소속</div>
+        <Dropdown
+          class="w-full"
+          v-model="department"
+          :options="departmentOptions"
+          optionLabel="name"
+          optionValue="value"
+          placeholder="소속 선택"
+          :disabled="true"
+        />
+      </div>
+
+      <div class="my-6 border border-slate-300"></div>
+
+      <div>
+        <div>이메일</div>
+        <InputText
+          v-model="email"
+          class="w-full"
+          :class="{ 'p-invalid': error.email.status }"
           placeholder="이메일을 입력하세요."
+          type="email"
           required
         />
       </div>
 
-      <div class="mx-7 mb-2">
+      <div>
+        <div>비밀번호</div>
         <Password
-          v-model="signupForm.password"
+          v-model="password"
           class="w-full"
-          toggleMask
-          :feedback="false"
+          :class="{ 'p-invalid': error.password.status }"
+          inputStyle="width:inherit;"
           placeholder="비밀번호를 입력하세요."
-          inputStyle="width:inherit;"
-        />
-
-        <div v-if="!isPasswordLongerThanSix && signupForm.password">
-          <span class="text-red-500">비밀번호를 6글자 이상 입력하세요.</span>
-        </div>
-      </div>
-
-      <div class="mx-7 mb-2">
-        <Password
-          v-model="signupForm.confirmedPassword"
-          class="w-full"
-          toggleMask
           :feedback="false"
-          placeholder="비밀번호를 다시 한번 입력하세요."
-          inputStyle="width:inherit;"
+          toggleMask
         />
-
-        <div v-if="!isPasswordSame && signupForm.confirmedPassword">
-          <span class="text-red-500">새 비밀번호가 일치하지 않습니다.</span>
-        </div>
       </div>
 
-      <div class="mx-7 mb-2">
-        <InputText
-          v-model="signupForm.name"
+      <div>
+        <div>비밀번호 확인</div>
+        <Password
+          v-model="confirmedPassword"
           class="w-full"
+          :class="{ 'p-invalid': error.confirmedPassword.status }"
+          inputStyle="width:inherit;"
+          placeholder="비밀번호를 입력하세요."
+          :feedback="false"
+          toggleMask
+        />
+      </div>
+
+      <div class="my-6 border border-slate-300"></div>
+
+      <div>
+        <div>이름</div>
+        <InputText
+          v-model="name"
+          class="w-full"
+          :class="{ 'p-invalid': error.name.status }"
           type="text"
           placeholder="이름을 입력하세요."
         />
       </div>
 
-      <div class="mx-7 mb-2">
-        <div class="flex justify-between items-center">
-          <div class="text-xl">담당 학급이 있나요?</div>
+      <div>
+        <div>담당</div>
+        <SelectButton
+          v-model="role"
+          class="grid grid-cols-3"
+          :options="roleOptions"
+          optionLabel="name"
+          optionValue="value"
+          placeholder="담당 학년"
+        />
+      </div>
 
-          <div class="flex items-center">
-            <RadioButton
-              v-model="signupForm.role"
-              name="role"
-              id="main"
-              value="main"
+      <Transition>
+        <div v-if="role === 'main' || role === 'sub'">
+          <div>학년반</div>
+          <div class="grid grid-cols-3 gap-3">
+            <Dropdown
+              v-model="grade"
+              :options="gradeOptions"
+              optionLabel="name"
+              optionValue="value"
+              :disabled="isNew"
+              placeholder="담당 학년"
             />
-            <label class="ml-2 text-xl cursor-pointer" for="main"> 담임 </label>
-          </div>
-
-          <div class="flex items-center">
-            <RadioButton
-              v-model="signupForm.role"
-              name="role"
-              id="sub"
-              value="sub"
+            <Dropdown
+              v-model="group"
+              :options="groupOptions"
+              optionLabel="name"
+              optionValue="value"
+              :disabled="isNew"
+              placeholder="담당 학급"
             />
-            <label class="ml-2 text-xl cursor-pointer" for="sub">
-              부담임
-            </label>
-          </div>
 
-          <div class="flex items-center">
-            <RadioButton
-              v-model="signupForm.role"
-              name="role"
-              id="common"
-              value="common"
-            />
-            <label class="ml-2 text-xl cursor-pointer" for="common">
-              아니요
-            </label>
+            <div class="self-center">
+              <Checkbox v-model="isNew" inputId="isNew" :binary="true" />
+              <label for="isNew" class="ml-2 text-lg">새친구</label>
+            </div>
           </div>
         </div>
-      </div>
+      </Transition>
 
-      <div
-        v-if="signupForm.role === 'main' || signupForm.role === 'sub'"
-        class="mx-7 mb-2 flex justify-between items-center"
-      >
-        <div
-          class="flex-shrink-0 flex items-center"
-          @click="setDisabled(false)"
-        >
-          <RadioButton
-            v-model="signupForm.grade"
-            id="third-grade"
-            name="grade"
-            value="3"
-          />
-          <label class="ml-2 text-xl cursor-pointer" for="third-grade">
-            3학년
-          </label>
-        </div>
+      <Button
+        class="mt-5 p-button-warning p-button-rounded"
+        label="회원가입"
+        :loading="isLoading"
+        loadingIcon="pi pi-spinner pi-spin"
+        @click="onSubmit"
+      />
 
-        <div
-          class="flex-shrink-0 flex items-center"
-          @click="setDisabled(false)"
-        >
-          <RadioButton
-            v-model="signupForm.grade"
-            id="forth-grade"
-            name="grade"
-            value="4"
-          />
-          <label class="ml-2 text-xl cursor-pointer" for="forth-grade">
-            4학년
-          </label>
-        </div>
-
-        <div class="flex-shrink-0 flex items-center" @click="setDisabled(true)">
-          <RadioButton
-            v-model="signupForm.grade"
-            id="new-face"
-            name="grade"
-            value="0"
-          />
-          <label class="ml-2 text-xl cursor-pointer" for="new-face">
-            새친구
-          </label>
-        </div>
-
-        <div>
-          <Dropdown
-            v-model="signupForm.group"
-            :options="group"
-            optionLabel="name"
-            optionValue="value"
-            placeholder="학급 선택"
-            :disabled="isDisabled"
-          />
-        </div>
-      </div>
-
-      <div class="mx-7 my-3">
-        <Button type="submit" class="p-button-warning w-full justify-center">
-          <span v-if="!isLoading" class="text-xl">회원가입</span>
-          <i
-            v-else
-            class="pi pi-spin pi-spinner"
-            style="font-size: 1.25rem; line-height: 1.75rem"
-          ></i>
-        </Button>
-      </div>
-
-      <div v-if="!isAllFilled" class="mx-7">
-        <span class="text-red-500">위 입력사항을 모두 입력해주세요.</span>
-      </div>
-
-      <div v-if="!isValidated" class="mx-7">
-        <span class="text-red-500">{{ errorMessage }}</span>
-      </div>
-
-      <div class="mx-7 mt-8 flex items-center justify-evenly">
+      <div class="mt-3 flex items-center justify-evenly">
         <span class="text-xl">계정이 있으신가요?</span>
-        <router-link :to="{ name: 'AccountLogin' }">
-          <span class="text-yellow-500 text-xl">로그인</span>
-        </router-link>
+        <RouterLink
+          :to="{ name: 'AccountLogin' }"
+          class="text-xl text-yellow-500"
+        >
+          로그인
+        </RouterLink>
       </div>
-    </form>
+    </div>
   </section>
 </template>
 
@@ -183,132 +146,162 @@
 import TheYoungeunBasic from '@/components/TheYoungeunBasic.vue';
 
 import { computed, reactive, ref, watch } from 'vue';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import { useRouter } from 'vue-router';
 import { useAccountStore } from '@/store/account';
+
+import {
+  churchOptions,
+  departmentOptions,
+  gradeOptions,
+  groupOptions,
+  roleOptions,
+} from './data';
 
 const account = useAccountStore();
 const router = useRouter();
 
-const initSignupForm = {
-  church: '영은교회',
-  department: '초등부',
-  email: '',
-  password: '',
-  confirmedPassword: '',
-  name: '',
-  role: 'common', // 'main', 'sub', 'common'
-  grade: '-1',
-  group: '-1',
-};
-const signupForm = reactive({ ...initSignupForm });
+const church = ref('영은교회');
+const department = ref('초등부');
+const email = ref('');
+const password = ref('');
+const confirmedPassword = ref('');
+const name = ref('');
+const role = ref('common');
+const grade = ref('3');
+const group = ref('1');
 
-const isPasswordLongerThanSix = computed(() => {
-  const regex = new RegExp('(?=.{6,})');
-  if (regex.test(signupForm.password)) {
-    return true;
-  } else {
-    return false;
-  }
-});
-
-const isPasswordSame = computed(() => {
-  if (!signupForm.password && !signupForm.confirmedPassword) {
-    return false;
-  } else if (signupForm.password === signupForm.confirmedPassword) {
-    return true;
-  } else {
-    return false;
-  }
-});
-
-watch(
-  () => signupForm.role,
-  (newValue) => {
-    if (newValue === 'main' || newValue === 'sub') {
-      signupForm.grade = '';
-      signupForm.group = '';
-    } else {
-      signupForm.grade = '-1';
-      signupForm.group = '-1';
-    }
-  }
-);
-
+const isNew = ref(false);
 const isLoading = ref(false);
-const isAllFilled = ref(true);
-const isValidated = ref(true);
-const errorMessage = ref('');
+
+watch(role, (newVal, oldVal) => {
+  if (newVal === 'common' && (oldVal === 'main' || oldVal === 'sub')) {
+    grade.value = '-1';
+    group.value = '-1';
+  } else if ((newVal === 'main' || newVal === 'sub') && oldVal === 'common') {
+    grade.value = '3';
+    group.value = '1';
+    isNew.value = false;
+  }
+});
+
+watch(isNew, (newVal, oldVal) => {
+  if (newVal) {
+    grade.value = '0';
+    group.value = '0';
+  }
+});
+
+const rules = computed(() => ({
+  email: { required },
+  password: { required },
+  confirmedPassword: { required },
+  name: { required },
+}));
+
+const v$ = useVuelidate(rules, {
+  email,
+  password,
+  confirmedPassword,
+  name,
+});
+
+const error = computed(() => ({
+  email: {
+    status: v$.value.email.$error,
+  },
+  password: {
+    status: v$.value.password.$error,
+  },
+  confirmedPassword: {
+    status: v$.value.confirmedPassword.$error,
+  },
+  name: {
+    status: v$.value.name.$error,
+  },
+}));
 
 const onSubmit = async () => {
   try {
-    // TODO: 초기화 점검하기, 또 추가되거나 깔끔하게 되어야할 로직 살피기
-    isAllFilled.value = true;
-    isValidated.value = true;
-
-    if (!Object.values(signupForm).every((value) => value)) {
-      isAllFilled.value = false;
-      return;
-    }
-    if (!isPasswordLongerThanSix.value) {
-      return;
-    }
-    if (!isPasswordSame.value) {
-      return;
-    }
-
     isLoading.value = true;
 
-    const signupRet = await account.signup(signupForm);
-    if (!signupRet) {
+    const isFormCorrect = await v$.value.$validate();
+    if (!isFormCorrect) {
       return;
     }
-    // 회원가입 실패
-    if (!signupRet.isSuccess) {
-      throw new Error(signupRet.message);
-    }
-    // 회원가입 성공
-    else if (signupRet.isSuccess) {
-      await account.createUser({
-        uid: signupRet.result.user.uid,
-        ...signupForm,
-      });
-      await account.loginAccount({
-        email: signupForm.email,
-        password: signupForm.password,
-      });
-      router.push({ name: 'HomeView' });
-    }
+    console.log(church.value);
+    console.log(department.value);
+    console.log(email.value);
+    console.log(password.value);
+    console.log(confirmedPassword.value);
+    console.log(name.value);
+    console.log(role.value);
+    console.log(grade.value);
+    console.log(group.value);
   } catch (error) {
-    if (error instanceof Error) {
-      isValidated.value = false;
-      errorMessage.value = error.message;
-    }
+    console.log((error as Error).message);
   } finally {
     isLoading.value = false;
   }
-};
 
-const group = [
-  { name: '1반', value: '1' },
-  { name: '2반', value: '2' },
-  { name: '3반', value: '3' },
-  { name: '4반', value: '4' },
-  { name: '5반', value: '5' },
-  { name: '6반', value: '6' },
-  { name: '7반', value: '7' },
-  { name: '8반', value: '8' },
-  { name: '9반', value: '9' },
-  { name: '10반', value: '10' },
-];
+  //   try {
+  //     // TODO: 초기화 점검하기, 또 추가되거나 깔끔하게 되어야할 로직 살피기
+  //     isAllFilled.value = true;
+  //     isValidated.value = true;
 
-const isDisabled = ref(false);
-const setDisabled = (bool: boolean) => {
-  if (bool) {
-    isDisabled.value = bool;
-    signupForm.group = '0';
-  } else {
-    isDisabled.value = bool;
-    signupForm.group = '';
-  }
+  //     if (!Object.values(signupForm).every((value) => value)) {
+  //       isAllFilled.value = false;
+  //       return;
+  //     }
+  //     if (!isPasswordLongerThanSix.value) {
+  //       return;
+  //     }
+  //     if (!isPasswordSame.value) {
+  //       return;
+  //     }
+
+  //     isLoading.value = true;
+
+  //     const signupRet = await account.signup(signupForm);
+  //     if (!signupRet) {
+  //       return;
+  //     }
+  //     // 회원가입 실패
+  //     if (!signupRet.isSuccess) {
+  //       throw new Error(signupRet.message);
+  //     }
+  //     // 회원가입 성공
+  //     else if (signupRet.isSuccess) {
+  //       await account.createUser({
+  //         uid: signupRet.result.user.uid,
+  //         ...signupForm,
+  //       });
+  //       await account.loginAccount({
+  //         email: signupForm.email,
+  //         password: signupForm.password,
+  //       });
+  //       router.push({ name: 'HomeView' });
+  //     }
+  //   } catch (error) {
+  //     if (error instanceof Error) {
+  //       isValidated.value = false;
+  //       errorMessage.value = error.message;
+  //     }
+  //   } finally {
+  //     isLoading.value = false;
+  //   }
 };
 </script>
+
+<style scoped>
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
+</style>
