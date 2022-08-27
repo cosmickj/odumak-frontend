@@ -1,84 +1,85 @@
 <template>
-  <the-youngeun-basic></the-youngeun-basic>
+  <section class="flex flex-col justify-center">
+    <TheYoungeunBasic />
 
-  <div class="mt-5">
-    <form @submit.prevent="onSubmit">
-      <div class="mx-7 mb-2">
-        <InputText
-          v-model="loginForm.email"
-          class="w-full"
-          id="email"
-          type="text"
-          placeholder="이메일을 입력하세요"
-        ></InputText>
-      </div>
+    <div class="mt-5">
+      <form @submit.prevent="onSubmit">
+        <div class="mx-7 mb-2">
+          <InputText
+            v-model="loginForm.email"
+            class="w-full"
+            id="email"
+            type="text"
+            placeholder="이메일을 입력하세요"
+          />
+        </div>
 
-      <div class="mx-7 mb-2">
-        <InputText
-          v-model="loginForm.password"
-          class="w-full"
-          id="password"
-          type="password"
-          placeholder="비밀번호를 입력하세요"
-        ></InputText>
-      </div>
+        <div class="mx-7 mb-2">
+          <InputText
+            v-model="loginForm.password"
+            class="w-full"
+            id="password"
+            type="password"
+            placeholder="비밀번호를 입력하세요"
+          />
+        </div>
 
-      <!-- 로그인 버튼 -->
-      <div class="mx-7 my-3">
-        <Button type="submit" class="p-button-warning w-full justify-center">
-          <span v-if="!isLoading" class="text-xl">로그인</span>
-          <i
-            v-else
-            class="pi pi-spin pi-spinner"
-            style="font-size: 1.25rem; line-height: 1.75rem"
-          ></i>
-        </Button>
-      </div>
+        <!-- 로그인 버튼 -->
+        <div class="mx-7 my-3">
+          <Button
+            class="p-button-warning p-button-rounded w-full justify-center"
+            label="로그인"
+            :loading="isLoading"
+            loadingIcon="pi pi-spinner pi-spin"
+            type="submit"
+          />
+        </div>
 
-      <div v-if="isError" class="mx-7 my-3">
-        <span class="text-red-500">
-          이메일 또는 비밀번호를 다시 확인하세요. 등록되지 않은 이메일이거나,
-          이메일 또는 비밀번호를 잘못 입력하셨습니다.
-        </span>
-      </div>
+        <div v-if="isError" class="mx-7 my-3">
+          <span class="text-red-500">
+            이메일 또는 비밀번호를 다시 확인하세요. 등록되지 않은 이메일이거나,
+            이메일 또는 비밀번호를 잘못 입력하셨습니다.
+          </span>
+        </div>
 
-      <div class="mx-7 mt-8 flex justify-evenly items-center">
-        <span class="text-xl">계정이 없으신가요?</span>
-        <router-link :to="{ name: 'AccountSignup' }">
-          <span class="text-yellow-500 text-xl">회원가입</span>
-        </router-link>
-      </div>
-    </form>
-  </div>
+        <div class="mx-7 mt-8 flex justify-evenly items-center">
+          <span class="text-xl">계정이 없으신가요?</span>
+          <router-link :to="{ name: 'AccountSignup' }">
+            <span class="text-yellow-500 text-xl">회원가입</span>
+          </router-link>
+        </div>
+      </form>
+    </div>
 
-  <Teleport to="#modal">
-    <Transition name="modal">
-      <div
-        v-if="isModalOpen"
-        class="absolute inset-0 w-screen h-screen bg-black bg-opacity-50 flex items-center justify-center"
-      >
-        <div ref="modal" class="bg-white rounded-lg shadow-lg">
-          <div class="text-2xl px-28 py-10">
-            <p>원할한 출석 관리를 위해</p>
-            <p><span>회원가입</span>을 진행해주세요.</p>
-          </div>
+    <Teleport to="#modal">
+      <Transition name="modal">
+        <div
+          v-if="isModalOpen"
+          class="absolute inset-0 w-screen h-screen bg-black bg-opacity-50 flex items-center justify-center"
+        >
+          <div ref="modal" class="bg-white rounded-lg shadow-lg">
+            <div class="text-2xl px-28 py-10">
+              <p>원할한 출석 관리를 위해</p>
+              <p><span>회원가입</span>을 진행해주세요.</p>
+            </div>
 
-          <div class="flex items-center justify-end px-10 pb-5">
-            <router-link :to="{ name: 'AccountLogin' }" @click="closeModal">
-              <Button
-                label="이미 계정이 있어요"
-                class="p-button-text p-button-plain"
-              />
-            </router-link>
+            <div class="flex items-center justify-end px-10 pb-5">
+              <router-link :to="{ name: 'AccountLogin' }" @click="closeModal">
+                <Button
+                  label="이미 계정이 있어요"
+                  class="p-button-text p-button-plain"
+                />
+              </router-link>
 
-            <router-link :to="{ name: 'AccountSignup' }">
-              <Button label="좋아요" type="button" class="p-button-warning" />
-            </router-link>
+              <router-link :to="{ name: 'AccountSignup' }">
+                <Button label="좋아요" type="button" class="p-button-warning" />
+              </router-link>
+            </div>
           </div>
         </div>
-      </div>
-    </Transition>
-  </Teleport>
+      </Transition>
+    </Teleport>
+  </section>
 </template>
 
 <script setup lang="ts">

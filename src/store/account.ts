@@ -124,9 +124,7 @@ export const useAccountStore = defineStore('account', {
         }
         // 이미 해당 이름으로 가입되어 있는 회원이 있는가?
         const q = query(usersColl, where('name', '==', payload.name));
-
         const querySnapshot = await getDocs(q);
-
         if (querySnapshot.docs.length) {
           return errResponse(baseResponse.NAME_DUPLICATED);
         }
@@ -136,12 +134,10 @@ export const useAccountStore = defineStore('account', {
           payload.email,
           payload.password
         );
-
         await updateProfile(signupRes.user, { displayName: payload.name });
-
         return response(baseResponse.SUCCESS, signupRes);
       } catch (err) {
-        console.log(err);
+        return errResponse(baseResponse.NETWORK_ERROR);
       }
     },
 

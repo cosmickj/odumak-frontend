@@ -1,22 +1,48 @@
 <template>
-  <div class="flex flex-col justify-center items-center">
-    <router-link
-      class="p-2"
-      :class="{ 'bg-yellow-500 rounded-full': isImportant }"
-      :to="{ name: routeName }"
-    >
-      <i class="pi text-3xl" :class="icon"></i>
-    </router-link>
-    <span>{{ title }}</span>
-  </div>
+  <RouterLink
+    :class="[
+      { 'button-important': isImportant },
+      { 'button-important--hide': !isHome },
+    ]"
+    :to="{ name: routeName }"
+  >
+    <div class="flex w-20 h-20 items-center justify-center">
+      <i class="text-5xl" :class="icon"></i>
+    </div>
+  </RouterLink>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
+
 defineProps<{
   icon: string;
-  isImportant?: boolean;
   routeName: string;
-  position?: string;
-  title: string;
+  isImportant?: boolean;
 }>();
+
+const route = useRoute();
+const isHome = computed(() => {
+  if (route.name === 'HomeView') {
+    return true;
+  } else {
+    return false;
+  }
+});
 </script>
+
+<style scoped>
+.button-important {
+  position: relative;
+  bottom: 26px;
+  background: rgb(234, 179, 8);
+  border: 4px solid rgb(241, 245, 249);
+  border-radius: 50%;
+  transition: all 0.5s;
+}
+.button-important--hide {
+  bottom: 0px;
+  border-color: rgb(255, 255, 255);
+}
+</style>

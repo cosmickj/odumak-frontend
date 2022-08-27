@@ -1,8 +1,8 @@
 <template>
-  <section class="h-screen p-8 bg-slate-100 flex flex-col">
-    <checker-header :user-data="userData" />
+  <section class="flex flex-col h-full p-8">
+    <CheckerHeader :user-data="userData" />
 
-    <calendar
+    <Calendar
       v-if="
         userData?.role === 'main' ||
         userData?.role === 'sub' ||
@@ -17,16 +17,15 @@
       @date-select="requestAttendance"
     />
 
-    <the-finger
+    <TheFinger
       v-if="userData?.role !== 'common' && !attendanceDate"
       class="pt-5"
     />
 
-    <the-loader v-if="isLoading" />
+    <TheLoader v-if="isLoading" />
 
     <!-- 선생님일 때 -->
-    <!-- TODO: 이 부분을 담임(main)과 부담임(sub) 모두로 설정하자 -->
-    <checker-students
+    <CheckerStudents
       v-if="
         (userData?.role === 'main' || userData?.role === 'sub') &&
         attendanceDate
@@ -38,7 +37,7 @@
     />
 
     <!-- 관리자일 때 -->
-    <checker-teachers
+    <CheckerTeachers
       v-else-if="userData?.role === 'admin' && attendanceDate"
       v-model="dataSource"
       :document-id="documentId"
@@ -49,7 +48,7 @@
     <!-- 일반교사일 때 -->
     <div
       v-else-if="userData?.role === 'common'"
-      class="grow flex justify-center items-center"
+      class="grow flex items-center justify-center"
     >
       <p class="text-xl">담당 학급이 있는 선생님만 이용할 수 있습니다.</p>
     </div>
