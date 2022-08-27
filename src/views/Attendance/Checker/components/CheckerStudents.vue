@@ -1,81 +1,90 @@
 <template>
-  <div class="overflow-auto h-[calc(100%_-_10rem)] select-none">
-    <form
-      :class="{
-        'border-x-4 border-b-4 border-slate-200 rounded-b-lg bg-slate-200':
-          isSub,
-      }"
-      @submit.prevent="handleSubmit"
-    >
+  <form
+    class="overflow-auto grow flex flex-col"
+    :class="{ 'p-5 bg-slate-200 rounded-lg': isSub }"
+    @submit.prevent="handleSubmit"
+  >
+    <div class="overflow-auto">
       <div
-        v-for="(student, i) in studentsAttendance"
-        :key="i"
-        class="attendance bg-white shadow"
+        class="flex bg-white shadow my-2 px-3 py-5"
+        v-for="(student, idx) in studentsAttendance"
+        :key="idx"
       >
-        <div class="student__name" :class="$attrs.class">
+        <div
+          class="flex w-2/5 text-3xl items-center justify-center"
+          :class="$attrs.class"
+        >
           {{ student.name }}
         </div>
 
-        <input
-          v-model="studentsAttendance[i].attendance"
-          class="attendance__input"
-          type="radio"
-          value="absence"
-          :id="`absence-${student.name}`"
-        />
-        <label
-          class="shadow-md attendance__label attendance__label__absence"
-          :for="`absence-${student.name}`"
-        >
-          <span>결석</span>
-        </label>
+        <div class="grid grid-cols-3 gap-3 w-3/5">
+          <div class="aspect-square text-xl">
+            <input
+              v-model="studentsAttendance[idx].attendance"
+              class="hidden w-0 h-0 attendance-button"
+              :id="`absence-${student.name}`"
+              value="absence"
+              type="radio"
+            />
+            <label
+              class="opacity-40 flex h-full rounded-lg items-center justify-center cursor-pointer absence"
+              :for="`absence-${student.name}`"
+            >
+              결석
+            </label>
+          </div>
 
-        <input
-          v-model="studentsAttendance[i].attendance"
-          class="attendance__input"
-          type="radio"
-          value="online"
-          :id="`online-${student.name}`"
-        />
-        <label
-          class="shadow-md attendance__label attendance__label__online"
-          :for="`online-${student.name}`"
-        >
-          <span>온라인</span>
-        </label>
+          <div class="aspect-square text-xl">
+            <input
+              v-model="studentsAttendance[idx].attendance"
+              class="hidden w-0 h-0 attendance-button"
+              :id="`online-${student.name}`"
+              value="online"
+              type="radio"
+            />
+            <label
+              class="opacity-40 flex h-full rounded-lg items-center justify-center cursor-pointer online"
+              :for="`online-${student.name}`"
+            >
+              온라인
+            </label>
+          </div>
 
-        <input
-          v-model="studentsAttendance[i].attendance"
-          class="attendance__input"
-          type="radio"
-          value="offline"
-          :id="`offline-${student.name}`"
-        />
-        <label
-          class="shadow-md attendance__label attendance__label__offline"
-          :for="`offline-${student.name}`"
-        >
-          <span>현장</span>
-        </label>
+          <div class="aspect-square text-xl">
+            <input
+              v-model="studentsAttendance[idx].attendance"
+              class="hidden w-0 h-0 attendance-button"
+              :id="`offline-${student.name}`"
+              value="offline"
+              type="radio"
+            />
+            <label
+              class="opacity-40 flex h-full rounded-lg items-center justify-center cursor-pointer offline"
+              :for="`offline-${student.name}`"
+            >
+              현장
+            </label>
+          </div>
+        </div>
       </div>
+    </div>
 
-      <div v-if="!documentId" class="flex justify-end">
-        <Button
-          class="w-2/6 p-button-warning p-button-lg"
-          label="제출하기"
-          type="submit"
-        />
-      </div>
+    <div>
+      <Button
+        v-if="!documentId"
+        class="w-full rounded-full p-button-warning p-button-lg"
+        label="제출하기"
+        type="submit"
+      />
 
-      <div v-else class="flex justify-end">
-        <Button
-          class="w-2/6 p-button-danger p-button-lg"
-          label="수정하기"
-          type="submit"
-        />
-      </div>
-    </form>
-  </div>
+      <Button
+        v-else
+        class="w-full rounded-full p-button-danger p-button-lg"
+        label="수정하기"
+        type="submit"
+      />
+    </div>
+  </form>
 </template>
 
 <script setup lang="ts">
@@ -88,7 +97,7 @@ const props = defineProps<{
   isSub?: boolean;
 }>();
 
-const emit = defineEmits(['submit', 'update:modelValue']);
+const emit = defineEmits(['update:modelValue', 'submit']);
 
 const studentsAttendance = computed({
   get: () => props.modelValue,
@@ -99,52 +108,28 @@ const handleSubmit = async () => emit('submit');
 </script>
 
 <style scoped>
-.attendance {
-  padding: 1rem;
-  margin: 0.5rem 0;
-  border-radius: 3px;
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
-}
-.attendance__input {
-  display: none;
-  height: 0;
-  width: 0;
-}
-.attendance__label {
-  opacity: 0.4;
-  height: 40px;
-  width: 40px;
-  border-radius: 0.8rem;
-  font-size: 0.6rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.5s;
-}
-.attendance__label__offline {
-  border: 2px solid #4caf50;
-}
-.attendance__label__online {
-  border: 2px solid #fbc02d;
-}
-.attendance__label__absence {
-  border: 2px solid #ff4032;
-}
-.attendance__input:checked + .attendance__label {
+.attendance-button:checked + label {
   opacity: 1;
+  font-weight: 700;
   animation: jelly 0.6s ease;
 }
-.attendance__input:checked + .attendance__label.attendance__label__offline {
-  background-color: #4caf50;
-  color: white;
+.absence {
+  border: 2px solid #ff4032;
 }
-.attendance__input:checked + .attendance__label.attendance__label__online {
+.online {
+  border: 2px solid #fbc02d;
+}
+.offline {
+  border: 2px solid #4caf50;
+}
+.attendance-button:checked + .absence {
+  background-color: #ff4032;
+}
+.attendance-button:checked + .online {
   background-color: #fbc02d;
 }
-.attendance__input:checked + .attendance__label.attendance__label__absence {
-  background-color: #ff4032;
+.attendance-button:checked + .offline {
+  background-color: #4caf50;
+  color: white;
 }
 </style>

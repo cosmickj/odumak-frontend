@@ -1,5 +1,7 @@
 <template>
-  <div class="overflow-auto h-[calc(100%_-_6rem)] p-8 bg-slate-100">
+  <div class="overflow-auto p-8 bg-slate-100">
+    <TheLoader v-if="isLoading" />
+
     <div class="text-3xl text-center">{{ title }} 출석현황</div>
 
     <!-- TODO: 누적 현황 작업 이후에 v-if 제거 -->
@@ -37,8 +39,6 @@
       v-else-if="position === 'teacher' && type === 'total'"
     />
   </div>
-
-  <the-loader v-if="isLoading" />
 </template>
 
 <script setup lang="ts">

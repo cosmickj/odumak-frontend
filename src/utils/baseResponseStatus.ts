@@ -5,4 +5,6 @@ export default {
   NAME_DUPLICATED: { isSuccess: false, code: 2000, message: "이미 등록된 이름입니다. 이름을 다시 확인하시고 관리자에게 문의해주세요." },
   ROLE_UNMATCHED: { isSuccess: false, code: 2000, message: "담당 학급을 다시 확인하시고 관리자에게 문의해주세요." },
   CLASS_UNMATCHED: { isSuccess: false, code: 2000, message: "입력하신 학년과 반을 다시 확인하시고 관리자에게 문의해주세요." },
+  // 네트워크 오류
+  NETWORK_ERROR: { isSuccess: false, code: 3000, message: "네트워크에 이상이 있어 다시 한번 요청해주세요." },
 };

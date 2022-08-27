@@ -1,60 +1,67 @@
 <template>
-  <form class="grow flex flex-col select-none" @submit.prevent="handleSubmit">
-    <div class="grow overflow-auto h-0">
+  <form class="overflow-auto grow flex flex-col" @submit.prevent="handleSubmit">
+    <div class="overflow-auto">
       <div v-for="(teacher, idx) in teachersAttendance" :key="idx">
-        <div class="attendance bg-white shadow">
-          <div class="flex flex-col items-center">
-            <!-- 교사 이름 -->
+        <div class="flex bg-white shadow my-2 p-5 items-center justify-between">
+          <div class="flex flex-col text-3xl items-center">
             <p>{{ teacher.name }}</p>
 
-            <!-- 교사 담당 학급 -->
             <p v-if="teacher.grade === '0'">새친구</p>
+
             <p v-else-if="teacher.grade !== '-1'">
               {{ teacher.grade }}-{{ teacher.group }}
             </p>
           </div>
 
-          <input
-            v-model="teachersAttendance[idx].attendance"
-            class="attendance__input"
-            type="radio"
-            value="absence"
-            :id="`absence-${teacher.name}`"
-          />
-          <label
-            class="shadow-md attendance__label attendance__label__absence"
-            :for="`absence-${teacher.name}`"
-          >
-            결석
-          </label>
+          <div class="grid grid-cols-3 gap-3 w-3/5">
+            <div class="aspect-square text-xl">
+              <input
+                v-model="teachersAttendance[idx].attendance"
+                class="hidden w-0 h-0 attendance-button"
+                :id="`absence-${teacher.name}`"
+                value="absence"
+                type="radio"
+              />
+              <label
+                class="opacity-40 flex h-full rounded-lg items-center justify-center cursor-pointer absence"
+                :for="`absence-${teacher.name}`"
+              >
+                결석
+              </label>
+            </div>
 
-          <input
-            v-model="teachersAttendance[idx].attendance"
-            class="attendance__input"
-            type="radio"
-            value="online"
-            :id="`online-${teacher.name}`"
-          />
-          <label
-            class="shadow-md attendance__label attendance__label__online"
-            :for="`online-${teacher.name}`"
-          >
-            온라인
-          </label>
+            <div class="aspect-square text-xl">
+              <input
+                v-model="teachersAttendance[idx].attendance"
+                class="hidden w-0 h-0 attendance-button"
+                :id="`online-${teacher.name}`"
+                value="online"
+                type="radio"
+              />
+              <label
+                class="opacity-40 flex h-full rounded-lg items-center justify-center cursor-pointer online"
+                :for="`online-${teacher.name}`"
+              >
+                온라인
+              </label>
+            </div>
 
-          <input
-            v-model="teachersAttendance[idx].attendance"
-            class="attendance__input"
-            type="radio"
-            value="offline"
-            :id="`offline-${teacher.name}`"
-          />
-          <label
-            class="shadow-md attendance__label attendance__label__offline"
-            :for="`offline-${teacher.name}`"
-          >
-            현장
-          </label>
+            <div class="aspect-square text-xl">
+              <input
+                v-model="teachersAttendance[idx].attendance"
+                class="hidden w-0 h-0 attendance-button"
+                :id="`offline-${teacher.name}`"
+                value="offline"
+                type="radio"
+              />
+              <label
+                class="opacity-40 flex h-full rounded-lg items-center justify-center cursor-pointer offline"
+                :for="`offline-${teacher.name}`"
+              >
+                현장
+              </label>
+            </div>
+          </div>
 
           <!-- 선생님별 학생 출석 현황 -->
           <div
@@ -94,17 +101,17 @@
       </div>
     </div>
 
-    <div v-if="!documentId" class="flex justify-center">
+    <div class="flex justify-center">
       <Button
-        class="w-2/6 p-button-lg p-button-warning"
+        v-if="!documentId"
+        class="w-1/3 rounded-full p-button-lg p-button-success"
         label="제출하기"
         type="submit"
       />
-    </div>
 
-    <div v-else class="flex justify-center">
       <Button
-        class="w-2/6 p-button-lg p-button-danger"
+        v-else
+        class="w-1/3 rounded-full p-button-lg p-button-help"
         label="수정하기"
         type="submit"
       />
@@ -226,7 +233,31 @@ const submitStudentAttendance = async (teacher: Teacher, idx: number) => {
 </script>
 
 <style scoped>
-.attendance {
+.attendance-button:checked + label {
+  opacity: 1;
+  font-weight: 700;
+  animation: jelly 0.6s ease;
+}
+.absence {
+  border: 2px solid #ff4032;
+}
+.online {
+  border: 2px solid #fbc02d;
+}
+.offline {
+  border: 2px solid #4caf50;
+}
+.attendance-button:checked + .absence {
+  background-color: #ff4032;
+}
+.attendance-button:checked + .online {
+  background-color: #fbc02d;
+}
+.attendance-button:checked + .offline {
+  background-color: #4caf50;
+  color: white;
+}
+/* .attendance {
   padding: 1rem 0;
   margin: 0.5rem 0;
   border-radius: 3px;
@@ -273,7 +304,7 @@ const submitStudentAttendance = async (teacher: Teacher, idx: number) => {
 }
 .attendance__input:checked + .attendance__label.attendance__label__absence {
   background-color: #ff4032;
-}
+} */
 .pi {
   font-size: 1.5rem;
   transition: all 0.3s;

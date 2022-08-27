@@ -12,6 +12,7 @@
     "esModuleInterop": true,
     "lib": ["esnext", "dom"],
     "skipLibCheck": true,
+    "removeComments": true,
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]

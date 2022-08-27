@@ -1,11 +1,8 @@
 <template>
-  <router-link
-    class="w-1/2"
-    :to="{ name: routeName, params: { position, type } }"
-  >
-    <Card class="mr-2">
+  <router-link :to="{ name: routeName, params: { position, type } }">
+    <Card>
       <template #title>
-        <div><i class="pi text-3xl" :class="icon"></i></div>
+        <div><i class="text-4xl" :class="icon"></i></div>
 
         <div>{{ 누구 }}</div>
 
@@ -46,8 +43,8 @@ const 분류 = computed(() => {
 :deep(.p-card-body) {
   height: 100%;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 }
 :deep(.p-card-title) {
   text-align: center;

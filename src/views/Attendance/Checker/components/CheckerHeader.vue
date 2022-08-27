@@ -1,9 +1,9 @@
 <template>
-  <header class="relative flex justify-center items-center">
+  <header class="relative flex items-center justify-center">
     <!-- 뒤로 가기 -->
-    <button class="h-full w-12 absolute left-0 cursor-pointer">
+    <button class="absolute left-0 w-12 h-full cursor-pointer">
       <router-link
-        class="h-full w-full flex justify-center items-center"
+        class="flex w-full h-full items-center justify-center"
         :to="{ name: 'HomeView' }"
       >
         <i class="pi pi-arrow-left text-3xl"></i>
@@ -16,12 +16,15 @@
 
   <div
     v-if="userData?.role === 'admin'"
-    class="flex justify-center text-2xl mt-5"
+    class="flex mt-5 text-2xl justify-center"
   >
     <div>{{ userData?.name }}</div>
   </div>
 
-  <div v-else class="flex justify-around text-2xl mt-5">
+  <div
+    v-else-if="userData?.role === 'main' || userData?.role === 'sub'"
+    class="flex mt-5 text-2xl justify-around"
+  >
     <div>{{ userData?.grade }}학년 {{ userData?.group }}반</div>
     <div>{{ userData?.name }} 선생님</div>
   </div>
