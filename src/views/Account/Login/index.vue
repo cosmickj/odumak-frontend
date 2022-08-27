@@ -26,14 +26,13 @@
 
         <!-- 로그인 버튼 -->
         <div class="mx-7 my-3">
-          <Button type="submit" class="p-button-warning w-full justify-center">
-            <span v-if="!isLoading" class="text-xl">로그인</span>
-            <i
-              v-else
-              class="pi pi-spin pi-spinner"
-              style="font-size: 1.25rem; line-height: 1.75rem"
-            ></i>
-          </Button>
+          <Button
+            class="p-button-warning p-button-rounded w-full justify-center"
+            label="로그인"
+            :loading="isLoading"
+            loadingIcon="pi pi-spinner pi-spin"
+            type="submit"
+          />
         </div>
 
         <div v-if="isError" class="mx-7 my-3">

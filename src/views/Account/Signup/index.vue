@@ -27,7 +27,7 @@
         />
       </div>
 
-      <div class="my-6 border border-slate-300"></div>
+      <div class="my-3 border border-slate-300"></div>
 
       <div>
         <div>이메일</div>
@@ -39,6 +39,10 @@
           type="email"
           required
         />
+        <div v-if="error.email.status" class="text-red-500">
+          <i class="pi pi-info-circle"></i>
+          {{ error.email.message }}
+        </div>
       </div>
 
       <div>
@@ -52,6 +56,10 @@
           :feedback="false"
           toggleMask
         />
+        <div v-if="error.password.status" class="text-red-500">
+          <i class="pi pi-info-circle"></i>
+          {{ error.password.message }}
+        </div>
       </div>
 
       <div>
@@ -65,9 +73,13 @@
           :feedback="false"
           toggleMask
         />
+        <div v-if="error.confirmedPassword.status" class="text-red-500">
+          <i class="pi pi-info-circle"></i>
+          {{ error.confirmedPassword.message }}
+        </div>
       </div>
 
-      <div class="my-6 border border-slate-300"></div>
+      <div class="my-3 border border-slate-300"></div>
 
       <div>
         <div>이름</div>
@@ -78,6 +90,10 @@
           type="text"
           placeholder="이름을 입력하세요."
         />
+        <div v-if="error.name.status" class="text-red-500">
+          <i class="pi pi-info-circle"></i>
+          {{ error.name.message }}
+        </div>
       </div>
 
       <div>
@@ -128,6 +144,7 @@
         loadingIcon="pi pi-spinner pi-spin"
         @click="onSubmit"
       />
+      <div v-if="isError" class="text-red-500">{{ errorMessage }}</div>
 
       <div class="mt-3 flex items-center justify-evenly">
         <span class="text-xl">계정이 있으신가요?</span>
@@ -143,12 +160,10 @@
 </template>
 
 <script setup lang="ts">
-import TheYoungeunBasic from '@/components/TheYoungeunBasic.vue';
-
 import { computed, reactive, ref, watch } from 'vue';
-import useVuelidate from '@vuelidate/core';
-import { required } from '@vuelidate/validators';
 import { useRouter } from 'vue-router';
+import useVuelidate from '@vuelidate/core';
+import { helpers, required, sameAs } from '@vuelidate/validators';
 import { useAccountStore } from '@/store/account';
 
 import {
@@ -169,11 +184,13 @@ const password = ref('');
 const confirmedPassword = ref('');
 const name = ref('');
 const role = ref('common');
-const grade = ref('3');
-const group = ref('1');
+const grade = ref('-1');
+const group = ref('-1');
 
 const isNew = ref(false);
 const isLoading = ref(false);
+const isError = ref(false);
+const errorMessage = ref('');
 
 watch(role, (newVal, oldVal) => {
   if (newVal === 'common' && (oldVal === 'main' || oldVal === 'sub')) {
@@ -194,10 +211,23 @@ watch(isNew, (newVal, oldVal) => {
 });
 
 const rules = computed(() => ({
-  email: { required },
-  password: { required },
-  confirmedPassword: { required },
-  name: { required },
+  email: { required: helpers.withMessage('이메일을 입력해주세요..', required) },
+  password: {
+    required: helpers.withMessage('비밀번호를 입력해주세요.', required),
+  },
+  confirmedPassword: {
+    required: helpers.withMessage(
+      '확인을 위해 새 비밀번호를 다시 입력해주세요.',
+      required
+    ),
+    sameAs: helpers.withMessage(
+      '비밀번호가 일치하지 않습니다.',
+      sameAs(password.value)
+    ),
+  },
+  name: {
+    required: helpers.withMessage('이름을 정확히 입력해주세요.', required),
+  },
 }));
 
 const v$ = useVuelidate(rules, {
@@ -210,15 +240,19 @@ const v$ = useVuelidate(rules, {
 const error = computed(() => ({
   email: {
     status: v$.value.email.$error,
+    message: v$.value.email.$errors[0]?.$message,
   },
   password: {
     status: v$.value.password.$error,
+    message: v$.value.password.$errors[0]?.$message,
   },
   confirmedPassword: {
     status: v$.value.confirmedPassword.$error,
+    message: v$.value.confirmedPassword.$errors[0]?.$message,
   },
   name: {
     status: v$.value.name.$error,
+    message: v$.value.name.$errors[0]?.$message,
   },
 }));
 
@@ -230,15 +264,39 @@ const onSubmit = async () => {
     if (!isFormCorrect) {
       return;
     }
-    console.log(church.value);
-    console.log(department.value);
-    console.log(email.value);
-    console.log(password.value);
-    console.log(confirmedPassword.value);
-    console.log(name.value);
-    console.log(role.value);
-    console.log(grade.value);
-    console.log(group.value);
+
+    const signupResult = await account.signup({
+      church: church.value,
+      department: department.value,
+      email: email.value,
+      password: password.value,
+      confirmedPassword: confirmedPassword.value,
+      name: name.value,
+      role: role.value,
+      grade: grade.value,
+      group: group.value,
+    });
+
+    if (!signupResult.isSuccess) {
+      isError.value = true;
+      errorMessage.value = signupResult?.message;
+    } else {
+      await account.createUser({
+        uid: signupResult.result.user.uid,
+        church: church.value,
+        department: department.value,
+        email: email.value,
+        name: name.value,
+        role: role.value,
+        grade: grade.value,
+        group: group.value,
+      });
+      await account.loginAccount({
+        email: email.value,
+        password: password.value,
+      });
+      router.push({ name: 'HomeView' });
+    }
   } catch (error) {
     console.log((error as Error).message);
   } finally {
@@ -246,23 +304,6 @@ const onSubmit = async () => {
   }
 
   //   try {
-  //     // TODO: 초기화 점검하기, 또 추가되거나 깔끔하게 되어야할 로직 살피기
-  //     isAllFilled.value = true;
-  //     isValidated.value = true;
-
-  //     if (!Object.values(signupForm).every((value) => value)) {
-  //       isAllFilled.value = false;
-  //       return;
-  //     }
-  //     if (!isPasswordLongerThanSix.value) {
-  //       return;
-  //     }
-  //     if (!isPasswordSame.value) {
-  //       return;
-  //     }
-
-  //     isLoading.value = true;
-
   //     const signupRet = await account.signup(signupForm);
   //     if (!signupRet) {
   //       return;
