@@ -1,6 +1,5 @@
 <template>
   <DataTable
-    class="overflow-auto w-full h-full p-12 drop-shadow-lg"
     :value="dataSource"
     :lazy="true"
     :loading="isLoading"
