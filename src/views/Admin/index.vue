@@ -2,21 +2,22 @@
   <div class="wrapper">
     <div class="container">
       <div class="p-5 text-center select-none my-12">
-        <RouterLink
-          class="text-2xl cursor-pointer after:content-['|'] after:mx-5"
-          :to="{ name: 'HomeView' }"
-        >
+        <RouterLink class="text-2xl cursor-pointer" :to="{ name: 'HomeView' }">
           <i class="text-2xl mr-2 pi pi-home"></i>
           홈
         </RouterLink>
 
+        <span class="text-2xl mx-5">|</span>
+
         <RouterLink
-          class="text-2xl cursor-pointer after:content-['|'] after:mx-5"
+          class="text-2xl cursor-pointer"
           :to="{ name: 'AdminView', params: { position: 'student' } }"
         >
           <i class="text-2xl mr-2 pi pi-user"></i>
           학생 목록
         </RouterLink>
+
+        <span class="text-2xl mx-5">|</span>
 
         <RouterLink
           class="text-2xl cursor-pointer"
@@ -39,13 +40,21 @@
       </div>
     </div>
 
-    <div class="container h-full overflow-auto">
-      <AdminStudent
-        v-if="route.params.position === 'student'"
-        :data-source="dataSource"
-        :is-loading="isLoading"
-      />
-      <AdminTeacher v-else :data-source="dataSource" :is-loading="isLoading" />
+    <div class="container">
+      <div
+        class="overflow-hidden mb-12 border border-slate-300 rounded-2xl drop-shadow-lg"
+      >
+        <AdminStudent
+          v-if="route.params.position === 'student'"
+          :data-source="dataSource"
+          :is-loading="isLoading"
+        />
+        <AdminTeacher
+          v-else
+          :data-source="dataSource"
+          :is-loading="isLoading"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -64,14 +73,12 @@ import { useMemberStore } from '@/store/member';
 import { computed, onMounted, ref, watch } from 'vue';
 
 const route = useRoute();
+const position = computed(() => route.params.position);
 
 const member = useMemberStore();
 
-const position = computed(() => {
-  return route.params.position;
-});
-const dataSource = ref();
 const isLoading = ref(false);
+const dataSource = ref();
 
 const getMembers = async () => {
   try {
@@ -100,21 +107,13 @@ watch(position, async () => {
 </script>
 
 <style scoped>
-/* .wrapper {
-  border: 2px solid red;
-  height: 100vh;
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-auto-rows: auto;
-  gap: 24px;
-} */
 .container {
   width: 100%;
   max-width: 1080px;
   margin: 0 auto;
-  /* background-color: orange; */
 }
 .router-link-exact-active {
+  font-weight: bold;
   color: orange;
 }
 </style>
