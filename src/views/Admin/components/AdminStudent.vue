@@ -27,6 +27,7 @@
     </template>
 
     <Column class="w-12" selectionMode="multiple" :exportable="false" />
+
     <Column
       v-for="(column, idx) in selectedColumns"
       :key="idx"
@@ -44,6 +45,22 @@
         </span>
       </template>
     </Column>
+
+    <Column :exportable="false">
+      <template #body="slotProps">
+        <div class="flex justify-center">
+          <Button
+            icon="pi pi-pencil"
+            class="p-button-rounded p-button-success mx-6"
+            @click="handelEdit(slotProps.data)"
+          />
+          <Button
+            icon="pi pi-trash"
+            class="p-button-rounded p-button-warning mx-6"
+          />
+        </div>
+      </template>
+    </Column>
   </DataTable>
 </template>
 
@@ -56,7 +73,7 @@ defineProps<{
   isLoading: boolean;
 }>();
 
-const emit = defineEmits(['rowClick']);
+const emit = defineEmits(['edit', 'rowClick']);
 
 const formatGender = (value: 'male' | 'female') => {
   if (value === 'male') return '남자';
@@ -90,6 +107,21 @@ const selectedColumns = ref(columns.value);
 
 const onToggle = (value: any) => {
   selectedColumns.value = columns.value.filter((col) => value.includes(col));
+};
+
+interface Student {
+  grade: string;
+  group: string;
+  name: string;
+  gender: string;
+  phone: string;
+  teacher: string;
+  address: string;
+  remark: string;
+}
+
+const handelEdit = (student: Student) => {
+  emit('edit', { ...student });
 };
 
 const handleRowClick = (ev: DataTableRowClickEvent) => {

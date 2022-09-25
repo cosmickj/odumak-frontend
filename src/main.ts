@@ -18,7 +18,9 @@ import Calendar from 'primevue/calendar';
 import Checkbox from 'primevue/checkbox';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
+import Dialog from 'primevue/dialog';
 import Dropdown from 'primevue/dropdown';
+import InputMask from 'primevue/inputmask';
 import InputText from 'primevue/inputtext';
 import MultiSelect from 'primevue/multiselect';
 import Password from 'primevue/password';
@@ -65,7 +67,9 @@ app
   .component('Checkbox', Checkbox)
   .component('Column', Column)
   .component('DataTable', DataTable)
+  .component('Dialog', Dialog)
   .component('Dropdown', Dropdown)
+  .component('InputMask', InputMask)
   .component('InputText', InputText)
   .component('MultiSelect', MultiSelect)
   .component('Password', Password)
