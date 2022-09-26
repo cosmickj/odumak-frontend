@@ -25,7 +25,7 @@ export const useMemberStore = defineStore('member', {
     return {};
   },
   actions: {
-    async createMember(payload: DefaultPayload) {
+    async createMember(payload: any) {
       const { church, department, position, ...memberInfo } = payload;
 
       const q = query(
@@ -36,16 +36,13 @@ export const useMemberStore = defineStore('member', {
       );
       const querySnapshot = await getDocs(q);
 
-      // 추가 등록
-      if (querySnapshot.docs.length) {
+      if (querySnapshot.size) {
         const docId = querySnapshot.docs[0].id;
         const docData = querySnapshot.docs[0].data();
         docData.members.push(memberInfo);
 
         return await setDoc(doc(db, 'members', docId), docData);
-      }
-      // 처음 등록
-      else {
+      } else {
         const params = {
           church,
           createdAt: serverTimestamp(),
@@ -107,7 +104,6 @@ export const useMemberStore = defineStore('member', {
       return;
     },
 
-    // async fetchMembers(payload: Omit<DefaultPayload, keyof State>) {
     async fetchMembers(payload: {
       church: string | undefined;
       department: string | undefined;

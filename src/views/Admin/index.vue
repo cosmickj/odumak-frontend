@@ -19,13 +19,13 @@
 
         <span class="text-2xl mx-5">|</span>
 
-        <!-- <RouterLink
+        <RouterLink
           class="text-2xl cursor-pointer"
           :to="{ name: 'AdminView', params: { position: 'teacher' } }"
         >
           <i class="text-2xl mr-2 pi pi-pencil"></i>
           교사 목록
-        </RouterLink> -->
+        </RouterLink>
       </div>
     </div>
 
@@ -207,12 +207,14 @@ export default {
 import AdminStudent from './components/AdminStudent.vue';
 import AdminTeacher from './components/AdminTeacher.vue';
 import { useRoute } from 'vue-router';
+import { useAccountStore } from '@/store/account';
 import { useMemberStore } from '@/store/member';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 
 const route = useRoute();
 const position = computed(() => route.params.position);
 
+const account = useAccountStore();
 const member = useMemberStore();
 
 const isLoading = ref(false);
@@ -223,8 +225,8 @@ const getMembers = async () => {
     isLoading.value = true;
     if (position.value === 'student' || position.value === 'teacher') {
       dataSource.value = await member.fetchMembers({
-        church: '영은교회',
-        department: '초등부',
+        church: account.userData?.church,
+        department: account.userData?.department,
         position: position.value,
       });
     }
@@ -263,7 +265,7 @@ const modal = reactive({
   status: false,
   label: '',
 });
-// const isModalOpened = ref(false);
+
 const selectedStudent = reactive<Student>({
   address: '',
   gender: 'male',
@@ -274,6 +276,28 @@ const selectedStudent = reactive<Student>({
   remark: '',
   teacher: '',
   registeredAt: new Date(),
+});
+
+watch(selectedStudent, async (student) => {
+  if (student.grade && student.group) {
+    const result = await member.fetchMembers({
+      church: account.userData?.church,
+      department: account.userData?.department,
+      position: 'teacher',
+      grade: student.grade,
+      group: student.group,
+      role: 'main',
+    });
+
+    if (result) {
+      if (result[0]?.name) {
+        selectedStudent.teacher = result[0]?.name;
+      } else {
+        const msg = '담당 교사가 없는 학급입니다. 다시 선택해주세요.';
+        selectedStudent.teacher = msg;
+      }
+    }
+  }
 });
 
 interface Student {
@@ -317,7 +341,13 @@ const openModalForAddStudent = () => {
   selectedStudent.registeredAt = new Date();
 };
 
-const addStudent = () => {
+const addStudent = async () => {
+  await member.createMember({
+    church: account.userData?.church,
+    department: account.userData?.department,
+    position: 'student',
+    ...selectedStudent,
+  });
   alert('추가되었습니다.');
 };
 
