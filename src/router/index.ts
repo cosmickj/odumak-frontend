@@ -58,13 +58,19 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/admin',
-    component: () => import('@/layouts/AdminLayout.vue'),
+    component: () => import('@/views/Admin/index.vue'),
+    props: true,
     meta: { requiresAuth: true, requiresAdmin: true },
     children: [
       {
-        path: ':position/table',
-        name: 'AdminView',
-        component: () => import('@/views/Admin/index.vue'),
+        path: 'students',
+        name: 'AdminStudent',
+        component: () => import('@/views/Admin/Student/index.vue'),
+      },
+      {
+        path: 'teachers',
+        name: 'AdminTeacher',
+        component: () => import('@/views/Admin/Teacher/index.vue'),
       },
     ],
   },
