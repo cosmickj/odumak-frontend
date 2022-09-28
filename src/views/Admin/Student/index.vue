@@ -70,6 +70,7 @@
               <Button
                 icon="pi pi-trash"
                 class="p-button-rounded p-button-warning mx-6"
+                @click="openModalForDeleteStudent(slotProps.data)"
               />
             </div>
           </template>
@@ -78,22 +79,36 @@
     </div>
   </div>
 
-  <StudentDialog :modal="modal" :selected-student="selectedStudent" />
+  <StudentDialog
+    :dialog="editDialog"
+    :selected-student="selectedStudent"
+    @add="addStudent"
+    @edit="editStudent"
+  />
+
+  <StudentDelete
+    :dialog="deleteDialog"
+    :selected-student="selectedStudent"
+    @cancel="closeModalForDeleteStudent"
+    @confirm="deleteStudent"
+  />
 </template>
 
 <script setup lang="ts">
 import StudentDialog from './components/StudentDialog.vue';
+import StudentDelete from './components/StudentDelete.vue';
 import { onMounted, reactive, ref, watch } from 'vue';
 import { useAccountStore } from '@/store/account';
 import { useMemberStore } from '@/store/member';
 import { Student, Teacher } from '@/types';
-// import type { DataTableRowClickEvent } from 'primevue/datatable/DataTable';
 
 const account = useAccountStore();
+
 const member = useMemberStore();
 
-const isLoading = ref(false);
 const dataSource = ref();
+
+const isLoading = ref(false);
 
 const getMembers = async () => {
   try {
@@ -136,25 +151,30 @@ const columns = ref([
   { field: 'remark', header: '비고', sortable: false, formatter: undefined },
 ]);
 
-const selectedStudents = ref();
-
 const selectedColumns = ref(columns.value);
 
 const onToggle = (value: any) => {
   selectedColumns.value = columns.value.filter((col) => value.includes(col));
 };
 
-const selectedStudent = reactive<Student>({
+interface SelectedStudent extends Student {
+  index: number;
+}
+
+const selectedStudent: SelectedStudent = reactive({
   address: '',
   gender: 'male',
   grade: '',
   group: '',
+  index: 0,
   name: '',
   phone: '',
   remark: '',
   teacher: '',
   registeredAt: new Date(),
 });
+
+const selectedStudents = ref();
 
 watch(selectedStudent, async (student) => {
   if (student.grade && student.group) {
@@ -176,23 +196,24 @@ watch(selectedStudent, async (student) => {
   }
 });
 
-const modal = reactive({
-  status: false,
+const editDialog = reactive({
   label: '',
+  status: false,
 });
 
-const openModalForEditStudent = (student: Student) => {
+const openModalForEditStudent = (student: SelectedStudent) => {
   selectedStudent.address = student.address;
   selectedStudent.gender = student.gender;
   selectedStudent.grade = student.grade;
   selectedStudent.group = student.group;
+  selectedStudent.index = student.index;
   selectedStudent.name = student.name;
   selectedStudent.phone = student.phone;
   selectedStudent.remark = student.remark;
   selectedStudent.teacher = student.teacher;
 
-  modal.status = true;
-  modal.label = '수정하기';
+  editDialog.status = true;
+  editDialog.label = '수정하기';
 };
 
 const openModalForAddStudent = () => {
@@ -200,14 +221,76 @@ const openModalForAddStudent = () => {
   selectedStudent.gender = 'male';
   selectedStudent.grade = '';
   selectedStudent.group = '';
+  selectedStudent.index = 0;
   selectedStudent.name = '';
   selectedStudent.phone = '';
   selectedStudent.remark = '';
   selectedStudent.teacher = '';
   selectedStudent.registeredAt = new Date();
 
-  modal.status = true;
-  modal.label = '추가하기';
+  editDialog.status = true;
+  editDialog.label = '추가하기';
+};
+
+const addStudent = async () => {
+  await member.createMember({
+    church: account.userData?.church,
+    department: account.userData?.department,
+    position: 'student',
+    ...selectedStudent,
+  });
+  alert('추가되었습니다.');
+};
+
+const editStudent = () => {
+  alert('수정되었습니다.');
+};
+
+const deleteDialog = reactive({
+  label: '',
+  status: false,
+});
+
+const openModalForDeleteStudent = (student: SelectedStudent) => {
+  selectedStudent.address = student.address;
+  selectedStudent.gender = student.gender;
+  selectedStudent.grade = student.grade;
+  selectedStudent.group = student.group;
+  selectedStudent.index = student.index;
+  selectedStudent.name = student.name;
+  selectedStudent.phone = student.phone;
+  selectedStudent.remark = student.remark;
+  selectedStudent.teacher = student.teacher;
+
+  deleteDialog.status = true;
+};
+
+const closeModalForDeleteStudent = () => {
+  selectedStudent.address = '';
+  selectedStudent.gender = 'male';
+  selectedStudent.grade = '';
+  selectedStudent.group = '';
+  selectedStudent.index = 0;
+  selectedStudent.name = '';
+  selectedStudent.phone = '';
+  selectedStudent.remark = '';
+  selectedStudent.teacher = '';
+  selectedStudent.registeredAt = new Date();
+
+  deleteDialog.status = false;
+};
+
+const deleteStudent = async () => {
+  await member.removeMember({
+    church: account.userData?.church,
+    department: account.userData?.department,
+    position: 'student',
+    index: selectedStudent.index,
+  });
+
+  deleteDialog.status = false;
+
+  await getMembers();
 };
 </script>
 

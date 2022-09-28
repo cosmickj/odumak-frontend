@@ -1,9 +1,9 @@
 <template>
   <Dialog
-    v-model:visible="modal.status"
+    v-model:visible="dialog.status"
     class="w-2/5"
     :breakpoints="{ '450px': '75vw' }"
-    :header="modal.label"
+    :header="dialog.label"
     modal
     maximizable
   >
@@ -119,16 +119,16 @@
 
         <div class="col-span-4">
           <Button
-            v-if="modal.label === '수정하기'"
-            :label="modal.label"
+            v-if="dialog.label === '수정하기'"
+            :label="dialog.label"
             class="p-button-warning w-full"
-            @click="editStudent"
+            @click="handelEdit"
           />
           <Button
-            v-else-if="modal.label === '추가하기'"
-            :label="modal.label"
+            v-else-if="dialog.label === '추가하기'"
+            :label="dialog.label"
             class="p-button-success w-full"
-            @click="addStudent"
+            @click="handelAdd"
           />
         </div>
       </div>
@@ -138,26 +138,14 @@
 
 <script setup lang="ts">
 defineProps<{
-  modal: {
+  dialog: {
     status: boolean;
     label: string;
   };
   selectedStudent: any;
 }>();
 
-const addStudent = async () => {
-  //   await member.createMember({
-  //     church: account.userData?.church,
-  //     department: account.userData?.department,
-  //     position: 'student',
-  //     ...selectedStudent,
-  //   });
-  alert('추가되었습니다.');
-};
-
-const editStudent = () => {
-  alert('수정되었습니다.');
-};
+const emit = defineEmits(['add', 'edit']);
 
 const gradeList = [
   { name: '3학년', value: '3' },
@@ -174,4 +162,8 @@ const groupList = [
   { name: '6반', value: '6' },
   { name: '7반', value: '7' },
 ];
+
+const handelAdd = () => emit('add');
+
+const handelEdit = () => emit('edit');
 </script>
