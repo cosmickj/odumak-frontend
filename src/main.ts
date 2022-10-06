@@ -1,17 +1,18 @@
 import '@/styles/normalize.css';
 import '@/styles/global.css';
-
-import { createApp } from 'vue';
-import { createPinia } from 'pinia';
-import router from '@/router';
-import App from '@/App.vue';
-
-import VueCookies from 'vue-cookies';
-import PrimeVue from 'primevue/config';
-
 import 'primevue/resources/primevue.min.css';
 import 'primevue/resources/themes/saga-blue/theme.css';
 import 'primeicons/primeicons.css';
+import '@/index.css'; // Tailwind CSS
+import 'animate.css';
+
+import { createApp } from 'vue';
+import App from '@/App.vue';
+import router from '@/router';
+import { createPinia } from 'pinia';
+import VueCookies from 'vue-cookies';
+import PrimeVue from 'primevue/config';
+
 import Button from 'primevue/button';
 import Card from 'primevue/card';
 import Calendar from 'primevue/calendar';
@@ -27,8 +28,6 @@ import Password from 'primevue/password';
 import RadioButton from 'primevue/radiobutton';
 import SelectButton from 'primevue/selectbutton';
 import Tree from 'primevue/tree';
-import '@/index.css'; // Tailwind CSS
-import 'animate.css';
 
 const app = createApp(App);
 

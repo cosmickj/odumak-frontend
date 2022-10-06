@@ -2,10 +2,10 @@
   <Dialog
     v-model:visible="dialog.status"
     class="w-2/5"
-    :breakpoints="{ '450px': '75vw' }"
-    :header="dialog.label"
     modal
     maximizable
+    :breakpoints="{ '450px': '75vw' }"
+    :header="dialog.label"
   >
     <div class="min-w-full">
       <div class="grid grid-cols-4 gap-x-12 gap-y-5">
@@ -24,20 +24,20 @@
         <div class="col-span-2">
           <p>몇 반 인가요?</p>
           <Dropdown
-            class="w-full"
             v-model="selectedStudent.group"
-            :options="groupList"
+            class="w-full"
+            placeholder="학급"
             option-label="name"
             option-value="value"
-            placeholder="학급"
+            :options="groupList"
           />
         </div>
 
         <div class="col-span-4">
           <p>이름</p>
           <InputText
-            class="w-full"
             v-model="selectedStudent.name"
+            class="w-full"
             placeholder="이름을 입력해주세요."
           />
         </div>
@@ -120,15 +120,15 @@
         <div class="col-span-4">
           <Button
             v-if="dialog.label === '수정하기'"
-            :label="dialog.label"
             class="p-button-warning w-full"
-            @click="handelEdit"
+            :label="dialog.label"
+            @click="handleSubmit('EDIT')"
           />
           <Button
             v-else-if="dialog.label === '추가하기'"
-            :label="dialog.label"
             class="p-button-success w-full"
-            @click="handelAdd"
+            :label="dialog.label"
+            @click="handleSubmit('ADD')"
           />
         </div>
       </div>
@@ -137,6 +137,7 @@
 </template>
 
 <script setup lang="ts">
+import { SubmitType } from '@/types';
 defineProps<{
   dialog: {
     status: boolean;
@@ -145,7 +146,7 @@ defineProps<{
   selectedStudent: any;
 }>();
 
-const emit = defineEmits(['add', 'edit']);
+const emit = defineEmits(['submit']);
 
 const gradeList = [
   { name: '3학년', value: '3' },
@@ -163,7 +164,5 @@ const groupList = [
   { name: '7반', value: '7' },
 ];
 
-const handelAdd = () => emit('add');
-
-const handelEdit = () => emit('edit');
+const handleSubmit = (submitType: SubmitType) => emit('submit', { submitType });
 </script>

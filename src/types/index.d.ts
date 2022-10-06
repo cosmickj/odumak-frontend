@@ -70,3 +70,5 @@ export interface AddTeacherParams {
   role: string | null;
   remark: string;
 }
+
+export type SubmitType = 'ADD' | 'EDIT';
