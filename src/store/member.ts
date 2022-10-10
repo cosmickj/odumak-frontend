@@ -55,7 +55,7 @@ export const useMemberStore = defineStore('member', {
     },
 
     async modifyMember(payload: any) {
-      const { church, department, index, position, ...params } = payload;
+      const { church, department, position, index, ...params } = payload;
 
       const q = query(
         membersColl,
@@ -81,6 +81,7 @@ export const useMemberStore = defineStore('member', {
 
     async removeMember(payload: any) {
       const { church, department, index, position, ...params } = payload;
+      console.log(params);
 
       const q = query(
         membersColl,
@@ -94,12 +95,16 @@ export const useMemberStore = defineStore('member', {
 
       let members = querySnapshot.docs[0].data().members;
 
-      members.splice(index, 1);
+      for (const member of members) {
+        console.log(member);
 
-      await updateDoc(doc(db, 'members', documentId), {
-        members,
-        updatedAt: serverTimestamp(),
-      });
+        // members.splice(index, 1);
+      }
+
+      // await updateDoc(doc(db, 'members', documentId), {
+      //   members,
+      //   updatedAt: serverTimestamp(),
+      // });
 
       return;
     },
