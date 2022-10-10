@@ -54,8 +54,8 @@
           :sortable="column.sortable"
         >
           <template #body="slotProps">
-            <span v-if="column.formatter">
-              {{ column.formatter(slotProps.data[column.field]) }}
+            <span v-if="column.format">
+              {{ column.format(slotProps.data[column.field]) }}
             </span>
 
             <span v-else>
@@ -112,26 +112,28 @@ import StudentsDelete from './components/StudentsDelete.vue';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useAccountStore } from '@/store/account';
 import { useMemberStore } from '@/store/member';
+import { v4 as uuidv4 } from 'uuid';
 import { useVuelidate } from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
-import { Student, SubmitType, Teacher } from '@/types';
-import { async } from '@firebase/util';
+import { Student, Teacher, SubmitType } from '@/types';
 
 const accountStore = useAccountStore();
 const memberStore = useMemberStore();
 
-const dataSource = ref();
-
 const isLoading = ref(false);
+const dataSource = ref();
 
 const getMembers = async () => {
   try {
     isLoading.value = true;
-    dataSource.value = await memberStore.fetchMembers({
-      church: accountStore.userData?.church,
-      department: accountStore.userData?.department,
-      position: 'student',
-    });
+    if (accountStore.userData) {
+      const result = await memberStore.fetchAll({
+        church: accountStore.userData.church,
+        department: accountStore.userData.department,
+        position: 'student',
+      });
+      dataSource.value = result;
+    }
   } catch (error) {
     console.log(error);
   } finally {
@@ -149,16 +151,15 @@ const formatBirth = (seconds: number | undefined) => {
   else return;
 };
 
-// prettier-ignore
 const columns = ref([
-  { field: 'grade', header: '학년', sortable: true, formatter: undefined },
-  { field: 'group', header: '학급', sortable: true, formatter: undefined },
-  { field: 'name', header: '이름', sortable: true, formatter: undefined },
-  { field: 'gender', header: '성별', sortable: false, formatter: formatGender },
-  { field: 'phone', header: '연락처', sortable: false, formatter: undefined },
-  { field: 'teacher', header: '담당 교사', sortable: true, formatter: undefined },
-  { field: 'address', header: '주소', sortable: true, formatter: undefined },
-  { field: 'remark', header: '비고', sortable: false, formatter: undefined },
+  { field: 'grade', header: '학년', sortable: true, format: undefined },
+  { field: 'group', header: '학급', sortable: true, format: undefined },
+  { field: 'name', header: '이름', sortable: true, format: undefined },
+  { field: 'gender', header: '성별', sortable: false, format: formatGender },
+  { field: 'phone', header: '연락처', sortable: false, format: undefined },
+  { field: 'teacher', header: '담당 교사', sortable: true, format: undefined },
+  { field: 'address', header: '주소', sortable: true, format: undefined },
+  { field: 'remark', header: '비고', sortable: false, format: undefined },
 ]);
 
 const selectedColumns = ref(columns.value);
@@ -167,24 +168,29 @@ const onToggle = (value: any) => {
   selectedColumns.value = columns.value.filter((col) => value.includes(col));
 };
 
-interface SelectedStudent extends Student {
-  index: number;
-}
+const selectedStudents = ref<Student[]>([]);
 
-const selectedStudents = ref<SelectedStudent[]>([]);
-
-const selectedStudent: SelectedStudent = reactive({
-  address: '',
-  gender: 'male',
+const initSelectedStudent: Student = {
+  _id: '',
   grade: '',
   group: '',
-  index: 0,
   name: '',
+  birth: new Date(`${new Date().getFullYear() - 10 + 1}-01-01`),
+  gender: 'male',
   phone: '',
-  remark: '',
+  phoneOwner: '',
   teacher: '',
+  address: '',
   registeredAt: new Date(),
-});
+  remark: '',
+};
+
+const selectedStudent = reactive({ ...initSelectedStudent });
+
+const resetSelectedStudent = () => {
+  // TODO: 3번째 매개변수에 대해서 타입체킹이 되지 않는다
+  Object.assign(selectedStudent, initSelectedStudent, { _id: uuidv4() });
+};
 
 watch(selectedStudent, async (student) => {
   if (student.grade && student.group) {
@@ -217,53 +223,44 @@ const addEditDialog = reactive({
   status: false,
 });
 
-const openModalForEditStudent = (student: SelectedStudent) => {
-  selectedStudent.address = student.address;
-  selectedStudent.gender = student.gender;
-  selectedStudent.grade = student.grade;
-  selectedStudent.group = student.group;
-  selectedStudent.name = student.name;
-  selectedStudent.phone = student.phone;
-  selectedStudent.remark = student.remark;
-  selectedStudent.teacher = student.teacher;
-
-  addEditDialog.status = true;
-  addEditDialog.label = '수정하기';
-};
-
 const openModalForAddStudent = () => {
-  selectedStudent.address = '';
-  selectedStudent.gender = 'male';
-  selectedStudent.grade = '';
-  selectedStudent.group = '';
-  selectedStudent.name = '';
-  selectedStudent.phone = '';
-  selectedStudent.remark = '';
-  selectedStudent.teacher = '';
-  selectedStudent.registeredAt = new Date();
+  resetSelectedStudent();
 
   addEditDialog.status = true;
   addEditDialog.label = '추가하기';
 };
 
 const addStudent = async () => {
-  await memberStore.createMember({
-    church: accountStore.userData?.church,
-    department: accountStore.userData?.department,
-    position: 'student',
-    ...selectedStudent,
-  });
-  alert('추가되었습니다.');
+  if (accountStore.userData) {
+    await memberStore.create({
+      church: accountStore.userData.church,
+      department: accountStore.userData.department,
+      position: 'student',
+      ...selectedStudent,
+    });
+    alert('추가되었습니다.');
+  }
+};
+
+const openModalForEditStudent = (student: Student) => {
+  student.birth = new Date(student.birth.seconds * 1000);
+  student.registeredAt = new Date(student.registeredAt.seconds * 1000);
+  Object.assign(selectedStudent, student);
+
+  addEditDialog.status = true;
+  addEditDialog.label = '수정하기';
 };
 
 const editStudent = async () => {
-  await memberStore.modifyMember({
-    church: accountStore.userData?.church,
-    department: accountStore.userData?.department,
-    position: 'student',
-    ...selectedStudent,
-  });
-  alert('수정되었습니다.');
+  if (accountStore.userData) {
+    await memberStore.modify({
+      church: accountStore.userData.church,
+      department: accountStore.userData.department,
+      position: 'student',
+      ...selectedStudent,
+    });
+    alert('수정되었습니다.');
+  }
 };
 
 const onSubmit = async ({ submitType }: { submitType: SubmitType }) => {
@@ -288,66 +285,56 @@ const deleteStudentsDialog = reactive({
   status: false,
 });
 
-const openModalForDeleteStudent = (student: SelectedStudent) => {
-  selectedStudent.address = student.address;
-  selectedStudent.gender = student.gender;
-  selectedStudent.grade = student.grade;
-  selectedStudent.group = student.group;
-  selectedStudent.index = student.index;
+const openModalForDeleteStudent = (student: Student) => {
+  selectedStudent._id = student._id;
   selectedStudent.name = student.name;
-  selectedStudent.phone = student.phone;
-  selectedStudent.remark = student.remark;
-  selectedStudent.teacher = student.teacher;
-
   deleteStudentDialog.status = true;
 };
 
 const closeModalForDeleteStudent = () => {
-  selectedStudent.address = '';
-  selectedStudent.gender = 'male';
-  selectedStudent.grade = '';
-  selectedStudent.group = '';
-  selectedStudent.index = 0;
-  selectedStudent.name = '';
-  selectedStudent.phone = '';
-  selectedStudent.remark = '';
-  selectedStudent.teacher = '';
-  selectedStudent.registeredAt = new Date();
-
+  resetSelectedStudent();
   deleteStudentDialog.status = false;
-};
-
-const deleteStudent = async () => {
-  await memberStore.removeMember({
-    church: accountStore.userData?.church,
-    department: accountStore.userData?.department,
-    position: 'student',
-    index: selectedStudent.index,
-  });
-
-  deleteStudentDialog.status = false;
-
-  await getMembers();
 };
 
 const setDeleteStudentsDialog = (flag: boolean) => {
   deleteStudentsDialog.status = flag;
 };
 
-const deleteStudents = async () => {
-  for await (const student of selectedStudents.value) {
-    await memberStore.removeMember({
+const deleteStudent = async () => {
+  if (accountStore.userData) {
+    await memberStore.remove({
       church: accountStore.userData?.church,
       department: accountStore.userData?.department,
       position: 'student',
-      index: student.index,
+      ids: [selectedStudent._id],
     });
-  }
 
-  setDeleteStudentsDialog(false);
+    deleteStudentDialog.status = false;
+    await getMembers();
+  }
 };
 
-onMounted(async () => await getMembers());
+const deleteStudents = async () => {
+  const ids = selectedStudents.value.map((student) => {
+    return student._id;
+  });
+
+  if (accountStore.userData) {
+    await memberStore.remove({
+      church: accountStore.userData?.church,
+      department: accountStore.userData?.department,
+      position: 'student',
+      ids,
+    });
+
+    setDeleteStudentsDialog(false);
+    await getMembers();
+  }
+};
+
+onMounted(async () => {
+  await getMembers();
+});
 </script>
 
 <style scoped>

@@ -3,6 +3,7 @@ export type TeacherRole = 'admin' | 'main' | 'sub' | 'common';
 export interface UserInfo {
   church: string;
   createdAt: Date;
+  department: string;
   email: string;
   grade: string;
   group: string;
@@ -22,16 +23,17 @@ export interface Member {
 }
 
 export interface Student {
-  address?: string;
-  attendance?: string;
-  birth?: string;
+  _id: string;
+  address: string;
+  birth: Date;
   gender: string;
   grade: string;
   group: string;
   name: string;
-  phone?: string;
-  registeredAt?: Date;
-  remark?: string;
+  phone: string;
+  phoneOwner: string;
+  registeredAt: Date;
+  remark: string;
   teacher: string;
 }
 

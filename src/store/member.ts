@@ -11,22 +11,41 @@ import {
 } from 'firebase/firestore';
 import { db, membersColl } from '@/firebase/config';
 import arraySort from 'array-sort';
-import type { AddStudentParams, MemberPosition, TeacherRole } from '@/types';
-import type { AccountData } from '@/types/store';
+import { Student, UserInfo, MemberPosition, TeacherRole } from '@/types';
 
-interface DefaultPayload
-  extends AddStudentParams,
-    Pick<AccountData, 'church' | 'department'> {
+interface FetchAllParmas extends Pick<UserInfo, 'church' | 'department'> {
+  position: MemberPosition;
+}
+
+interface CreateParams
+  extends Student,
+    Pick<UserInfo, 'church' | 'department'> {
+  position: MemberPosition;
+}
+
+interface CreateTemplateParams extends Pick<UserInfo, 'church' | 'department'> {
+  members: [];
+  position: MemberPosition;
+  createdAt: unknown;
+}
+
+// TODO: CreateParams와 같은 값이다. 리펙토링할 때 수정해보자
+interface ModifyParams
+  extends Student,
+    Pick<UserInfo, 'church' | 'department'> {
+  position: MemberPosition;
+}
+
+interface RemoveParams extends Pick<UserInfo, 'church' | 'department'> {
+  ids: string[];
   position: MemberPosition;
 }
 
 export const useMemberStore = defineStore('member', {
-  state: () => {
-    return {};
-  },
+  state: () => ({}),
   actions: {
-    async createMember(payload: any) {
-      const { church, department, position, ...memberInfo } = payload;
+    async fetchAll(params: FetchAllParmas) {
+      const { church, department, position } = params;
 
       const q = query(
         membersColl,
@@ -34,28 +53,49 @@ export const useMemberStore = defineStore('member', {
         where('department', '==', department),
         where('position', '==', position)
       );
-      const querySnapshot = await getDocs(q);
+      const qSnapshot = await getDocs(q);
 
-      if (querySnapshot.size) {
-        const docId = querySnapshot.docs[0].id;
-        const docData = querySnapshot.docs[0].data();
-        docData.members.push(memberInfo);
+      if (qSnapshot.empty) {
+        await this.createTemplate({
+          church,
+          department,
+          members: [],
+          position,
+          createdAt: serverTimestamp(),
+        });
+        await this.fetchAll(params);
+      } else {
+        const members = qSnapshot.docs[0].data().members;
+        return arraySort(members, ['grade', 'group', 'name']);
+      }
+    },
+
+    async create(params: CreateParams) {
+      const { church, department, position, ...memberParams } = params;
+
+      const q = query(
+        membersColl,
+        where('church', '==', church),
+        where('department', '==', department),
+        where('position', '==', position)
+      );
+      const qSnapshot = await getDocs(q);
+
+      if (!qSnapshot.empty) {
+        const docId = qSnapshot.docs[0].id;
+        const docData = qSnapshot.docs[0].data();
+        docData.members.push(memberParams);
 
         return await setDoc(doc(db, 'members', docId), docData);
-      } else {
-        const params = {
-          church,
-          createdAt: serverTimestamp(),
-          department,
-          members: [memberInfo],
-          position,
-        };
-        return await addDoc(membersColl, params);
       }
     },
 
-    async modifyMember(payload: any) {
-      const { church, department, position, index, ...params } = payload;
+    async createTemplate(params: CreateTemplateParams) {
+      return await addDoc(membersColl, params);
+    },
+
+    async modify(params: ModifyParams) {
+      const { _id, church, department, position, ...memberParams } = params;
 
       const q = query(
         membersColl,
@@ -63,25 +103,25 @@ export const useMemberStore = defineStore('member', {
         where('department', '==', department),
         where('position', '==', position)
       );
+      const qSnapshot = await getDocs(q);
 
-      const querySnapshot = await getDocs(q);
+      if (!qSnapshot.empty) {
+        const docId = qSnapshot.docs[0].id;
+        const docData = qSnapshot.docs[0].data();
 
-      const documentId = querySnapshot.docs[0].id;
+        docData.members.forEach((member: Student) => {
+          if (member._id === _id) Object.assign(member, memberParams);
+        });
 
-      let members = querySnapshot.docs[0].data().members;
-      members[index] = params;
-
-      await updateDoc(doc(db, 'members', documentId), {
-        members,
-        updatedAt: serverTimestamp(),
-      });
-
-      return;
+        return await updateDoc(doc(db, 'members', docId), {
+          members: docData.members,
+          updatedAt: serverTimestamp(),
+        });
+      }
     },
 
-    async removeMember(payload: any) {
-      const { church, department, index, position, ...params } = payload;
-      console.log(params);
+    async remove(params: RemoveParams) {
+      const { ids, church, department, position } = params;
 
       const q = query(
         membersColl,
@@ -89,24 +129,21 @@ export const useMemberStore = defineStore('member', {
         where('department', '==', department),
         where('position', '==', position)
       );
+      const qSnapshot = await getDocs(q);
 
-      const querySnapshot = await getDocs(q);
-      const documentId = querySnapshot.docs[0].id;
+      if (!qSnapshot.empty) {
+        const docId = qSnapshot.docs[0].id;
+        const docData = qSnapshot.docs[0].data();
 
-      let members = querySnapshot.docs[0].data().members;
+        const members = docData.members.filter((member: Student) => {
+          return !ids.includes(member._id);
+        });
 
-      for (const member of members) {
-        console.log(member);
-
-        // members.splice(index, 1);
+        return await updateDoc(doc(db, 'members', docId), {
+          members,
+          updatedAt: serverTimestamp(),
+        });
       }
-
-      // await updateDoc(doc(db, 'members', documentId), {
-      //   members,
-      //   updatedAt: serverTimestamp(),
-      // });
-
-      return;
     },
 
     async fetchMembers(payload: {

@@ -42,10 +42,14 @@
           />
         </div>
 
-        <!-- <div class="col-span-4">
-          <p>생년월일</p>
-          <Calendar  class="w-full" v-model="selectedStudent.birth"/>
-        </div> -->
+        <div class="col-span-4">
+          <p>생년월일이 어떻게 되나요?</p>
+          <Calendar
+            v-model="selectedStudent.birth"
+            class="w-full"
+            date-format="yy년 mm월 dd일"
+          />
+        </div>
 
         <div class="col-span-4">
           <p>성별</p>
@@ -137,13 +141,14 @@
 </template>
 
 <script setup lang="ts">
-import { SubmitType } from '@/types';
+import { Student, SubmitType } from '@/types';
+
 defineProps<{
   dialog: {
     status: boolean;
     label: string;
   };
-  selectedStudent: any;
+  selectedStudent: Student;
 }>();
 
 const emit = defineEmits(['submit']);
