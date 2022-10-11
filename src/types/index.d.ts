@@ -1,4 +1,5 @@
 export type TeacherRole = 'admin' | 'main' | 'sub' | 'common';
+export type MemberPosition = 'student' | 'teacher';
 
 export interface UserInfo {
   church: string;
@@ -9,17 +10,6 @@ export interface UserInfo {
   group: string;
   name: string;
   role: TeacherRole;
-}
-
-export type MemberPosition = 'student' | 'teacher';
-
-export interface Member {
-  church: string;
-  createdAt: Date;
-  department: string;
-  members: Student | Teacher;
-  position: MemberPosition;
-  updatedAt: Date;
 }
 
 export interface Student {
@@ -38,12 +28,24 @@ export interface Student {
 }
 
 export interface Teacher {
-  attendance?: string;
+  _id: string;
+  birth: Date;
+  gender: string;
   grade: string;
   group: string;
   name: string;
-  registeredAt?: Date;
   role: TeacherRole;
+  remark: string;
+  registeredAt: Date;
+}
+
+export interface Member {
+  church: string;
+  createdAt: Date;
+  department: string;
+  members: Student | Teacher;
+  position: MemberPosition;
+  updatedAt: Date;
 }
 
 export interface Option {
@@ -51,26 +53,26 @@ export interface Option {
   value: string;
 }
 
-export interface AddStudentParams {
-  index?: number | null;
-  grade: string | null;
-  group: string | null;
-  name: string;
-  gender: string | null;
-  birth: Date | null;
-  phone: string;
-  teacher: string;
-  address: string;
-  remark: string;
-}
+// export interface AddStudentParams {
+//   index?: number | null;
+//   grade: string | null;
+//   group: string | null;
+//   name: string;
+//   gender: string | null;
+//   birth: Date | null;
+//   phone: string;
+//   teacher: string;
+//   address: string;
+//   remark: string;
+// }
 
-export interface AddTeacherParams {
-  index?: number | null;
-  grade: string | null;
-  group: string | null;
-  name: string;
-  role: string | null;
-  remark: string;
-}
+// export interface AddTeacherParams {
+//   index?: number | null;
+//   grade: string | null;
+//   group: string | null;
+//   name: string;
+//   role: string | null;
+//   remark: string;
+// }
 
 export type SubmitType = 'ADD' | 'EDIT';
