@@ -1,7 +1,7 @@
 <template>
   <Dialog
     v-model:visible="dialog.status"
-    class="w-2/5"
+    class="overflow-hidden w-2/5"
     modal
     maximizable
     :breakpoints="{ '450px': '75vw' }"
@@ -10,31 +10,31 @@
     <div class="min-w-full">
       <div class="grid grid-cols-4 gap-x-12 gap-y-5">
         <div class="col-span-2">
-          <p>몇 학년을 담당하시는가요?</p>
+          <p class="mb-2">몇 학년을 담당하시는가요?</p>
           <Dropdown
             class="w-full"
             v-model="selectedTeacher.grade"
-            :options="gradeList"
-            option-label="name"
+            :options="grade"
+            option-label="label"
             option-value="value"
             placeholder="학년"
           />
         </div>
 
         <div class="col-span-2">
-          <p>몇 학급을 담당하시는가요?</p>
+          <p class="mb-2">몇 학급을 담당하시는가요?</p>
           <Dropdown
             v-model="selectedTeacher.group"
             class="w-full"
             placeholder="학급"
-            option-label="name"
+            option-label="label"
             option-value="value"
-            :options="groupList"
+            :options="group"
           />
         </div>
 
         <div class="col-span-4">
-          <p>이름</p>
+          <p class="mb-2">이름</p>
           <InputText
             v-model="selectedTeacher.name"
             class="w-full"
@@ -43,37 +43,108 @@
         </div>
 
         <div class="col-span-4">
-          <p>생년월일이 어떻게 되나요?</p>
-          <Calendar
-            v-model="selectedTeacher.birth"
-            class="w-full"
-            date-format="yy년 mm월 dd일"
-          />
-        </div>
+          <p class="mb-2">학급 담임 여부를 체크해주세요.</p>
+          <div class="flex gap-x-4 items-center">
+            <div class="flex gap-x-1 items-center">
+              <RadioButton
+                name="role"
+                inputId="main"
+                value="main"
+                v-model="selectedTeacher.role"
+              />
+              <label class="cursor-pointer" for="main">담임</label>
+            </div>
 
-        <div class="col-span-4">
-          <p>성별</p>
-          <div class="flex items-center">
-            <RadioButton
-              name="gender"
-              inputId="male"
-              value="male"
-              v-model="selectedTeacher.gender"
-            />
-            <label class="cursor-pointer" for="male"> 남자 선생님 </label>
+            <div class="flex gap-x-1 items-center">
+              <RadioButton
+                name="role"
+                inputId="sub"
+                value="sub"
+                v-model="selectedTeacher.role"
+              />
+              <label class="cursor-pointer" for="sub">부담임</label>
+            </div>
 
-            <RadioButton
-              name="gender"
-              inputId="female"
-              value="female"
-              v-model="selectedTeacher.gender"
-            />
-            <label class="cursor-pointer" for="female"> 여자 선생님 </label>
+            <div class="flex gap-x-1 items-center">
+              <RadioButton
+                name="role"
+                inputId="common"
+                value="common"
+                v-model="selectedTeacher.role"
+              />
+              <label class="cursor-pointer" for="common">미담당</label>
+            </div>
           </div>
         </div>
 
         <div class="col-span-4">
-          <p>연락처</p>
+          <p class="mb-2 flex items-center">
+            생년월일이 어떻게 되나요?
+            <InputSwitch v-model="isChecked" class="ml-4" input-id="later" />
+            <label class="ml-1 cursor-pointer select-none" for="later">
+              다음에 입력할게요
+            </label>
+          </p>
+          <div class="flex gap-x-8 items-center">
+            <Dropdown
+              v-model="selectedBirthYear"
+              class="w-full"
+              option-label="label"
+              option-value="value"
+              :disabled="isChecked"
+              :options="birthYear"
+              @change="handleBirthChange"
+            />
+
+            <Dropdown
+              v-model="selectedBirthMonth"
+              class="w-full"
+              option-label="label"
+              option-value="value"
+              :disabled="isChecked"
+              :options="birthMonth"
+              @change="handleBirthChange"
+            />
+
+            <Dropdown
+              v-model="selectedBirthDate"
+              class="w-full"
+              option-label="label"
+              option-value="value"
+              :disabled="isChecked"
+              :options="birthDate"
+              @change="handleBirthChange"
+            />
+          </div>
+        </div>
+
+        <div class="col-span-4">
+          <p class="mb-2">성별</p>
+          <div class="flex gap-x-4 items-center">
+            <div class="flex gap-x-1 items-center">
+              <RadioButton
+                name="gender"
+                inputId="male"
+                value="male"
+                v-model="selectedTeacher.gender"
+              />
+              <label class="cursor-pointer" for="male"> 남자 선생님 </label>
+            </div>
+
+            <div class="flex gap-x-1 items-center">
+              <RadioButton
+                name="gender"
+                inputId="female"
+                value="female"
+                v-model="selectedTeacher.gender"
+              />
+              <label class="cursor-pointer" for="female"> 여자 선생님 </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-span-4">
+          <p class="mb-2">연락처</p>
           <InputMask
             class="w-full"
             v-model="selectedTeacher.phone"
@@ -83,17 +154,20 @@
         </div>
 
         <div class="col-span-4">
-          <p>해당 선생님의 초등부를 등록일이 언제인가요?</p>
+          <p class="mb-2">
+            추가하려는 선생님께서 언제 처음 초등부와 함께 하였나요?
+          </p>
           <Calendar
             class="w-full"
             touchUI
             v-model="selectedTeacher.registeredAt"
             date-format="yy년 mm월 dd일"
+            :manual-input="false"
           />
         </div>
 
         <div class="col-span-4">
-          <p>비고</p>
+          <p class="mb-2">비고</p>
           <InputText class="w-full" v-model="selectedTeacher.remark" />
         </div>
 
@@ -117,33 +191,42 @@
 </template>
 
 <script setup lang="ts">
-import { SubmitType } from '@/types';
+import { SubmitType, Teacher } from '@/types';
+import { ref } from 'vue';
+import { birthYear, birthMonth, birthDate, grade, group } from '../../data';
 
-defineProps<{
+const props = defineProps<{
   dialog: {
     status: boolean;
     label: string;
   };
-  selectedTeacher: any;
+  selectedTeacher: Teacher;
 }>();
 
-const emit = defineEmits(['submit']);
+const emit = defineEmits(['submit', 'birthChange']);
 
-const gradeList = [
-  { name: '3학년', value: '3' },
-  { name: '4학년', value: '4' },
-];
+const isChecked = ref(false);
 
-const groupList = [
-  { name: '새친구', value: '0' },
-  { name: '1반', value: '1' },
-  { name: '2반', value: '2' },
-  { name: '3반', value: '3' },
-  { name: '4반', value: '4' },
-  { name: '5반', value: '5' },
-  { name: '6반', value: '6' },
-  { name: '7반', value: '7' },
-];
+const selectedBirthYear = ref(
+  props.selectedTeacher.birth.getFullYear().toString()
+);
+
+const selectedBirthMonth = ref(
+  (props.selectedTeacher.birth.getMonth() + 1).toString()
+);
+
+const selectedBirthDate = ref(props.selectedTeacher.birth.getDate().toString());
+
+const handleBirthChange = () => {
+  const selectedBirthString = `${selectedBirthYear.value}-${selectedBirthMonth.value}-${selectedBirthDate.value}`;
+  emit('birthChange', { birth: new Date(selectedBirthString) });
+};
 
 const handleSubmit = (submitType: SubmitType) => emit('submit', { submitType });
 </script>
+
+<style>
+.p-dropdown-panel {
+  overflow: hidden;
+}
+</style>

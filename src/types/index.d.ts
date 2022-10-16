@@ -29,14 +29,15 @@ export interface Student {
 
 export interface Teacher {
   _id: string;
-  birth: Date;
-  gender: string;
   grade: string;
   group: string;
   name: string;
   role: TeacherRole;
-  remark: string;
+  birth: Date;
+  gender: string;
+  phone: string;
   registeredAt: Date;
+  remark: string;
 }
 
 export interface Member {

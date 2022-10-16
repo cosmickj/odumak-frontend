@@ -23,6 +23,7 @@ import Dialog from 'primevue/dialog';
 import Dropdown from 'primevue/dropdown';
 import InputMask from 'primevue/inputmask';
 import InputText from 'primevue/inputtext';
+import InputSwitch from 'primevue/inputswitch';
 import MultiSelect from 'primevue/multiselect';
 import Password from 'primevue/password';
 import RadioButton from 'primevue/radiobutton';
@@ -70,6 +71,7 @@ app
   .component('Dropdown', Dropdown)
   .component('InputMask', InputMask)
   .component('InputText', InputText)
+  .component('InputSwitch', InputSwitch)
   .component('MultiSelect', MultiSelect)
   .component('Password', Password)
   .component('RadioButton', RadioButton)

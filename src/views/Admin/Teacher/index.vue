@@ -81,6 +81,7 @@
   <TeacherDialog
     :dialog="addEditDialog"
     :selected-teacher="selectedTeacher"
+    @birth-change="setBirth"
     @submit=""
   />
 </template>
@@ -143,6 +144,9 @@ const initSelectedTeacher: Teacher = {
   group: '',
   name: '',
   role: 'common',
+  birth: new Date(),
+  gender: '',
+  phone: '',
   remark: '',
   registeredAt: new Date(),
 };
@@ -160,6 +164,10 @@ const openDialogForAddTeacher = () => {
   resetSelectedTeacher();
   addEditDialog.status = true;
   addEditDialog.label = '추가하기';
+};
+
+const setBirth = ({ birth }: { birth: Date }) => {
+  selectedTeacher.birth = birth;
 };
 
 onMounted(async () => {

@@ -29,4 +29,38 @@ const teacherRole: Option[] = [
   { label: '일반교사', value: 'common' },
 ];
 
-export { gender, grade, group, teacherRole };
+const getBirthYear = () => {
+  const currentYear = new Date().getFullYear();
+  const minYear = currentYear - 100;
+  let years = [];
+  for (let y = currentYear; y >= minYear; y--) {
+    years.push({ label: `${y}년`, value: y.toString() });
+  }
+  return years;
+};
+
+const getBirthMonth = () => {
+  const minMonth = 1;
+  const maxMonth = 12;
+  let months = [];
+  for (let m = minMonth; m <= maxMonth; m++) {
+    months.push({ label: `${m}월`, value: m.toString() });
+  }
+  return months;
+};
+
+const getBirthDate = () => {
+  const minDate = 1;
+  const maxDate = 31;
+  let days = [];
+  for (let d = minDate; d <= maxDate; d++) {
+    days.push({ label: `${d}일`, value: d.toString() });
+  }
+  return days;
+};
+
+const birthYear: Option[] = getBirthYear();
+const birthMonth: Option[] = getBirthMonth();
+const birthDate: Option[] = getBirthDate();
+
+export { birthYear, birthMonth, birthDate, gender, grade, group, teacherRole };
