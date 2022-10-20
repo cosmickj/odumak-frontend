@@ -6,16 +6,18 @@
     maximizable
     :breakpoints="{ '450px': '75vw' }"
     :header="dialog.label"
+    @hide="handleHide"
   >
     <div class="min-w-full">
       <div class="grid grid-cols-4 gap-x-12 gap-y-5">
         <div class="col-span-2">
           <p>몇 학년 인가요?</p>
           <Dropdown
-            class="w-full"
             v-model="selectedStudent.grade"
-            :options="gradeList"
-            option-label="name"
+            class="w-full"
+            :class="{ 'p-invalid': errors.grade.status }"
+            :options="GRADE"
+            option-label="label"
             option-value="value"
             placeholder="학년"
           />
@@ -26,10 +28,22 @@
           <Dropdown
             v-model="selectedStudent.group"
             class="w-full"
+            :class="{ 'p-invalid': errors.group.status }"
             placeholder="학급"
-            option-label="name"
+            option-label="label"
             option-value="value"
-            :options="groupList"
+            :options="GROUP"
+          />
+        </div>
+
+        <div class="col-span-4">
+          <p>담당 교사</p>
+          <InputText
+            v-model="selectedStudent.teacher"
+            class="w-full"
+            :class="{ 'p-invalid': errors.teacher.status }"
+            disabled
+            placeholder="학년과 학급을 선택하시면 자동으로 입력됩니다."
           />
         </div>
 
@@ -38,17 +52,50 @@
           <InputText
             v-model="selectedStudent.name"
             class="w-full"
+            :class="{ 'p-invalid': errors.name.status }"
             placeholder="이름을 입력해주세요."
           />
         </div>
 
         <div class="col-span-4">
-          <p>생년월일이 어떻게 되나요?</p>
-          <Calendar
-            v-model="selectedStudent.birth"
-            class="w-full"
-            date-format="yy년 mm월 dd일"
-          />
+          <p class="mb-2 flex items-center">
+            생년월일이 언제인가요?
+            <InputSwitch v-model="isChecked" class="ml-4" input-id="later" />
+            <label class="ml-1 cursor-pointer select-none" for="later">
+              다음에 입력할게요
+            </label>
+          </p>
+          <div class="flex gap-x-8 items-center">
+            <Dropdown
+              v-model="selectedBirthYear"
+              class="w-full"
+              option-label="label"
+              option-value="value"
+              :disabled="isChecked"
+              :options="BIRTH_YEAR"
+              @change="handleBirthChange"
+            />
+
+            <Dropdown
+              v-model="selectedBirthMonth"
+              class="w-full"
+              option-label="label"
+              option-value="value"
+              :disabled="isChecked"
+              :options="BIRTH_MONTH"
+              @change="handleBirthChange"
+            />
+
+            <Dropdown
+              v-model="selectedBirthDate"
+              class="w-full"
+              option-label="label"
+              option-value="value"
+              :disabled="isChecked"
+              :options="BIRTH_DATE"
+              @change="handleBirthChange"
+            />
+          </div>
         </div>
 
         <div class="col-span-4">
@@ -88,16 +135,6 @@
         </div>
 
         <div class="col-span-4">
-          <p>담당 교사</p>
-          <InputText
-            class="w-full"
-            disabled
-            v-model="selectedStudent.teacher"
-            placeholder="학년과 학급을 선택하시면 자동으로 입력됩니다."
-          />
-        </div>
-
-        <div class="col-span-4">
           <p>어디 사는 친구인가요?</p>
           <InputText
             class="w-full"
@@ -109,10 +146,10 @@
         <div class="col-span-4">
           <p>언제 초등부를 처음 나왔나요?</p>
           <Calendar
-            class="w-full"
-            touchUI
             v-model="selectedStudent.registeredAt"
+            class="w-full"
             date-format="yy년 mm월 dd일"
+            touchUI
           />
         </div>
 
@@ -142,32 +179,50 @@
 
 <script setup lang="ts">
 import { Student, SubmitType } from '@/types';
+import { ref } from 'vue';
+import {
+  BIRTH_DATE,
+  BIRTH_MONTH,
+  BIRTH_YEAR,
+  GRADE,
+  GROUP,
+} from '@/constants/common';
 
-defineProps<{
+const props = defineProps<{
   dialog: {
     status: boolean;
     label: string;
   };
   selectedStudent: Student;
+  errors: any;
 }>();
 
-const emit = defineEmits(['submit']);
+const emit = defineEmits(['hide', 'submit', 'birthChange']);
 
-const gradeList = [
-  { name: '3학년', value: '3' },
-  { name: '4학년', value: '4' },
-];
+const isChecked = ref(false);
 
-const groupList = [
-  { name: '새친구', value: '0' },
-  { name: '1반', value: '1' },
-  { name: '2반', value: '2' },
-  { name: '3반', value: '3' },
-  { name: '4반', value: '4' },
-  { name: '5반', value: '5' },
-  { name: '6반', value: '6' },
-  { name: '7반', value: '7' },
-];
+const selectedBirthYear = ref(
+  props.selectedStudent.birth.getFullYear().toString()
+);
+
+const selectedBirthMonth = ref(
+  (props.selectedStudent.birth.getMonth() + 1).toString()
+);
+
+const selectedBirthDate = ref(props.selectedStudent.birth.getDate().toString());
+
+const handleBirthChange = () => {
+  const selectedBirthString = `${selectedBirthYear.value}-${selectedBirthMonth.value}-${selectedBirthDate.value}`;
+  emit('birthChange', { birth: new Date(selectedBirthString) });
+};
 
 const handleSubmit = (submitType: SubmitType) => emit('submit', { submitType });
+
+const handleHide = () => emit('hide');
 </script>
+
+<style>
+.p-dropdown-panel {
+  overflow: hidden;
+}
+</style>

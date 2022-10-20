@@ -86,7 +86,9 @@
 
   <StudentDialog
     :dialog="addEditDialog"
+    :errors="errors"
     :selected-student="selectedStudent"
+    @hide="v$.$reset"
     @submit="onSubmit"
   />
 
@@ -114,7 +116,7 @@ import { useAccountStore } from '@/store/account';
 import { useMemberStore } from '@/store/member';
 import { v4 as uuidv4 } from 'uuid';
 import { useVuelidate } from '@vuelidate/core';
-import { required } from '@vuelidate/validators';
+import { required, helpers, not, sameAs } from '@vuelidate/validators';
 import { Student, Teacher, SubmitType } from '@/types';
 
 const accountStore = useAccountStore();
@@ -174,12 +176,12 @@ const initSelectedStudent: Student = {
   _id: '',
   grade: '',
   group: '',
+  teacher: '',
   name: '',
   birth: new Date(`${new Date().getFullYear() - 10 + 1}-01-01`),
   gender: 'male',
   phone: '',
   phoneOwner: '',
-  teacher: '',
   address: '',
   registeredAt: new Date(),
   remark: '',
@@ -213,9 +215,37 @@ watch(selectedStudent, async (student) => {
 });
 
 const rules = computed(() => ({
-  name: { required },
+  name: {
+    required: helpers.withMessage('이름을 꼭 입력해주세요.', required),
+  },
+  grade: { required },
+  group: { required },
+  teacher: {
+    required,
+    rejected: not(sameAs('담당 교사가 없는 학급입니다. 다시 선택해주세요.')),
+  },
 }));
+
 const v$ = useVuelidate(rules, selectedStudent);
+
+const errors = computed(() => ({
+  name: {
+    status: v$.value.$error,
+    message: v$.value.$errors[0]?.$message,
+  },
+  grade: {
+    status: v$.value.$error,
+    message: v$.value.$errors[0]?.$message,
+  },
+  group: {
+    status: v$.value.$error,
+    message: v$.value.$errors[0]?.$message,
+  },
+  teacher: {
+    status: v$.value.$error,
+    message: v$.value.$errors[0]?.$message,
+  },
+}));
 
 // || 생성 혹은 수정하기
 const addEditDialog = reactive({
