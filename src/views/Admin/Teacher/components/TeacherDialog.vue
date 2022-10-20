@@ -14,7 +14,7 @@
           <Dropdown
             class="w-full"
             v-model="selectedTeacher.grade"
-            :options="grade"
+            :options="GRADE"
             option-label="label"
             option-value="value"
             placeholder="학년"
@@ -29,7 +29,7 @@
             placeholder="학급"
             option-label="label"
             option-value="value"
-            :options="group"
+            :options="GROUP"
           />
         </div>
 
@@ -92,7 +92,7 @@
               option-label="label"
               option-value="value"
               :disabled="isChecked"
-              :options="birthYear"
+              :options="BIRTH_YEAR"
               @change="handleBirthChange"
             />
 
@@ -102,7 +102,7 @@
               option-label="label"
               option-value="value"
               :disabled="isChecked"
-              :options="birthMonth"
+              :options="BIRTH_MONTH"
               @change="handleBirthChange"
             />
 
@@ -112,7 +112,7 @@
               option-label="label"
               option-value="value"
               :disabled="isChecked"
-              :options="birthDate"
+              :options="BIRTH_DATE"
               @change="handleBirthChange"
             />
           </div>
@@ -193,7 +193,13 @@
 <script setup lang="ts">
 import { SubmitType, Teacher } from '@/types';
 import { ref } from 'vue';
-import { birthYear, birthMonth, birthDate, grade, group } from '../../data';
+import {
+  BIRTH_DATE,
+  BIRTH_MONTH,
+  BIRTH_YEAR,
+  GRADE,
+  GROUP,
+} from '@/constants/common';
 
 const props = defineProps<{
   dialog: {

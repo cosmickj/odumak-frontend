@@ -1,11 +1,11 @@
 import type { Option } from '@/types';
 
-const grade: Option[] = [
+const GRADE: Option[] = [
   { label: '3학년', value: '3' },
   { label: '4학년', value: '4' },
 ];
 
-const group: Option[] = [
+const GROUP: Option[] = [
   { label: '1반', value: '1' },
   { label: '2반', value: '2' },
   { label: '3반', value: '3' },
@@ -18,12 +18,12 @@ const group: Option[] = [
   { label: '10반', value: '10' },
 ];
 
-const gender: Option[] = [
+const GENDER: Option[] = [
   { label: '남자', value: 'male' },
   { label: '여자', value: 'female' },
 ];
 
-const teacherRole: Option[] = [
+const TEACHER_ROLE: Option[] = [
   { label: '담임', value: 'main' },
   { label: '부담임', value: 'sub' },
   { label: '일반교사', value: 'common' },
@@ -59,8 +59,16 @@ const getBirthDate = () => {
   return days;
 };
 
-const birthYear: Option[] = getBirthYear();
-const birthMonth: Option[] = getBirthMonth();
-const birthDate: Option[] = getBirthDate();
+const BIRTH_YEAR: Option[] = getBirthYear();
+const BIRTH_MONTH: Option[] = getBirthMonth();
+const BIRTH_DATE: Option[] = getBirthDate();
 
-export { birthYear, birthMonth, birthDate, gender, grade, group, teacherRole };
+export {
+  BIRTH_YEAR,
+  BIRTH_MONTH,
+  BIRTH_DATE,
+  GENDER,
+  GRADE,
+  GROUP,
+  TEACHER_ROLE,
+};
