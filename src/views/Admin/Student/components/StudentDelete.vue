@@ -25,12 +25,14 @@
 </template>
 
 <script setup lang="ts">
+import { Student } from '@/types';
+
 defineProps<{
   dialog: {
     status: boolean;
     label: string;
   };
-  selectedStudent: any;
+  selectedStudent: Student;
 }>();
 
 const emit = defineEmits(['cancel', 'confirm']);

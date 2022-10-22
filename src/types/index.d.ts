@@ -1,5 +1,8 @@
-export type TeacherRole = 'admin' | 'main' | 'sub' | 'common';
+export type SubmitType = 'ADD' | 'EDIT';
+
+export type Gender = 'male' | 'female';
 export type MemberPosition = 'student' | 'teacher';
+export type TeacherRole = 'admin' | 'main' | 'sub' | 'common';
 
 export interface UserInfo {
   church: string;
@@ -12,11 +15,20 @@ export interface UserInfo {
   role: TeacherRole;
 }
 
+export interface Member {
+  church: string;
+  createdAt: Date;
+  department: string;
+  members: Student | Teacher;
+  position: MemberPosition;
+  updatedAt: Date;
+}
+
 export interface Student {
   _id: string;
   address: string;
   birth: Date;
-  gender: string;
+  gender: Gender;
   grade: string;
   group: string;
   name: string;
@@ -34,19 +46,10 @@ export interface Teacher {
   name: string;
   role: TeacherRole;
   birth: Date;
-  gender: string;
+  gender: Gender;
   phone: string;
   registeredAt: Date;
   remark: string;
-}
-
-export interface Member {
-  church: string;
-  createdAt: Date;
-  department: string;
-  members: Student | Teacher;
-  position: MemberPosition;
-  updatedAt: Date;
 }
 
 export interface Option {
@@ -54,26 +57,9 @@ export interface Option {
   value: string;
 }
 
-// export interface AddStudentParams {
-//   index?: number | null;
-//   grade: string | null;
-//   group: string | null;
-//   name: string;
-//   gender: string | null;
-//   birth: Date | null;
-//   phone: string;
-//   teacher: string;
-//   address: string;
-//   remark: string;
-// }
-
-// export interface AddTeacherParams {
-//   index?: number | null;
-//   grade: string | null;
-//   group: string | null;
-//   name: string;
-//   role: string | null;
-//   remark: string;
-// }
-
-export type SubmitType = 'ADD' | 'EDIT';
+export interface CustomColumn {
+  field: string;
+  header: string;
+  sortable: boolean;
+  format: undefined | Function;
+}

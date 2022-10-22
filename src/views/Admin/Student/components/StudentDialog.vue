@@ -178,8 +178,8 @@
 </template>
 
 <script setup lang="ts">
-import { Student, SubmitType } from '@/types';
 import { ref } from 'vue';
+import { Student, SubmitType } from '@/types';
 import {
   BIRTH_DATE,
   BIRTH_MONTH,

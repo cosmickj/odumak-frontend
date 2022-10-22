@@ -6,14 +6,16 @@
     maximizable
     :breakpoints="{ '450px': '75vw' }"
     :header="dialog.label"
+    @hide="handleHide"
   >
     <div class="min-w-full">
       <div class="grid grid-cols-4 gap-x-12 gap-y-5">
         <div class="col-span-2">
           <p class="mb-2">몇 학년을 담당하시는가요?</p>
           <Dropdown
-            class="w-full"
             v-model="selectedTeacher.grade"
+            class="w-full"
+            :class="{ 'p-invalid': errors.grade.status }"
             :options="GRADE"
             option-label="label"
             option-value="value"
@@ -26,6 +28,7 @@
           <Dropdown
             v-model="selectedTeacher.group"
             class="w-full"
+            :class="{ 'p-invalid': errors.group.status }"
             placeholder="학급"
             option-label="label"
             option-value="value"
@@ -38,6 +41,7 @@
           <InputText
             v-model="selectedTeacher.name"
             class="w-full"
+            :class="{ 'p-invalid': errors.name.status }"
             placeholder="이름을 입력해주세요."
           />
         </div>
@@ -158,9 +162,9 @@
             추가하려는 선생님께서 언제 처음 초등부와 함께 하였나요?
           </p>
           <Calendar
+            v-model="selectedTeacher.registeredAt"
             class="w-full"
             touchUI
-            v-model="selectedTeacher.registeredAt"
             date-format="yy년 mm월 dd일"
             :manual-input="false"
           />
@@ -191,8 +195,8 @@
 </template>
 
 <script setup lang="ts">
-import { SubmitType, Teacher } from '@/types';
 import { ref } from 'vue';
+import { SubmitType, Teacher } from '@/types';
 import {
   BIRTH_DATE,
   BIRTH_MONTH,
@@ -207,9 +211,10 @@ const props = defineProps<{
     label: string;
   };
   selectedTeacher: Teacher;
+  errors: any;
 }>();
 
-const emit = defineEmits(['submit', 'birthChange']);
+const emit = defineEmits(['hide', 'submit', 'birthChange']);
 
 const isChecked = ref(false);
 
@@ -227,6 +232,8 @@ const handleBirthChange = () => {
   const selectedBirthString = `${selectedBirthYear.value}-${selectedBirthMonth.value}-${selectedBirthDate.value}`;
   emit('birthChange', { birth: new Date(selectedBirthString) });
 };
+
+const handleHide = () => emit('hide');
 
 const handleSubmit = (submitType: SubmitType) => emit('submit', { submitType });
 </script>

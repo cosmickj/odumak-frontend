@@ -20,12 +20,12 @@
   <div class="container">
     <div class="overflow-hidden mb-12 rounded-2xl drop-shadow-lg">
       <DataTable
-        :value="dataSource"
         v-model:selection="selectedStudents"
+        :value="dataSource"
         lazy
         rowHover
-        sortMode="multiple"
         removableSort
+        sortMode="multiple"
         responsiveLayout="scroll"
         :loading="isLoading"
       >
@@ -114,10 +114,12 @@ import StudentsDelete from './components/StudentsDelete.vue';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useAccountStore } from '@/store/account';
 import { useMemberStore } from '@/store/member';
+import { formatGender } from '@/utils/useFormat';
 import { v4 as uuidv4 } from 'uuid';
 import { useVuelidate } from '@vuelidate/core';
 import { required, helpers, not, sameAs } from '@vuelidate/validators';
-import { Student, Teacher, SubmitType } from '@/types';
+import { CustomColumn, SubmitType, Student, Teacher } from '@/types';
+import type { Timestamp } from '@firebase/firestore';
 
 const accountStore = useAccountStore();
 const memberStore = useMemberStore();
@@ -143,17 +145,9 @@ const getMembers = async () => {
   }
 };
 
-const formatGender = (value: 'male' | 'female') => {
-  if (value === 'male') return '남자';
-  else if (value === 'female') return '여자';
-};
+onMounted(async () => await getMembers());
 
-const formatBirth = (seconds: number | undefined) => {
-  if (seconds) return new Date(seconds * 1000);
-  else return;
-};
-
-const columns = ref([
+const columns = ref<CustomColumn[]>([
   { field: 'grade', header: '학년', sortable: true, format: undefined },
   { field: 'group', header: '학급', sortable: true, format: undefined },
   { field: 'name', header: '이름', sortable: true, format: undefined },
@@ -169,8 +163,6 @@ const selectedColumns = ref(columns.value);
 const onToggle = (value: any) => {
   selectedColumns.value = columns.value.filter((col) => value.includes(col));
 };
-
-const selectedStudents = ref<Student[]>([]);
 
 const initSelectedStudent: Student = {
   _id: '',
@@ -188,11 +180,7 @@ const initSelectedStudent: Student = {
 };
 
 const selectedStudent = reactive({ ...initSelectedStudent });
-
-const resetSelectedStudent = () => {
-  // TODO: 3번째 매개변수에 대해서 타입체킹이 되지 않는다
-  Object.assign(selectedStudent, initSelectedStudent, { _id: uuidv4() });
-};
+const selectedStudents = ref<Student[]>([]);
 
 watch(selectedStudent, async (student) => {
   if (student.grade && student.group) {
@@ -215,9 +203,7 @@ watch(selectedStudent, async (student) => {
 });
 
 const rules = computed(() => ({
-  name: {
-    required: helpers.withMessage('이름을 꼭 입력해주세요.', required),
-  },
+  name: { required: helpers.withMessage('이름을 꼭 입력해주세요.', required) },
   grade: { required },
   group: { required },
   teacher: {
@@ -230,20 +216,20 @@ const v$ = useVuelidate(rules, selectedStudent);
 
 const errors = computed(() => ({
   name: {
-    status: v$.value.$error,
-    message: v$.value.$errors[0]?.$message,
+    status: v$.value.name.$error,
+    message: v$.value.name.$errors[0]?.$message,
   },
   grade: {
-    status: v$.value.$error,
-    message: v$.value.$errors[0]?.$message,
+    status: v$.value.grade.$error,
+    message: v$.value.grade.$errors[0]?.$message,
   },
   group: {
-    status: v$.value.$error,
-    message: v$.value.$errors[0]?.$message,
+    status: v$.value.group.$error,
+    message: v$.value.group.$errors[0]?.$message,
   },
   teacher: {
-    status: v$.value.$error,
-    message: v$.value.$errors[0]?.$message,
+    status: v$.value.teacher.$error,
+    message: v$.value.teacher.$errors[0]?.$message,
   },
 }));
 
@@ -260,6 +246,36 @@ const openModalForAddStudent = () => {
   addEditDialog.label = '추가하기';
 };
 
+const resetSelectedStudent = () => {
+  // TODO: 3번째 매개변수에 대해서 타입체킹이 되지 않는다
+  Object.assign(selectedStudent, initSelectedStudent, { _id: uuidv4() });
+};
+
+const openModalForEditStudent = (student: Student) => {
+  const _birth = student.birth as unknown as Timestamp;
+  const _registeredAt = student.registeredAt as unknown as Timestamp;
+  student.birth = new Date(_birth.seconds * 1000);
+  student.registeredAt = new Date(_registeredAt.seconds * 1000);
+  Object.assign(selectedStudent, student);
+
+  addEditDialog.status = true;
+  addEditDialog.label = '수정하기';
+};
+
+const onSubmit = async ({ submitType }: { submitType: SubmitType }) => {
+  const isFormCorrect = await v$.value.$validate();
+  if (!isFormCorrect) return;
+
+  if (submitType === 'ADD') {
+    await addStudent();
+  } else {
+    await editStudent();
+  }
+
+  addEditDialog.status = false;
+  await getMembers();
+};
+
 const addStudent = async () => {
   if (accountStore.userData) {
     await memberStore.create({
@@ -270,15 +286,6 @@ const addStudent = async () => {
     });
     alert('추가되었습니다.');
   }
-};
-
-const openModalForEditStudent = (student: Student) => {
-  student.birth = new Date(student.birth.seconds * 1000);
-  student.registeredAt = new Date(student.registeredAt.seconds * 1000);
-  Object.assign(selectedStudent, student);
-
-  addEditDialog.status = true;
-  addEditDialog.label = '수정하기';
 };
 
 const editStudent = async () => {
@@ -293,24 +300,8 @@ const editStudent = async () => {
   }
 };
 
-const onSubmit = async ({ submitType }: { submitType: SubmitType }) => {
-  const isFormCorrect = await v$.value.$validate();
-  if (!isFormCorrect) return;
-
-  if (submitType === 'ADD') await addStudent();
-  else if (submitType === 'EDIT') await editStudent();
-
-  addEditDialog.status = false;
-  await getMembers();
-};
-
 // || 삭제하기
 const deleteStudentDialog = reactive({
-  label: '',
-  status: false,
-});
-
-const deleteStudentsDialog = reactive({
   label: '',
   status: false,
 });
@@ -326,10 +317,6 @@ const closeModalForDeleteStudent = () => {
   deleteStudentDialog.status = false;
 };
 
-const setDeleteStudentsDialog = (flag: boolean) => {
-  deleteStudentsDialog.status = flag;
-};
-
 const deleteStudent = async () => {
   if (accountStore.userData) {
     await memberStore.remove({
@@ -342,6 +329,15 @@ const deleteStudent = async () => {
     deleteStudentDialog.status = false;
     await getMembers();
   }
+};
+
+const deleteStudentsDialog = reactive({
+  label: '',
+  status: false,
+});
+
+const setDeleteStudentsDialog = (flag: boolean) => {
+  deleteStudentsDialog.status = flag;
 };
 
 const deleteStudents = async () => {
@@ -361,10 +357,6 @@ const deleteStudents = async () => {
     await getMembers();
   }
 };
-
-onMounted(async () => {
-  await getMembers();
-});
 </script>
 
 <style scoped>

@@ -11,14 +11,21 @@ import {
 } from 'firebase/firestore';
 import { db, membersColl } from '@/firebase/config';
 import arraySort from 'array-sort';
-import { Student, UserInfo, MemberPosition, TeacherRole } from '@/types';
+import {
+  Student,
+  UserInfo,
+  MemberPosition,
+  TeacherRole,
+  Teacher,
+} from '@/types';
 
 interface FetchAllParmas extends Pick<UserInfo, 'church' | 'department'> {
   position: MemberPosition;
 }
 
 interface CreateParams
-  extends Student,
+  extends Partial<Student>,
+    Partial<Teacher>,
     Pick<UserInfo, 'church' | 'department'> {
   position: MemberPosition;
 }
@@ -31,7 +38,8 @@ interface CreateTemplateParams extends Pick<UserInfo, 'church' | 'department'> {
 
 // TODO: CreateParams와 같은 값이다. 리펙토링할 때 수정해보자
 interface ModifyParams
-  extends Student,
+  extends Partial<Student>,
+    Partial<Teacher>,
     Pick<UserInfo, 'church' | 'department'> {
   position: MemberPosition;
 }
