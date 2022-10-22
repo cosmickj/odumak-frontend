@@ -27,12 +27,6 @@
   </div>
 </template>
 
-<script lang="ts">
-export default {
-  name: 'Admin',
-};
-</script>
-
 <style scoped>
 .container {
   width: 100%;

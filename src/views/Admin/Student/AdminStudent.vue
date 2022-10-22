@@ -5,14 +5,14 @@
         class="p-button-success mr-2"
         icon="pi pi-plus"
         label="추가하기"
-        @click="openDialogForAddTeacher"
+        @click="openModalForAddStudent"
       />
       <Button
         class="p-button-danger"
         icon="pi pi-trash"
         label="삭제하기"
-        :disabled="!selectedTeachers.length"
-        @click="deleteTeachersDialog.status = true"
+        :disabled="!selectedStudents.length"
+        @click="setDeleteStudentsDialog(true)"
       />
     </div>
   </div>
@@ -20,7 +20,7 @@
   <div class="container">
     <div class="overflow-hidden mb-12 rounded-2xl drop-shadow-lg">
       <DataTable
-        v-model:selection="selectedTeachers"
+        v-model:selection="selectedStudents"
         :value="dataSource"
         lazy
         rowHover
@@ -70,12 +70,12 @@
               <Button
                 icon="pi pi-pencil"
                 class="p-button-rounded p-button-success mx-6"
-                @click="openDialogForEditTeacher(slotProps.data)"
+                @click="openModalForEditStudent(slotProps.data)"
               />
               <Button
                 icon="pi pi-trash"
                 class="p-button-rounded p-button-warning mx-6"
-                @click="openDialogForDeleteTeacher(slotProps.data)"
+                @click="openModalForDeleteStudent(slotProps.data)"
               />
             </div>
           </template>
@@ -84,42 +84,41 @@
     </div>
   </div>
 
-  <TeacherDialog
+  <StudentDialog
     :dialog="addEditDialog"
     :errors="errors"
-    :selected-teacher="selectedTeacher"
-    @birth-change="setBirth"
+    :selected-student="selectedStudent"
     @hide="v$.$reset"
     @submit="onSubmit"
   />
 
-  <TeacherDelete
-    :dialog="deleteTeacherDialog"
-    :selected-teacher="selectedTeacher"
-    @cancel="closeModalForDeleteTeacher"
-    @confirm="deleteTeacher"
+  <StudentDelete
+    :dialog="deleteStudentDialog"
+    :selected-student="selectedStudent"
+    @cancel="closeModalForDeleteStudent"
+    @confirm="deleteStudent"
   />
 
-  <TeachersDelete
-    :dialog="deleteTeachersDialog"
-    :selected-teachers="selectedTeachers"
-    @cancel="deleteTeachersDialog.status = false"
-    @confirm="deleteTeachers"
+  <StudentsDelete
+    :dialog="deleteStudentsDialog"
+    :selected-students="selectedStudents"
+    @cancel="setDeleteStudentsDialog(false)"
+    @confirm="deleteStudents"
   />
 </template>
 
 <script setup lang="ts">
-import TeacherDialog from './components/TeacherDialog.vue';
-import TeacherDelete from './components/TeacherDelete.vue';
-import TeachersDelete from './components/TeachersDelete.vue';
-import { computed, onMounted, reactive, ref } from 'vue';
+import StudentDialog from './components/AdminStudentDialog.vue';
+import StudentDelete from './components/AdminStudentDelete.vue';
+import StudentsDelete from './components/AdminStudentsDelete.vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useAccountStore } from '@/store/account';
 import { useMemberStore } from '@/store/member';
-import { formatRole } from '@/utils/useFormat';
+import { formatGender } from '@/utils/useFormat';
 import { v4 as uuidv4 } from 'uuid';
 import { useVuelidate } from '@vuelidate/core';
-import { required } from '@vuelidate/validators';
-import { CustomColumn, SubmitType, Teacher } from '@/types';
+import { required, helpers, not, sameAs } from '@vuelidate/validators';
+import { CustomColumn, SubmitType, Student, Teacher } from '@/types';
 import type { Timestamp } from '@firebase/firestore';
 
 const accountStore = useAccountStore();
@@ -135,7 +134,7 @@ const getMembers = async () => {
       const result = await memberStore.fetchAll({
         church: accountStore.userData.church,
         department: accountStore.userData.department,
-        position: 'teacher',
+        position: 'student',
       });
       dataSource.value = result;
     }
@@ -149,10 +148,13 @@ const getMembers = async () => {
 onMounted(async () => await getMembers());
 
 const columns = ref<CustomColumn[]>([
-  { field: 'grade', header: '담당 학년', sortable: true, format: undefined },
-  { field: 'group', header: '담당 학급', sortable: true, format: undefined },
+  { field: 'grade', header: '학년', sortable: true, format: undefined },
+  { field: 'group', header: '학급', sortable: true, format: undefined },
   { field: 'name', header: '이름', sortable: true, format: undefined },
-  { field: 'role', header: '담임 여부', sortable: false, format: formatRole },
+  { field: 'gender', header: '성별', sortable: false, format: formatGender },
+  { field: 'phone', header: '연락처', sortable: false, format: undefined },
+  { field: 'teacher', header: '담당 교사', sortable: true, format: undefined },
+  { field: 'address', header: '주소', sortable: true, format: undefined },
   { field: 'remark', header: '비고', sortable: false, format: undefined },
 ]);
 
@@ -162,31 +164,61 @@ const onToggle = (value: any) => {
   selectedColumns.value = columns.value.filter((col) => value.includes(col));
 };
 
-const initSelectedTeacher: Teacher = {
+const initSelectedStudent: Student = {
   _id: '',
   grade: '',
   group: '',
+  teacher: '',
   name: '',
-  role: 'common',
-  birth: new Date(),
+  birth: new Date(`${new Date().getFullYear() - 10 + 1}-01-01`),
   gender: 'male',
   phone: '',
-  remark: '',
+  phoneOwner: '',
+  address: '',
   registeredAt: new Date(),
+  remark: '',
 };
 
-const selectedTeacher = reactive({ ...initSelectedTeacher });
-const selectedTeachers = ref<Teacher[]>([]);
+const selectedStudent = reactive({ ...initSelectedStudent });
+const selectedStudents = ref<Student[]>([]);
+
+watch(selectedStudent, async (student) => {
+  if (student.grade && student.group) {
+    const result = (await memberStore.fetchMembers({
+      church: accountStore.userData?.church,
+      department: accountStore.userData?.department,
+      position: 'teacher',
+      grade: student.grade,
+      group: student.group,
+      role: 'main',
+    })) as Teacher[]; // TODO: as 제거하기
+
+    if (result[0]?.name) {
+      selectedStudent.teacher = result[0]?.name;
+    } else {
+      const msg = '담당 교사가 없는 학급입니다. 다시 선택해주세요.';
+      selectedStudent.teacher = msg;
+    }
+  }
+});
 
 const rules = computed(() => ({
+  name: { required: helpers.withMessage('이름을 꼭 입력해주세요.', required) },
   grade: { required },
   group: { required },
-  name: { required },
+  teacher: {
+    required,
+    rejected: not(sameAs('담당 교사가 없는 학급입니다. 다시 선택해주세요.')),
+  },
 }));
 
-const v$ = useVuelidate(rules, selectedTeacher);
+const v$ = useVuelidate(rules, selectedStudent);
 
 const errors = computed(() => ({
+  name: {
+    status: v$.value.name.$error,
+    message: v$.value.name.$errors[0]?.$message,
+  },
   grade: {
     status: v$.value.grade.$error,
     message: v$.value.grade.$errors[0]?.$message,
@@ -195,9 +227,9 @@ const errors = computed(() => ({
     status: v$.value.group.$error,
     message: v$.value.group.$errors[0]?.$message,
   },
-  name: {
-    status: v$.value.name.$error,
-    message: v$.value.name.$errors[0]?.$message,
+  teacher: {
+    status: v$.value.teacher.$error,
+    message: v$.value.teacher.$errors[0]?.$message,
   },
 }));
 
@@ -207,27 +239,24 @@ const addEditDialog = reactive({
   status: false,
 });
 
-const setBirth = ({ birth }: { birth: Date }) => {
-  selectedTeacher.birth = birth;
-};
+const openModalForAddStudent = () => {
+  resetSelectedStudent();
 
-const openDialogForAddTeacher = () => {
-  resetSelectedTeacher();
   addEditDialog.status = true;
   addEditDialog.label = '추가하기';
 };
 
-const resetSelectedTeacher = () => {
+const resetSelectedStudent = () => {
   // TODO: 3번째 매개변수에 대해서 타입체킹이 되지 않는다
-  Object.assign(selectedTeacher, initSelectedTeacher, { _id: uuidv4() });
+  Object.assign(selectedStudent, initSelectedStudent, { _id: uuidv4() });
 };
 
-const openDialogForEditTeacher = (teacher: Teacher) => {
-  const _birth = teacher.birth as unknown as Timestamp;
-  const _registeredAt = teacher.registeredAt as unknown as Timestamp;
-  teacher.birth = new Date(_birth.seconds * 1000);
-  teacher.registeredAt = new Date(_registeredAt.seconds * 1000);
-  Object.assign(selectedTeacher, teacher);
+const openModalForEditStudent = (student: Student) => {
+  const _birth = student.birth as unknown as Timestamp;
+  const _registeredAt = student.registeredAt as unknown as Timestamp;
+  student.birth = new Date(_birth.seconds * 1000);
+  student.registeredAt = new Date(_registeredAt.seconds * 1000);
+  Object.assign(selectedStudent, student);
 
   addEditDialog.status = true;
   addEditDialog.label = '수정하기';
@@ -238,89 +267,93 @@ const onSubmit = async ({ submitType }: { submitType: SubmitType }) => {
   if (!isFormCorrect) return;
 
   if (submitType === 'ADD') {
-    await addTeacher();
+    await addStudent();
   } else {
-    await editTeacher();
+    await editStudent();
   }
 
   addEditDialog.status = false;
   await getMembers();
 };
 
-const addTeacher = async () => {
+const addStudent = async () => {
   if (accountStore.userData) {
     await memberStore.create({
       church: accountStore.userData.church,
       department: accountStore.userData.department,
-      position: 'teacher',
-      ...selectedTeacher,
+      position: 'student',
+      ...selectedStudent,
     });
     alert('추가되었습니다.');
   }
 };
 
-const editTeacher = async () => {
+const editStudent = async () => {
   if (accountStore.userData) {
     await memberStore.modify({
       church: accountStore.userData.church,
       department: accountStore.userData.department,
-      position: 'teacher',
-      ...selectedTeacher,
+      position: 'student',
+      ...selectedStudent,
     });
     alert('수정되었습니다.');
   }
 };
 
 // || 삭제하기
-const deleteTeacherDialog = reactive({
+const deleteStudentDialog = reactive({
   label: '',
   status: false,
 });
 
-const openDialogForDeleteTeacher = (teacher: Teacher) => {
-  selectedTeacher._id = teacher._id;
-  selectedTeacher.name = teacher.name;
-  deleteTeacherDialog.status = true;
+const openModalForDeleteStudent = (student: Student) => {
+  selectedStudent._id = student._id;
+  selectedStudent.name = student.name;
+  deleteStudentDialog.status = true;
 };
 
-const closeModalForDeleteTeacher = () => {
-  resetSelectedTeacher();
-  deleteTeacherDialog.status = false;
+const closeModalForDeleteStudent = () => {
+  resetSelectedStudent();
+  deleteStudentDialog.status = false;
 };
 
-const deleteTeacher = async () => {
+const deleteStudent = async () => {
   if (accountStore.userData) {
     await memberStore.remove({
       church: accountStore.userData?.church,
       department: accountStore.userData?.department,
-      position: 'teacher',
-      ids: [selectedTeacher._id],
+      position: 'student',
+      ids: [selectedStudent._id],
     });
 
-    deleteTeacherDialog.status = false;
+    deleteStudentDialog.status = false;
     await getMembers();
   }
 };
 
-const deleteTeachersDialog = reactive({
+const deleteStudentsDialog = reactive({
   label: '',
   status: false,
 });
 
-const deleteTeachers = async () => {
-  const ids = selectedTeachers.value.map((teacher) => {
-    return teacher._id;
+const setDeleteStudentsDialog = (flag: boolean) => {
+  deleteStudentsDialog.status = flag;
+};
+
+const deleteStudents = async () => {
+  const ids = selectedStudents.value.map((student) => {
+    return student._id;
   });
 
   if (accountStore.userData) {
     await memberStore.remove({
       church: accountStore.userData?.church,
       department: accountStore.userData?.department,
-      position: 'teacher',
+      position: 'student',
       ids,
     });
 
-    deleteTeachersDialog.status = false;
+    setDeleteStudentsDialog(false);
     await getMembers();
   }
 };
