@@ -58,8 +58,17 @@
     </div>
 
     <div class="flex justify-center">
-      <img class="mx-4 cursor-pointer oauth-btn" :src="loginKakao" alt="" />
-      <img class="mx-4 cursor-pointer oauth-btn" :src="loginNaver" alt="" />
+      <img
+        class="mx-4 cursor-pointer oauth-btn"
+        :src="loginKakao"
+        alt="카카오 로그인"
+      />
+      <img
+        class="mx-4 cursor-pointer oauth-btn"
+        :src="loginNaver"
+        alt="네이버 로그인"
+        @click="loginWithNaver"
+      />
     </div>
 
     <Teleport to="#modal">
@@ -109,9 +118,9 @@ const $cookies = inject<VueCookies>('$cookies');
 const isModalOpen = ref(false);
 
 onMounted(() => {
-  if (!$cookies?.get('has_account')) {
-    setTimeout(() => (isModalOpen.value = true), 800);
-  }
+  // if (!$cookies?.get('has_account')) {
+  //   setTimeout(() => (isModalOpen.value = true), 800);
+  // }
 });
 
 const closeModal = () => {
@@ -141,6 +150,24 @@ const onSubmit = async () => {
     isLoading.value = false;
     isError.value = true;
   }
+};
+
+const loginWithNaver = () => {
+  const state =
+    Math.random().toString(36).substring(2, 15) +
+    Math.random().toString(36).substring(2, 15);
+  window.localStorage.setItem('naverState', state);
+
+  const params = [];
+  params.push('response_type=code');
+  params.push('client_id=' + import.meta.env.VITE_NAVER_CLIENT_ID);
+  params.push('redirect_uri=' + import.meta.env.VITE_NAVER_CALLBACK_URL);
+  params.push('state=' + state);
+
+  const authBaseUrl = 'https://nid.naver.com/oauth2.0/authorize';
+  const authCodeUrl = authBaseUrl + '?' + params.join('&');
+  // console.log(authCodeUrl);
+  location.href = authCodeUrl;
 };
 </script>
 

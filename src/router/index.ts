@@ -21,6 +21,11 @@ const routes: Array<RouteRecordRaw> = [
     ],
   },
   {
+    path: '/callback/naver',
+    name: 'CallbackNaver',
+    component: () => import('@/views/Account/Login/LoginCallbackNaver.vue'),
+  },
+  {
     path: '/',
     meta: { requiresAuth: true },
     component: () => import('@/layouts/DefaultLayout.vue'),
