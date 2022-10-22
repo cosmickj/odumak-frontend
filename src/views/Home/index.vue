@@ -6,10 +6,7 @@
         <strong>{{ userName }}</strong> &nbsp;선생님!
       </div>
 
-      <RouterLink
-        v-if="isAdmin"
-        :to="{ name: 'AdminView', params: { position: 'student' } }"
-      >
+      <RouterLink v-if="isAdmin" :to="{ name: 'AdminStudent' }">
         <div class="text-lg text-amber-500 text-center cursor-pointer">
           <u>관리자 페이지 이동하기</u>
         </div>

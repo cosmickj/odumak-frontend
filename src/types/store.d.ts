@@ -5,8 +5,8 @@ export interface AccountData {
   grade: string;
   group: string;
   role: TeacherRole;
-  church?: string;
-  department?: string;
+  church: string;
+  department: string;
   createdAt: {
     nanoseconds: number;
     seconds: number;

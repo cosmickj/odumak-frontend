@@ -1,27 +1,55 @@
-export interface UserInfo {
-  name: string;
-  email: string;
-  createdAt: Date;
-}
+export type SubmitType = 'ADD' | 'EDIT';
 
-export interface Student {
-  grade: string;
-  group: string;
-  teacher?: string;
-  name: string;
-  gender?: string;
-  birth?: string;
-  phone?: string;
-  address?: string;
-  remark?: string;
-  attendance?: string;
-}
-export interface Teacher {
-  attendance?: string;
+export type Gender = 'male' | 'female';
+export type MemberPosition = 'student' | 'teacher';
+export type TeacherRole = 'admin' | 'main' | 'sub' | 'common';
+
+export interface UserInfo {
+  church: string;
+  createdAt: Date;
+  department: string;
+  email: string;
   grade: string;
   group: string;
   name: string;
   role: TeacherRole;
+}
+
+export interface Member {
+  church: string;
+  createdAt: Date;
+  department: string;
+  members: Student | Teacher;
+  position: MemberPosition;
+  updatedAt: Date;
+}
+
+export interface Student {
+  _id: string;
+  address: string;
+  birth: Date;
+  gender: Gender;
+  grade: string;
+  group: string;
+  name: string;
+  phone: string;
+  phoneOwner: string;
+  registeredAt: Date;
+  remark: string;
+  teacher: string;
+}
+
+export interface Teacher {
+  _id: string;
+  grade: string;
+  group: string;
+  name: string;
+  role: TeacherRole;
+  birth: Date;
+  gender: Gender;
+  phone: string;
+  registeredAt: Date;
+  remark: string;
 }
 
 export interface Option {
@@ -29,28 +57,9 @@ export interface Option {
   value: string;
 }
 
-export interface AddStudentParams {
-  index?: number | null;
-  grade: string | null;
-  group: string | null;
-  name: string;
-  gender: string | null;
-  birth: Date | null;
-  phone: string;
-  teacher: string;
-  address: string;
-  remark: string;
+export interface CustomColumn {
+  field: string;
+  header: string;
+  sortable: boolean;
+  format: undefined | Function;
 }
-
-export interface AddTeacherParams {
-  index?: number | null;
-  grade: string | null;
-  group: string | null;
-  name: string;
-  role: string | null;
-  remark: string;
-}
-
-export type TeacherRole = 'admin' | 'main' | 'sub' | 'common';
-
-export type MemberPosition = 'student' | 'teacher';
