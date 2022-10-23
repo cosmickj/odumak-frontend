@@ -64,6 +64,7 @@
         alt="카카오 로그인"
       />
       <img
+        id="naver_id_login"
         class="mx-4 cursor-pointer oauth-btn"
         :src="loginNaver"
         alt="네이버 로그인"
@@ -121,6 +122,14 @@ onMounted(() => {
   // if (!$cookies?.get('has_account')) {
   //   setTimeout(() => (isModalOpen.value = true), 800);
   // }
+
+  const naver_id_login = new window.naver_id_login(
+    import.meta.env.VITE_NAVER_CLIENT_ID,
+    import.meta.env.VITE_NAVER_CALLBACK_URL
+  );
+  var state = naver_id_login.getUniqState();
+  naver_id_login.setState(state);
+  naver_id_login.init_naver_id_login();
 });
 
 const closeModal = () => {
@@ -153,21 +162,9 @@ const onSubmit = async () => {
 };
 
 const loginWithNaver = () => {
-  const state =
-    Math.random().toString(36).substring(2, 15) +
-    Math.random().toString(36).substring(2, 15);
-  window.localStorage.setItem('naverState', state);
-
-  const params = [];
-  params.push('response_type=code');
-  params.push('client_id=' + import.meta.env.VITE_NAVER_CLIENT_ID);
-  params.push('redirect_uri=' + import.meta.env.VITE_NAVER_CALLBACK_URL);
-  params.push('state=' + state);
-
-  const authBaseUrl = 'https://nid.naver.com/oauth2.0/authorize';
-  const authCodeUrl = authBaseUrl + '?' + params.join('&');
-  // console.log(authCodeUrl);
-  location.href = authCodeUrl;
+  const id = '#naver_id_login_anchor';
+  const target = document.querySelector(id) as HTMLAnchorElement;
+  target.click();
 };
 </script>
 

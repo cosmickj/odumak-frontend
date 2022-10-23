@@ -1,6 +1,6 @@
 declare global {
   export interface Window {
-    naver: any;
+    naver_id_login: any;
   }
 }
 
