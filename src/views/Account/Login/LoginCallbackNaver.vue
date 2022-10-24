@@ -5,7 +5,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { getData } from '@/api/members';
+import { getProfile } from '@/api/oauth';
 
 const router = useRouter();
 
@@ -17,8 +17,9 @@ onMounted(async () => {
       return q.split('=');
     });
   const obj = Object.fromEntries(queryList);
-  const { data } = await getData(obj['access_token']);
-  console.log(data);
+  const { data } = await getProfile(obj['access_token']);
+
+  console.log(JSON.parse(data));
 });
 </script>
 
