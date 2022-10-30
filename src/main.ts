@@ -6,12 +6,13 @@ import 'primeicons/primeicons.css';
 import '@/index.css'; // Tailwind CSS
 import 'animate.css';
 
-import { createApp } from 'vue';
-import App from '@/App.vue';
 import router from '@/router';
 import { createPinia } from 'pinia';
-import VueCookies from 'vue-cookies';
+import { createApp } from 'vue';
+import App from '@/App.vue';
+
 import PrimeVue from 'primevue/config';
+import VueCookies from 'vue-cookies';
 
 import Button from 'primevue/button';
 import Card from 'primevue/card';
