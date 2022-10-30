@@ -1,9 +1,15 @@
 import { instance } from './index';
 
-const getProfile = (token: string) => {
-  return instance.post('/default/odumak-login-getProfile', {
-    token: token,
-  });
+const test = () => {
+  return instance.get('/test');
 };
 
-export { getProfile };
+const getNaverOAuth = (token: string) => {
+  return instance.post('/naver-oauth', { token });
+};
+
+const getCustomToken = (uid: string) => {
+  return instance.post('/custom-token', { uid });
+};
+
+export { test, getNaverOAuth, getCustomToken };
