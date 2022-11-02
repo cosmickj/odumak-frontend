@@ -1,25 +1,55 @@
 <template>
   <div class="container">
-    <div class="mb-12">
-      <Button
-        class="p-button-success mr-2"
-        icon="pi pi-plus"
-        label="추가하기"
-        @click="openModalForAddStudent"
+    <div class="mb-5 flex justify-between">
+      <div>
+        <Button
+          class="p-button-success p-button-lg mr-2"
+          icon="pi pi-plus"
+          label="추가하기"
+          @click="openModalForAddStudent"
+        />
+        <Button
+          class="p-button-danger p-button-lg"
+          icon="pi pi-trash"
+          label="삭제하기"
+          :disabled="!selectedStudents.length"
+          @click="setDeleteStudentsDialog(true)"
+        />
+      </div>
+
+      <div class="flex">
+        <Button
+          class="p-button-help p-button-lg"
+          icon="pi pi-external-link"
+          label="내보내기"
+          @click="exportCSV"
+        />
+      </div>
+    </div>
+
+    <div class="mb-5 flex items-center">
+      <FileUpload
+        class="p-button-lg mr-4"
+        mode="basic"
+        choose-label="여러 학생 추가하기"
+        accept=".csv"
+        custom-upload
+        auto
+        @uploader="uploadTemplate"
       />
-      <Button
-        class="p-button-danger"
-        icon="pi pi-trash"
-        label="삭제하기"
-        :disabled="!selectedStudents.length"
-        @click="setDeleteStudentsDialog(true)"
-      />
+
+      <span class="text-xl cursor-pointer underline">
+        <a :href="fileLink" download="여러_학생_추가하기_템플릿">
+          여러 학생 추가하기 템플릿 다운받기
+        </a>
+      </span>
     </div>
   </div>
 
   <div class="container">
     <div class="overflow-hidden mb-12 rounded-2xl drop-shadow-lg">
       <DataTable
+        ref="dataTableRef"
         v-model:selection="selectedStudents"
         :value="dataSource"
         lazy
@@ -114,15 +144,36 @@ import StudentsDelete from './components/AdminStudentsDelete.vue';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useAccountStore } from '@/store/account';
 import { useMemberStore } from '@/store/member';
+import { upload } from '@/api/upload';
 import { formatGender } from '@/utils/useFormat';
 import { v4 as uuidv4 } from 'uuid';
 import { useVuelidate } from '@vuelidate/core';
 import { required, helpers, not, sameAs } from '@vuelidate/validators';
 import { CustomColumn, SubmitType, Student, Teacher } from '@/types';
+import type DataTable from 'primevue/datatable';
 import type { Timestamp } from '@firebase/firestore';
 
 const accountStore = useAccountStore();
 const memberStore = useMemberStore();
+
+const dataTableRef = ref<DataTable | null>(null);
+
+const exportCSV = () => {
+  if (dataTableRef.value) {
+    dataTableRef.value.exportCSV();
+    console.log(dataTableRef.value);
+  }
+};
+
+const fileLocation = './students-upload-template.csv';
+const fileLink = new URL(fileLocation, import.meta.url).href;
+
+const uploadTemplate = async (event: any) => {
+  let formData = new FormData();
+  formData.append('file', event.files);
+  const result = await upload(formData);
+  console.log(result.data);
+};
 
 const isLoading = ref(false);
 const dataSource = ref();

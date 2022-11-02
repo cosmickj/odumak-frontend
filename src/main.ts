@@ -22,6 +22,7 @@ import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import Dialog from 'primevue/dialog';
 import Dropdown from 'primevue/dropdown';
+import FileUpload from 'primevue/fileupload';
 import InputMask from 'primevue/inputmask';
 import InputText from 'primevue/inputtext';
 import InputSwitch from 'primevue/inputswitch';
@@ -70,6 +71,7 @@ app
   .component('DataTable', DataTable)
   .component('Dialog', Dialog)
   .component('Dropdown', Dropdown)
+  .component('FileUpload', FileUpload)
   .component('InputMask', InputMask)
   .component('InputText', InputText)
   .component('InputSwitch', InputSwitch)
