@@ -38,10 +38,17 @@
         @uploader="uploadTemplate"
       />
 
-      <span class="text-xl cursor-pointer underline">
-        <a :href="fileLink" download="여러_학생_추가하기_템플릿">
+      <span class="text-xl">
+        <a
+          class="underline"
+          :href="fileLink"
+          download="여러_학생_추가하기_템플릿"
+        >
           여러 학생 추가하기 템플릿 다운받기
         </a>
+        <span class="text-base text-red-600">
+          (절대로 템플릿을 변경하지 마세요)
+        </span>
       </span>
     </div>
   </div>
@@ -149,11 +156,10 @@ import { formatGender } from '@/utils/useFormat';
 import { v4 as uuidv4 } from 'uuid';
 import { useVuelidate } from '@vuelidate/core';
 import { required, helpers, not, sameAs } from '@vuelidate/validators';
+import csv from 'csvtojson';
 import { CustomColumn, SubmitType, Student, Teacher } from '@/types';
 import type DataTable from 'primevue/datatable';
 import type { Timestamp } from '@firebase/firestore';
-//
-import axios from 'axios';
 
 const accountStore = useAccountStore();
 const memberStore = useMemberStore();
@@ -174,8 +180,14 @@ const uploadTemplate = async (event: any) => {
   let formData = new FormData();
   formData.append('file', event.files[0]);
 
-  const result = await uploadFile(formData);
-  console.log(result.data);
+  const { data } = await uploadFile(formData);
+  const result = await csv({
+    noheader: false,
+    output: 'json',
+  }).fromString(data);
+  result.splice(0, 2);
+
+  console.log(result);
 };
 
 const isLoading = ref(false);
