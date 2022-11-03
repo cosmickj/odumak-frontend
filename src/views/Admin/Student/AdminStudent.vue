@@ -144,7 +144,7 @@ import StudentsDelete from './components/AdminStudentsDelete.vue';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useAccountStore } from '@/store/account';
 import { useMemberStore } from '@/store/member';
-import { upload } from '@/api/upload';
+import { uploadFile } from '@/api/upload';
 import { formatGender } from '@/utils/useFormat';
 import { v4 as uuidv4 } from 'uuid';
 import { useVuelidate } from '@vuelidate/core';
@@ -152,6 +152,8 @@ import { required, helpers, not, sameAs } from '@vuelidate/validators';
 import { CustomColumn, SubmitType, Student, Teacher } from '@/types';
 import type DataTable from 'primevue/datatable';
 import type { Timestamp } from '@firebase/firestore';
+//
+import axios from 'axios';
 
 const accountStore = useAccountStore();
 const memberStore = useMemberStore();
@@ -170,8 +172,9 @@ const fileLink = new URL(fileLocation, import.meta.url).href;
 
 const uploadTemplate = async (event: any) => {
   let formData = new FormData();
-  formData.append('file', event.files);
-  const result = await upload(formData);
+  formData.append('file', event.files[0]);
+
+  const result = await uploadFile(formData);
   console.log(result.data);
 };
 
