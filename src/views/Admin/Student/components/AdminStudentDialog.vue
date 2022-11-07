@@ -9,19 +9,22 @@
     <template #header>
       <div class="flex gap-x-4 items-center">
         <span class="text-xl">{{ dialog.label }}</span>
-        <Button class="p-button-success" label="행 추가" />
+        <Button
+          class="p-button-success"
+          label="행 추가"
+          @click="handleAddRow"
+        />
         <Button class="p-button-warning" label="제출하기" />
       </div>
     </template>
 
-    <!-- <div class="overflow-x-auto"> -->
     <div class="grid gap-x-5 gap-y-3 grid-cols-custom w-fit">
       <!-- Header -->
       <p class="self-baseline">학년</p>
       <p class="self-baseline">학급</p>
       <p class="self-baseline">이름</p>
-      <p class="self-baseline">생년월일</p>
       <p class="self-baseline">성별</p>
+      <p class="self-baseline">생년월일</p>
       <p class="self-baseline">연락처(- 없이 입력)</p>
       <p class="self-baseline">누구의 연락처인가요?</p>
       <p class="self-baseline">주소</p>
@@ -30,7 +33,7 @@
       <p class="self-baseline">삭제</p>
 
       <!-- Row -->
-      <template v-for="i in 1" :key="i">
+      <template v-for="(selectedStudent, i) in selectedStudents" :key="i">
         <Dropdown
           v-model="selectedStudent.grade"
           :class="{ 'p-invalid': errors.grade.status }"
@@ -124,7 +127,6 @@
         <Button class="p-button-danger" label="X" />
       </template>
     </div>
-    <!-- </div> -->
   </Dialog>
 </template>
 
@@ -144,23 +146,22 @@ const props = defineProps<{
     status: boolean;
     label: string;
   };
-  selectedStudent: Student;
+  selectedStudents: Student[];
   errors: any;
 }>();
 
-const emit = defineEmits(['hide', 'submit', 'birthChange']);
+const emit = defineEmits(['hide', 'submit', 'birthChange', 'addRow']);
 
 const isChecked = ref(false);
 
-const selectedBirthYear = ref(
-  props.selectedStudent.birth.getFullYear().toString()
-);
+const selectedBirthYear = ref();
+// props.selectedStudent.birth.getFullYear().toString()
 
-const selectedBirthMonth = ref(
-  (props.selectedStudent.birth.getMonth() + 1).toString()
-);
+const selectedBirthMonth = ref();
+// (props.selectedStudent.birth.getMonth() + 1).toString()
 
-const selectedBirthDate = ref(props.selectedStudent.birth.getDate().toString());
+const selectedBirthDate = ref();
+// props.selectedStudent.birth.getDate().toString()
 
 const handleBirthChange = () => {
   const selectedBirthString = `${selectedBirthYear.value}-${selectedBirthMonth.value}-${selectedBirthDate.value}`;
@@ -170,6 +171,8 @@ const handleBirthChange = () => {
 const handleSubmit = (submitType: SubmitType) => emit('submit', { submitType });
 
 const handleHide = () => emit('hide');
+
+const handleAddRow = () => emit('addRow');
 </script>
 
 <style>

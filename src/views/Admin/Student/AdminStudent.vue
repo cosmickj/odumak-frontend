@@ -7,6 +7,7 @@
           icon="pi pi-plus"
           label="추가하기"
           :disabled="selectedStudents.length != 0"
+          @click="openDialogToAddStudent"
         />
         <Button
           class="p-button-warning p-button-lg"
@@ -97,7 +98,8 @@
   <StudentDialog
     :dialog="addEditDialog"
     :errors="errors"
-    :selected-student="selectedStudent"
+    :selected-students="selectedStudents"
+    @add-row="addSelectedStudents"
     @hide="v$.$reset"
     @submit="onSubmit"
   />
@@ -224,28 +226,28 @@ const initSelectedStudent: Student = {
   remark: '',
 };
 
-const selectedStudent = reactive({ ...initSelectedStudent });
+const selectedStudent = reactive({ ...initSelectedStudent }); // 제거 가능 및 필요
 const selectedStudents = ref<Student[]>([]);
 
-watch(selectedStudent, async (student) => {
-  if (student.grade && student.group) {
-    const result = (await memberStore.fetchMembers({
-      church: accountStore.userData?.church,
-      department: accountStore.userData?.department,
-      position: 'teacher',
-      grade: student.grade,
-      group: student.group,
-      role: 'main',
-    })) as Teacher[]; // TODO: as 제거하기
+// watch(selectedStudent, async (student) => {
+//   if (student.grade && student.group) {
+//     const result = (await memberStore.fetchMembers({
+//       church: accountStore.userData?.church,
+//       department: accountStore.userData?.department,
+//       position: 'teacher',
+//       grade: student.grade,
+//       group: student.group,
+//       role: 'main',
+//     })) as Teacher[]; // TODO: as 제거하기
 
-    if (result[0]?.name) {
-      selectedStudent.teacher = result[0]?.name;
-    } else {
-      const msg = '담당 교사가 없는 학급입니다. 다시 선택해주세요.';
-      selectedStudent.teacher = msg;
-    }
-  }
-});
+//     if (result[0]?.name) {
+//       selectedStudent.teacher = result[0]?.name;
+//     } else {
+//       const msg = '담당 교사가 없는 학급입니다. 다시 선택해주세요.';
+//       selectedStudent.teacher = msg;
+//     }
+//   }
+// });
 
 const rules = computed(() => ({
   name: { required: helpers.withMessage('이름을 꼭 입력해주세요.', required) },
@@ -284,19 +286,23 @@ const addEditDialog = reactive({
   status: false,
 });
 
-const openModalForAddStudent = () => {
-  resetSelectedStudent();
-
+const openDialogToAddStudent = () => {
   addEditDialog.status = true;
   addEditDialog.label = '추가하기';
+  addSelectedStudents();
+};
+
+const addSelectedStudents = () => {
+  const _student = resetSelectedStudent();
+  selectedStudents.value.push(_student);
 };
 
 const resetSelectedStudent = () => {
   // TODO: 3번째 매개변수에 대해서 타입체킹이 되지 않는다
-  Object.assign(selectedStudent, initSelectedStudent, { _id: uuidv4() });
+  return Object.assign({}, initSelectedStudent, { _id: uuidv4() });
 };
 
-const openModalForEditStudent = (student: Student) => {
+const openModalToEditStudent = (student: Student) => {
   const _birth = student.birth as unknown as Timestamp;
   const _registeredAt = student.registeredAt as unknown as Timestamp;
   student.birth = new Date(_birth.seconds * 1000);
