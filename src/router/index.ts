@@ -21,6 +21,11 @@ const routes: Array<RouteRecordRaw> = [
     ],
   },
   {
+    path: '/callback/naver',
+    name: 'CallbackNaver',
+    component: () => import('@/views/Account/Login/LoginCallbackNaver.vue'),
+  },
+  {
     path: '/',
     meta: { requiresAuth: true },
     component: () => import('@/layouts/DefaultLayout.vue'),
@@ -80,29 +85,29 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach(async (to, from, next) => {
-  const user = await getCurrentUser();
-  const needAuth = to.matched.some((record) => record.meta.requiresAuth);
-  const needAdmin = to.matched.some((record) => record.meta.requiresAdmin);
+// router.beforeEach(async (to, from, next) => {
+//   const user = await getCurrentUser();
+//   const needAuth = to.matched.some((record) => record.meta.requiresAuth);
+//   const needAdmin = to.matched.some((record) => record.meta.requiresAdmin);
 
-  if ((needAuth && user) || (!needAuth && !user)) {
-    if (needAdmin) {
-      const account = useAccountStore();
-      const userData = await account.fetchAccount({ uid: user.uid });
-      if (userData!.role !== 'admin') {
-        next('/');
-      } else {
-        next();
-      }
-    } else {
-      next();
-    }
-  } else if (!needAuth && user) {
-    next('/');
-  } else {
-    next('/account/login');
-  }
-});
+//   if ((needAuth && user) || (!needAuth && !user)) {
+//     if (needAdmin) {
+//       const account = useAccountStore();
+//       const userData = await account.fetchAccount({ uid: user.uid });
+//       if (userData!.role !== 'admin') {
+//         next('/');
+//       } else {
+//         next();
+//       }
+//     } else {
+//       next();
+//     }
+//   } else if (!needAuth && user) {
+//     next('/');
+//   } else {
+//     next('/account/login');
+//   }
+// });
 
 // router auth checker
 export const getCurrentUser = (): any => {

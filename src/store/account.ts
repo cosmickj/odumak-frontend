@@ -26,61 +26,47 @@ interface AccountState {
   isAuthReady: boolean;
 }
 
+enum Collection {
+  USER = 'newUsers',
+}
+
 export const useAccountStore = defineStore('account', {
-  state: (): AccountState => {
-    return {
-      userData: null,
-      isAuthReady: false,
-    };
-  },
+  state: (): AccountState => ({
+    userData: null,
+    isAuthReady: false,
+  }),
 
   actions: {
-    async loginAccount({
-      email,
-      password,
-    }: {
-      email: string;
-      password: string;
-    }) {
+    async createUser(payload: any) {
       try {
-        const loginAccountRes = await signInWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
-        const fetchAccountRes = await this.fetchAccount({
-          uid: loginAccountRes.user.uid,
+        await setDoc(doc(db, Collection.USER, payload.uid), {
+          church: payload.church,
+          department: payload.department,
+          // email: payload.email,
+          // name: payload.name,
+          role: payload.role,
+          grade: payload.grade,
+          group: payload.group,
+          createdAt: serverTimestamp(),
         });
-        this.userData = {
-          uid: loginAccountRes.user.uid,
-          email: loginAccountRes.user.email!,
-          name: loginAccountRes.user.displayName!,
-          ...(fetchAccountRes as AccountData),
-        };
-        this.isAuthReady = true;
-      } catch (error) {
-        throw new Error('could not complete login');
-      }
-    },
-
-    async fetchAccount({ uid }: { uid: string }) {
-      try {
-        const docRef = doc(db, 'users', uid);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-          return docSnap.data();
-        } else {
-          return [];
-        }
       } catch (error) {
         console.log(error);
       }
     },
 
-    async logoutAccount() {
-      await signOut(auth);
-      this.userData = null;
+    async fetchAccount({ uid }: { uid: string }) {
+      try {
+        const docRef = doc(db, Collection.USER, uid);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          return docSnap.data();
+        } else {
+          return null;
+        }
+      } catch (error) {
+        console.log(error);
+      }
     },
 
     async signup(payload: {
@@ -141,21 +127,37 @@ export const useAccountStore = defineStore('account', {
       }
     },
 
-    async createUser(payload: any) {
+    async loginAccount({
+      email,
+      password,
+    }: {
+      email: string;
+      password: string;
+    }) {
       try {
-        await setDoc(doc(db, 'users', payload.uid), {
-          church: payload.church,
-          department: payload.department,
-          email: payload.email,
-          name: payload.name,
-          role: payload.role,
-          grade: payload.grade,
-          group: payload.group,
-          createdAt: serverTimestamp(),
+        const loginAccountRes = await signInWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+        const fetchAccountRes = await this.fetchAccount({
+          uid: loginAccountRes.user.uid,
         });
+        this.userData = {
+          uid: loginAccountRes.user.uid,
+          email: loginAccountRes.user.email!,
+          name: loginAccountRes.user.displayName!,
+          ...(fetchAccountRes as AccountData),
+        };
+        this.isAuthReady = true;
       } catch (error) {
-        console.log(error);
+        throw new Error('could not complete login');
       }
+    },
+
+    async logoutAccount() {
+      await signOut(auth);
+      this.userData = null;
     },
   },
 });

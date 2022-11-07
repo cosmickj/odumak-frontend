@@ -1,49 +1,76 @@
 <template>
   <div class="container">
-    <div class="mb-12">
-      <Button
-        class="p-button-success mr-2"
-        icon="pi pi-plus"
-        label="추가하기"
-        @click="openModalForAddStudent"
+    <div class="mb-5 flex justify-between">
+      <div class="flex gap-x-3">
+        <Button
+          class="p-button-success p-button-lg"
+          icon="pi pi-plus"
+          label="추가하기"
+          :disabled="selectedStudents.length != 0"
+        />
+        <Button
+          class="p-button-warning p-button-lg"
+          icon="pi pi-user-edit"
+          label="수정하기"
+          :disabled="selectedStudents.length == 0"
+        />
+        <Button
+          class="p-button-danger p-button-lg"
+          icon="pi pi-trash"
+          label="삭제하기"
+          :disabled="selectedStudents.length == 0"
+        />
+      </div>
+
+      <div class="flex">
+        <Button
+          class="p-button-help p-button-lg"
+          icon="pi pi-external-link"
+          label="내보내기"
+          @click="exportCSV"
+        />
+      </div>
+    </div>
+
+    <div class="mb-5 flex items-center">
+      <FileUpload
+        class="p-button-lg mr-4"
+        mode="basic"
+        choose-label="여러 학생 추가하기"
+        accept=".csv"
+        custom-upload
+        auto
+        @uploader="uploadTemplate"
       />
-      <Button
-        class="p-button-danger"
-        icon="pi pi-trash"
-        label="삭제하기"
-        :disabled="!selectedStudents.length"
-        @click="setDeleteStudentsDialog(true)"
-      />
+
+      <span class="text-xl">
+        <a
+          class="underline"
+          :href="fileLink"
+          download="여러_학생_추가하기_템플릿"
+        >
+          여러 학생 추가하기 템플릿 다운받기
+        </a>
+        <span class="text-base text-red-600">
+          (절대로 템플릿을 변경하지 마세요)
+        </span>
+      </span>
     </div>
   </div>
 
   <div class="container">
     <div class="overflow-hidden mb-12 rounded-2xl drop-shadow-lg">
       <DataTable
+        ref="dataTableRef"
         v-model:selection="selectedStudents"
+        :loading="isLoading"
         :value="dataSource"
         lazy
         rowHover
         removableSort
         sortMode="multiple"
         responsiveLayout="scroll"
-        :loading="isLoading"
       >
-        <template #header>
-          <div>
-            <span class="mr-5">*보고 싶은 컬럼을 선택하세요:</span>
-
-            <MultiSelect
-              class="w-1/4"
-              :modelValue="selectedColumns"
-              :options="columns"
-              optionLabel="header"
-              placeholder="Select Columns"
-              @update:modelValue="onToggle"
-            />
-          </div>
-        </template>
-
         <Column class="w-12" selectionMode="multiple" :exportable="false" />
 
         <Column
@@ -63,23 +90,6 @@
             </span>
           </template>
         </Column>
-
-        <Column :exportable="false">
-          <template #body="slotProps">
-            <div class="flex justify-center">
-              <Button
-                icon="pi pi-pencil"
-                class="p-button-rounded p-button-success mx-6"
-                @click="openModalForEditStudent(slotProps.data)"
-              />
-              <Button
-                icon="pi pi-trash"
-                class="p-button-rounded p-button-warning mx-6"
-                @click="openModalForDeleteStudent(slotProps.data)"
-              />
-            </div>
-          </template>
-        </Column>
       </DataTable>
     </div>
   </div>
@@ -92,13 +102,14 @@
     @submit="onSubmit"
   />
 
-  <StudentDelete
+  <!-- <StudentDelete
     :dialog="deleteStudentDialog"
     :selected-student="selectedStudent"
     @cancel="closeModalForDeleteStudent"
     @confirm="deleteStudent"
-  />
+  /> -->
 
+  <!-- TODO: 1명 / 2명 이상 선택시 보이는 글귀를 if문 처리 -->
   <StudentsDelete
     :dialog="deleteStudentsDialog"
     :selected-students="selectedStudents"
@@ -114,30 +125,64 @@ import StudentsDelete from './components/AdminStudentsDelete.vue';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useAccountStore } from '@/store/account';
 import { useMemberStore } from '@/store/member';
+import { uploadFile } from '@/api/upload';
 import { formatGender } from '@/utils/useFormat';
 import { v4 as uuidv4 } from 'uuid';
 import { useVuelidate } from '@vuelidate/core';
 import { required, helpers, not, sameAs } from '@vuelidate/validators';
+import csv from 'csvtojson';
 import { CustomColumn, SubmitType, Student, Teacher } from '@/types';
+import type DataTable from 'primevue/datatable';
 import type { Timestamp } from '@firebase/firestore';
 
 const accountStore = useAccountStore();
 const memberStore = useMemberStore();
 
+const dataTableRef = ref<DataTable | null>(null);
+
+const exportCSV = () => {
+  if (dataTableRef.value) {
+    dataTableRef.value.exportCSV();
+    console.log(dataTableRef.value);
+  }
+};
+
+const fileLocation = './students-upload-template.csv';
+const fileLink = new URL(fileLocation, import.meta.url).href;
+
+const uploadTemplate = async (event: any) => {
+  let formData = new FormData();
+  formData.append('file', event.files[0]);
+
+  const { data } = await uploadFile(formData);
+  const result = await csv({
+    noheader: false,
+    output: 'json',
+  }).fromString(data);
+  result.splice(0, 2);
+
+  console.log(result);
+};
+
+/**
+ * DataTable에 들어갈 데이터 가져오기
+ */
 const isLoading = ref(false);
 const dataSource = ref();
 
 const getMembers = async () => {
   try {
     isLoading.value = true;
-    if (accountStore.userData) {
-      const result = await memberStore.fetchAll({
-        church: accountStore.userData.church,
-        department: accountStore.userData.department,
-        position: 'student',
-      });
-      dataSource.value = result;
-    }
+    // if (accountStore.userData) {
+    const result = await memberStore.fetchAll({
+      church: '테스트',
+      department: '테스트',
+      // church: accountStore.userData.church,
+      // department: accountStore.userData.department,
+      position: 'student',
+    });
+    dataSource.value = result;
+    // }
   } catch (error) {
     console.log(error);
   } finally {

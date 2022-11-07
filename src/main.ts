@@ -6,12 +6,13 @@ import 'primeicons/primeicons.css';
 import '@/index.css'; // Tailwind CSS
 import 'animate.css';
 
-import { createApp } from 'vue';
-import App from '@/App.vue';
 import router from '@/router';
 import { createPinia } from 'pinia';
-import VueCookies from 'vue-cookies';
+import { createApp } from 'vue';
+import App from '@/App.vue';
+
 import PrimeVue from 'primevue/config';
+import VueCookies from 'vue-cookies';
 
 import Button from 'primevue/button';
 import Card from 'primevue/card';
@@ -21,6 +22,7 @@ import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import Dialog from 'primevue/dialog';
 import Dropdown from 'primevue/dropdown';
+import FileUpload from 'primevue/fileupload';
 import InputMask from 'primevue/inputmask';
 import InputText from 'primevue/inputtext';
 import InputSwitch from 'primevue/inputswitch';
@@ -69,6 +71,7 @@ app
   .component('DataTable', DataTable)
   .component('Dialog', Dialog)
   .component('Dropdown', Dropdown)
+  .component('FileUpload', FileUpload)
   .component('InputMask', InputMask)
   .component('InputText', InputText)
   .component('InputSwitch', InputSwitch)
