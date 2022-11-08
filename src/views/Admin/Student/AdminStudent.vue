@@ -99,9 +99,10 @@
     :dialog="addEditDialog"
     :errors="errors"
     :selected-students="selectedStudents"
-    @add-row="addSelectedStudents"
-    @hide="v$.$reset"
-    @submit="onSubmit"
+    @add-row="addSelectedStudent"
+    @delete-row="deleteSelectedStudent"
+    @hide="clearSelectedStudents"
+    @submit="submitSelectedStudents"
   />
 
   <!-- <StudentDelete
@@ -259,47 +260,57 @@ const rules = computed(() => ({
   },
 }));
 
-const v$ = useVuelidate(rules, selectedStudent);
+const v = useVuelidate(rules, selectedStudents.value);
+// const v = useVuelidate();
 
 const errors = computed(() => ({
   name: {
-    status: v$.value.name.$error,
-    message: v$.value.name.$errors[0]?.$message,
+    status: v.value.name.$error,
+    message: v.value.name.$errors[0]?.$message,
   },
   grade: {
-    status: v$.value.grade.$error,
-    message: v$.value.grade.$errors[0]?.$message,
+    status: v.value.grade.$error,
+    message: v.value.grade.$errors[0]?.$message,
   },
   group: {
-    status: v$.value.group.$error,
-    message: v$.value.group.$errors[0]?.$message,
+    status: v.value.group.$error,
+    message: v.value.group.$errors[0]?.$message,
   },
   teacher: {
-    status: v$.value.teacher.$error,
-    message: v$.value.teacher.$errors[0]?.$message,
+    status: v.value.teacher.$error,
+    message: v.value.teacher.$errors[0]?.$message,
   },
 }));
 
 // || 생성 혹은 수정하기
-const addEditDialog = reactive({
-  label: '',
+const addEditDialog: { label: SubmitType; status: boolean } = reactive({
+  label: '추가하기',
   status: false,
 });
 
 const openDialogToAddStudent = () => {
   addEditDialog.status = true;
   addEditDialog.label = '추가하기';
-  addSelectedStudents();
+  addSelectedStudent();
 };
 
-const addSelectedStudents = () => {
-  const _student = resetSelectedStudent();
+const addSelectedStudent = () => {
+  const _student = clearSelectedStudent();
   selectedStudents.value.push(_student);
 };
 
-const resetSelectedStudent = () => {
+const deleteSelectedStudent = (index: number) => {
+  selectedStudents.value.splice(index, 1);
+};
+
+const clearSelectedStudent = () => {
   // TODO: 3번째 매개변수에 대해서 타입체킹이 되지 않는다
   return Object.assign({}, initSelectedStudent, { _id: uuidv4() });
+};
+
+const clearSelectedStudents = () => {
+  v.value.$reset();
+  selectedStudents.value.splice(0, selectedStudents.value.length);
 };
 
 const openModalToEditStudent = (student: Student) => {
@@ -313,18 +324,20 @@ const openModalToEditStudent = (student: Student) => {
   addEditDialog.label = '수정하기';
 };
 
-const onSubmit = async ({ submitType }: { submitType: SubmitType }) => {
-  const isFormCorrect = await v$.value.$validate();
-  if (!isFormCorrect) return;
+const submitSelectedStudents = async (submitType: SubmitType) => {
+  console.log(v.value.name);
 
-  if (submitType === 'ADD') {
-    await addStudent();
-  } else {
-    await editStudent();
-  }
+  // const isFormCorrect = await v.value.$validate();
+  // if (!isFormCorrect) return;
 
-  addEditDialog.status = false;
-  await getMembers();
+  // if (submitType === 'ADD') {
+  //   await addStudent();
+  // } else {
+  //   await editStudent();
+  // }
+
+  // addEditDialog.status = false;
+  // await getMembers();
 };
 
 const addStudent = async () => {
@@ -364,7 +377,7 @@ const openModalForDeleteStudent = (student: Student) => {
 };
 
 const closeModalForDeleteStudent = () => {
-  resetSelectedStudent();
+  clearSelectedStudent();
   deleteStudentDialog.status = false;
 };
 

@@ -14,7 +14,11 @@
           label="행 추가"
           @click="handleAddRow"
         />
-        <Button class="p-button-warning" label="제출하기" />
+        <Button
+          class="p-button-warning"
+          label="제출하기"
+          @click="handleSubmit(dialog.label)"
+        />
       </div>
     </template>
 
@@ -36,6 +40,7 @@
       <template v-for="(selectedStudent, i) in selectedStudents" :key="i">
         <Dropdown
           v-model="selectedStudent.grade"
+          class="w-28"
           :class="{ 'p-invalid': errors.grade.status }"
           :options="GRADE"
           option-label="label"
@@ -45,6 +50,7 @@
 
         <Dropdown
           v-model="selectedStudent.group"
+          class="w-28"
           :class="{ 'p-invalid': errors.group.status }"
           placeholder="학급"
           option-label="label"
@@ -78,6 +84,7 @@
         <div class="flex items-center">
           <Dropdown
             v-model="selectedBirthYear"
+            class="w-28"
             option-label="label"
             option-value="value"
             :disabled="isChecked"
@@ -86,6 +93,7 @@
           />
           <Dropdown
             v-model="selectedBirthMonth"
+            class="w-24"
             option-label="label"
             option-value="value"
             :disabled="isChecked"
@@ -94,6 +102,7 @@
           />
           <Dropdown
             v-model="selectedBirthDate"
+            class="w-24"
             option-label="label"
             option-value="value"
             :disabled="isChecked"
@@ -124,7 +133,7 @@
 
         <InputText v-model="selectedStudent.remark" />
 
-        <Button class="p-button-danger" label="X" />
+        <Button class="p-button-danger" label="X" @click="handleDeleteRow(i)" />
       </template>
     </div>
   </Dialog>
@@ -144,13 +153,19 @@ import {
 const props = defineProps<{
   dialog: {
     status: boolean;
-    label: string;
+    label: SubmitType;
   };
   selectedStudents: Student[];
   errors: any;
 }>();
 
-const emit = defineEmits(['hide', 'submit', 'birthChange', 'addRow']);
+const emit = defineEmits([
+  'hide',
+  'submit',
+  'birthChange',
+  'addRow',
+  'deleteRow',
+]);
 
 const isChecked = ref(false);
 
@@ -168,11 +183,13 @@ const handleBirthChange = () => {
   emit('birthChange', { birth: new Date(selectedBirthString) });
 };
 
-const handleSubmit = (submitType: SubmitType) => emit('submit', { submitType });
-
 const handleHide = () => emit('hide');
 
 const handleAddRow = () => emit('addRow');
+
+const handleDeleteRow = (index: number) => emit('deleteRow', index);
+
+const handleSubmit = (submitType: SubmitType) => emit('submit', submitType);
 </script>
 
 <style>
