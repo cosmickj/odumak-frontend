@@ -132,7 +132,7 @@ import { uploadFile } from '@/api/upload';
 import { formatGender } from '@/utils/useFormat';
 import { v4 as uuidv4 } from 'uuid';
 import { useVuelidate } from '@vuelidate/core';
-import { required, helpers, not, sameAs } from '@vuelidate/validators';
+import { required, helpers } from '@vuelidate/validators';
 import csv from 'csvtojson';
 import { CustomColumn, SubmitType, Student, Teacher } from '@/types';
 import type DataTable from 'primevue/datatable';
@@ -162,9 +162,24 @@ const uploadTemplate = async (event: any) => {
     noheader: false,
     output: 'json',
   }).fromString(data);
-  result.splice(0, 2);
 
-  console.log(result);
+  preprocessUploadedTemplate(result);
+
+  selectedStudents.collection.push(...result);
+  addEditDialog.label = '추가하기';
+  addEditDialog.status = true;
+};
+
+// TODO: any 타입 제거하기
+const preprocessUploadedTemplate = (data: any) => {
+  data.splice(0, 2);
+  data.forEach((d: any) => {
+    // _id
+    d['_id'] = uuidv4();
+    // gender
+    if (d.gender === '남') d.gender = 'male';
+    else d.gender = 'female';
+  });
 };
 
 /**
@@ -244,9 +259,7 @@ const rules = {
 
 const v = useVuelidate(rules, selectedStudents);
 
-const errors = computed(() => {
-  return v.value.$errors[0]?.$response?.$errors;
-});
+const errors = computed(() => v.value.$errors[0]?.$response?.$errors);
 
 // || 생성 혹은 수정하기
 const addEditDialog: { label: SubmitType; status: boolean } = reactive({
