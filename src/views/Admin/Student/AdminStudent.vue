@@ -6,20 +6,20 @@
           class="p-button-success p-button-lg"
           icon="pi pi-plus"
           label="추가하기"
-          :disabled="selectedStudents.length != 0"
+          :disabled="selectedStudents.collection.length != 0"
           @click="openDialogToAddStudent"
         />
         <Button
           class="p-button-warning p-button-lg"
           icon="pi pi-user-edit"
           label="수정하기"
-          :disabled="selectedStudents.length == 0"
+          :disabled="selectedStudents.collection.length == 0"
         />
         <Button
           class="p-button-danger p-button-lg"
           icon="pi pi-trash"
           label="삭제하기"
-          :disabled="selectedStudents.length == 0"
+          :disabled="selectedStudents.collection.length == 0"
         />
       </div>
 
@@ -98,7 +98,7 @@
   <StudentDialog
     :dialog="addEditDialog"
     :errors="errors"
-    :selected-students="selectedStudents"
+    :selected-students="selectedStudents.collection"
     @add-row="addSelectedStudent"
     @delete-row="deleteSelectedStudent"
     @hide="clearSelectedStudents"
@@ -115,7 +115,7 @@
   <!-- TODO: 1명 / 2명 이상 선택시 보이는 글귀를 if문 처리 -->
   <StudentsDelete
     :dialog="deleteStudentsDialog"
-    :selected-students="selectedStudents"
+    :selected-students="selectedStudents.collection"
     @cancel="setDeleteStudentsDialog(false)"
     @confirm="deleteStudents"
   />
@@ -227,60 +227,26 @@ const initSelectedStudent: Student = {
   remark: '',
 };
 
-const selectedStudent = reactive({ ...initSelectedStudent }); // 제거 가능 및 필요
-const selectedStudents = ref<Student[]>([]);
+const selectedStudent = reactive({ ...initSelectedStudent }); // TODO: 해당 변수 제거 검토
 
-// watch(selectedStudent, async (student) => {
-//   if (student.grade && student.group) {
-//     const result = (await memberStore.fetchMembers({
-//       church: accountStore.userData?.church,
-//       department: accountStore.userData?.department,
-//       position: 'teacher',
-//       grade: student.grade,
-//       group: student.group,
-//       role: 'main',
-//     })) as Teacher[]; // TODO: as 제거하기
+const selectedStudents = reactive({ collection: [] as Student[] });
 
-//     if (result[0]?.name) {
-//       selectedStudent.teacher = result[0]?.name;
-//     } else {
-//       const msg = '담당 교사가 없는 학급입니다. 다시 선택해주세요.';
-//       selectedStudent.teacher = msg;
-//     }
-//   }
-// });
+const rules = {
+  collection: {
+    $each: helpers.forEach({
+      name: { required },
+      grade: { required },
+      group: { required },
+      teacher: { required },
+    }),
+  },
+};
 
-const rules = computed(() => ({
-  name: { required: helpers.withMessage('이름을 꼭 입력해주세요.', required) },
-  grade: { required },
-  group: { required },
-  teacher: {
-    required,
-    rejected: not(sameAs('담당 교사가 없는 학급입니다. 다시 선택해주세요.')),
-  },
-}));
+const v = useVuelidate(rules, selectedStudents);
 
-const v = useVuelidate(rules, selectedStudents.value);
-// const v = useVuelidate();
-
-const errors = computed(() => ({
-  name: {
-    status: v.value.name.$error,
-    message: v.value.name.$errors[0]?.$message,
-  },
-  grade: {
-    status: v.value.grade.$error,
-    message: v.value.grade.$errors[0]?.$message,
-  },
-  group: {
-    status: v.value.group.$error,
-    message: v.value.group.$errors[0]?.$message,
-  },
-  teacher: {
-    status: v.value.teacher.$error,
-    message: v.value.teacher.$errors[0]?.$message,
-  },
-}));
+const errors = computed(() => {
+  return v.value.$errors[0]?.$response?.$errors;
+});
 
 // || 생성 혹은 수정하기
 const addEditDialog: { label: SubmitType; status: boolean } = reactive({
@@ -296,11 +262,11 @@ const openDialogToAddStudent = () => {
 
 const addSelectedStudent = () => {
   const _student = clearSelectedStudent();
-  selectedStudents.value.push(_student);
+  selectedStudents.collection.push(_student);
 };
 
 const deleteSelectedStudent = (index: number) => {
-  selectedStudents.value.splice(index, 1);
+  selectedStudents.collection.splice(index, 1);
 };
 
 const clearSelectedStudent = () => {
@@ -310,7 +276,7 @@ const clearSelectedStudent = () => {
 
 const clearSelectedStudents = () => {
   v.value.$reset();
-  selectedStudents.value.splice(0, selectedStudents.value.length);
+  selectedStudents.collection.splice(0, selectedStudents.collection.length);
 };
 
 const openModalToEditStudent = (student: Student) => {
@@ -325,17 +291,14 @@ const openModalToEditStudent = (student: Student) => {
 };
 
 const submitSelectedStudents = async (submitType: SubmitType) => {
-  console.log(v.value.name);
-
-  // const isFormCorrect = await v.value.$validate();
-  // if (!isFormCorrect) return;
+  const isFormCorrect = await v.value.collection.$validate();
+  if (!isFormCorrect) return;
 
   // if (submitType === 'ADD') {
   //   await addStudent();
   // } else {
   //   await editStudent();
   // }
-
   // addEditDialog.status = false;
   // await getMembers();
 };
@@ -405,7 +368,7 @@ const setDeleteStudentsDialog = (flag: boolean) => {
 };
 
 const deleteStudents = async () => {
-  const ids = selectedStudents.value.map((student) => {
+  const ids = selectedStudents.collection.map((student) => {
     return student._id;
   });
 

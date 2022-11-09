@@ -2,7 +2,6 @@
   <Dialog
     v-model:visible="dialog.status"
     modal
-    maximizable
     :breakpoints="{ '1280px': '90vw', '450px': '90vw' }"
     @hide="handleHide"
   >
@@ -41,7 +40,7 @@
         <Dropdown
           v-model="selectedStudent.grade"
           class="w-28"
-          :class="{ 'p-invalid': errors.grade.status }"
+          :class="{ 'p-invalid': isError(i, 'grade') }"
           :options="GRADE"
           option-label="label"
           option-value="value"
@@ -51,7 +50,7 @@
         <Dropdown
           v-model="selectedStudent.group"
           class="w-28"
-          :class="{ 'p-invalid': errors.group.status }"
+          :class="{ 'p-invalid': isError(i, 'group') }"
           placeholder="학급"
           option-label="label"
           option-value="value"
@@ -60,7 +59,7 @@
 
         <InputText
           v-model="selectedStudent.name"
-          :class="{ 'p-invalid': errors.name.status }"
+          :class="{ 'p-invalid': isError(i, 'name') }"
           placeholder="이름을 입력해주세요."
         />
 
@@ -155,8 +154,8 @@ const props = defineProps<{
     status: boolean;
     label: SubmitType;
   };
-  selectedStudents: Student[];
   errors: any;
+  selectedStudents: Student[];
 }>();
 
 const emit = defineEmits([
@@ -166,6 +165,14 @@ const emit = defineEmits([
   'addRow',
   'deleteRow',
 ]);
+
+const isError = (index: number, key: string) => {
+  if (props.errors && props.errors[index][key].length > 0) {
+    return true;
+  } else {
+    return false;
+  }
+};
 
 const isChecked = ref(false);
 
