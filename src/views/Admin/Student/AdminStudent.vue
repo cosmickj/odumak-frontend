@@ -124,9 +124,7 @@ const exportCSV = () => {
   }
 };
 
-/**
- * DataTable에 들어갈 데이터 가져오기
- */
+// DataTable에 들어갈 데이터 가져오기
 const isLoading = ref(false);
 const dataSource = ref();
 
@@ -158,7 +156,6 @@ const columns = ref<CustomColumn[]>([
   { field: 'name', header: '이름', sortable: true, format: undefined },
   { field: 'gender', header: '성별', sortable: false, format: formatGender },
   { field: 'phone', header: '연락처', sortable: false, format: undefined },
-  // { field: 'teacher', header: '담당 교사', sortable: true, format: undefined },
   { field: 'address', header: '주소', sortable: true, format: undefined },
   { field: 'remark', header: '비고', sortable: false, format: undefined },
 ]);
@@ -249,28 +246,36 @@ const deleteSelectedStudent = (index: number) => {
 // };
 
 const submitSelectedStudents = async (submitType: SubmitType) => {
-  const isFormCorrect = await v.value.collection.$validate();
-  if (!isFormCorrect) return;
-  if (submitType === '추가하기') {
-    await addStudent();
-  } else {
-    await editStudent();
+  try {
+    const isFormCorrect = await v.value.collection.$validate();
+    if (!isFormCorrect) return;
+
+    if (submitType === '추가하기') {
+      await addStudent();
+    } else {
+      await editStudent();
+    }
+  } catch (error) {
+    console.log(error);
+  } finally {
+    addEditDialog.status = false;
+    await getMembers();
   }
-  addEditDialog.status = false;
-  await getMembers();
 };
 
 const addStudent = async () => {
-  if (accountStore.userData) {
-    await memberStore.create({
-      church: '테스트',
-      department: '테스트',
-      // church: accountStore.userData.church,
-      // department: accountStore.userData.department,
-      position: 'student',
-      ...selectedStudents.collection,
-    });
-    alert('추가되었습니다.');
+  try {
+    if (accountStore.userData) {
+      await memberStore.create({
+        church: accountStore.userData.church,
+        department: accountStore.userData.department,
+        position: 'student',
+        members: selectedStudents.collection,
+      });
+      alert('추가되었습니다.');
+    }
+  } catch (error) {
+    console.log(error);
   }
 };
 

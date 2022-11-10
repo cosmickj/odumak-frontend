@@ -23,10 +23,8 @@ interface FetchAllParmas extends Pick<UserInfo, 'church' | 'department'> {
   position: MemberPosition;
 }
 
-interface CreateParams
-  extends Partial<Student>,
-    Partial<Teacher>,
-    Pick<UserInfo, 'church' | 'department'> {
+interface CreateParams extends Pick<UserInfo, 'church' | 'department'> {
+  members: Student[] | Teacher[];
   position: MemberPosition;
 }
 
@@ -79,7 +77,7 @@ export const useMemberStore = defineStore('member', {
     },
 
     async create(params: CreateParams) {
-      const { church, department, position, ...memberParams } = params;
+      const { church, department, position, members } = params;
 
       const q = query(
         membersColl,
@@ -92,7 +90,7 @@ export const useMemberStore = defineStore('member', {
       if (!qSnapshot.empty) {
         const docId = qSnapshot.docs[0].id;
         const docData = qSnapshot.docs[0].data();
-        docData.members.push(memberParams);
+        docData.members.push(...members);
 
         return await setDoc(doc(db, 'members', docId), docData);
       }
