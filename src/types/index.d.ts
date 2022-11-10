@@ -33,7 +33,6 @@ export interface Student {
   group: string;
   name: string;
   phone: string;
-  phoneOwner: string;
   registeredAt: Date;
   remark: string;
   teacher: string;

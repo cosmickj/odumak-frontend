@@ -32,38 +32,13 @@
         />
       </div>
     </div>
-
-    <div class="mb-5 flex items-center">
-      <FileUpload
-        class="p-button-lg mr-4"
-        mode="basic"
-        choose-label="여러 학생 추가하기"
-        accept=".csv"
-        custom-upload
-        auto
-        @uploader="uploadTemplate"
-      />
-
-      <span class="text-xl">
-        <a
-          class="underline"
-          :href="fileLink"
-          download="여러_학생_추가하기_템플릿"
-        >
-          여러 학생 추가하기 템플릿 다운받기
-        </a>
-        <span class="text-base text-red-600">
-          (절대로 템플릿을 변경하지 마세요)
-        </span>
-      </span>
-    </div>
   </div>
 
   <div class="container">
     <div class="overflow-hidden mb-12 rounded-2xl drop-shadow-lg">
       <DataTable
         ref="dataTableRef"
-        v-model:selection="selectedStudents"
+        v-model:selection="selectedStudents.collection"
         :loading="isLoading"
         :value="dataSource"
         lazy
@@ -100,6 +75,7 @@
     :errors="errors"
     :selected-students="selectedStudents.collection"
     @add-row="addSelectedStudent"
+    @copy-row="copySelectedStudent"
     @delete-row="deleteSelectedStudent"
     @hide="clearSelectedStudents"
     @submit="submitSelectedStudents"
@@ -128,12 +104,10 @@ import StudentsDelete from './components/AdminStudentsDelete.vue';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useAccountStore } from '@/store/account';
 import { useMemberStore } from '@/store/member';
-import { uploadFile } from '@/api/upload';
 import { formatGender } from '@/utils/useFormat';
 import { v4 as uuidv4 } from 'uuid';
 import { useVuelidate } from '@vuelidate/core';
 import { required, helpers } from '@vuelidate/validators';
-import csv from 'csvtojson';
 import { CustomColumn, SubmitType, Student, Teacher } from '@/types';
 import type DataTable from 'primevue/datatable';
 import type { Timestamp } from '@firebase/firestore';
@@ -150,38 +124,6 @@ const exportCSV = () => {
   }
 };
 
-const fileLocation = './students-upload-template.csv';
-const fileLink = new URL(fileLocation, import.meta.url).href;
-
-const uploadTemplate = async (event: any) => {
-  let formData = new FormData();
-  formData.append('file', event.files[0]);
-
-  const { data } = await uploadFile(formData);
-  const result = await csv({
-    noheader: false,
-    output: 'json',
-  }).fromString(data);
-
-  preprocessUploadedTemplate(result);
-
-  selectedStudents.collection.push(...result);
-  addEditDialog.label = '추가하기';
-  addEditDialog.status = true;
-};
-
-// TODO: any 타입 제거하기
-const preprocessUploadedTemplate = (data: any) => {
-  data.splice(0, 2);
-  data.forEach((d: any) => {
-    // _id
-    d['_id'] = uuidv4();
-    // gender
-    if (d.gender === '남') d.gender = 'male';
-    else d.gender = 'female';
-  });
-};
-
 /**
  * DataTable에 들어갈 데이터 가져오기
  */
@@ -193,8 +135,8 @@ const getMembers = async () => {
     isLoading.value = true;
     // if (accountStore.userData) {
     const result = await memberStore.fetchAll({
-      church: '테스트',
-      department: '테스트',
+      church: '테스트', // 추후 삭제
+      department: '테스트', // 추후 삭제
       // church: accountStore.userData.church,
       // department: accountStore.userData.department,
       position: 'student',
@@ -216,7 +158,7 @@ const columns = ref<CustomColumn[]>([
   { field: 'name', header: '이름', sortable: true, format: undefined },
   { field: 'gender', header: '성별', sortable: false, format: formatGender },
   { field: 'phone', header: '연락처', sortable: false, format: undefined },
-  { field: 'teacher', header: '담당 교사', sortable: true, format: undefined },
+  // { field: 'teacher', header: '담당 교사', sortable: true, format: undefined },
   { field: 'address', header: '주소', sortable: true, format: undefined },
   { field: 'remark', header: '비고', sortable: false, format: undefined },
 ]);
@@ -236,7 +178,6 @@ const initSelectedStudent: Student = {
   birth: new Date(`${new Date().getFullYear() - 10 + 1}-01-01`),
   gender: 'male',
   phone: '',
-  phoneOwner: '',
   address: '',
   registeredAt: new Date(),
   remark: '',
@@ -246,13 +187,22 @@ const selectedStudent = reactive({ ...initSelectedStudent }); // TODO: 해당 �
 
 const selectedStudents = reactive({ collection: [] as Student[] });
 
+const clearSelectedStudent = () => {
+  // TODO: 3번째 매개변수에 대해서 타입체킹이 되지 않는다
+  return Object.assign({}, initSelectedStudent, { _id: uuidv4() });
+};
+
+const clearSelectedStudents = () => {
+  v.value.$reset();
+  selectedStudents.collection.splice(0, selectedStudents.collection.length);
+};
+
 const rules = {
   collection: {
     $each: helpers.forEach({
       name: { required },
       grade: { required },
       group: { required },
-      teacher: { required },
     }),
   },
 };
@@ -278,51 +228,47 @@ const addSelectedStudent = () => {
   selectedStudents.collection.push(_student);
 };
 
+const copySelectedStudent = (index: number) => {
+  const target = selectedStudents.collection[index];
+  const _student = Object.assign({}, target, { _id: uuidv4() });
+  selectedStudents.collection.push(_student);
+};
+
 const deleteSelectedStudent = (index: number) => {
   selectedStudents.collection.splice(index, 1);
 };
 
-const clearSelectedStudent = () => {
-  // TODO: 3번째 매개변수에 대해서 타입체킹이 되지 않는다
-  return Object.assign({}, initSelectedStudent, { _id: uuidv4() });
-};
-
-const clearSelectedStudents = () => {
-  v.value.$reset();
-  selectedStudents.collection.splice(0, selectedStudents.collection.length);
-};
-
-const openModalToEditStudent = (student: Student) => {
-  const _birth = student.birth as unknown as Timestamp;
-  const _registeredAt = student.registeredAt as unknown as Timestamp;
-  student.birth = new Date(_birth.seconds * 1000);
-  student.registeredAt = new Date(_registeredAt.seconds * 1000);
-  Object.assign(selectedStudent, student);
-
-  addEditDialog.status = true;
-  addEditDialog.label = '수정하기';
-};
+// const openModalToEditStudent = (student: Student) => {
+//   const _birth = student.birth as unknown as Timestamp;
+//   const _registeredAt = student.registeredAt as unknown as Timestamp;
+//   student.birth = new Date(_birth.seconds * 1000);
+//   student.registeredAt = new Date(_registeredAt.seconds * 1000);
+//   Object.assign(selectedStudent, student);
+//   addEditDialog.status = true;
+//   addEditDialog.label = '수정하기';
+// };
 
 const submitSelectedStudents = async (submitType: SubmitType) => {
   const isFormCorrect = await v.value.collection.$validate();
   if (!isFormCorrect) return;
-
-  // if (submitType === 'ADD') {
-  //   await addStudent();
-  // } else {
-  //   await editStudent();
-  // }
-  // addEditDialog.status = false;
-  // await getMembers();
+  if (submitType === '추가하기') {
+    await addStudent();
+  } else {
+    await editStudent();
+  }
+  addEditDialog.status = false;
+  await getMembers();
 };
 
 const addStudent = async () => {
   if (accountStore.userData) {
     await memberStore.create({
-      church: accountStore.userData.church,
-      department: accountStore.userData.department,
+      church: '테스트',
+      department: '테스트',
+      // church: accountStore.userData.church,
+      // department: accountStore.userData.department,
       position: 'student',
-      ...selectedStudent,
+      ...selectedStudents.collection,
     });
     alert('추가되었습니다.');
   }

@@ -2,6 +2,7 @@
   <Dialog
     v-model:visible="dialog.status"
     modal
+    position="top"
     :breakpoints="{ '1280px': '90vw', '450px': '90vw' }"
     @hide="handleHide"
   >
@@ -29,10 +30,10 @@
       <p class="self-baseline">성별</p>
       <p class="self-baseline">생년월일</p>
       <p class="self-baseline">연락처(- 없이 입력)</p>
-      <p class="self-baseline">누구의 연락처인가요?</p>
       <p class="self-baseline">주소</p>
       <p class="self-baseline">초등부 처음 온 날</p>
       <p class="self-baseline">비고</p>
+      <p class="self-baseline">복사</p>
       <p class="self-baseline">삭제</p>
 
       <!-- Row -->
@@ -118,8 +119,6 @@
           placeholder="(010)-0000-0000"
         />
 
-        <InputText placeholder="ex) 엄마, 아빠 등등" />
-
         <InputText
           v-model="selectedStudent.address"
           placeholder="주소를 입력해주세요."
@@ -132,7 +131,17 @@
 
         <InputText v-model="selectedStudent.remark" />
 
-        <Button class="p-button-danger" label="X" @click="handleDeleteRow(i)" />
+        <Button
+          class="p-button-help"
+          icon="pi pi-copy"
+          @click="handleCopyRow(i)"
+        />
+
+        <Button
+          class="p-button-danger"
+          icon="pi pi-times"
+          @click="handleDeleteRow(i)"
+        />
       </template>
     </div>
   </Dialog>
@@ -163,6 +172,7 @@ const emit = defineEmits([
   'submit',
   'birthChange',
   'addRow',
+  'copyRow',
   'deleteRow',
 ]);
 
@@ -193,6 +203,8 @@ const handleBirthChange = () => {
 const handleHide = () => emit('hide');
 
 const handleAddRow = () => emit('addRow');
+
+const handleCopyRow = (index: number) => emit('copyRow', index);
 
 const handleDeleteRow = (index: number) => emit('deleteRow', index);
 
