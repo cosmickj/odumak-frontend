@@ -21,6 +21,7 @@
           icon="pi pi-trash"
           label="삭제하기"
           :disabled="selectedStudents.collection.length == 0"
+          @click="openDialogToDeleteStudents"
         />
       </div>
 
@@ -82,25 +83,16 @@
     @submit="submitSelectedStudents"
   />
 
-  <!-- <StudentDelete
-    :dialog="deleteStudentDialog"
-    :selected-student="selectedStudent"
-    @cancel="closeModalForDeleteStudent"
-    @confirm="deleteStudent"
-  /> -->
-
-  <!-- TODO: 1명 / 2명 이상 선택시 보이는 글귀를 if문 처리 -->
   <StudentsDelete
     :dialog="deleteStudentsDialog"
     :selected-students="selectedStudents.collection"
-    @cancel="setDeleteStudentsDialog(false)"
+    @cancel="deleteStudentsDialog.status = false"
     @confirm="deleteStudents"
   />
 </template>
 
 <script setup lang="ts">
 import StudentDialog from './components/AdminStudentDialog.vue';
-import StudentDelete from './components/AdminStudentDelete.vue';
 import StudentsDelete from './components/AdminStudentsDelete.vue';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useAccountStore } from '@/store/account';
@@ -131,16 +123,18 @@ const dataSource = ref();
 const getMembers = async () => {
   try {
     isLoading.value = true;
-    // if (accountStore.userData) {
-    const result = await memberStore.fetchAll({
-      church: '테스트', // 추후 삭제
-      department: '테스트', // 추후 삭제
-      // church: accountStore.userData.church,
-      // department: accountStore.userData.department,
-      position: 'student',
-    });
-    dataSource.value = result;
-    // }
+    console.log(accountStore.userData);
+
+    if (accountStore.userData) {
+      const result = await memberStore.fetchAll({
+        church: accountStore.userData.church,
+        department: accountStore.userData.department,
+        position: 'student',
+      });
+      console.log(result);
+
+      dataSource.value = result;
+    }
   } catch (error) {
     console.log(error);
   } finally {
@@ -287,60 +281,35 @@ const editStudent = async () => {
 };
 
 // || 삭제하기
-const deleteStudentDialog = reactive({
-  label: '',
-  status: false,
-});
-
-const openModalForDeleteStudent = (student: Student) => {
-  selectedStudent._id = student._id;
-  selectedStudent.name = student.name;
-  deleteStudentDialog.status = true;
-};
-
-const closeModalForDeleteStudent = () => {
-  clearSelectedStudent();
-  deleteStudentDialog.status = false;
-};
-
-const deleteStudent = async () => {
-  if (accountStore.userData) {
-    await memberStore.remove({
-      church: accountStore.userData?.church,
-      department: accountStore.userData?.department,
-      position: 'student',
-      ids: [selectedStudent._id],
-    });
-
-    deleteStudentDialog.status = false;
-    await getMembers();
-  }
-};
-
 const deleteStudentsDialog = reactive({
   label: '',
   status: false,
 });
 
-const setDeleteStudentsDialog = (flag: boolean) => {
-  deleteStudentsDialog.status = flag;
+const openDialogToDeleteStudents = () => {
+  deleteStudentsDialog.label = '삭제하기';
+  deleteStudentsDialog.status = true;
 };
 
 const deleteStudents = async () => {
-  const ids = selectedStudents.collection.map((student) => {
-    return student._id;
-  });
+  try {
+    const ids = selectedStudents.collection.map((student) => student._id);
 
-  if (accountStore.userData) {
+    // if (accountStore.userData) {
     await memberStore.remove({
-      church: accountStore.userData?.church,
-      department: accountStore.userData?.department,
+      church: '테스트',
+      department: '테스트',
+      // church: accountStore.userData?.church,
+      // department: accountStore.userData?.department,
       position: 'student',
       ids,
     });
 
-    setDeleteStudentsDialog(false);
+    deleteStudentsDialog.status = false;
     await getMembers();
+    // }
+  } catch (error) {
+    console.log(error);
   }
 };
 </script>
