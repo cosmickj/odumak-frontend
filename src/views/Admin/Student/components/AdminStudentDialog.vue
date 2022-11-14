@@ -82,32 +82,9 @@
         </div>
 
         <div class="flex items-center">
-          <Dropdown
-            v-model="selectedBirthYear"
-            class="w-28"
-            option-label="label"
-            option-value="value"
-            :disabled="isChecked"
-            :options="BIRTH_YEAR"
-            @change="handleBirthChange"
-          />
-          <Dropdown
-            v-model="selectedBirthMonth"
-            class="w-24"
-            option-label="label"
-            option-value="value"
-            :disabled="isChecked"
-            :options="BIRTH_MONTH"
-            @change="handleBirthChange"
-          />
-          <Dropdown
-            v-model="selectedBirthDate"
-            class="w-24"
-            option-label="label"
-            option-value="value"
-            :disabled="isChecked"
-            :options="BIRTH_DATE"
-            @change="handleBirthChange"
+          <Calendar
+            v-model="selectedStudent.birth"
+            date-format="yy년 mm월 dd일"
           />
           <InputSwitch v-model="isChecked" class="ml-4" input-id="later" />
           <label class="cursor-pointer select-none" for="later"> 나중에 </label>
@@ -148,7 +125,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { Student, SubmitType } from '@/types';
 import {
   BIRTH_DATE,
@@ -177,22 +154,19 @@ const emit = defineEmits([
 ]);
 
 const isError = (index: number, key: string) => {
-  if (props.errors && props.errors[index][key].length > 0) {
-    return true;
-  } else {
-    return false;
-  }
+  if (props.errors && props.errors[index][key].length > 0) return true;
+  else return false;
 };
 
 const isChecked = ref(false);
 
-const selectedBirthYear = ref();
+const selectedBirthYear = ref('2022');
 // props.selectedStudent.birth.getFullYear().toString()
 
-const selectedBirthMonth = ref();
+const selectedBirthMonth = ref('12');
 // (props.selectedStudent.birth.getMonth() + 1).toString()
 
-const selectedBirthDate = ref();
+const selectedBirthDate = ref('13');
 // props.selectedStudent.birth.getDate().toString()
 
 const handleBirthChange = () => {

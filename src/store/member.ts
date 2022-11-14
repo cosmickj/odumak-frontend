@@ -72,6 +72,10 @@ export const useMemberStore = defineStore('member', {
         await this.fetchAll(params);
       } else {
         const members = qSnapshot.docs[0].data().members;
+        members.forEach((member: any) => {
+          member.birth = member.birth.toDate();
+          member.registeredAt = member.registeredAt.toDate();
+        });
         return arraySort(members, ['grade', 'group', 'name']);
       }
     },

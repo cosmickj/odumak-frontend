@@ -14,6 +14,7 @@
           icon="pi pi-user-edit"
           label="수정하기"
           :disabled="selectedStudents.collection.length == 0"
+          @click="openDialogToEditStudent"
         />
         <Button
           class="p-button-danger p-button-lg"
@@ -110,7 +111,6 @@ import { useVuelidate } from '@vuelidate/core';
 import { required, helpers } from '@vuelidate/validators';
 import { CustomColumn, SubmitType, Student, Teacher } from '@/types';
 import type DataTable from 'primevue/datatable';
-import type { Timestamp } from '@firebase/firestore';
 
 const accountStore = useAccountStore();
 const memberStore = useMemberStore();
@@ -235,15 +235,10 @@ const deleteSelectedStudent = (index: number) => {
   selectedStudents.collection.splice(index, 1);
 };
 
-// const openModalToEditStudent = (student: Student) => {
-//   const _birth = student.birth as unknown as Timestamp;
-//   const _registeredAt = student.registeredAt as unknown as Timestamp;
-//   student.birth = new Date(_birth.seconds * 1000);
-//   student.registeredAt = new Date(_registeredAt.seconds * 1000);
-//   Object.assign(selectedStudent, student);
-//   addEditDialog.status = true;
-//   addEditDialog.label = '수정하기';
-// };
+const openDialogToEditStudent = () => {
+  addEditDialog.status = true;
+  addEditDialog.label = '수정하기';
+};
 
 const submitSelectedStudents = async (submitType: SubmitType) => {
   try {
