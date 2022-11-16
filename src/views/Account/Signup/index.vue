@@ -286,6 +286,8 @@ const onSubmit = async () => {
         role: role.value,
         grade: grade.value,
         group: group.value,
+        isAccepted: false,
+        isRejected: false,
       });
       await account.login({
         email: email.value,

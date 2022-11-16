@@ -92,13 +92,9 @@ export const useAccountStore = defineStore('account', {
      */
     async createUser(params: AccountCreateUserParams) {
       try {
-        const { church, department, grade, group, role, uid } = params;
+        const { uid, ...setDocParams } = params;
         await setDoc(doc(db, Collection.USERS, uid), {
-          church,
-          department,
-          role,
-          grade,
-          group,
+          ...setDocParams,
           createdAt: serverTimestamp(),
         });
       } catch (error) {

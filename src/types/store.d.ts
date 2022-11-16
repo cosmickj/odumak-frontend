@@ -26,6 +26,9 @@ export interface AccountCreateUserParams {
   role: TeacherRole;
   grade: string;
   group: string;
+  //
+  isAccepted: boolean;
+  isRejected: boolean;
 }
 
 export interface AccountFetchUserParams {
