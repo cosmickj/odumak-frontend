@@ -1,5 +1,4 @@
 export type SubmitType = '추가하기' | '수정하기';
-
 export type Gender = 'male' | 'female';
 export type MemberPosition = 'student' | 'teacher';
 export type TeacherRole = 'admin' | 'main' | 'sub' | 'common';

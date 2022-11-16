@@ -18,10 +18,7 @@ import {
   TeacherRole,
   Teacher,
 } from '@/types';
-
-interface FetchAllParmas extends Pick<UserInfo, 'church' | 'department'> {
-  position: MemberPosition;
-}
+import { MembersFetchAllParmas } from '@/types/store';
 
 interface CreateParams extends Pick<UserInfo, 'church' | 'department'> {
   members: Student[] | Teacher[];
@@ -50,9 +47,8 @@ interface RemoveParams extends Pick<UserInfo, 'church' | 'department'> {
 export const useMemberStore = defineStore('member', {
   state: () => ({}),
   actions: {
-    async fetchAll(params: FetchAllParmas) {
+    async fetchAll(params: MembersFetchAllParmas) {
       const { church, department, position } = params;
-
       const q = query(
         membersColl,
         where('church', '==', church),
@@ -60,8 +56,11 @@ export const useMemberStore = defineStore('member', {
         where('position', '==', position)
       );
       const qSnapshot = await getDocs(q);
-
       if (qSnapshot.empty) {
+        /**
+         * 만약 해당 교회(church)와 부서(department)로 기록이 없다면
+         * 이를 담아줄 템플릿을 생성한 이후 다시 한 번 해당 함수를 호출한다.
+         */
         await this.createTemplate({
           church,
           department,
@@ -71,6 +70,10 @@ export const useMemberStore = defineStore('member', {
         });
         await this.fetchAll(params);
       } else {
+        /**
+         * 만약 해당 교회(church)와 부서(department)로 기록이 있다면
+         * Firebase의 Timestamp형식을 Date형식으로 변경해준 이후 반환해준다.
+         */
         const members = qSnapshot.docs[0].data().members;
         members.forEach((member: any) => {
           member.birth = member.birth.toDate();
@@ -156,47 +159,47 @@ export const useMemberStore = defineStore('member', {
       }
     },
 
-    async fetchMembers(payload: {
-      church: string | undefined;
-      department: string | undefined;
-      grade?: string;
-      group?: string;
-      position: MemberPosition;
-      role?: TeacherRole;
-    }) {
-      try {
-        const { church, department, grade, group, position, role } = payload;
+    //   async fetchMembers(payload: {
+    //     church: string | undefined;
+    //     department: string | undefined;
+    //     grade?: string;
+    //     group?: string;
+    //     position: MemberPosition;
+    //     role?: TeacherRole;
+    //   }) {
+    //     try {
+    //       const { church, department, grade, group, position, role } = payload;
 
-        const q = query(
-          membersColl,
-          where('church', '==', church),
-          where('department', '==', department),
-          where('position', '==', position)
-        );
+    //       const q = query(
+    //         membersColl,
+    //         where('church', '==', church),
+    //         where('department', '==', department),
+    //         where('position', '==', position)
+    //       );
 
-        const querySnapshot = await getDocs(q);
+    //       const querySnapshot = await getDocs(q);
 
-        if (querySnapshot.docs.length) {
-          let members = querySnapshot.docs[0].data().members;
-          members.forEach(
-            (member: any, idx: number) => (member['index'] = idx)
-          );
+    //       if (querySnapshot.docs.length) {
+    //         let members = querySnapshot.docs[0].data().members;
+    //         members.forEach(
+    //           (member: any, idx: number) => (member['index'] = idx)
+    //         );
 
-          if (role === 'admin') {
-            // pass
-          } else if (role === 'main' || role === 'sub') {
-            /** TODO : any 타입 정리하기 */
-            members = members.filter(
-              (member: any) => member.grade === grade && member.group === group
-            );
-          }
-          return arraySort(members, ['grade', 'group', 'name']);
-        } else {
-          return [];
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    },
+    //         if (role === 'admin') {
+    //           // pass
+    //         } else if (role === 'main' || role === 'sub') {
+    //           /** TODO : any 타입 정리하기 */
+    //           members = members.filter(
+    //             (member: any) => member.grade === grade && member.group === group
+    //           );
+    //         }
+    //         return arraySort(members, ['grade', 'group', 'name']);
+    //       } else {
+    //         return [];
+    //       }
+    //     } catch (error) {
+    //       console.log(error);
+    //     }
+    //   },
   },
 });

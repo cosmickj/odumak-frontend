@@ -15,12 +15,14 @@
       </div>
 
       <div class="mx-7 mb-2">
-        <InputText
+        <Password
           v-model="loginForm.password"
           class="w-full"
           id="password"
-          type="password"
           placeholder="비밀번호를 입력하세요"
+          inputStyle="width:inherit;"
+          :feedback="false"
+          toggleMask
         />
       </div>
 
@@ -137,20 +139,20 @@ const closeModal = () => {
   isModalOpen.value = false;
 };
 
+const isLoading = ref(false);
+const isError = ref(false);
+
 const initLoginForm = {
   email: '',
   password: '',
 };
 const loginForm = reactive({ ...initLoginForm });
 
-const isLoading = ref(false);
-const isError = ref(false);
-
 const onSubmit = async () => {
   try {
     isLoading.value = true;
     isError.value = false;
-    await account.loginAccount({
+    await account.login({
       email: loginForm.email.trimEnd(),
       password: loginForm.password.trimEnd(),
     });

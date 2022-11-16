@@ -1,6 +1,6 @@
-import type { MemberPosition, TeacherRole } from '.';
+import type { MemberPosition, TeacherRole, UserInfo } from './index';
 
-// account.ts
+/** account.ts */
 export interface AccountData {
   grade: string;
   group: string;
@@ -19,6 +19,30 @@ export interface UserData extends AccountData {
   name: string;
 }
 
+export interface AccountCreateUserParams {
+  uid: string;
+  church: string;
+  department: string;
+  role: TeacherRole;
+  grade: string;
+  group: string;
+}
+
+export interface AccountFetchUserParams {
+  uid: string;
+}
+
+export interface AccountSignupParams {
+  email: string;
+  password: string;
+  name: string;
+}
+
+export interface AccountLoginParams {
+  email: string;
+  password: string;
+}
+
 // attendace.ts
 export interface StudentsAttendance {
   date: Date;
@@ -33,7 +57,7 @@ export interface TeachersAttendance {
   teachersAttendance: Teacher[];
 }
 
-// member.ts
+/** member.ts */
 export interface Members {
   church: string;
   department: string;
@@ -43,4 +67,9 @@ export interface Members {
     seconds: number;
     nanoseconds: number;
   };
+}
+
+export interface MembersFetchAllParmas
+  extends Pick<UserInfo, 'church' | 'department'> {
+  position: MemberPosition;
 }

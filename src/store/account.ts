@@ -1,62 +1,116 @@
 import { defineStore } from 'pinia';
-import { useMemberStore } from './member';
-import { auth, db, usersColl } from '@/firebase/config';
-import {
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  serverTimestamp,
-  setDoc,
-  where,
-} from 'firebase/firestore';
+import baseResponse from '@/utils/baseResponseStatus';
+import { errResponse, response } from '@/utils/response';
+
+import { auth, db } from '@/firebase/config';
+import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
   updateProfile,
 } from 'firebase/auth';
-import baseResponse from '@/utils/baseResponseStatus';
-import { errResponse, response } from '@/utils/response';
-import type { Teacher, TeacherRole } from '@/types';
-import type { AccountData, UserData } from '@/types/store';
 
-interface AccountState {
-  userData: UserData | null;
+import { Collection } from '@/enums';
+import {
+  AccountData,
+  AccountCreateUserParams,
+  AccountSignupParams,
+  AccountLoginParams,
+  AccountFetchUserParams,
+  UserData,
+} from '@/types/store';
+
+interface AccountStoreState {
   isAuthReady: boolean;
-}
-
-enum Collection {
-  USER = 'newUsers',
+  userData: UserData | null;
 }
 
 export const useAccountStore = defineStore('account', {
-  state: (): AccountState => ({
-    userData: null,
+  state: (): AccountStoreState => ({
     isAuthReady: false,
+    userData: null,
   }),
-
   actions: {
-    async createUser(payload: any) {
+    /**
+     * 회원가입
+     */
+    async signup(params: AccountSignupParams) {
       try {
-        await setDoc(doc(db, Collection.USER, payload.uid), {
-          church: payload.church,
-          department: payload.department,
-          // email: payload.email,
-          // name: payload.name,
-          role: payload.role,
-          grade: payload.grade,
-          group: payload.group,
+        const signupRes = await createUserWithEmailAndPassword(
+          auth,
+          params.email,
+          params.password
+        );
+        await updateProfile(signupRes.user, {
+          displayName: params.name,
+        });
+        return response(baseResponse.SUCCESS, signupRes);
+      } catch (err) {
+        return errResponse(baseResponse.NETWORK_ERROR);
+      }
+    },
+    /**
+     * 로그인
+     */
+    async login(params: AccountLoginParams) {
+      try {
+        const { email, password } = params;
+        const loginAccountRes = await signInWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+        const fetchAccountRes = (await this.fetchUser({
+          uid: loginAccountRes.user.uid,
+        })) as AccountData;
+        // 받아온 Auth 데이터와 User 데이터를 합쳐준다.
+        this.userData = {
+          uid: loginAccountRes.user.uid,
+          email: loginAccountRes.user.email || '이메일이 존재하지 않습니다.',
+          name: loginAccountRes.user.displayName || '이름이 존재하지 않습니다.',
+          ...fetchAccountRes,
+        };
+        this.isAuthReady = true;
+      } catch (error) {
+        throw new Error('could not complete login');
+      }
+    },
+    /**
+     * 로그아웃
+     */
+    async logout() {
+      try {
+        await signOut(auth);
+        this.userData = null;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
+     * 회원가입 이후 유저 정보 생성 함수
+     */
+    async createUser(params: AccountCreateUserParams) {
+      try {
+        const { church, department, grade, group, role, uid } = params;
+        await setDoc(doc(db, Collection.USERS, uid), {
+          church,
+          department,
+          role,
+          grade,
+          group,
           createdAt: serverTimestamp(),
         });
       } catch (error) {
         console.log(error);
       }
     },
-
-    async fetchAccount({ uid }: { uid: string }) {
+    /**
+     * 로그인 이후 유저 정보 읽기 함수
+     */
+    async fetchUser(params: AccountFetchUserParams) {
       try {
-        const docRef = doc(db, Collection.USER, uid);
+        const docRef = doc(db, Collection.USERS, params.uid);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
@@ -67,97 +121,6 @@ export const useAccountStore = defineStore('account', {
       } catch (error) {
         console.log(error);
       }
-    },
-
-    async signup(payload: {
-      church: string;
-      department: string;
-      email: string;
-      password: string;
-      confirmedPassword: string;
-      name: string;
-      // TODO: 타입 정리하기
-      role: TeacherRole | string;
-      grade: string;
-      group: string;
-    }) {
-      try {
-        const member = useMemberStore();
-        const teacherList = (await member.fetchMembers({
-          church: payload.church,
-          department: payload.department,
-          position: 'teacher',
-        })) as Teacher[];
-
-        const target = teacherList.filter(
-          (teacher) => teacher.name === payload.name
-        );
-
-        // 해당 이름을 가진 사람이 선생님으로 등록되어 있는가?
-        if (!target.length) {
-          return errResponse(baseResponse.NAME_UNKNOWN);
-        }
-        // 해당 이름으로 가입하려는 사람의 역할이 맞는가?
-        if (target[0].role !== payload.role) {
-          return errResponse(baseResponse.ROLE_UNMATCHED);
-        }
-        // 입력된 담당 학급 내용이 맞는가?
-        if (
-          target[0].grade !== payload.grade ||
-          target[0].group !== payload.group
-        ) {
-          return errResponse(baseResponse.CLASS_UNMATCHED);
-        }
-        // 이미 해당 이름으로 가입되어 있는 회원이 있는가?
-        const q = query(usersColl, where('name', '==', payload.name));
-        const querySnapshot = await getDocs(q);
-        if (querySnapshot.docs.length) {
-          return errResponse(baseResponse.NAME_DUPLICATED);
-        }
-
-        const signupRes = await createUserWithEmailAndPassword(
-          auth,
-          payload.email,
-          payload.password
-        );
-        await updateProfile(signupRes.user, { displayName: payload.name });
-        return response(baseResponse.SUCCESS, signupRes);
-      } catch (err) {
-        return errResponse(baseResponse.NETWORK_ERROR);
-      }
-    },
-
-    async loginAccount({
-      email,
-      password,
-    }: {
-      email: string;
-      password: string;
-    }) {
-      try {
-        const loginAccountRes = await signInWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
-        const fetchAccountRes = await this.fetchAccount({
-          uid: loginAccountRes.user.uid,
-        });
-        this.userData = {
-          uid: loginAccountRes.user.uid,
-          email: loginAccountRes.user.email!,
-          name: loginAccountRes.user.displayName!,
-          ...(fetchAccountRes as AccountData),
-        };
-        this.isAuthReady = true;
-      } catch (error) {
-        throw new Error('could not complete login');
-      }
-    },
-
-    async logoutAccount() {
-      await signOut(auth);
-      this.userData = null;
     },
   },
 });

@@ -2,7 +2,7 @@
   <section class="flex flex-col justify-center">
     <div class="grid grid-cols-1 gap-2 px-8">
       <div>
-        <div>교회</div>
+        <p>교회</p>
         <Dropdown
           class="w-full"
           v-model="church"
@@ -15,7 +15,7 @@
       </div>
 
       <div>
-        <div>소속</div>
+        <p>소속</p>
         <Dropdown
           class="w-full"
           v-model="department"
@@ -30,7 +30,7 @@
       <div class="my-3 border border-slate-300"></div>
 
       <div>
-        <div>이메일</div>
+        <p>이메일</p>
         <InputText
           v-model="email"
           class="w-full"
@@ -46,7 +46,7 @@
       </div>
 
       <div>
-        <div>비밀번호</div>
+        <p>비밀번호</p>
         <Password
           v-model="password"
           class="w-full"
@@ -63,7 +63,7 @@
       </div>
 
       <div>
-        <div>비밀번호 확인</div>
+        <p>비밀번호 확인</p>
         <Password
           v-model="confirmedPassword"
           class="w-full"
@@ -82,7 +82,7 @@
       <div class="my-3 border border-slate-300"></div>
 
       <div>
-        <div>이름</div>
+        <p>이름</p>
         <InputText
           v-model="name"
           class="w-full"
@@ -97,7 +97,7 @@
       </div>
 
       <div>
-        <div>담당</div>
+        <p>담당</p>
         <SelectButton
           v-model="role"
           class="grid grid-cols-3"
@@ -110,7 +110,7 @@
 
       <Transition>
         <div v-if="role === 'main' || role === 'sub'">
-          <div>학년반</div>
+          <p>학년반</p>
           <div class="grid grid-cols-3 gap-3">
             <Dropdown
               v-model="grade"
@@ -165,7 +165,6 @@ import { useRouter } from 'vue-router';
 import useVuelidate from '@vuelidate/core';
 import { helpers, required, sameAs } from '@vuelidate/validators';
 import { useAccountStore } from '@/store/account';
-
 import {
   churchOptions,
   departmentOptions,
@@ -173,6 +172,7 @@ import {
   groupOptions,
   roleOptions,
 } from './data';
+import { TeacherRole } from '@/types';
 
 const account = useAccountStore();
 const router = useRouter();
@@ -183,9 +183,9 @@ const email = ref('');
 const password = ref('');
 const confirmedPassword = ref('');
 const name = ref('');
-const role = ref('common');
-const grade = ref('-1');
-const group = ref('-1');
+const role = ref<TeacherRole>('common');
+const grade = ref('0');
+const group = ref('0');
 
 const isNew = ref(false);
 const isLoading = ref(false);
@@ -194,8 +194,8 @@ const errorMessage = ref('');
 
 watch(role, (newVal, oldVal) => {
   if (newVal === 'common' && (oldVal === 'main' || oldVal === 'sub')) {
-    grade.value = '-1';
-    group.value = '-1';
+    grade.value = '0';
+    group.value = '0';
   } else if ((newVal === 'main' || newVal === 'sub') && oldVal === 'common') {
     grade.value = '3';
     group.value = '1';
@@ -230,7 +230,7 @@ const rules = computed(() => ({
   },
 }));
 
-const v$ = useVuelidate(rules, {
+const v = useVuelidate(rules, {
   email,
   password,
   confirmedPassword,
@@ -239,20 +239,20 @@ const v$ = useVuelidate(rules, {
 
 const error = computed(() => ({
   email: {
-    status: v$.value.email.$error,
-    message: v$.value.email.$errors[0]?.$message,
+    status: v.value.email.$error,
+    message: v.value.email.$errors[0]?.$message,
   },
   password: {
-    status: v$.value.password.$error,
-    message: v$.value.password.$errors[0]?.$message,
+    status: v.value.password.$error,
+    message: v.value.password.$errors[0]?.$message,
   },
   confirmedPassword: {
-    status: v$.value.confirmedPassword.$error,
-    message: v$.value.confirmedPassword.$errors[0]?.$message,
+    status: v.value.confirmedPassword.$error,
+    message: v.value.confirmedPassword.$errors[0]?.$message,
   },
   name: {
-    status: v$.value.name.$error,
-    message: v$.value.name.$errors[0]?.$message,
+    status: v.value.name.$error,
+    message: v.value.name.$errors[0]?.$message,
   },
 }));
 
@@ -260,38 +260,34 @@ const onSubmit = async () => {
   try {
     isLoading.value = true;
 
-    const isFormCorrect = await v$.value.$validate();
-    if (!isFormCorrect) {
-      return;
-    }
+    const isFormCorrect = await v.value.$validate();
+    if (!isFormCorrect) return;
 
     const signupResult = await account.signup({
-      church: church.value,
-      department: department.value,
       email: email.value,
       password: password.value,
-      confirmedPassword: confirmedPassword.value,
       name: name.value,
-      role: role.value,
-      grade: grade.value,
-      group: group.value,
     });
 
     if (!signupResult.isSuccess) {
+      /**
+       * 회원가입이 실패했을 경우
+       */
       isError.value = true;
       errorMessage.value = signupResult?.message;
     } else {
+      /**
+       * 회원가입이 성공했을 경우
+       */
       await account.createUser({
         uid: signupResult.result.user.uid,
         church: church.value,
         department: department.value,
-        email: email.value,
-        name: name.value,
         role: role.value,
         grade: grade.value,
         group: group.value,
       });
-      await account.loginAccount({
+      await account.login({
         email: email.value,
         password: password.value,
       });
@@ -302,36 +298,6 @@ const onSubmit = async () => {
   } finally {
     isLoading.value = false;
   }
-
-  //   try {
-  //     const signupRet = await account.signup(signupForm);
-  //     if (!signupRet) {
-  //       return;
-  //     }
-  //     // 회원가입 실패
-  //     if (!signupRet.isSuccess) {
-  //       throw new Error(signupRet.message);
-  //     }
-  //     // 회원가입 성공
-  //     else if (signupRet.isSuccess) {
-  //       await account.createUser({
-  //         uid: signupRet.result.user.uid,
-  //         ...signupForm,
-  //       });
-  //       await account.loginAccount({
-  //         email: signupForm.email,
-  //         password: signupForm.password,
-  //       });
-  //       router.push({ name: 'HomeView' });
-  //     }
-  //   } catch (error) {
-  //     if (error instanceof Error) {
-  //       isValidated.value = false;
-  //       errorMessage.value = error.message;
-  //     }
-  //   } finally {
-  //     isLoading.value = false;
-  //   }
 };
 </script>
 

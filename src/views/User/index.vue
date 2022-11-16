@@ -18,7 +18,7 @@ const account = useAccountStore();
 const router = useRouter();
 
 const logout = async () => {
-  await account.logoutAccount();
+  await account.logout();
   router.push({ name: 'AccountLogin' });
 };
 </script>

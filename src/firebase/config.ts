@@ -1,3 +1,5 @@
+import { Collection } from '@/enums';
+
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { collection, getFirestore } from 'firebase/firestore';
@@ -22,6 +24,6 @@ export const auth = getAuth();
 export const db = getFirestore();
 
 // connect firebase database collections
-export const usersColl = collection(db, 'users');
-export const membersColl = collection(db, 'members');
-export const attendancesColl = collection(db, 'attendances');
+export const attendancesColl = collection(db, Collection.ATTENDANCES);
+export const membersColl = collection(db, Collection.MEMBERS);
+export const usersColl = collection(db, Collection.USERS);

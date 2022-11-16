@@ -49,7 +49,7 @@ import type { AccountData } from '@/types/store';
   const account = useAccountStore();
   const currentUser = (await getCurrentUser()) as User;
   if (currentUser) {
-    const result = (await account.fetchAccount({
+    const result = (await account.fetchUser({
       uid: currentUser.uid,
     })) as AccountData;
     account.userData = {
