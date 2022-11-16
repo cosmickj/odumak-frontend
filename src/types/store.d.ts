@@ -19,6 +19,17 @@ export interface UserData extends AccountData {
   name: string;
 }
 
+export interface AccountSignupParams {
+  email: string;
+  password: string;
+  name: string;
+}
+
+export interface AccountLoginParams {
+  email: string;
+  password: string;
+}
+
 export interface AccountCreateUserParams {
   uid: string;
   church: string;
@@ -35,15 +46,8 @@ export interface AccountFetchUserParams {
   uid: string;
 }
 
-export interface AccountSignupParams {
-  email: string;
-  password: string;
-  name: string;
-}
-
-export interface AccountLoginParams {
-  email: string;
-  password: string;
+export interface AccountDeleteUserParams {
+  uid: string;
 }
 
 // attendace.ts

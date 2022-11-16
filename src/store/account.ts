@@ -3,9 +3,16 @@ import baseResponse from '@/utils/baseResponseStatus';
 import { errResponse, response } from '@/utils/response';
 
 import { auth, db } from '@/firebase/config';
-import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
+import {
+  deleteDoc,
+  doc,
+  getDoc,
+  serverTimestamp,
+  setDoc,
+} from 'firebase/firestore';
 import {
   createUserWithEmailAndPassword,
+  deleteUser,
   signInWithEmailAndPassword,
   signOut,
   updateProfile,
@@ -13,11 +20,12 @@ import {
 
 import { Collection } from '@/enums';
 import {
-  AccountData,
   AccountCreateUserParams,
-  AccountSignupParams,
-  AccountLoginParams,
+  AccountData,
+  AccountDeleteUserParams,
   AccountFetchUserParams,
+  AccountLoginParams,
+  AccountSignupParams,
   UserData,
 } from '@/types/store';
 
@@ -88,6 +96,21 @@ export const useAccountStore = defineStore('account', {
       }
     },
     /**
+     * 탈퇴 하기
+     */
+    async delete() {
+      try {
+        const account = auth.currentUser;
+        if (account) {
+          await deleteUser(account);
+          await this.deleteUser({ uid: account.uid });
+        }
+        this.userData = null;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
      * 회원가입 이후 유저 정보 생성 함수
      */
     async createUser(params: AccountCreateUserParams) {
@@ -114,6 +137,16 @@ export const useAccountStore = defineStore('account', {
         } else {
           return null;
         }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
+     * 탈퇴 이후 유저 정보 삭제 함수
+     */
+    async deleteUser(params: AccountDeleteUserParams) {
+      try {
+        await deleteDoc(doc(db, Collection.USERS, params.uid));
       } catch (error) {
         console.log(error);
       }
