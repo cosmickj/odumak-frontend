@@ -2,38 +2,46 @@
   <Dialog
     v-model:visible="dialog.status"
     modal
-    maximizable
+    position="top"
     :breakpoints="{ '1280px': '90vw', '450px': '90vw' }"
     @hide="handleHide"
   >
     <template #header>
       <div class="flex gap-x-4 items-center">
         <span class="text-xl">{{ dialog.label }}</span>
-        <Button class="p-button-success" label="행 추가" />
-        <Button class="p-button-warning" label="제출하기" />
+        <Button
+          class="p-button-success"
+          label="행 추가"
+          @click="handleAddRow"
+        />
+        <Button
+          class="p-button-warning"
+          label="제출하기"
+          @click="handleSubmit(dialog.label)"
+        />
       </div>
     </template>
 
-    <!-- <div class="overflow-x-auto"> -->
     <div class="grid gap-x-5 gap-y-3 grid-cols-custom w-fit">
       <!-- Header -->
       <p class="self-baseline">학년</p>
       <p class="self-baseline">학급</p>
       <p class="self-baseline">이름</p>
-      <p class="self-baseline">생년월일</p>
       <p class="self-baseline">성별</p>
+      <p class="self-baseline">생년월일</p>
       <p class="self-baseline">연락처(- 없이 입력)</p>
-      <p class="self-baseline">누구의 연락처인가요?</p>
       <p class="self-baseline">주소</p>
       <p class="self-baseline">초등부 처음 온 날</p>
       <p class="self-baseline">비고</p>
+      <p class="self-baseline">복사</p>
       <p class="self-baseline">삭제</p>
 
       <!-- Row -->
-      <template v-for="i in 1" :key="i">
+      <template v-for="(selectedStudent, i) in selectedStudents" :key="i">
         <Dropdown
           v-model="selectedStudent.grade"
-          :class="{ 'p-invalid': errors.grade.status }"
+          class="w-28"
+          :class="{ 'p-invalid': isError(i, 'grade') }"
           :options="GRADE"
           option-label="label"
           option-value="value"
@@ -42,7 +50,8 @@
 
         <Dropdown
           v-model="selectedStudent.group"
-          :class="{ 'p-invalid': errors.group.status }"
+          class="w-28"
+          :class="{ 'p-invalid': isError(i, 'group') }"
           placeholder="학급"
           option-label="label"
           option-value="value"
@@ -51,7 +60,7 @@
 
         <InputText
           v-model="selectedStudent.name"
-          :class="{ 'p-invalid': errors.name.status }"
+          :class="{ 'p-invalid': isError(i, 'name') }"
           placeholder="이름을 입력해주세요."
         />
 
@@ -73,29 +82,9 @@
         </div>
 
         <div class="flex items-center">
-          <Dropdown
-            v-model="selectedBirthYear"
-            option-label="label"
-            option-value="value"
-            :disabled="isChecked"
-            :options="BIRTH_YEAR"
-            @change="handleBirthChange"
-          />
-          <Dropdown
-            v-model="selectedBirthMonth"
-            option-label="label"
-            option-value="value"
-            :disabled="isChecked"
-            :options="BIRTH_MONTH"
-            @change="handleBirthChange"
-          />
-          <Dropdown
-            v-model="selectedBirthDate"
-            option-label="label"
-            option-value="value"
-            :disabled="isChecked"
-            :options="BIRTH_DATE"
-            @change="handleBirthChange"
+          <Calendar
+            v-model="selectedStudent.birth"
+            date-format="yy년 mm월 dd일"
           />
           <InputSwitch v-model="isChecked" class="ml-4" input-id="later" />
           <label class="cursor-pointer select-none" for="later"> 나중에 </label>
@@ -106,8 +95,6 @@
           mask="(999)-9999-9999"
           placeholder="(010)-0000-0000"
         />
-
-        <InputText placeholder="ex) 엄마, 아빠 등등" />
 
         <InputText
           v-model="selectedStudent.address"
@@ -121,15 +108,24 @@
 
         <InputText v-model="selectedStudent.remark" />
 
-        <Button class="p-button-danger" label="X" />
+        <Button
+          class="p-button-help"
+          icon="pi pi-copy"
+          @click="handleCopyRow(i)"
+        />
+
+        <Button
+          class="p-button-danger"
+          icon="pi pi-times"
+          @click="handleDeleteRow(i)"
+        />
       </template>
     </div>
-    <!-- </div> -->
   </Dialog>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { Student, SubmitType } from '@/types';
 import {
   BIRTH_DATE,
@@ -142,34 +138,51 @@ import {
 const props = defineProps<{
   dialog: {
     status: boolean;
-    label: string;
+    label: SubmitType;
   };
-  selectedStudent: Student;
   errors: any;
+  selectedStudents: Student[];
 }>();
 
-const emit = defineEmits(['hide', 'submit', 'birthChange']);
+const emit = defineEmits([
+  'hide',
+  'submit',
+  'birthChange',
+  'addRow',
+  'copyRow',
+  'deleteRow',
+]);
+
+const isError = (index: number, key: string) => {
+  if (props.errors && props.errors[index][key].length > 0) return true;
+  else return false;
+};
 
 const isChecked = ref(false);
 
-const selectedBirthYear = ref(
-  props.selectedStudent.birth.getFullYear().toString()
-);
+const selectedBirthYear = ref('2022');
+// props.selectedStudent.birth.getFullYear().toString()
 
-const selectedBirthMonth = ref(
-  (props.selectedStudent.birth.getMonth() + 1).toString()
-);
+const selectedBirthMonth = ref('12');
+// (props.selectedStudent.birth.getMonth() + 1).toString()
 
-const selectedBirthDate = ref(props.selectedStudent.birth.getDate().toString());
+const selectedBirthDate = ref('13');
+// props.selectedStudent.birth.getDate().toString()
 
 const handleBirthChange = () => {
   const selectedBirthString = `${selectedBirthYear.value}-${selectedBirthMonth.value}-${selectedBirthDate.value}`;
   emit('birthChange', { birth: new Date(selectedBirthString) });
 };
 
-const handleSubmit = (submitType: SubmitType) => emit('submit', { submitType });
-
 const handleHide = () => emit('hide');
+
+const handleAddRow = () => emit('addRow');
+
+const handleCopyRow = (index: number) => emit('copyRow', index);
+
+const handleDeleteRow = (index: number) => emit('deleteRow', index);
+
+const handleSubmit = (submitType: SubmitType) => emit('submit', submitType);
 </script>
 
 <style>

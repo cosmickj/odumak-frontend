@@ -6,19 +6,22 @@
           class="p-button-success p-button-lg"
           icon="pi pi-plus"
           label="추가하기"
-          :disabled="selectedStudents.length != 0"
+          :disabled="selectedStudents.collection.length != 0"
+          @click="openDialogToAddStudent"
         />
         <Button
           class="p-button-warning p-button-lg"
           icon="pi pi-user-edit"
           label="수정하기"
-          :disabled="selectedStudents.length == 0"
+          :disabled="selectedStudents.collection.length == 0"
+          @click="openDialogToEditStudent"
         />
         <Button
           class="p-button-danger p-button-lg"
           icon="pi pi-trash"
           label="삭제하기"
-          :disabled="selectedStudents.length == 0"
+          :disabled="selectedStudents.collection.length == 0"
+          @click="openDialogToDeleteStudents"
         />
       </div>
 
@@ -31,38 +34,13 @@
         />
       </div>
     </div>
-
-    <div class="mb-5 flex items-center">
-      <FileUpload
-        class="p-button-lg mr-4"
-        mode="basic"
-        choose-label="여러 학생 추가하기"
-        accept=".csv"
-        custom-upload
-        auto
-        @uploader="uploadTemplate"
-      />
-
-      <span class="text-xl">
-        <a
-          class="underline"
-          :href="fileLink"
-          download="여러_학생_추가하기_템플릿"
-        >
-          여러 학생 추가하기 템플릿 다운받기
-        </a>
-        <span class="text-base text-red-600">
-          (절대로 템플릿을 변경하지 마세요)
-        </span>
-      </span>
-    </div>
   </div>
 
   <div class="container">
     <div class="overflow-hidden mb-12 rounded-2xl drop-shadow-lg">
       <DataTable
         ref="dataTableRef"
-        v-model:selection="selectedStudents"
+        v-model:selection="selectedStudents.collection"
         :loading="isLoading"
         :value="dataSource"
         lazy
@@ -97,43 +75,34 @@
   <StudentDialog
     :dialog="addEditDialog"
     :errors="errors"
-    :selected-student="selectedStudent"
-    @hide="v$.$reset"
-    @submit="onSubmit"
+    :selected-students="selectedStudents.collection"
+    @add-row="addSelectedStudent"
+    @copy-row="copySelectedStudent"
+    @delete-row="deleteSelectedStudent"
+    @hide="clearSelectedStudents"
+    @submit="submitSelectedStudents"
   />
 
-  <!-- <StudentDelete
-    :dialog="deleteStudentDialog"
-    :selected-student="selectedStudent"
-    @cancel="closeModalForDeleteStudent"
-    @confirm="deleteStudent"
-  /> -->
-
-  <!-- TODO: 1명 / 2명 이상 선택시 보이는 글귀를 if문 처리 -->
   <StudentsDelete
     :dialog="deleteStudentsDialog"
-    :selected-students="selectedStudents"
-    @cancel="setDeleteStudentsDialog(false)"
+    :selected-students="selectedStudents.collection"
+    @cancel="deleteStudentsDialog.status = false"
     @confirm="deleteStudents"
   />
 </template>
 
 <script setup lang="ts">
 import StudentDialog from './components/AdminStudentDialog.vue';
-import StudentDelete from './components/AdminStudentDelete.vue';
 import StudentsDelete from './components/AdminStudentsDelete.vue';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useAccountStore } from '@/store/account';
 import { useMemberStore } from '@/store/member';
-import { uploadFile } from '@/api/upload';
 import { formatGender } from '@/utils/useFormat';
 import { v4 as uuidv4 } from 'uuid';
 import { useVuelidate } from '@vuelidate/core';
-import { required, helpers, not, sameAs } from '@vuelidate/validators';
-import csv from 'csvtojson';
+import { required, helpers } from '@vuelidate/validators';
 import { CustomColumn, SubmitType, Student, Teacher } from '@/types';
 import type DataTable from 'primevue/datatable';
-import type { Timestamp } from '@firebase/firestore';
 
 const accountStore = useAccountStore();
 const memberStore = useMemberStore();
@@ -147,42 +116,25 @@ const exportCSV = () => {
   }
 };
 
-const fileLocation = './students-upload-template.csv';
-const fileLink = new URL(fileLocation, import.meta.url).href;
-
-const uploadTemplate = async (event: any) => {
-  let formData = new FormData();
-  formData.append('file', event.files[0]);
-
-  const { data } = await uploadFile(formData);
-  const result = await csv({
-    noheader: false,
-    output: 'json',
-  }).fromString(data);
-  result.splice(0, 2);
-
-  console.log(result);
-};
-
-/**
- * DataTable에 들어갈 데이터 가져오기
- */
+// DataTable에 들어갈 데이터 가져오기
 const isLoading = ref(false);
 const dataSource = ref();
 
 const getMembers = async () => {
   try {
     isLoading.value = true;
-    // if (accountStore.userData) {
-    const result = await memberStore.fetchAll({
-      church: '테스트',
-      department: '테스트',
-      // church: accountStore.userData.church,
-      // department: accountStore.userData.department,
-      position: 'student',
-    });
-    dataSource.value = result;
-    // }
+    console.log(accountStore.userData);
+
+    if (accountStore.userData) {
+      const result = await memberStore.fetchAll({
+        church: accountStore.userData.church,
+        department: accountStore.userData.department,
+        position: 'student',
+      });
+      console.log(result);
+
+      dataSource.value = result;
+    }
   } catch (error) {
     console.log(error);
   } finally {
@@ -198,7 +150,6 @@ const columns = ref<CustomColumn[]>([
   { field: 'name', header: '이름', sortable: true, format: undefined },
   { field: 'gender', header: '성별', sortable: false, format: formatGender },
   { field: 'phone', header: '연락처', sortable: false, format: undefined },
-  { field: 'teacher', header: '담당 교사', sortable: true, format: undefined },
   { field: 'address', header: '주소', sortable: true, format: undefined },
   { field: 'remark', header: '비고', sortable: false, format: undefined },
 ]);
@@ -218,118 +169,102 @@ const initSelectedStudent: Student = {
   birth: new Date(`${new Date().getFullYear() - 10 + 1}-01-01`),
   gender: 'male',
   phone: '',
-  phoneOwner: '',
   address: '',
   registeredAt: new Date(),
   remark: '',
 };
 
-const selectedStudent = reactive({ ...initSelectedStudent });
-const selectedStudents = ref<Student[]>([]);
+const selectedStudent = reactive({ ...initSelectedStudent }); // TODO: 해당 변수 제거 검토
 
-watch(selectedStudent, async (student) => {
-  if (student.grade && student.group) {
-    const result = (await memberStore.fetchMembers({
-      church: accountStore.userData?.church,
-      department: accountStore.userData?.department,
-      position: 'teacher',
-      grade: student.grade,
-      group: student.group,
-      role: 'main',
-    })) as Teacher[]; // TODO: as 제거하기
+const selectedStudents = reactive({ collection: [] as Student[] });
 
-    if (result[0]?.name) {
-      selectedStudent.teacher = result[0]?.name;
-    } else {
-      const msg = '담당 교사가 없는 학급입니다. 다시 선택해주세요.';
-      selectedStudent.teacher = msg;
-    }
-  }
-});
+const clearSelectedStudent = () => {
+  // TODO: 3번째 매개변수에 대해서 타입체킹이 되지 않는다
+  return Object.assign({}, initSelectedStudent, { _id: uuidv4() });
+};
 
-const rules = computed(() => ({
-  name: { required: helpers.withMessage('이름을 꼭 입력해주세요.', required) },
-  grade: { required },
-  group: { required },
-  teacher: {
-    required,
-    rejected: not(sameAs('담당 교사가 없는 학급입니다. 다시 선택해주세요.')),
-  },
-}));
+const clearSelectedStudents = () => {
+  v.value.$reset();
+  selectedStudents.collection.splice(0, selectedStudents.collection.length);
+};
 
-const v$ = useVuelidate(rules, selectedStudent);
+const rules = {
+  collection: {
+    $each: helpers.forEach({
+      name: { required },
+      grade: { required },
+      group: { required },
+    }),
+  },
+};
 
-const errors = computed(() => ({
-  name: {
-    status: v$.value.name.$error,
-    message: v$.value.name.$errors[0]?.$message,
-  },
-  grade: {
-    status: v$.value.grade.$error,
-    message: v$.value.grade.$errors[0]?.$message,
-  },
-  group: {
-    status: v$.value.group.$error,
-    message: v$.value.group.$errors[0]?.$message,
-  },
-  teacher: {
-    status: v$.value.teacher.$error,
-    message: v$.value.teacher.$errors[0]?.$message,
-  },
-}));
+const v = useVuelidate(rules, selectedStudents);
+
+const errors = computed(() => v.value.$errors[0]?.$response?.$errors);
 
 // || 생성 혹은 수정하기
-const addEditDialog = reactive({
-  label: '',
+const addEditDialog: { label: SubmitType; status: boolean } = reactive({
+  label: '추가하기',
   status: false,
 });
 
-const openModalForAddStudent = () => {
-  resetSelectedStudent();
-
+const openDialogToAddStudent = () => {
   addEditDialog.status = true;
   addEditDialog.label = '추가하기';
+  addSelectedStudent();
 };
 
-const resetSelectedStudent = () => {
-  // TODO: 3번째 매개변수에 대해서 타입체킹이 되지 않는다
-  Object.assign(selectedStudent, initSelectedStudent, { _id: uuidv4() });
+const addSelectedStudent = () => {
+  const _student = clearSelectedStudent();
+  selectedStudents.collection.push(_student);
 };
 
-const openModalForEditStudent = (student: Student) => {
-  const _birth = student.birth as unknown as Timestamp;
-  const _registeredAt = student.registeredAt as unknown as Timestamp;
-  student.birth = new Date(_birth.seconds * 1000);
-  student.registeredAt = new Date(_registeredAt.seconds * 1000);
-  Object.assign(selectedStudent, student);
+const copySelectedStudent = (index: number) => {
+  const target = selectedStudents.collection[index];
+  const _student = Object.assign({}, target, { _id: uuidv4() });
+  selectedStudents.collection.push(_student);
+};
 
+const deleteSelectedStudent = (index: number) => {
+  selectedStudents.collection.splice(index, 1);
+};
+
+const openDialogToEditStudent = () => {
   addEditDialog.status = true;
   addEditDialog.label = '수정하기';
 };
 
-const onSubmit = async ({ submitType }: { submitType: SubmitType }) => {
-  const isFormCorrect = await v$.value.$validate();
-  if (!isFormCorrect) return;
+const submitSelectedStudents = async (submitType: SubmitType) => {
+  try {
+    const isFormCorrect = await v.value.collection.$validate();
+    if (!isFormCorrect) return;
 
-  if (submitType === 'ADD') {
-    await addStudent();
-  } else {
-    await editStudent();
+    if (submitType === '추가하기') {
+      await addStudent();
+    } else {
+      await editStudent();
+    }
+  } catch (error) {
+    console.log(error);
+  } finally {
+    addEditDialog.status = false;
+    await getMembers();
   }
-
-  addEditDialog.status = false;
-  await getMembers();
 };
 
 const addStudent = async () => {
-  if (accountStore.userData) {
-    await memberStore.create({
-      church: accountStore.userData.church,
-      department: accountStore.userData.department,
-      position: 'student',
-      ...selectedStudent,
-    });
-    alert('추가되었습니다.');
+  try {
+    if (accountStore.userData) {
+      await memberStore.create({
+        church: accountStore.userData.church,
+        department: accountStore.userData.department,
+        position: 'student',
+        members: selectedStudents.collection,
+      });
+      alert('추가되었습니다.');
+    }
+  } catch (error) {
+    console.log(error);
   }
 };
 
@@ -346,60 +281,35 @@ const editStudent = async () => {
 };
 
 // || 삭제하기
-const deleteStudentDialog = reactive({
-  label: '',
-  status: false,
-});
-
-const openModalForDeleteStudent = (student: Student) => {
-  selectedStudent._id = student._id;
-  selectedStudent.name = student.name;
-  deleteStudentDialog.status = true;
-};
-
-const closeModalForDeleteStudent = () => {
-  resetSelectedStudent();
-  deleteStudentDialog.status = false;
-};
-
-const deleteStudent = async () => {
-  if (accountStore.userData) {
-    await memberStore.remove({
-      church: accountStore.userData?.church,
-      department: accountStore.userData?.department,
-      position: 'student',
-      ids: [selectedStudent._id],
-    });
-
-    deleteStudentDialog.status = false;
-    await getMembers();
-  }
-};
-
 const deleteStudentsDialog = reactive({
   label: '',
   status: false,
 });
 
-const setDeleteStudentsDialog = (flag: boolean) => {
-  deleteStudentsDialog.status = flag;
+const openDialogToDeleteStudents = () => {
+  deleteStudentsDialog.label = '삭제하기';
+  deleteStudentsDialog.status = true;
 };
 
 const deleteStudents = async () => {
-  const ids = selectedStudents.value.map((student) => {
-    return student._id;
-  });
+  try {
+    const ids = selectedStudents.collection.map((student) => student._id);
 
-  if (accountStore.userData) {
+    // if (accountStore.userData) {
     await memberStore.remove({
-      church: accountStore.userData?.church,
-      department: accountStore.userData?.department,
+      church: '테스트',
+      department: '테스트',
+      // church: accountStore.userData?.church,
+      // department: accountStore.userData?.department,
       position: 'student',
       ids,
     });
 
-    setDeleteStudentsDialog(false);
+    deleteStudentsDialog.status = false;
     await getMembers();
+    // }
+  } catch (error) {
+    console.log(error);
   }
 };
 </script>

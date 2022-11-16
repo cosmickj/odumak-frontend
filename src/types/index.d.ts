@@ -1,4 +1,4 @@
-export type SubmitType = 'ADD' | 'EDIT';
+export type SubmitType = '추가하기' | '수정하기';
 
 export type Gender = 'male' | 'female';
 export type MemberPosition = 'student' | 'teacher';
@@ -33,7 +33,6 @@ export interface Student {
   group: string;
   name: string;
   phone: string;
-  phoneOwner: string;
   registeredAt: Date;
   remark: string;
   teacher: string;
