@@ -42,7 +42,7 @@ app.use(PrimeVue);
 import { getCurrentUser } from '@/router';
 import { useAccountStore } from './store/account';
 import type { User } from 'firebase/auth/dist/auth';
-import type { AccountData } from '@/types/store';
+import type { UserData } from '@/types/store';
 
 // Waiting for Auth to be Ready
 (async () => {
@@ -51,11 +51,11 @@ import type { AccountData } from '@/types/store';
   if (currentUser) {
     const result = (await account.fetchUser({
       uid: currentUser.uid,
-    })) as AccountData;
+    })) as UserData;
     account.userData = {
-      email: currentUser.email!,
-      name: currentUser.displayName!,
       uid: currentUser.uid,
+      email: currentUser.email!,
+      displayName: currentUser.displayName!,
       ...result,
     };
   }

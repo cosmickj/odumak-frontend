@@ -1,22 +1,20 @@
 import type { MemberPosition, TeacherRole, UserInfo } from './index';
 
 /** account.ts */
-export interface AccountData {
+type K = 'uid' | 'email' | 'displayName';
+export type AccountData = {
+  -readonly [key in K]: User[key];
+};
+
+export interface UserData {
+  church: string;
+  createdAt: Date;
+  department: string;
   grade: string;
   group: string;
   role: TeacherRole;
-  church: string;
-  department: string;
-  createdAt: {
-    nanoseconds: number;
-    seconds: number;
-  };
-}
-
-export interface UserData extends AccountData {
-  uid: string;
-  email: string;
-  name: string;
+  isAccepted: boolean;
+  isRejected: boolean;
 }
 
 export interface AccountSignupParams {

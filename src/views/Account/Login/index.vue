@@ -3,7 +3,7 @@
     <h1 class="mb-3 px-7 text-4xl">아이들과 가까워지는 시간</h1>
     <p class="mb-8 px-7 text-xl">오늘도 여러분의 섬김에 감사합니다</p>
 
-    <form @submit.prevent="onSubmit">
+    <form @submit.prevent="loginWithEmail">
       <div class="mx-7 mb-2">
         <InputText
           v-model="loginForm.email"
@@ -148,7 +148,7 @@ const initLoginForm = {
 };
 const loginForm = reactive({ ...initLoginForm });
 
-const onSubmit = async () => {
+const loginWithEmail = async () => {
   try {
     isLoading.value = true;
     isError.value = false;

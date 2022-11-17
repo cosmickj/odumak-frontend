@@ -20,8 +20,8 @@ import {
 
 import { Collection } from '@/enums';
 import {
-  AccountCreateUserParams,
   AccountData,
+  AccountCreateUserParams,
   AccountDeleteUserParams,
   AccountFetchUserParams,
   AccountLoginParams,
@@ -29,9 +29,12 @@ import {
   UserData,
 } from '@/types/store';
 
+// TODO: OdumakData로 추후에 변경하자
+interface _UserData extends AccountData, UserData {}
+
 interface AccountStoreState {
   isAuthReady: boolean;
-  userData: UserData | null;
+  userData: _UserData | null;
 }
 
 export const useAccountStore = defineStore('account', {
@@ -64,22 +67,16 @@ export const useAccountStore = defineStore('account', {
     async login(params: AccountLoginParams) {
       try {
         const { email, password } = params;
-        const loginAccountRes = await signInWithEmailAndPassword(
+        const { user: account } = await signInWithEmailAndPassword(
           auth,
           email,
           password
         );
-        const fetchAccountRes = (await this.fetchUser({
-          uid: loginAccountRes.user.uid,
-        })) as AccountData;
-        // 받아온 Auth 데이터와 User 데이터를 합쳐준다.
-        this.userData = {
-          uid: loginAccountRes.user.uid,
-          email: loginAccountRes.user.email || '이메일이 존재하지 않습니다.',
-          name: loginAccountRes.user.displayName || '이름이 존재하지 않습니다.',
-          ...fetchAccountRes,
-        };
-        this.isAuthReady = true;
+        const fetchUserRes = (await this.fetchUser({
+          uid: account.uid,
+        })) as UserData;
+
+        this.composeUserData(account, fetchUserRes);
       } catch (error) {
         throw new Error('could not complete login');
       }
@@ -133,7 +130,7 @@ export const useAccountStore = defineStore('account', {
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-          return docSnap.data();
+          return docSnap.data() as UserData;
         } else {
           return null;
         }
@@ -150,6 +147,18 @@ export const useAccountStore = defineStore('account', {
       } catch (error) {
         console.log(error);
       }
+    },
+    /**
+     * 계정 정보와 유저 정보를 합치기
+     */
+    composeUserData(_a: AccountData, _u: UserData) {
+      this.userData = {
+        uid: _a.uid,
+        email: _a.email || '이메일이 존재하지 않습니다.',
+        displayName: _a.displayName || '이름이 존재하지 않습니다.',
+        ..._u,
+      };
+      this.isAuthReady = true;
     },
   },
 });

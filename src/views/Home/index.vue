@@ -2,8 +2,9 @@
   <section class="p-5">
     <header class="mb-5">
       <div class="flex my-2 text-3xl items-baseline justify-center">
-        안녕하세요,&nbsp;
-        <strong>{{ userName }}</strong> &nbsp;선생님!
+        <p>
+          안녕하세요, <strong>{{ userName }}</strong> 선생님!
+        </p>
       </div>
 
       <RouterLink v-if="isAdmin" :to="{ name: 'AdminStudent' }">
@@ -57,7 +58,7 @@ import { useAccountStore } from '@/store/account';
 
 const account = useAccountStore();
 
-const userName = computed(() => account.userData?.name);
+const userName = computed(() => account.userData?.displayName);
 const isAdmin = computed(() => {
   if (account.userData?.role === 'admin') {
     return true;
