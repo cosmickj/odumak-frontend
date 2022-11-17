@@ -1,5 +1,7 @@
 <template>
-  <div>Loading...</div>
+  <div class="h-screen flex items-center justify-center">
+    <span class="text-4xl">Loading...</span>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -69,17 +71,22 @@ onMounted(async () => {
     }
 
     // #005 오두막 서비스에 필요한 유저 데이터를 저장할 document 생성
-    const hasDoc = await accountStore.fetchAccount({ uid: id });
+    const hasDoc = await accountStore.fetchUser({ uid: id });
     if (!hasDoc) {
       await accountStore.createUser({
         uid: id,
         church: '',
         department: '',
-        role: '',
+        role: 'common',
         grade: '',
         group: '',
+        isAccepted: false,
+        isRejected: false,
       });
     }
+
+    // TODO: 소셜 계정으로 회원 가입 혹은 로그인 했을 때도 유저 정보를 붙여서 반환해야 한다.
+    // console.log(user);
 
     router.push({ name: 'HomeView' });
   } catch (error) {
