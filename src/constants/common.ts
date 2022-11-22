@@ -1,11 +1,21 @@
 import type { Option } from '@/types';
 
-const GRADE: Option[] = [
+const CHURCH_OPTIONS: Option[] = [
+  //
+  { label: '영은교회', value: '영은교회' },
+];
+
+const DEPARTMENT_OPTIONS: Option[] = [
+  //
+  { label: '초등부', value: '초등부' },
+];
+
+const GRADE_OPTIONS: Option[] = [
   { label: '3학년', value: '3' },
   { label: '4학년', value: '4' },
 ];
 
-const GROUP: Option[] = [
+const GROUP_OPTIONS: Option[] = [
   { label: '1반', value: '1' },
   { label: '2반', value: '2' },
   { label: '3반', value: '3' },
@@ -67,8 +77,10 @@ export {
   BIRTH_YEAR,
   BIRTH_MONTH,
   BIRTH_DATE,
+  CHURCH_OPTIONS,
+  DEPARTMENT_OPTIONS,
   GENDER,
-  GRADE,
-  GROUP,
+  GRADE_OPTIONS,
+  GROUP_OPTIONS,
   TEACHER_ROLE,
 };

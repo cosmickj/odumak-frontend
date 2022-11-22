@@ -16,7 +16,7 @@
             v-model="selectedTeacher.grade"
             class="w-full"
             :class="{ 'p-invalid': errors.grade.status }"
-            :options="GRADE"
+            :options="GRADE_OPTIONS"
             option-label="label"
             option-value="value"
             placeholder="학년"
@@ -32,7 +32,7 @@
             placeholder="학급"
             option-label="label"
             option-value="value"
-            :options="GROUP"
+            :options="GROUP_OPTIONS"
           />
         </div>
 
@@ -201,8 +201,8 @@ import {
   BIRTH_DATE,
   BIRTH_MONTH,
   BIRTH_YEAR,
-  GRADE,
-  GROUP,
+  GRADE_OPTIONS,
+  GROUP_OPTIONS,
 } from '@/constants/common';
 
 const props = defineProps<{

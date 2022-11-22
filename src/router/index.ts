@@ -27,8 +27,8 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/',
-    meta: { requiresAuth: true },
     component: () => import('@/layouts/DefaultLayout.vue'),
+    meta: { requiresAuth: true },
     children: [
       {
         path: '',
@@ -43,7 +43,13 @@ const routes: Array<RouteRecordRaw> = [
         name: 'UserView',
         components: {
           default: () => import('@/views/User/index.vue'),
-          GlobalNavbar: () => import('@/components/TheNavbar.vue'),
+        },
+      },
+      {
+        path: 'user/edit',
+        name: 'UserEditView',
+        components: {
+          default: () => import('@/views/User/UserEdit.vue'),
         },
       },
       {
@@ -109,7 +115,7 @@ const router = createRouter({
 //   }
 // });
 
-// router auth checker
+// Router Auth Checker
 export const getCurrentUser = (): any => {
   return new Promise((resolve, reject) => {
     const removeListener = onAuthStateChanged(

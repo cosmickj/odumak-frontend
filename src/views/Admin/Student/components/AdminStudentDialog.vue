@@ -42,7 +42,7 @@
           v-model="selectedStudent.grade"
           class="w-28"
           :class="{ 'p-invalid': isError(i, 'grade') }"
-          :options="GRADE"
+          :options="GRADE_OPTIONS"
           option-label="label"
           option-value="value"
           placeholder="학년"
@@ -55,7 +55,7 @@
           placeholder="학급"
           option-label="label"
           option-value="value"
-          :options="GROUP"
+          :options="GROUP_OPTIONS"
         />
 
         <InputText
@@ -131,8 +131,8 @@ import {
   BIRTH_DATE,
   BIRTH_MONTH,
   BIRTH_YEAR,
-  GRADE,
-  GROUP,
+  GRADE_OPTIONS,
+  GROUP_OPTIONS,
 } from '@/constants/common';
 
 const props = defineProps<{

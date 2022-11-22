@@ -1,8 +1,10 @@
 <template>
-  <div v-if="accountStore.isAuthReady" class="grow overflow-auto text-2xl">
+  <div v-if="accountStore.isAuthReady" class="grow overflow-hidden text-2xl">
     <!-- 기본 정보 -->
     <div class="bg-slate-50">
-      <div class="flex px-8 py-4 items-center justify-between font-semibold">
+      <div
+        class="sticky top-0 left-0 flex px-8 py-4 bg-slate-50 items-center justify-between font-semibold"
+      >
         <span
           class="flex min-w-[24px] aspect-square items-center justify-center cursor-pointer before:block before:w-3 before:aspect-square before:border-l-2 before:border-b-2 before:border-black before:rotate-45"
           @click="router.push({ name: 'HomeView' })"
@@ -10,6 +12,7 @@
         <span>{{ accountStore.userData?.displayName }}님의 정보</span>
         <span
           class="flex min-w-[24px] aspect-square items-center justify-center cursor-pointer"
+          @click="router.push({ name: 'UserEditView' })"
         >
           수정
         </span>
