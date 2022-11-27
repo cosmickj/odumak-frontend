@@ -1,5 +1,5 @@
 export enum Collection {
   ATTENDANCES = 'attendances',
-  MEMBERS = 'members',
+  MEMBERS = 'newMembers',
   USERS = 'newUsers',
 }

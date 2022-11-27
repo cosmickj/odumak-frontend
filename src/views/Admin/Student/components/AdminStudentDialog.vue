@@ -37,9 +37,9 @@
       <p class="self-baseline">삭제</p>
 
       <!-- Row -->
-      <template v-for="(selectedStudent, i) in selectedStudents" :key="i">
+      <template v-for="(student, i) in students" :key="i">
         <Dropdown
-          v-model="selectedStudent.grade"
+          v-model="student.grade"
           class="w-28"
           :class="{ 'p-invalid': isError(i, 'grade') }"
           :options="GRADE_OPTIONS"
@@ -49,7 +49,7 @@
         />
 
         <Dropdown
-          v-model="selectedStudent.group"
+          v-model="student.group"
           class="w-28"
           :class="{ 'p-invalid': isError(i, 'group') }"
           placeholder="학급"
@@ -59,7 +59,7 @@
         />
 
         <InputText
-          v-model="selectedStudent.name"
+          v-model="student.name"
           :class="{ 'p-invalid': isError(i, 'name') }"
           placeholder="이름을 입력해주세요."
         />
@@ -69,44 +69,38 @@
             name="gender"
             inputId="male"
             value="male"
-            v-model="selectedStudent.gender"
+            v-model="student.gender"
           />
           <label class="cursor-pointer" for="male"> 남 </label>
           <RadioButton
             name="gender"
             inputId="female"
             value="female"
-            v-model="selectedStudent.gender"
+            v-model="student.gender"
           />
           <label class="cursor-pointer" for="female"> 여 </label>
         </div>
 
         <div class="flex items-center">
-          <Calendar
-            v-model="selectedStudent.birth"
-            date-format="yy년 mm월 dd일"
-          />
+          <Calendar v-model="student.birth" date-format="yy년 mm월 dd일" />
           <InputSwitch v-model="isChecked" class="ml-4" input-id="later" />
           <label class="cursor-pointer select-none" for="later"> 나중에 </label>
         </div>
 
         <InputMask
-          v-model="selectedStudent.phone"
+          v-model="student.phone"
           mask="(999)-9999-9999"
           placeholder="(010)-0000-0000"
         />
 
         <InputText
-          v-model="selectedStudent.address"
+          v-model="student.address"
           placeholder="주소를 입력해주세요."
         />
 
-        <Calendar
-          v-model="selectedStudent.registeredAt"
-          date-format="yy년 mm월 dd일"
-        />
+        <Calendar v-model="student.registeredAt" date-format="yy년 mm월 dd일" />
 
-        <InputText v-model="selectedStudent.remark" />
+        <InputText v-model="student.remark" />
 
         <Button
           class="p-button-help"
@@ -125,7 +119,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import { Student, SubmitType } from '@/types';
 import {
   BIRTH_DATE,
@@ -141,7 +135,7 @@ const props = defineProps<{
     label: SubmitType;
   };
   errors: any;
-  selectedStudents: Student[];
+  students: Student[];
 }>();
 
 const emit = defineEmits([

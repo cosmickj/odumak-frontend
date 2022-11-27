@@ -46,20 +46,20 @@ import type { UserData } from '@/types/store';
 
 // Waiting for Auth to be Ready
 (async () => {
-  const account = useAccountStore();
+  const accountStore = useAccountStore();
   const currentUser = (await getCurrentUser()) as User;
   if (currentUser) {
-    const result = (await account.fetchUser({
+    const result = (await accountStore.fetchUser({
       uid: currentUser.uid,
     })) as UserData;
-    account.userData = {
+    accountStore.userData = {
       uid: currentUser.uid,
       email: currentUser.email!,
       displayName: currentUser.displayName!,
       ...result,
     };
   }
-  account.isAuthReady = true;
+  accountStore.isAuthReady = true;
 })();
 
 app

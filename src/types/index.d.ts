@@ -24,7 +24,7 @@ export interface Member {
 }
 
 export interface Student {
-  _id: string;
+  uid?: string;
   address: string;
   birth: Date;
   gender: Gender;
@@ -34,7 +34,6 @@ export interface Student {
   phone: string;
   registeredAt: Date;
   remark: string;
-  teacher: string;
 }
 
 export interface Teacher {
