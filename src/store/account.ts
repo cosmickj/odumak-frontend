@@ -30,7 +30,7 @@ import {
 } from '@/types/store';
 
 // TODO: OdumakData로 추후에 변경하자
-interface _UserData extends AccountData, UserData {}
+export interface _UserData extends AccountData, UserData {}
 
 interface AccountStoreState {
   isAuthReady: boolean;

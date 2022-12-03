@@ -1,4 +1,9 @@
-import type { MemberPosition, TeacherRole, UserInfo } from './index';
+import type {
+  AttendanceState,
+  MemberPosition,
+  TeacherRole,
+  UserInfo,
+} from './index';
 
 /** account.ts */
 type K = 'uid' | 'email' | 'displayName';
@@ -62,6 +67,14 @@ export interface TeachersAttendance {
   teachersAttendance: Teacher[];
 }
 
+export interface AttendaceAddAttendanceParams {
+  church: string;
+  department: string;
+  grade: string;
+  group: string;
+  attendances: DataSource[];
+}
+
 /** member.ts */
 export interface Members {
   church: string;
@@ -77,4 +90,10 @@ export interface Members {
 export interface MembersFetchAllParmas
   extends Pick<UserInfo, 'church' | 'department'> {
   position: MemberPosition;
+}
+
+export interface MembersFetchByGradeGroupParams
+  extends Pick<UserInfo, 'church' | 'department'> {
+  grade: string;
+  group: string;
 }

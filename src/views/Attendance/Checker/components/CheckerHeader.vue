@@ -18,7 +18,7 @@
     v-if="userData?.role === 'admin'"
     class="flex mt-5 text-2xl justify-center"
   >
-    <div>{{ userData?.name }}</div>
+    <div>{{ userData?.displayName }}</div>
   </div>
 
   <div
@@ -26,14 +26,14 @@
     class="flex mt-5 text-2xl justify-around"
   >
     <div>{{ userData?.grade }}학년 {{ userData?.group }}반</div>
-    <div>{{ userData?.name }} 선생님</div>
+    <div>{{ userData?.displayName }} 선생님</div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { UserData } from '@/types/store';
+import { _UserData } from '@/store/account';
 
-const props = defineProps<{
-  userData: UserData | null;
+defineProps<{
+  userData: _UserData | null;
 }>();
 </script>

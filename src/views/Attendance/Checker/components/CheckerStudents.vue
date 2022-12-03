@@ -6,8 +6,8 @@
   >
     <div class="overflow-auto">
       <div
+        v-for="(student, idx) in modelValue"
         class="flex bg-white shadow my-2 px-3 py-5"
-        v-for="(student, idx) in studentsAttendance"
         :key="idx"
       >
         <div
@@ -20,9 +20,9 @@
         <div class="grid grid-cols-3 gap-3 w-3/5">
           <div class="aspect-square text-xl">
             <input
-              v-model="studentsAttendance[idx].attendance"
-              class="hidden w-0 h-0 attendance-button"
+              v-model="student.status"
               :id="`absence-${student.name}`"
+              class="hidden w-0 h-0 attendance-button"
               value="absence"
               type="radio"
             />
@@ -36,9 +36,9 @@
 
           <div class="aspect-square text-xl">
             <input
-              v-model="studentsAttendance[idx].attendance"
-              class="hidden w-0 h-0 attendance-button"
+              v-model="student.status"
               :id="`online-${student.name}`"
+              class="hidden w-0 h-0 attendance-button"
               value="online"
               type="radio"
             />
@@ -52,7 +52,7 @@
 
           <div class="aspect-square text-xl">
             <input
-              v-model="studentsAttendance[idx].attendance"
+              v-model="student.status"
               class="hidden w-0 h-0 attendance-button"
               :id="`offline-${student.name}`"
               value="offline"
@@ -88,21 +88,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import type { DataSource } from '@/types';
 
 const props = defineProps<{
-  documentId: string;
-  modelValue: any;
   attendanceDate: Date;
+  documentId: string;
   isSub?: boolean;
+  modelValue: DataSource[];
 }>();
 
 const emit = defineEmits(['update:modelValue', 'submit']);
-
-const studentsAttendance = computed({
-  get: () => props.modelValue,
-  set: (studentsAttendance) => emit('update:modelValue', studentsAttendance),
-});
 
 const handleSubmit = async () => emit('submit');
 </script>
