@@ -88,9 +88,7 @@ export interface Members {
 }
 
 export interface MembersFetchAllParmas
-  extends Pick<UserInfo, 'church' | 'department'> {
-  position: MemberPosition;
-}
+  extends Pick<UserInfo, 'church' | 'department'> {}
 
 export interface MembersFetchByGradeGroupParams
   extends Pick<UserInfo, 'church' | 'department'> {

@@ -31,7 +31,6 @@ import {
 
 interface MembersCreateParams extends Pick<UserInfo, 'church' | 'department'> {
   members: Member[];
-  // position: MemberPosition;
 }
 
 // TODO: CreateParams와 같은 값이다. 리펙토링할 때 수정해보자
@@ -40,7 +39,7 @@ interface ModifyParams extends Partial<Member>, Partial<Teacher> {
 }
 
 interface RemoveParams {
-  uids: string[];
+  uids: (string | undefined)[];
 }
 
 export const useMemberStore = defineStore('member', {
@@ -61,19 +60,19 @@ export const useMemberStore = defineStore('member', {
     },
 
     async fetchAll(params: MembersFetchAllParmas) {
-      const { church, department, position } = params;
+      const { church, department } = params;
+
       const q = query(
         membersColl,
         where('church', '==', church),
-        where('department', '==', department),
-        where('position', '==', position)
+        where('department', '==', department)
       );
-
       const qSnapshot = await getDocs(q);
+
       const members = qSnapshot.docs.map((doc) => ({
         uid: doc.id,
         ...doc.data(),
-      }));
+      })) as Member[];
 
       return arraySort(members, ['grade', 'group', 'name']);
     },
@@ -90,7 +89,7 @@ export const useMemberStore = defineStore('member', {
       );
       const qSnapshot = await getDocs(q);
 
-      let members = qSnapshot.docs.map((doc) => ({
+      const members = qSnapshot.docs.map((doc) => ({
         uid: doc.id,
         ...doc.data(),
       })) as Member[];
@@ -124,7 +123,9 @@ export const useMemberStore = defineStore('member', {
       const { uids } = params;
 
       uids.forEach(async (uid) => {
-        await deleteDoc(doc(db, 'newMembers', uid));
+        if (uid) {
+          await deleteDoc(doc(db, 'newMembers', uid));
+        }
       });
     },
   },

@@ -24,6 +24,7 @@ export interface UserInfo {
 }
 
 export interface Member {
+  uid?: string;
   attendances: Attendance[];
   address: string;
   birth: Date;
@@ -37,7 +38,6 @@ export interface Member {
   phone: string;
   registeredAt: Date;
   remark: string;
-  uid: string;
 }
 
 // prettier-ignore

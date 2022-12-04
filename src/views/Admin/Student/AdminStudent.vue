@@ -100,7 +100,7 @@ import { useMemberStore } from '@/store/member';
 import { formatGender } from '@/utils/useFormat';
 import { useVuelidate } from '@vuelidate/core';
 import { required, helpers } from '@vuelidate/validators';
-import { CustomColumn, SubmitType, Student, Teacher } from '@/types';
+import { CustomColumn, Member, SubmitType } from '@/types';
 import type DataTable from 'primevue/datatable';
 
 const { userData } = useAccountStore();
@@ -109,10 +109,7 @@ const memberStore = useMemberStore();
 const dataTableRef = ref<DataTable | null>(null);
 
 const exportCSV = () => {
-  if (dataTableRef.value) {
-    dataTableRef.value.exportCSV();
-    console.log(dataTableRef.value);
-  }
+  if (dataTableRef.value) dataTableRef.value.exportCSV();
 };
 
 const isLoading = ref(false);
@@ -120,15 +117,14 @@ const dataSource = ref();
 
 const getMembers = async () => {
   try {
+    if (!userData) return;
+
     isLoading.value = true;
-    if (userData) {
-      const result = await memberStore.fetchAll({
-        church: userData.church,
-        department: userData.department,
-        position: 'student',
-      });
-      dataSource.value = result;
-    }
+
+    dataSource.value = await memberStore.fetchAll({
+      church: userData.church,
+      department: userData.department,
+    });
   } catch (error) {
     console.log(error);
   } finally {
@@ -150,13 +146,16 @@ const columns = ref<CustomColumn[]>([
 
 const selectedColumns = ref(columns.value);
 
-const onToggle = (value: any) => {
-  selectedColumns.value = columns.value.filter((col) => value.includes(col));
-};
+// const onToggle = (value: any) => {
+//   selectedColumns.value = columns.value.filter((col) => value.includes(col));
+// };
 
-const initSelectedStudent: Student = {
+const initSelectedStudent: Member = {
   address: '',
+  attendances: [],
   birth: new Date(`${new Date().getFullYear() - 10 + 1}-01-01`),
+  church: '',
+  department: '',
   gender: 'male',
   grade: '',
   group: '',
@@ -168,7 +167,7 @@ const initSelectedStudent: Student = {
 
 const selectedStudent = reactive({ ...initSelectedStudent }); // TODO: 해당 변수 제거 검토
 
-const selectedStudents = reactive({ collection: [] as Student[] });
+const selectedStudents = reactive({ collection: [] as Member[] });
 
 const clearSelectedStudent = () => {
   return Object.assign({}, initSelectedStudent);
@@ -244,15 +243,15 @@ const submitSelectedStudents = async (submitType: SubmitType) => {
 
 const addStudent = async () => {
   try {
-    if (userData) {
-      memberStore.create({
-        church: userData.church,
-        department: userData.department,
-        position: 'student',
-        members: selectedStudents.collection,
-      });
-      alert('추가되었습니다.');
-    }
+    if (!userData) return;
+
+    memberStore.create({
+      church: userData.church,
+      department: userData.department,
+      members: selectedStudents.collection,
+    });
+
+    alert('추가되었습니다.');
   } catch (error) {
     console.log(error);
   }
@@ -283,15 +282,12 @@ const openDialogToDeleteStudents = () => {
 
 const deleteStudents = async () => {
   try {
-    const uids = selectedStudents.collection.map((student) => {
-      return student.uid;
-    });
+    const uids = selectedStudents.collection.map((student) => student.uid);
 
-    if (uids) {
-      await memberStore.remove({ uids });
-      deleteStudentsDialog.status = false;
-      await getMembers();
-    }
+    await memberStore.remove({ uids });
+
+    deleteStudentsDialog.status = false;
+    await getMembers();
   } catch (error) {
     console.log(error);
   }
