@@ -1,20 +1,18 @@
 <template>
-  <form
-    class="overflow-auto grow flex flex-col"
-    :class="{ 'p-5 bg-slate-200 rounded-lg': isSub }"
-    @submit.prevent="handleSubmit"
-  >
+  <form class="overflow-auto grow flex flex-col" @submit.prevent="handleSubmit">
     <div class="overflow-auto">
       <div
         v-for="(student, idx) in modelValue"
         class="flex bg-white shadow my-2 px-3 py-5"
+        :class="{ 'bg-red-300/25': student.targetIdx }"
         :key="idx"
       >
         <div
-          class="flex w-2/5 text-3xl items-center justify-center"
+          class="flex flex-col w-2/5 text-xl items-center justify-center"
           :class="$attrs.class"
         >
-          {{ student.name }}
+          <span>{{ student.name }}</span>
+          <span v-if="student.targetIdx" class="text-red-700">입력 필요</span>
         </div>
 
         <div class="grid grid-cols-3 gap-3 w-3/5">
@@ -69,37 +67,55 @@
       </div>
     </div>
 
-    <div>
-      <Button
-        v-if="!documentId"
-        class="w-full rounded-full p-button-warning p-button-lg"
-        label="제출하기"
-        type="submit"
-      />
-
-      <Button
-        v-else
-        class="w-full rounded-full p-button-danger p-button-lg"
-        label="수정하기"
-        type="submit"
-      />
-    </div>
+    <Button
+      class="p-button-warning p-button-lg w-full rounded-full"
+      label="제출하기"
+      type="submit"
+      :disabled="!isDisabled"
+    />
   </form>
 </template>
 
 <script setup lang="ts">
+import { computed, ref, watch } from 'vue';
 import type { DataSource } from '@/types';
 
 const props = defineProps<{
   attendanceDate: Date;
-  documentId: string;
-  isSub?: boolean;
   modelValue: DataSource[];
 }>();
 
 const emit = defineEmits(['update:modelValue', 'submit']);
 
+let originalDataSource: string = '';
+
+const hasNone = computed(() => {
+  return props.modelValue.map((d) => d.targetIdx).includes(-1);
+});
+
+const isChanged = ref(false);
+
+const isDisabled = computed(() => {
+  return isChanged.value || hasNone.value;
+});
+// CONTINUE HERE
+
 const handleSubmit = async () => emit('submit');
+
+watch(
+  props.modelValue,
+  (newValue) => {
+    if (!originalDataSource)
+      originalDataSource = JSON.stringify(props.modelValue);
+
+    if (JSON.stringify(newValue) !== originalDataSource) {
+      isChanged.value = true;
+    } else {
+      isChanged.value = false;
+    }
+  },
+  { deep: true }
+);
 </script>
 
 <style scoped>

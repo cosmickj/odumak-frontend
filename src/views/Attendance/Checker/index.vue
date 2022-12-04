@@ -14,7 +14,11 @@
     />
 
     <TheFinger
-      v-if="isTeacher(accountStore.userData?.role) && !attendanceDate"
+      v-if="
+        (isTeacher(accountStore.userData?.role) ||
+          isAdmin(accountStore.userData?.role)) &&
+        !attendanceDate
+      "
       class="pt-5"
     />
 
@@ -22,7 +26,7 @@
 
     <!-- 일반교사일 때 -->
     <div
-      v-if="!isTeacher(accountStore.userData?.role)"
+      v-if="!isTeacher(accountStore.userData?.role) && attendanceDate"
       class="grow flex items-center justify-center text-xl"
     >
       <p>담당 학급이 있는 선생님만 이용할 수 있습니다.</p>
@@ -30,18 +34,16 @@
 
     <!-- 선생님일 때 -->
     <CheckerStudents
-      v-if="isTeacher(accountStore.userData?.role) && attendanceDate"
+      v-else-if="isTeacher(accountStore.userData?.role) && attendanceDate"
       v-model="dataSource"
-      :document-id="documentId"
       :attendance-date="attendanceDate"
       @submit="submitAttendance"
     />
 
     <!-- 관리자일 때 -->
     <CheckerTeachers
-      v-if="isAdmin(accountStore.userData?.role) && attendanceDate"
+      v-else-if="isAdmin(accountStore.userData?.role) && attendanceDate"
       v-model="dataSource"
-      :document-id="documentId"
       :attendance-date="attendanceDate"
       @submit="submitAttendance"
     />
@@ -73,7 +75,7 @@ const memberStore = useMemberStore();
 
 const isLoading = ref(false);
 
-const documentId = ref('');
+// const documentId = ref('');
 
 const dataSource = ref<DataSource[]>([]);
 
@@ -97,22 +99,17 @@ const getAttendances = async () => {
     targetMembers.forEach((member) => {
       let status: AttendanceStatus = 'offline';
 
-      const targetIdx = member.attendances.findIndex((attendace) => {
-        // CONTINUE HERE
-        console.log(typeof attendace.attendedAt.toDate());
-        console.log(typeof attendanceDate.value);
-
-        return attendace.attendedAt.toDate() === attendanceDate.value;
+      const targetIdx = member.attendances.findIndex((attd) => {
+        const recordedAttendanceDate = attd.attendedAt.toDate().getTime();
+        const selectedAttendaceDate = attendanceDate.value?.getTime();
+        return recordedAttendanceDate === selectedAttendaceDate;
       });
-
-      console.log(targetIdx);
 
       if (targetIdx !== -1) {
         status = member.attendances[targetIdx].status;
       }
 
-      // TODO: 현재 이전에 입력이 아예 안되었던 친구들인지 아니면 입력되었던 친구들인지 구별이 안간다.
-      if (attendanceDate.value) {
+      if (attendanceDate.value && member.uid) {
         dataSource.value.push({
           uid: member.uid,
           name: member.name,
