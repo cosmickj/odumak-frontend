@@ -37,6 +37,7 @@
       v-else-if="isTeacher(accountStore.userData?.role) && attendanceDate"
       v-model="dataSource"
       :attendance-date="attendanceDate"
+      :copy-data-source="copyDataSource"
       @submit="submitAttendance"
     />
 
@@ -78,6 +79,7 @@ const isLoading = ref(false);
 // const documentId = ref('');
 
 const dataSource = ref<DataSource[]>([]);
+const copyDataSource = ref('');
 
 const attendanceDate = ref<Date>();
 
@@ -85,6 +87,7 @@ const getAttendances = async () => {
   try {
     isLoading.value = true;
     dataSource.value = [];
+    copyDataSource.value = '';
 
     if (!accountStore.userData) return;
 
@@ -119,6 +122,7 @@ const getAttendances = async () => {
         });
       }
     });
+    copyDataSource.value = JSON.stringify(dataSource.value);
   } catch (error) {
     console.log(error);
   } finally {
@@ -127,50 +131,20 @@ const getAttendances = async () => {
 };
 
 const submitAttendance = async () => {
-  if (!accountStore.userData) return;
+  try {
+    if (!accountStore.userData) return;
 
-  await attendanceStore.addAttendance({
-    attendances: dataSource.value,
-    church: accountStore.userData.church,
-    department: accountStore.userData.department,
-    grade: accountStore.userData.grade,
-    group: accountStore.userData.group,
-  });
-
-  // try {
-  //   const role = userData.value?.role!;
-  //   const position = getPositionFromRole(role);
-  //   let response;
-  //   if (role === 'admin') {
-  //     response = await attendance.addAttendance({
-  //       documentId: documentId.value,
-  //       attendanceDate: attendanceDate.value,
-  //       createUser: userData.value?.name,
-  //       church: userData.value?.church,
-  //       department: userData.value?.department,
-  //       position,
-  //       records: dataSource.value,
-  //     });
-  //   }
-  //   // role === 'teacher'
-  //   else {
-  //     response = await attendance.addAttendance({
-  //       documentId: documentId.value,
-  //       attendanceDate: attendanceDate.value,
-  //       createUser: userData.value?.name,
-  //       church: userData.value?.church,
-  //       department: userData.value?.department,
-  //       grade: userData.value?.grade,
-  //       group: userData.value?.group,
-  //       position,
-  //       records: dataSource.value,
-  //     });
-  //   }
-  //   documentId.value = response.documentId;
-  //   alert(response.message);
-  // } catch (error) {
-  //   console.log(error);
-  // }
+    // CONTINUE: 기존에 데이터가 있으면 추가가 아닌 수정되어야한다.
+    await attendanceStore.addAttendance({
+      attendances: dataSource.value,
+      church: accountStore.userData.church,
+      department: accountStore.userData.department,
+      grade: accountStore.userData.grade,
+      group: accountStore.userData.group,
+    });
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const isTeacher = (role: TeacherRole | undefined) => {

@@ -4,7 +4,7 @@
       <div
         v-for="(student, idx) in modelValue"
         class="flex bg-white shadow my-2 px-3 py-5"
-        :class="{ 'bg-red-300/25': student.targetIdx }"
+        :class="{ 'bg-red-300/25': !isEntered(student.targetIdx) }"
         :key="idx"
       >
         <div
@@ -12,7 +12,9 @@
           :class="$attrs.class"
         >
           <span>{{ student.name }}</span>
-          <span v-if="student.targetIdx" class="text-red-700">입력 필요</span>
+          <span v-if="!isEntered(student.targetIdx)" class="text-red-700">
+            입력 필요
+          </span>
         </div>
 
         <div class="grid grid-cols-3 gap-3 w-3/5">
@@ -71,7 +73,7 @@
       class="p-button-warning p-button-lg w-full rounded-full"
       label="제출하기"
       type="submit"
-      :disabled="!isDisabled"
+      :disabled="isDisabled"
     />
   </form>
 </template>
@@ -82,40 +84,39 @@ import type { DataSource } from '@/types';
 
 const props = defineProps<{
   attendanceDate: Date;
+  copyDataSource: string;
   modelValue: DataSource[];
 }>();
 
 const emit = defineEmits(['update:modelValue', 'submit']);
 
-let originalDataSource: string = '';
-
-const hasNone = computed(() => {
-  return props.modelValue.map((d) => d.targetIdx).includes(-1);
-});
-
-const isChanged = ref(false);
-
-const isDisabled = computed(() => {
-  return isChanged.value || hasNone.value;
-});
-// CONTINUE HERE
-
-const handleSubmit = async () => emit('submit');
-
 watch(
-  props.modelValue,
-  (newValue) => {
-    if (!originalDataSource)
-      originalDataSource = JSON.stringify(props.modelValue);
-
-    if (JSON.stringify(newValue) !== originalDataSource) {
+  () => props.modelValue,
+  (newVal) => {
+    if (JSON.stringify(newVal) !== props.copyDataSource) {
       isChanged.value = true;
-    } else {
-      isChanged.value = false;
-    }
+    } else isChanged.value = false;
   },
   { deep: true }
 );
+
+const isChanged = ref(false);
+
+const isAllEntered = computed(() => {
+  return !props.modelValue.map((d) => d.targetIdx).includes(-1);
+});
+
+const isDisabled = computed(() => {
+  if (isAllEntered.value && !isChanged.value) return true;
+  else return false;
+});
+
+const isEntered = (index: number) => {
+  if (index >= 0) return true;
+  return false;
+};
+
+const handleSubmit = () => emit('submit');
 </script>
 
 <style scoped>
