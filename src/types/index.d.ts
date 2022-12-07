@@ -48,6 +48,7 @@ export interface Attendance {
   attendedAt: Date;
   state: AttendanceState;
   status: AttendanceStatus;
+  createdAt: Date;
 }
 
 export interface DataSource {
@@ -56,6 +57,7 @@ export interface DataSource {
   status: AttendanceStatus;
   targetIdx: number;
   attendedAt: Date;
+  createdAt?: Date;
 }
 
 /**

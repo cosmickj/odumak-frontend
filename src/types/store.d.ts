@@ -67,13 +67,22 @@ export interface TeachersAttendance {
   teachersAttendance: Teacher[];
 }
 
+export interface AttendaceAddAttendancesParams
+  extends Omit<AttendaceAddAttendanceParams, 'attendance'> {
+  attendances: DataSource[];
+  checksum: string;
+}
+
 export interface AttendaceAddAttendanceParams {
+  attendance: DataSource;
   church: string;
   department: string;
   grade: string;
   group: string;
-  attendances: DataSource[];
 }
+
+export interface AttendaceRemoveAttendanceParams
+  extends AttendaceAddAttendanceParams {}
 
 /** member.ts */
 export interface Members {

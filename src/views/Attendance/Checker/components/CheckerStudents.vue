@@ -84,7 +84,7 @@ import type { DataSource } from '@/types';
 
 const props = defineProps<{
   attendanceDate: Date;
-  copyDataSource: string;
+  checksum: string;
   modelValue: DataSource[];
 }>();
 
@@ -93,7 +93,7 @@ const emit = defineEmits(['update:modelValue', 'submit']);
 watch(
   () => props.modelValue,
   (newVal) => {
-    if (JSON.stringify(newVal) !== props.copyDataSource) {
+    if (JSON.stringify(newVal) !== props.checksum) {
       isChanged.value = true;
     } else isChanged.value = false;
   },

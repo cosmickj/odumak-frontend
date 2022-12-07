@@ -4,6 +4,7 @@ import { useMemberStore } from './member';
 import { db, attendancesColl } from '@/firebase/config';
 import {
   addDoc,
+  arrayRemove,
   arrayUnion,
   doc,
   getDoc,
@@ -21,7 +22,11 @@ import type {
   Teacher,
   TeacherRole,
 } from '@/types';
-import type { AttendaceAddAttendanceParams } from '@/types/store';
+import type {
+  AttendaceAddAttendanceParams,
+  AttendaceAddAttendancesParams,
+  AttendaceRemoveAttendanceParams,
+} from '@/types/store';
 
 export const useAttendanceStore = defineStore('attendance', {
   state: () => ({}),
@@ -179,25 +184,72 @@ export const useAttendanceStore = defineStore('attendance', {
       // }
     },
 
-    async addAttendance(params: AttendaceAddAttendanceParams) {
-      const { attendances, church, department, grade, group } = params;
+    async addAttendances(params: AttendaceAddAttendancesParams) {
+      const { attendances, checksum, church, department, grade, group } =
+        params;
 
-      attendances.forEach(async (attendance) => {
-        const params: Attendance = {
-          attendedAt: attendance.attendedAt,
-          status: attendance.status,
-          state: {
-            grade,
-            group,
-            church,
-            department,
-          },
-        };
+      attendances.forEach(async (attendance, index) => {
+        const _old = JSON.stringify(JSON.parse(checksum)[index]);
+        const _new = JSON.stringify(attendance);
+        // Continue here: 슈밤 date를 stringify 하면 시간대 차이로 시간이 변경된다...!!!
+        if (attendance.targetIdx !== -1 && _old !== _new) {
+          // await this.removeAttendance({
+          //   attendance: JSON.parse(_old),
+          //   church,
+          //   department,
+          //   grade,
+          //   group,
+          // });
+        }
 
-        await updateDoc(doc(db, 'newMembers', attendance.uid), {
-          attendances: arrayUnion(params),
-        });
+        // await this.addAttendance({
+        //   attendance,
+        //   church,
+        //   department,
+        //   grade,
+        //   group,
+        // });
       });
+    },
+
+    async addAttendance(params: AttendaceAddAttendanceParams) {
+      const { attendance, church, department, grade, group } = params;
+
+      const _: Attendance = {
+        attendedAt: attendance.attendedAt,
+        status: attendance.status,
+        state: {
+          grade,
+          group,
+          church,
+          department,
+        },
+        createdAt: attendance.createdAt,
+      };
+
+      await updateDoc(doc(db, 'newMembers', attendance.uid), {
+        attendances: arrayUnion(_),
+      });
+    },
+
+    async removeAttendance(params: AttendaceRemoveAttendanceParams) {
+      const { attendance, church, department, grade, group } = params;
+
+      const _: Attendance = {
+        attendedAt: attendance.attendedAt,
+        status: attendance.status,
+        state: {
+          grade,
+          group,
+          church,
+          department,
+        },
+        createdAt: attendance.createdAt,
+      };
+
+      // await updateDoc(doc(db, 'newMembers', attendance.uid), {
+      //   attendances: arrayRemove(_),
+      // });
     },
   },
 });

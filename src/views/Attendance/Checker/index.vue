@@ -37,7 +37,7 @@
       v-else-if="isTeacher(accountStore.userData?.role) && attendanceDate"
       v-model="dataSource"
       :attendance-date="attendanceDate"
-      :copy-data-source="copyDataSource"
+      :checksum="copyDataSource"
       @submit="submitAttendance"
     />
 
@@ -76,8 +76,6 @@ const memberStore = useMemberStore();
 
 const isLoading = ref(false);
 
-// const documentId = ref('');
-
 const dataSource = ref<DataSource[]>([]);
 const copyDataSource = ref('');
 
@@ -101,15 +99,19 @@ const getAttendances = async () => {
     // TODO: 추후 아래 로직을 attendace.ts의 action으로 분리하자
     targetMembers.forEach((member) => {
       let status: AttendanceStatus = 'offline';
+      let createdAt = new Date();
+      createdAt.setHours(0, 0, 0, 0);
 
       const targetIdx = member.attendances.findIndex((attd) => {
         const recordedAttendanceDate = attd.attendedAt.toDate().getTime();
         const selectedAttendaceDate = attendanceDate.value?.getTime();
+
         return recordedAttendanceDate === selectedAttendaceDate;
       });
 
       if (targetIdx !== -1) {
         status = member.attendances[targetIdx].status;
+        createdAt = member.attendances[targetIdx].createdAt.toDate();
       }
 
       if (attendanceDate.value && member.uid) {
@@ -119,9 +121,11 @@ const getAttendances = async () => {
           attendedAt: attendanceDate.value,
           status,
           targetIdx,
+          createdAt,
         });
       }
     });
+
     copyDataSource.value = JSON.stringify(dataSource.value);
   } catch (error) {
     console.log(error);
@@ -134,10 +138,10 @@ const submitAttendance = async () => {
   try {
     if (!accountStore.userData) return;
 
-    // CONTINUE: 기존에 데이터가 있으면 추가가 아닌 수정되어야한다.
-    await attendanceStore.addAttendance({
+    await attendanceStore.addAttendances({
       attendances: dataSource.value,
       church: accountStore.userData.church,
+      checksum: copyDataSource.value,
       department: accountStore.userData.department,
       grade: accountStore.userData.grade,
       group: accountStore.userData.group,
