@@ -20,8 +20,8 @@ import type { MemberPosition } from '@/types/index.js';
 
 const props = defineProps<{
   icon: string;
-  routeName: string;
   position: MemberPosition;
+  routeName: string;
   type: string;
 }>();
 

@@ -4,7 +4,7 @@
       <div
         v-for="(student, idx) in modelValue"
         class="flex bg-white shadow my-2 px-3 py-5"
-        :class="{ 'bg-red-300/25': !isEntered(student.targetIdx) }"
+        :class="{ 'bg-red-300/25': !hasAttendance(student.targetIdx) }"
         :key="idx"
       >
         <div
@@ -12,7 +12,7 @@
           :class="$attrs.class"
         >
           <span>{{ student.name }}</span>
-          <span v-if="!isEntered(student.targetIdx)" class="text-red-700">
+          <span v-if="!hasAttendance(student.targetIdx)" class="text-red-700">
             입력 필요
           </span>
         </div>
@@ -111,7 +111,7 @@ const isDisabled = computed(() => {
   else return false;
 });
 
-const isEntered = (index: number) => {
+const hasAttendance = (index: number) => {
   if (index >= 0) return true;
   return false;
 };

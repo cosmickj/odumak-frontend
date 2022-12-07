@@ -191,24 +191,24 @@ export const useAttendanceStore = defineStore('attendance', {
       attendances.forEach(async (attendance, index) => {
         const _old = JSON.stringify(JSON.parse(checksum)[index]);
         const _new = JSON.stringify(attendance);
-        // Continue here: 슈밤 date를 stringify 하면 시간대 차이로 시간이 변경된다...!!!
+
         if (attendance.targetIdx !== -1 && _old !== _new) {
-          // await this.removeAttendance({
-          //   attendance: JSON.parse(_old),
-          //   church,
-          //   department,
-          //   grade,
-          //   group,
-          // });
+          await this.removeAttendance({
+            attendance: JSON.parse(_old),
+            church,
+            department,
+            grade,
+            group,
+          });
         }
 
-        // await this.addAttendance({
-        //   attendance,
-        //   church,
-        //   department,
-        //   grade,
-        //   group,
-        // });
+        await this.addAttendance({
+          attendance,
+          church,
+          department,
+          grade,
+          group,
+        });
       });
     },
 
@@ -236,7 +236,7 @@ export const useAttendanceStore = defineStore('attendance', {
       const { attendance, church, department, grade, group } = params;
 
       const _: Attendance = {
-        attendedAt: attendance.attendedAt,
+        attendedAt: new Date(attendance.attendedAt),
         status: attendance.status,
         state: {
           grade,
@@ -244,12 +244,12 @@ export const useAttendanceStore = defineStore('attendance', {
           church,
           department,
         },
-        createdAt: attendance.createdAt,
+        createdAt: new Date(attendance.createdAt),
       };
 
-      // await updateDoc(doc(db, 'newMembers', attendance.uid), {
-      //   attendances: arrayRemove(_),
-      // });
+      await updateDoc(doc(db, 'newMembers', attendance.uid), {
+        attendances: arrayRemove(_),
+      });
     },
   },
 });

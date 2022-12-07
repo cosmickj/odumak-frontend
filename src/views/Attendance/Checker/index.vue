@@ -58,17 +58,11 @@ import CheckerHeader from './components/CheckerHeader.vue';
 import CheckerStudents from './components/CheckerStudents.vue';
 import CheckerTeachers from './components/CheckerTeachers.vue';
 
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import { useAccountStore } from '@/store/account';
 import { useAttendanceStore } from '@/store/attendance';
 import { useMemberStore } from '@/store/member';
-import { getPositionFromRole } from '@/utils/position';
-import type {
-  AttendanceStatus,
-  Teacher,
-  TeacherRole,
-  DataSource,
-} from '@/types';
+import type { AttendanceStatus, TeacherRole, DataSource } from '@/types';
 
 const accountStore = useAccountStore();
 const attendanceStore = useAttendanceStore();

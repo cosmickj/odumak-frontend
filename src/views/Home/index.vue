@@ -44,26 +44,23 @@
         type="total"
       />
     </div>
-
-    <p class="mt-20 text-2xl text-red-500 text-center">
-      22. 08. 21 기준 업데이트 완료
-    </p>
   </section>
 </template>
 
 <script setup lang="ts">
 import HomeMenu from './components/HomeMenu.vue';
+
 import { computed } from 'vue';
 import { useAccountStore } from '@/store/account';
 
-const account = useAccountStore();
+const { userData } = useAccountStore();
 
-const userName = computed(() => account.userData?.displayName);
+const userName = computed(() => userData?.displayName);
+
 const isAdmin = computed(() => {
-  if (account.userData?.role === 'admin') {
+  if (userData?.role === 'admin') {
     return true;
-  } else {
-    return false;
   }
+  return false;
 });
 </script>
