@@ -57,7 +57,7 @@ import type { UserData } from '@/types/store';
       uid: currentUser.uid,
     })) as UserData;
 
-    accountStore.userData = {
+    accountStore.accountData = {
       uid: currentUser.uid,
       email: currentUser.email!,
       displayName: currentUser.displayName!,

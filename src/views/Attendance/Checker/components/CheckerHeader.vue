@@ -15,25 +15,25 @@
   </header>
 
   <div
-    v-if="userData?.role === 'admin'"
+    v-if="accountData?.role === 'admin'"
     class="flex mt-5 text-2xl justify-center"
   >
-    <div>{{ userData?.displayName }}</div>
+    <div>{{ accountData?.displayName }}</div>
   </div>
 
   <div
-    v-else-if="userData?.role === 'main' || userData?.role === 'sub'"
+    v-else-if="accountData?.role === 'main' || accountData?.role === 'sub'"
     class="flex mt-5 text-2xl justify-around"
   >
-    <div>{{ userData?.grade }}학년 {{ userData?.group }}반</div>
-    <div>{{ userData?.displayName }} 선생님</div>
+    <div>{{ accountData?.grade }}학년 {{ accountData?.group }}반</div>
+    <div>{{ accountData?.displayName }} 선생님</div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { _UserData } from '@/store/account';
+import { AccountData } from '@/types/store';
 
 defineProps<{
-  userData: _UserData | null;
+  accountData: AccountData | null;
 }>();
 </script>

@@ -104,9 +104,9 @@ import {
 } from '@/constants/common';
 
 const router = useRouter();
-const { isAuthReady, userData } = useAccountStore();
+const { isAuthReady, accountData } = useAccountStore();
 
-const form = reactive({ ...userData });
+const form = reactive({ ...accountData });
 
 watch(
   form,

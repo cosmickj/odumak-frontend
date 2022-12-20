@@ -61,7 +61,7 @@ const route = useRoute();
 const account = useAccountStore();
 const attendance = useAttendanceStore();
 
-const userData = computed(() => account.userData);
+// const userData = computed(() => account.userData);
 const position = computed(() => route.params.position as MemberPosition);
 const type = computed(() => route.params.type);
 
@@ -95,20 +95,19 @@ const teachersAttendance = ref<Teacher[]>([]);
 
 const onAttendanceDateSelect = async () => {
   try {
-    isLoading.value = true;
-    const params = {
-      attendanceDate: attendanceDate.value!,
-      church: userData.value?.church!,
-      department: userData.value?.department!,
-    };
-
-    if (position.value === 'student') {
-      const result = await attendance.fetchStudentsAttendanceByDate(params);
-      studentsAttendance.value = result;
-    } else {
-      const result = await attendance.fetchTeachersAttendanceByDate(params);
-      teachersAttendance.value = result;
-    }
+    // isLoading.value = true;
+    // const params = {
+    //   attendanceDate: attendanceDate.value!,
+    //   church: userData.value?.church!,
+    //   department: userData.value?.department!,
+    // };
+    // if (position.value === 'student') {
+    //   const result = await attendance.fetchStudentsAttendanceByDate(params);
+    //   studentsAttendance.value = result;
+    // } else {
+    //   const result = await attendance.fetchTeachersAttendanceByDate(params);
+    //   teachersAttendance.value = result;
+    // }
   } catch (error) {
     console.log(error);
   } finally {

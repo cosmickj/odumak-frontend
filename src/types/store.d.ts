@@ -6,8 +6,10 @@ import type {
 } from './index';
 
 /** account.ts */
+export interface AccountData extends AuthData, UserData {}
+
 type K = 'uid' | 'email' | 'displayName';
-export type AccountData = {
+export type AuthData = {
   -readonly [key in K]: User[key];
 };
 

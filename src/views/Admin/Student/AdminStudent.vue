@@ -103,7 +103,7 @@ import { required, helpers } from '@vuelidate/validators';
 import { CustomColumn, Member, SubmitType } from '@/types';
 import type DataTable from 'primevue/datatable';
 
-const { userData } = useAccountStore();
+const { accountData } = useAccountStore();
 const memberStore = useMemberStore();
 
 const dataTableRef = ref<DataTable | null>(null);
@@ -117,13 +117,13 @@ const dataSource = ref();
 
 const getMembers = async () => {
   try {
-    if (!userData) return;
+    if (!accountData) return;
 
     isLoading.value = true;
 
     dataSource.value = await memberStore.fetchAll({
-      church: userData.church,
-      department: userData.department,
+      church: accountData.church,
+      department: accountData.department,
     });
   } catch (error) {
     console.log(error);
@@ -243,11 +243,11 @@ const submitSelectedStudents = async (submitType: SubmitType) => {
 
 const addStudent = async () => {
   try {
-    if (!userData) return;
+    if (!accountData) return;
 
     memberStore.create({
-      church: userData.church,
-      department: userData.department,
+      church: accountData.church,
+      department: accountData.department,
       members: selectedStudents.collection,
     });
 
@@ -258,10 +258,10 @@ const addStudent = async () => {
 };
 
 const editStudent = async () => {
-  if (userData) {
+  if (accountData) {
     await memberStore.modify({
-      church: userData.church,
-      department: userData.department,
+      church: accountData.church,
+      department: accountData.department,
       position: 'student',
       ...selectedStudent,
     });

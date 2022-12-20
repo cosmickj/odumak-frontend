@@ -1,9 +1,9 @@
 <template>
   <section class="flex flex-col h-full p-8">
-    <CheckerHeader :user-data="accountStore.userData" />
+    <CheckerHeader :user-data="accountStore.accountData" />
 
     <Calendar
-      v-if="isTeacher(accountStore.userData?.role)"
+      v-if="isTeacher(accountStore.accountData?.role)"
       v-model="attendanceDate"
       class="pt-5"
       input-class="text-center"
@@ -15,8 +15,8 @@
 
     <TheFinger
       v-if="
-        (isAdmin(accountStore.userData?.role) ||
-          isTeacher(accountStore.userData?.role)) &&
+        (isAdmin(accountStore.accountData?.role) ||
+          isTeacher(accountStore.accountData?.role)) &&
         !attendanceDate
       "
       class="pt-5"
@@ -26,7 +26,7 @@
 
     <!-- 일반교사일 때 -->
     <div
-      v-if="!isTeacher(accountStore.userData?.role) && attendanceDate"
+      v-if="!isTeacher(accountStore.accountData?.role) && attendanceDate"
       class="grow flex items-center justify-center text-xl"
     >
       <p>담당 학급이 있는 선생님만 이용할 수 있습니다.</p>
@@ -34,7 +34,7 @@
 
     <!-- 선생님일 때 -->
     <CheckerStudents
-      v-else-if="isTeacher(accountStore.userData?.role) && attendanceDate"
+      v-else-if="isTeacher(accountStore.accountData?.role) && attendanceDate"
       v-model="dataSource"
       :attendance-date="attendanceDate"
       :checksum="copyDataSource"
@@ -44,7 +44,7 @@
     <!-- 관리자일 때 -->
     <!-- CONTINUE HERE: 이제부터는 member가 아닌 user를 대상으로 하는 것이다. -->
     <CheckerTeachers
-      v-else-if="isAdmin(accountStore.userData?.role) && attendanceDate"
+      v-else-if="isAdmin(accountStore.accountData?.role) && attendanceDate"
       v-model="dataSource"
       :attendance-date="attendanceDate"
       :checksum="copyDataSource"
@@ -83,13 +83,13 @@ const getAttendances = async () => {
     dataSource.value = [];
     copyDataSource.value = '';
 
-    if (!accountStore.userData) return;
+    if (!accountStore.accountData) return;
 
     const targetMembers = await memberStore.fetchByGradeGroup({
-      church: accountStore.userData.church,
-      department: accountStore.userData.department,
-      grade: accountStore.userData.grade,
-      group: accountStore.userData.group,
+      church: accountStore.accountData.church,
+      department: accountStore.accountData.department,
+      grade: accountStore.accountData.grade,
+      group: accountStore.accountData.group,
     });
 
     // TODO: 추후 아래 로직을 attendace.ts의 action으로 분리하자
@@ -132,15 +132,15 @@ const getAttendances = async () => {
 
 const submitAttendance = async () => {
   try {
-    if (!accountStore.userData) return;
+    if (!accountStore.accountData) return;
 
     await attendanceStore.addAttendances({
       attendances: dataSource.value,
-      church: accountStore.userData.church,
+      church: accountStore.accountData.church,
       checksum: copyDataSource.value,
-      department: accountStore.userData.department,
-      grade: accountStore.userData.grade,
-      group: accountStore.userData.group,
+      department: accountStore.accountData.department,
+      grade: accountStore.accountData.grade,
+      group: accountStore.accountData.group,
     });
   } catch (error) {
     console.log(error);

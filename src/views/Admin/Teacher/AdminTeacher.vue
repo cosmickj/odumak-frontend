@@ -131,10 +131,10 @@ const dataSource = ref();
 const getMembers = async () => {
   try {
     isLoading.value = true;
-    if (accountStore.userData) {
+    if (accountStore.accountData) {
       const result = await memberStore.fetchAll({
-        church: accountStore.userData.church,
-        department: accountStore.userData.department,
+        church: accountStore.accountData.church,
+        department: accountStore.accountData.department,
       });
       dataSource.value = result;
     }
@@ -247,7 +247,7 @@ const onSubmit = async ({ submitType }: { submitType: SubmitType }) => {
 };
 
 const addTeacher = async () => {
-  if (accountStore.userData) {
+  if (accountStore.accountData) {
     // await memberStore.create({
     //   church: accountStore.userData.church,
     //   department: accountStore.userData.department,
@@ -258,10 +258,10 @@ const addTeacher = async () => {
 };
 
 const editTeacher = async () => {
-  if (accountStore.userData) {
+  if (accountStore.accountData) {
     await memberStore.modify({
-      church: accountStore.userData.church,
-      department: accountStore.userData.department,
+      church: accountStore.accountData.church,
+      department: accountStore.accountData.department,
       position: 'teacher',
       ...selectedTeacher,
     });
@@ -287,7 +287,7 @@ const closeModalForDeleteTeacher = () => {
 };
 
 const deleteTeacher = async () => {
-  if (accountStore.userData) {
+  if (accountStore.accountData) {
     await memberStore.remove({
       uids: [selectedTeacher._id],
     });
@@ -307,7 +307,7 @@ const deleteTeachers = async () => {
     return teacher._id;
   });
 
-  if (accountStore.userData) {
+  if (accountStore.accountData) {
     await memberStore.remove({
       uids: ids,
     });

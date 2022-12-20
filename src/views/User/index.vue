@@ -9,7 +9,7 @@
           class="flex min-w-[24px] aspect-square items-center justify-center cursor-pointer before:block before:w-3 before:aspect-square before:border-l-2 before:border-b-2 before:border-black before:rotate-45"
           @click="router.push({ name: 'HomeView' })"
         ></span>
-        <span>{{ accountStore.userData?.displayName }}님의 정보</span>
+        <span>{{ accountStore.accountData?.displayName }}님의 정보</span>
         <span
           class="flex min-w-[24px] aspect-square items-center justify-center cursor-pointer"
           @click="router.push({ name: 'UserEditView' })"
@@ -20,7 +20,7 @@
       <!-- TODO: 추후에 사진도 넣어보자 -->
       <div class="flex px-8 py-4 items-center justify-between">
         <span>이름</span>
-        <span>{{ accountStore.userData?.displayName }}</span>
+        <span>{{ accountStore.accountData?.displayName }}</span>
       </div>
       <div class="flex px-8 py-4 items-center justify-between">
         <span>생년월일</span>
@@ -32,7 +32,7 @@
       </div>
       <div class="flex px-8 py-4 items-center justify-between">
         <span>이메일</span>
-        <span>{{ accountStore.userData?.email }}</span>
+        <span>{{ accountStore.accountData?.email }}</span>
       </div>
     </div>
 
@@ -108,19 +108,19 @@ const router = useRouter();
 const accountStore = useAccountStore();
 
 const church = computed(() => {
-  const _church = accountStore.userData?.church;
+  const _church = accountStore.accountData?.church;
   if (_church) return _church;
   else return '없음';
 });
 
 const department = computed(() => {
-  const _department = accountStore.userData?.department;
+  const _department = accountStore.accountData?.department;
   if (_department) return _department;
   else return '없음';
 });
 
 const role = computed(() => {
-  const _role = accountStore.userData?.role;
+  const _role = accountStore.accountData?.role;
   if (_role === 'admin') {
     return '관리자';
   } else if (_role === 'main') {
@@ -135,13 +135,13 @@ const role = computed(() => {
 });
 
 const grade = computed(() => {
-  const _grade = accountStore.userData?.grade;
+  const _grade = accountStore.accountData?.grade;
   if (_grade) return _grade + '학년';
   else return '없음';
 });
 
 const group = computed(() => {
-  const _group = accountStore.userData?.group;
+  const _group = accountStore.accountData?.group;
   if (_group) return _group + '학급';
   else return '없음';
 });

@@ -11,7 +11,7 @@ import {
 
 import { Collection } from '@/enums';
 import {
-  AccountData,
+  AuthData,
   UserData,
   UserCreateSingleParams,
   UserDeleteSingleParams,

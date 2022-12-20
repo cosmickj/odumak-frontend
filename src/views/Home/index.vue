@@ -53,12 +53,12 @@ import HomeMenu from './components/HomeMenu.vue';
 import { computed } from 'vue';
 import { useAccountStore } from '@/store/account';
 
-const { userData } = useAccountStore();
+const { accountData } = useAccountStore();
 
-const userName = computed(() => userData?.displayName);
+const userName = computed(() => accountData?.displayName);
 
 const isAdmin = computed(() => {
-  if (userData?.role === 'admin') {
+  if (accountData?.role === 'admin') {
     return true;
   }
   return false;

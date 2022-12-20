@@ -15,23 +15,21 @@ import {
 
 import {
   AccountData,
+  AuthData,
+  UserData,
   AccountLoginParams,
   AccountSignupParams,
-  UserData,
 } from '@/types/store';
-
-// TODO: OdumakData로 추후에 변경하자
-export interface _UserData extends AccountData, UserData {}
 
 interface AccountStoreState {
   isAuthReady: boolean;
-  userData: _UserData | null;
+  accountData: AccountData | null;
 }
 
 export const useAccountStore = defineStore('account', {
   state: (): AccountStoreState => ({
     isAuthReady: false,
-    userData: null,
+    accountData: null,
   }),
   actions: {
     /**
@@ -69,7 +67,7 @@ export const useAccountStore = defineStore('account', {
           uid: account.uid,
         })) as UserData;
 
-        this.composeUserData(account, fetchUserRes);
+        this.composeAccountData(account, fetchUserRes);
       } catch (error) {
         throw new Error('could not complete login');
       }
@@ -80,7 +78,7 @@ export const useAccountStore = defineStore('account', {
     async logout() {
       try {
         await signOut(auth);
-        this.userData = null;
+        this.accountData = null;
       } catch (error) {
         console.log(error);
       }
@@ -97,7 +95,7 @@ export const useAccountStore = defineStore('account', {
           await deleteUser(account);
           await userStore.deleteSingle({ uid: account.uid });
         }
-        this.userData = null;
+        this.accountData = null;
       } catch (error) {
         console.log(error);
       }
@@ -105,11 +103,11 @@ export const useAccountStore = defineStore('account', {
     /**
      * 계정 정보와 유저 정보를 합치기
      */
-    composeUserData(accountData: AccountData, userData: UserData) {
-      this.userData = {
-        uid: accountData.uid,
-        email: accountData.email || '이메일이 존재하지 않습니다.',
-        displayName: accountData.displayName || '이름이 존재하지 않습니다.',
+    composeAccountData(authData: AuthData, userData: UserData) {
+      this.accountData = {
+        uid: authData.uid,
+        email: authData.email || '이메일이 존재하지 않습니다.',
+        displayName: authData.displayName || '이름이 존재하지 않습니다.',
         ...userData,
       };
       this.isAuthReady = true;

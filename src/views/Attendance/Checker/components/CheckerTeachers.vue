@@ -138,7 +138,7 @@ const member = useMemberStore();
 //   set: (teachersAttendance) => emit('update:modelValue', teachersAttendance),
 // });
 
-const userData = computed(() => account.userData);
+// const userData = computed(() => account.userData);
 
 const isLoading = ref<boolean[]>([]);
 
