@@ -27,7 +27,7 @@
         />
       </div>
 
-      <div class="my-3 border border-slate-300"></div>
+      <div class="my-3 bg-slate-300 border border-slate-300"></div>
 
       <div>
         <p>이메일</p>
@@ -79,7 +79,7 @@
         </div>
       </div>
 
-      <div class="my-3 border border-slate-300"></div>
+      <div class="my-3 bg-slate-300 border border-slate-300"></div>
 
       <div>
         <p>이름</p>
@@ -117,7 +117,7 @@
               :options="gradeOptions"
               optionLabel="name"
               optionValue="value"
-              :disabled="isNew"
+              :disabled="isNewGroup"
               placeholder="담당 학년"
             />
             <Dropdown
@@ -125,13 +125,13 @@
               :options="groupOptions"
               optionLabel="name"
               optionValue="value"
-              :disabled="isNew"
+              :disabled="isNewGroup"
               placeholder="담당 학급"
             />
 
             <div class="self-center">
-              <Checkbox v-model="isNew" inputId="isNew" :binary="true" />
-              <label for="isNew" class="ml-2 text-lg">새친구</label>
+              <Checkbox v-model="isNewGroup" inputId="isNew" :binary="true" />
+              <label for="isNew" class="ml-2 text-lg">새친구 학급</label>
             </div>
           </div>
         </div>
@@ -166,7 +166,7 @@ import { useAccountStore } from '@/store/account';
 import { useUserStore } from '@/store/user';
 
 import useVuelidate from '@vuelidate/core';
-import { helpers, required, sameAs } from '@vuelidate/validators';
+import { helpers, required, sameAs, minLength } from '@vuelidate/validators';
 
 import {
   churchOptions,
@@ -175,54 +175,59 @@ import {
   groupOptions,
   roleOptions,
 } from './data';
-import { TeacherRole } from '@/types';
+import type { UserRole } from '@/types';
 
 const router = useRouter();
 
 const accountStore = useAccountStore();
 const userStore = useUserStore();
 
-const church = ref('영은교회');
-const department = ref('초등부');
 const email = ref('');
 const password = ref('');
 const confirmedPassword = ref('');
-const name = ref('');
-const role = ref<TeacherRole>('common');
-const grade = ref('0');
-const group = ref('0');
 
-const isNew = ref(false);
-const isLoading = ref(false);
-const isError = ref(false);
-const errorMessage = ref('');
+const name = ref('');
+const church = ref('영은교회');
+const department = ref('초등부');
+const grade = ref('na');
+const group = ref('na');
+const role = ref<UserRole>('common');
+
+const isNewGroup = ref(false);
 
 watch(role, (newVal, oldVal) => {
   if (newVal === 'common' && (oldVal === 'main' || oldVal === 'sub')) {
-    grade.value = '0';
-    group.value = '0';
+    grade.value = 'na';
+    group.value = 'na';
   } else if ((newVal === 'main' || newVal === 'sub') && oldVal === 'common') {
     grade.value = '3';
     group.value = '1';
-    isNew.value = false;
+    isNewGroup.value = false;
   }
 });
 
-watch(isNew, (newVal, oldVal) => {
+watch(isNewGroup, (newVal) => {
   if (newVal) {
     grade.value = '0';
     group.value = '0';
+  } else {
+    grade.value = '3';
+    group.value = '1';
   }
 });
 
 const rules = computed(() => ({
-  email: { required: helpers.withMessage('이메일을 입력해주세요..', required) },
+  email: { required: helpers.withMessage('이메일을 입력해주세요.', required) },
   password: {
     required: helpers.withMessage('비밀번호를 입력해주세요.', required),
+    minLength: helpers.withMessage(
+      '최소 6글자 이상 입력해주세요.',
+      minLength(6)
+    ),
   },
   confirmedPassword: {
     required: helpers.withMessage(
-      '확인을 위해 새 비밀번호를 다시 입력해주세요.',
+      '확인을 위해 비밀번호를 다시 한 번 입력해주세요.',
       required
     ),
     sameAs: helpers.withMessage(
@@ -231,7 +236,7 @@ const rules = computed(() => ({
     ),
   },
   name: {
-    required: helpers.withMessage('이름을 정확히 입력해주세요.', required),
+    required: helpers.withMessage('이름을 입력해주세요.', required),
   },
 }));
 
@@ -261,6 +266,11 @@ const error = computed(() => ({
   },
 }));
 
+const isLoading = ref(false);
+
+const isError = ref(false);
+const errorMessage = ref('');
+
 const onSubmit = async () => {
   try {
     isLoading.value = true;
@@ -275,29 +285,27 @@ const onSubmit = async () => {
     });
 
     if (!signupResult.isSuccess) {
-      /**
-       * 회원가입이 실패했을 경우
-       */
       isError.value = true;
-      errorMessage.value = signupResult?.message;
+      errorMessage.value = signupResult.message;
     } else {
-      /**
-       * 회원가입이 성공했을 경우
-       */
       await userStore.createSingle({
         uid: signupResult.result.user.uid,
+        birth: null,
         church: church.value,
         department: department.value,
-        role: role.value,
         grade: grade.value,
         group: group.value,
+        role: role.value,
+        phone: null,
         isAccepted: false,
         isRejected: false,
       });
+
       await accountStore.login({
         email: email.value,
         password: password.value,
       });
+
       router.push({ name: 'HomeView' });
     }
   } catch (error) {

@@ -14,23 +14,12 @@ import App from '@/App.vue';
 import PrimeVue from 'primevue/config';
 import VueCookies from 'vue-cookies';
 
-import Button from 'primevue/button';
-import Card from 'primevue/card';
-import Calendar from 'primevue/calendar';
-import Checkbox from 'primevue/checkbox';
-import Column from 'primevue/column';
-import DataTable from 'primevue/datatable';
-import Dialog from 'primevue/dialog';
-import Dropdown from 'primevue/dropdown';
-import FileUpload from 'primevue/fileupload';
-import InputMask from 'primevue/inputmask';
-import InputText from 'primevue/inputtext';
-import InputSwitch from 'primevue/inputswitch';
-import MultiSelect from 'primevue/multiselect';
-import Password from 'primevue/password';
-import RadioButton from 'primevue/radiobutton';
-import SelectButton from 'primevue/selectbutton';
-import Tree from 'primevue/tree';
+import { getCurrentUser } from '@/router';
+import { useAccountStore } from '@/store/account';
+import { useUserStore } from '@/store/user';
+
+import type { UserData } from '@/types';
+import type { User } from 'firebase/auth/dist/auth';
 
 const app = createApp(App);
 
@@ -38,12 +27,6 @@ app.use(router);
 app.use(createPinia());
 app.use(VueCookies);
 app.use(PrimeVue);
-
-import { getCurrentUser } from '@/router';
-import { useUserStore } from '@/store/user';
-import { useAccountStore } from './store/account';
-import type { User } from 'firebase/auth/dist/auth';
-import type { UserData } from '@/types/store';
 
 // Waiting for Auth to be Ready
 (async () => {
@@ -66,6 +49,24 @@ import type { UserData } from '@/types/store';
   }
   accountStore.isAuthReady = true;
 })();
+
+import Button from 'primevue/button';
+import Card from 'primevue/card';
+import Calendar from 'primevue/calendar';
+import Checkbox from 'primevue/checkbox';
+import Column from 'primevue/column';
+import DataTable from 'primevue/datatable';
+import Dialog from 'primevue/dialog';
+import Dropdown from 'primevue/dropdown';
+import FileUpload from 'primevue/fileupload';
+import InputMask from 'primevue/inputmask';
+import InputText from 'primevue/inputtext';
+import InputSwitch from 'primevue/inputswitch';
+import MultiSelect from 'primevue/multiselect';
+import Password from 'primevue/password';
+import RadioButton from 'primevue/radiobutton';
+import SelectButton from 'primevue/selectbutton';
+import Tree from 'primevue/tree';
 
 app
   .component('Button', Button)

@@ -92,22 +92,21 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-  const user = await getCurrentUser();
+  const currentUser = await getCurrentUser();
   const needAuth = to.matched.some((record) => record.meta.requiresAuth);
   const needAdmin = to.matched.some((record) => record.meta.requiresAdmin);
 
-  if ((needAuth && user) || (!needAuth && !user)) {
+  if ((needAuth && currentUser) || (!needAuth && !currentUser)) {
     if (needAdmin) {
       const userStore = useUserStore();
-
-      const userData = await userStore.fetchSingle({ uid: user.uid });
+      const userData = await userStore.fetchSingle({ uid: currentUser.uid });
 
       if (userData!.role !== 'admin') next('/');
       else next();
     } else {
       next();
     }
-  } else if (!needAuth && user) {
+  } else if (!needAuth && currentUser) {
     next('/');
   } else {
     next('/account/login');

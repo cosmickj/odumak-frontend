@@ -24,11 +24,11 @@
       </div>
       <div class="flex px-8 py-4 items-center justify-between">
         <span>생년월일</span>
-        <span>(todo) 1995.12.13</span>
+        <span>{{ accountStore.accountData?.birth || '없음' }}</span>
       </div>
       <div class="flex px-8 py-4 items-center justify-between">
         <span>휴대폰 번호</span>
-        <span>(todo) 010-7636-8084</span>
+        <span>{{ accountStore.accountData?.phone || '없음' }}</span>
       </div>
       <div class="flex px-8 py-4 items-center justify-between">
         <span>이메일</span>
@@ -100,9 +100,9 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAccountStore } from '@/store/account';
-import { computed } from 'vue';
 
 const router = useRouter();
 const accountStore = useAccountStore();
@@ -136,17 +136,19 @@ const role = computed(() => {
 
 const grade = computed(() => {
   const _grade = accountStore.accountData?.grade;
-  if (_grade) return _grade + '학년';
-  else return '없음';
+
+  if (_grade === 'na') return '없음';
+  else if (_grade) return _grade + '학년';
 });
 
 const group = computed(() => {
   const _group = accountStore.accountData?.group;
-  if (_group) return _group + '학급';
-  else return '없음';
+
+  if (_group === 'na') return '없음';
+  else if (_group) return _group + '학급';
 });
 
-const isNan = (str: string) => {
+const isNan = (str: string | undefined) => {
   if (str === '없음') return true;
   else return false;
 };

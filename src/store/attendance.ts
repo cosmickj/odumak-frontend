@@ -17,10 +17,10 @@ import {
 
 import type {
   Attendance,
-  Member,
+  MemberData,
   MemberPosition,
   Teacher,
-  TeacherRole,
+  UserRole,
 } from '@/types';
 import type {
   AttendaceAddAttendanceParams,

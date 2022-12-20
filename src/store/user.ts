@@ -10,9 +10,8 @@ import {
 } from 'firebase/firestore';
 
 import { Collection } from '@/enums';
-import {
-  AuthData,
-  UserData,
+import type { UserData } from '@/types';
+import type {
   UserCreateSingleParams,
   UserDeleteSingleParams,
   UserFetchSingleParams,
@@ -25,9 +24,10 @@ export const useUserStore = defineStore('user', {
      */
     async createSingle(params: UserCreateSingleParams) {
       try {
-        const { uid, ...setDocParams } = params;
+        const { uid, ...createSingleParams } = params;
+
         await setDoc(doc(db, Collection.USERS, uid), {
-          ...setDocParams,
+          ...createSingleParams,
           createdAt: serverTimestamp(),
         });
       } catch (error) {

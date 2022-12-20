@@ -2,7 +2,7 @@ import baseResponse from '@/utils/baseResponseStatus';
 import { errResponse, response } from '@/utils/response';
 
 import { defineStore } from 'pinia';
-import { useUserStore } from './user';
+import { useUserStore } from '@/store/user';
 
 import { auth } from '@/firebase/config';
 import {
@@ -13,13 +13,8 @@ import {
   updateProfile,
 } from 'firebase/auth';
 
-import {
-  AccountData,
-  AuthData,
-  UserData,
-  AccountLoginParams,
-  AccountSignupParams,
-} from '@/types/store';
+import type { AccountData, AuthData, UserData } from '@/types';
+import type { AccountLoginParams, AccountSignupParams } from '@/types/store';
 
 interface AccountStoreState {
   isAuthReady: boolean;
@@ -37,15 +32,13 @@ export const useAccountStore = defineStore('account', {
      */
     async signup(params: AccountSignupParams) {
       try {
-        const signupRes = await createUserWithEmailAndPassword(
+        const signupResponse = await createUserWithEmailAndPassword(
           auth,
           params.email,
           params.password
         );
-        await updateProfile(signupRes.user, {
-          displayName: params.name,
-        });
-        return response(baseResponse.SUCCESS, signupRes);
+        await updateProfile(signupResponse.user, { displayName: params.name });
+        return response(baseResponse.SUCCESS, signupResponse);
       } catch (err) {
         return errResponse(baseResponse.NETWORK_ERROR);
       }
@@ -55,21 +48,24 @@ export const useAccountStore = defineStore('account', {
      */
     async login(params: AccountLoginParams) {
       try {
-        const userStore = useUserStore();
-
-        const { email, password } = params;
-        const { user: account } = await signInWithEmailAndPassword(
+        const { user: authData } = await signInWithEmailAndPassword(
           auth,
-          email,
-          password
+          params.email,
+          params.password
         );
-        const fetchUserRes = (await userStore.fetchSingle({
-          uid: account.uid,
-        })) as UserData;
 
-        this.composeAccountData(account, fetchUserRes);
+        const userStore = useUserStore();
+        const fetchSingleResponse = await userStore.fetchSingle({
+          uid: authData.uid,
+        });
+
+        if (fetchSingleResponse) {
+          this.composeAccountData(authData, fetchSingleResponse);
+        } else {
+          throw Error('로그인 과정에서 오류가 발생하였습니다.');
+        }
       } catch (error) {
-        throw new Error('could not complete login');
+        console.log(error);
       }
     },
     /**
@@ -89,11 +85,11 @@ export const useAccountStore = defineStore('account', {
     async delete() {
       try {
         const userStore = useUserStore();
+        const currentUser = auth.currentUser;
 
-        const account = auth.currentUser;
-        if (account) {
-          await deleteUser(account);
-          await userStore.deleteSingle({ uid: account.uid });
+        if (currentUser) {
+          await deleteUser(currentUser);
+          await userStore.deleteSingle({ uid: currentUser.uid });
         }
         this.accountData = null;
       } catch (error) {

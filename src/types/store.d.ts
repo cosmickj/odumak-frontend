@@ -1,29 +1,6 @@
-import type {
-  AttendanceState,
-  MemberPosition,
-  TeacherRole,
-  UserInfo,
-} from './index';
+import { UserData } from './index';
 
 /** account.ts */
-export interface AccountData extends AuthData, UserData {}
-
-type K = 'uid' | 'email' | 'displayName';
-export type AuthData = {
-  -readonly [key in K]: User[key];
-};
-
-export interface UserData {
-  church: string;
-  createdAt: Date;
-  department: string;
-  grade: string;
-  group: string;
-  role: TeacherRole;
-  isAccepted: boolean;
-  isRejected: boolean;
-}
-
 export interface AccountSignupParams {
   email: string;
   password: string;
@@ -67,7 +44,7 @@ export interface AttendaceRemoveAttendanceParams
   extends AttendaceAddAttendanceParams {}
 
 /** member.ts */
-export interface Members {
+export interface Member {
   church: string;
   department: string;
   members: Teacher[] | Student[];
@@ -78,26 +55,18 @@ export interface Members {
   };
 }
 
-export interface MembersFetchAllParmas
-  extends Pick<UserInfo, 'church' | 'department'> {}
+export interface MemberFetchAllParmas
+  extends Pick<AccountData, 'church' | 'department'> {}
 
-export interface MembersFetchByGradeGroupParams
-  extends Pick<UserInfo, 'church' | 'department'> {
+export interface MemberFetchByGradeGroupParams
+  extends Pick<AccountData, 'church' | 'department'> {
   grade: string;
   group: string;
 }
 
 /** user.ts */
-export interface UserCreateSingleParams {
+export interface UserCreateSingleParams extends Omit<UserData, 'createdAt'> {
   uid: string;
-  church: string;
-  department: string;
-  role: TeacherRole;
-  grade: string;
-  group: string;
-  //
-  isAccepted: boolean;
-  isRejected: boolean;
 }
 
 export interface UserFetchSingleParams {

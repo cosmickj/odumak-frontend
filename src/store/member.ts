@@ -17,24 +17,24 @@ import {
 import { db, membersColl } from '@/firebase/config';
 
 import {
-  Member,
+  MemberData,
   UserInfo,
   MemberPosition,
-  TeacherRole,
+  UserRole,
   Teacher,
 } from '@/types';
 
 import {
-  MembersFetchAllParmas,
-  MembersFetchByGradeGroupParams,
+  MemberFetchAllParmas,
+  MemberFetchByGradeGroupParams,
 } from '@/types/store';
 
 interface MembersCreateParams extends Pick<UserInfo, 'church' | 'department'> {
-  members: Member[];
+  members: MemberData[];
 }
 
 // TODO: CreateParams와 같은 값이다. 리펙토링할 때 수정해보자
-interface ModifyParams extends Partial<Member>, Partial<Teacher> {
+interface ModifyParams extends Partial<MemberData>, Partial<Teacher> {
   position: MemberPosition;
 }
 
@@ -59,7 +59,7 @@ export const useMemberStore = defineStore('member', {
       });
     },
 
-    async fetchAll(params: MembersFetchAllParmas) {
+    async fetchAll(params: MemberFetchAllParmas) {
       const { church, department } = params;
 
       const q = query(
@@ -72,12 +72,12 @@ export const useMemberStore = defineStore('member', {
       const members = qSnapshot.docs.map((doc) => ({
         uid: doc.id,
         ...doc.data(),
-      })) as Member[];
+      })) as MemberData[];
 
       return arraySort(members, ['grade', 'group', 'name']);
     },
 
-    async fetchByGradeGroup(params: MembersFetchByGradeGroupParams) {
+    async fetchByGradeGroup(params: MemberFetchByGradeGroupParams) {
       const { church, department, grade, group } = params;
 
       const q = query(
@@ -92,7 +92,7 @@ export const useMemberStore = defineStore('member', {
       const members = qSnapshot.docs.map((doc) => ({
         uid: doc.id,
         ...doc.data(),
-      })) as Member[];
+      })) as MemberData[];
 
       return arraySort(members, ['grade', 'group', 'name']);
     },
