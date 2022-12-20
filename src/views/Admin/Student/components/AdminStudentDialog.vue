@@ -120,7 +120,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { Student, SubmitType } from '@/types';
+import { SubmitType } from '@/types';
 import {
   BIRTH_DATE,
   BIRTH_MONTH,
@@ -135,7 +135,7 @@ const props = defineProps<{
     label: SubmitType;
   };
   errors: any;
-  students: Student[];
+  students: any[];
 }>();
 
 const emit = defineEmits([

@@ -53,7 +53,7 @@ import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAttendanceStore } from '@/store/attendance';
 
-import type { MemberPosition, Student, Teacher } from '@/types';
+import type { MemberPosition, Teacher } from '@/types';
 import { useAccountStore } from '@/store/account';
 
 const route = useRoute();
@@ -90,7 +90,7 @@ const title = computed(() => {
 const isLoading = ref(false);
 const attendanceDate = ref<Date>();
 
-const studentsAttendance = ref<Student[]>([]);
+const studentsAttendance = ref<any[]>([]);
 const teachersAttendance = ref<Teacher[]>([]);
 
 const onAttendanceDateSelect = async () => {

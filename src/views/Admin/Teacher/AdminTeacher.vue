@@ -135,7 +135,6 @@ const getMembers = async () => {
       const result = await memberStore.fetchAll({
         church: accountStore.userData.church,
         department: accountStore.userData.department,
-        position: 'teacher',
       });
       dataSource.value = result;
     }
@@ -237,7 +236,7 @@ const onSubmit = async ({ submitType }: { submitType: SubmitType }) => {
   const isFormCorrect = await v$.value.$validate();
   if (!isFormCorrect) return;
 
-  if (submitType === 'ADD') {
+  if (submitType === '추가하기') {
     await addTeacher();
   } else {
     await editTeacher();
@@ -249,12 +248,11 @@ const onSubmit = async ({ submitType }: { submitType: SubmitType }) => {
 
 const addTeacher = async () => {
   if (accountStore.userData) {
-    await memberStore.create({
-      church: accountStore.userData.church,
-      department: accountStore.userData.department,
-      position: 'teacher',
-      ...selectedTeacher,
-    });
+    // await memberStore.create({
+    //   church: accountStore.userData.church,
+    //   department: accountStore.userData.department,
+    //   ...selectedTeacher,
+    // });
     alert('추가되었습니다.');
   }
 };
@@ -291,10 +289,7 @@ const closeModalForDeleteTeacher = () => {
 const deleteTeacher = async () => {
   if (accountStore.userData) {
     await memberStore.remove({
-      church: accountStore.userData?.church,
-      department: accountStore.userData?.department,
-      position: 'teacher',
-      ids: [selectedTeacher._id],
+      uids: [selectedTeacher._id],
     });
 
     deleteTeacherDialog.status = false;
@@ -314,10 +309,7 @@ const deleteTeachers = async () => {
 
   if (accountStore.userData) {
     await memberStore.remove({
-      church: accountStore.userData?.church,
-      department: accountStore.userData?.department,
-      position: 'teacher',
-      ids,
+      uids: ids,
     });
 
     deleteTeachersDialog.status = false;

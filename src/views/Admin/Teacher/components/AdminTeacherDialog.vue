@@ -180,13 +180,13 @@
             v-if="dialog.label === '수정하기'"
             class="p-button-warning w-full"
             :label="dialog.label"
-            @click="handleSubmit('EDIT')"
+            @click="handleSubmit('수정하기')"
           />
           <Button
             v-else-if="dialog.label === '추가하기'"
             class="p-button-success w-full"
             :label="dialog.label"
-            @click="handleSubmit('ADD')"
+            @click="handleSubmit('추가하기')"
           />
         </div>
       </div>

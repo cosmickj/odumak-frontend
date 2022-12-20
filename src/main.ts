@@ -3,8 +3,8 @@ import '@/styles/global.css';
 import 'primevue/resources/primevue.min.css';
 import 'primevue/resources/themes/saga-blue/theme.css';
 import 'primeicons/primeicons.css';
-import '@/index.css'; // Tailwind CSS
 import 'animate.css';
+import '@/index.css'; // Tailwind CSS
 
 import router from '@/router';
 import { createPinia } from 'pinia';
@@ -40,6 +40,7 @@ app.use(VueCookies);
 app.use(PrimeVue);
 
 import { getCurrentUser } from '@/router';
+import { useUserStore } from '@/store/user';
 import { useAccountStore } from './store/account';
 import type { User } from 'firebase/auth/dist/auth';
 import type { UserData } from '@/types/store';
@@ -47,11 +48,15 @@ import type { UserData } from '@/types/store';
 // Waiting for Auth to be Ready
 (async () => {
   const accountStore = useAccountStore();
+  const userStore = useUserStore();
+
   const currentUser = (await getCurrentUser()) as User;
+
   if (currentUser) {
-    const result = (await accountStore.fetchUser({
+    const result = (await userStore.fetchSingle({
       uid: currentUser.uid,
     })) as UserData;
+
     accountStore.userData = {
       uid: currentUser.uid,
       email: currentUser.email!,

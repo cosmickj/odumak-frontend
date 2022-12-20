@@ -1,15 +1,10 @@
-import { defineStore } from 'pinia';
 import baseResponse from '@/utils/baseResponseStatus';
 import { errResponse, response } from '@/utils/response';
 
-import { auth, db } from '@/firebase/config';
-import {
-  deleteDoc,
-  doc,
-  getDoc,
-  serverTimestamp,
-  setDoc,
-} from 'firebase/firestore';
+import { defineStore } from 'pinia';
+import { useUserStore } from './user';
+
+import { auth } from '@/firebase/config';
 import {
   createUserWithEmailAndPassword,
   deleteUser,
@@ -18,12 +13,8 @@ import {
   updateProfile,
 } from 'firebase/auth';
 
-import { Collection } from '@/enums';
 import {
   AccountData,
-  AccountCreateUserParams,
-  AccountDeleteUserParams,
-  AccountFetchUserParams,
   AccountLoginParams,
   AccountSignupParams,
   UserData,
@@ -66,13 +57,15 @@ export const useAccountStore = defineStore('account', {
      */
     async login(params: AccountLoginParams) {
       try {
+        const userStore = useUserStore();
+
         const { email, password } = params;
         const { user: account } = await signInWithEmailAndPassword(
           auth,
           email,
           password
         );
-        const fetchUserRes = (await this.fetchUser({
+        const fetchUserRes = (await userStore.fetchSingle({
           uid: account.uid,
         })) as UserData;
 
@@ -97,10 +90,12 @@ export const useAccountStore = defineStore('account', {
      */
     async delete() {
       try {
+        const userStore = useUserStore();
+
         const account = auth.currentUser;
         if (account) {
           await deleteUser(account);
-          await this.deleteUser({ uid: account.uid });
+          await userStore.deleteSingle({ uid: account.uid });
         }
         this.userData = null;
       } catch (error) {
@@ -108,55 +103,14 @@ export const useAccountStore = defineStore('account', {
       }
     },
     /**
-     * 회원가입 이후 유저 정보 생성 함수
-     */
-    async createUser(params: AccountCreateUserParams) {
-      try {
-        const { uid, ...setDocParams } = params;
-        await setDoc(doc(db, Collection.USERS, uid), {
-          ...setDocParams,
-          createdAt: serverTimestamp(),
-        });
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    /**
-     * 로그인 이후 유저 정보 읽기 함수
-     */
-    async fetchUser(params: AccountFetchUserParams) {
-      try {
-        const docRef = doc(db, Collection.USERS, params.uid);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-          return docSnap.data() as UserData;
-        } else {
-          return null;
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    /**
-     * 탈퇴 이후 유저 정보 삭제 함수
-     */
-    async deleteUser(params: AccountDeleteUserParams) {
-      try {
-        await deleteDoc(doc(db, Collection.USERS, params.uid));
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    /**
      * 계정 정보와 유저 정보를 합치기
      */
-    composeUserData(_a: AccountData, _u: UserData) {
+    composeUserData(accountData: AccountData, userData: UserData) {
       this.userData = {
-        uid: _a.uid,
-        email: _a.email || '이메일이 존재하지 않습니다.',
-        displayName: _a.displayName || '이름이 존재하지 않습니다.',
-        ..._u,
+        uid: accountData.uid,
+        email: accountData.email || '이메일이 존재하지 않습니다.',
+        displayName: accountData.displayName || '이름이 존재하지 않습니다.',
+        ...userData,
       };
       this.isAuthReady = true;
     },

@@ -160,11 +160,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { useAccountStore } from '@/store/account';
+import { useUserStore } from '@/store/user';
+
 import useVuelidate from '@vuelidate/core';
 import { helpers, required, sameAs } from '@vuelidate/validators';
-import { useAccountStore } from '@/store/account';
+
 import {
   churchOptions,
   departmentOptions,
@@ -174,8 +177,10 @@ import {
 } from './data';
 import { TeacherRole } from '@/types';
 
-const account = useAccountStore();
 const router = useRouter();
+
+const accountStore = useAccountStore();
+const userStore = useUserStore();
 
 const church = ref('영은교회');
 const department = ref('초등부');
@@ -230,7 +235,7 @@ const rules = computed(() => ({
   },
 }));
 
-const v = useVuelidate(rules, {
+const v$ = useVuelidate(rules, {
   email,
   password,
   confirmedPassword,
@@ -239,20 +244,20 @@ const v = useVuelidate(rules, {
 
 const error = computed(() => ({
   email: {
-    status: v.value.email.$error,
-    message: v.value.email.$errors[0]?.$message,
+    status: v$.value.email.$error,
+    message: v$.value.email.$errors[0]?.$message,
   },
   password: {
-    status: v.value.password.$error,
-    message: v.value.password.$errors[0]?.$message,
+    status: v$.value.password.$error,
+    message: v$.value.password.$errors[0]?.$message,
   },
   confirmedPassword: {
-    status: v.value.confirmedPassword.$error,
-    message: v.value.confirmedPassword.$errors[0]?.$message,
+    status: v$.value.confirmedPassword.$error,
+    message: v$.value.confirmedPassword.$errors[0]?.$message,
   },
   name: {
-    status: v.value.name.$error,
-    message: v.value.name.$errors[0]?.$message,
+    status: v$.value.name.$error,
+    message: v$.value.name.$errors[0]?.$message,
   },
 }));
 
@@ -260,10 +265,10 @@ const onSubmit = async () => {
   try {
     isLoading.value = true;
 
-    const isFormCorrect = await v.value.$validate();
+    const isFormCorrect = await v$.value.$validate();
     if (!isFormCorrect) return;
 
-    const signupResult = await account.signup({
+    const signupResult = await accountStore.signup({
       email: email.value,
       password: password.value,
       name: name.value,
@@ -279,7 +284,7 @@ const onSubmit = async () => {
       /**
        * 회원가입이 성공했을 경우
        */
-      await account.createUser({
+      await userStore.createSingle({
         uid: signupResult.result.user.uid,
         church: church.value,
         department: department.value,
@@ -289,7 +294,7 @@ const onSubmit = async () => {
         isAccepted: false,
         isRejected: false,
       });
-      await account.login({
+      await accountStore.login({
         email: email.value,
         password: password.value,
       });
@@ -308,7 +313,6 @@ const onSubmit = async () => {
 .v-leave-active {
   transition: opacity 0.3s ease;
 }
-
 .v-enter-from,
 .v-leave-to {
   opacity: 0;

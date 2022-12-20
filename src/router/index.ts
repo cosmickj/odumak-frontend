@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import { auth } from '@/firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
-import { useAccountStore } from '@/store/account';
+import { useUserStore } from '@/store/user';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -98,8 +98,10 @@ router.beforeEach(async (to, from, next) => {
 
   if ((needAuth && user) || (!needAuth && !user)) {
     if (needAdmin) {
-      const accountStore = useAccountStore();
-      const userData = await accountStore.fetchUser({ uid: user.uid });
+      const userStore = useUserStore();
+
+      const userData = await userStore.fetchSingle({ uid: user.uid });
+
       if (userData!.role !== 'admin') next('/');
       else next();
     } else {

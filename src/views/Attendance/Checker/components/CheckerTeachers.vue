@@ -205,7 +205,7 @@ const submitStudentAttendance = async (teacher: Teacher, idx: number) => {
   // const response = await attendance.addAttendances({
   //   documentId: studentsAttendanceByTeacher.value[teacher.name].documentId,
   //   attendanceDate: props.attendanceDate,
-  //   createUser: userData.value?.name,
+  //   createSingle: userData.value?.name,
   //   church: userData.value?.church,
   //   department: userData.value?.department,
   //   grade: teacher.grade,

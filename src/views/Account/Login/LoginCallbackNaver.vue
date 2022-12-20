@@ -8,7 +8,10 @@
 import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAccountStore } from '@/store/account';
+import { useUserStore } from '@/store/user';
+
 import { getNaverOAuth, getCustomToken } from '@/api/oauth';
+
 import { auth } from '@/firebase/config';
 import {
   signInWithCustomToken,
@@ -29,7 +32,9 @@ interface NaverOAuth {
 }
 
 const router = useRouter();
+
 const accountStore = useAccountStore();
+const userStore = useUserStore();
 
 onMounted(async () => {
   try {
@@ -69,9 +74,9 @@ onMounted(async () => {
     }
 
     // #005 오두막 서비스에 필요한 유저 데이터를 저장할 document 생성
-    const user = await accountStore.fetchUser({ uid: id });
+    const user = await userStore.fetchSingle({ uid: id });
     if (!user) {
-      await accountStore.createUser({
+      await userStore.createSingle({
         uid: id,
         church: '',
         department: '',

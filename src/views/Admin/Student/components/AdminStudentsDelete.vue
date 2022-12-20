@@ -31,14 +31,12 @@
 </template>
 
 <script setup lang="ts">
-import { Student } from '@/types';
-
 defineProps<{
   dialog: {
     status: boolean;
     label: string;
   };
-  selectedStudents: Student[];
+  selectedStudents: any[];
 }>();
 
 const emit = defineEmits(['cancel', 'confirm']);

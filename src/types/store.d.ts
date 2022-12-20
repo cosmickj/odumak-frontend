@@ -33,26 +33,6 @@ export interface AccountLoginParams {
   password: string;
 }
 
-export interface AccountCreateUserParams {
-  uid: string;
-  church: string;
-  department: string;
-  role: TeacherRole;
-  grade: string;
-  group: string;
-  //
-  isAccepted: boolean;
-  isRejected: boolean;
-}
-
-export interface AccountFetchUserParams {
-  uid: string;
-}
-
-export interface AccountDeleteUserParams {
-  uid: string;
-}
-
 // attendace.ts
 export interface StudentsAttendance {
   date: Date;
@@ -103,4 +83,25 @@ export interface MembersFetchByGradeGroupParams
   extends Pick<UserInfo, 'church' | 'department'> {
   grade: string;
   group: string;
+}
+
+/** user.ts */
+export interface UserCreateSingleParams {
+  uid: string;
+  church: string;
+  department: string;
+  role: TeacherRole;
+  grade: string;
+  group: string;
+  //
+  isAccepted: boolean;
+  isRejected: boolean;
+}
+
+export interface UserFetchSingleParams {
+  uid: string;
+}
+
+export interface UserDeleteSingleParams {
+  uid: string;
 }
