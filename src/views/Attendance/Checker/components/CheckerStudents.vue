@@ -7,10 +7,7 @@
         :class="{ 'bg-red-300/25': !hasAttendance(student.targetIdx) }"
         :key="idx"
       >
-        <div
-          class="flex flex-col w-2/5 text-xl items-center justify-center"
-          :class="$attrs.class"
-        >
+        <div class="flex flex-col w-2/5 text-xl items-center justify-center">
           <span>{{ student.name }}</span>
           <span v-if="!hasAttendance(student.targetIdx)" class="text-red-700">
             입력 필요

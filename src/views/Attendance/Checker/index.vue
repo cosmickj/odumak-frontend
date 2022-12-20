@@ -15,8 +15,8 @@
 
     <TheFinger
       v-if="
-        (isTeacher(accountStore.userData?.role) ||
-          isAdmin(accountStore.userData?.role)) &&
+        (isAdmin(accountStore.userData?.role) ||
+          isTeacher(accountStore.userData?.role)) &&
         !attendanceDate
       "
       class="pt-5"
@@ -42,10 +42,12 @@
     />
 
     <!-- 관리자일 때 -->
+    <!-- CONTINUE HERE: 이제부터는 member가 아닌 user를 대상으로 하는 것이다. -->
     <CheckerTeachers
       v-else-if="isAdmin(accountStore.userData?.role) && attendanceDate"
       v-model="dataSource"
       :attendance-date="attendanceDate"
+      :checksum="copyDataSource"
       @submit="submitAttendance"
     />
   </section>
