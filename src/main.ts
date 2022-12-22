@@ -3,7 +3,6 @@ import '@/styles/global.css';
 import 'primevue/resources/primevue.min.css';
 import 'primevue/resources/themes/saga-blue/theme.css';
 import 'primeicons/primeicons.css';
-import 'animate.css';
 import '@/index.css'; // Tailwind CSS
 
 import router from '@/router';
