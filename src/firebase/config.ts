@@ -27,3 +27,4 @@ export const db = getFirestore();
 export const attendancesColl = collection(db, Collection.ATTENDANCES);
 export const membersColl = collection(db, Collection.MEMBERS);
 export const usersColl = collection(db, Collection.USERS);
+// TODO: attendances는 따로 collection을 만들어서 uid로 연결해주는 거 어떤가?

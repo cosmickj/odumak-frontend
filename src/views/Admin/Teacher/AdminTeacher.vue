@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <!-- <div class="container">
     <div class="mb-12">
       <Button
         class="p-button-success mr-2"
@@ -15,9 +15,16 @@
         @click="deleteTeachersDialog.status = true"
       />
     </div>
-  </div>
+  </div> -->
 
-  <div class="container">
+  <AdminDataTable
+    :data-source="dataSource"
+    :is-loading="isLoading"
+    :selected-columns="selectedColumns"
+    :selected-rows="selectedTeachers"
+  />
+
+  <!-- <div class="container">
     <div class="overflow-hidden mb-12 rounded-2xl drop-shadow-lg">
       <DataTable
         v-model:selection="selectedTeachers"
@@ -82,7 +89,7 @@
         </Column>
       </DataTable>
     </div>
-  </div>
+  </div> -->
 
   <TeacherDialog
     :dialog="addEditDialog"
@@ -109,16 +116,20 @@
 </template>
 
 <script setup lang="ts">
+import AdminDataTable from '@/views/Admin/AdminDataTable.vue';
 import TeacherDialog from './components/AdminTeacherDialog.vue';
 import TeacherDelete from './components/AdminTeacherDelete.vue';
 import TeachersDelete from './components/AdminTeachersDelete.vue';
+
 import { computed, onMounted, reactive, ref } from 'vue';
 import { useAccountStore } from '@/store/account';
 import { useMemberStore } from '@/store/member';
 import { formatRole } from '@/utils/useFormat';
+
 import { v4 as uuidv4 } from 'uuid';
 import { useVuelidate } from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
+
 import { CustomColumn, SubmitType, Teacher } from '@/types';
 import type { Timestamp } from '@firebase/firestore';
 

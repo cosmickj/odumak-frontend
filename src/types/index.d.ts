@@ -42,7 +42,7 @@ export interface MemberData {
   registeredAt: Date;
   remark: string;
   attendances: Attendance[];
-  createdAt: Date;
+  createdAt?: Date;
 }
 
 /** Attendance */
@@ -61,7 +61,12 @@ export interface Attendance {
 }
 
 /** Etc */
-export type SubmitType = '추가하기' | '수정하기';
+export type DialogLabel = '추가하기' | '수정하기' | '삭제하기';
+
+export interface Dialog {
+  isShow: boolean;
+  label: DialogLabel;
+}
 
 // export interface DataSource {
 //   uid: string;
@@ -77,9 +82,9 @@ export type SubmitType = '추가하기' | '수정하기';
 //   value: string;
 // }
 
-// export interface CustomColumn {
-//   field: string;
-//   header: string;
-//   sortable: boolean;
-//   format: undefined | Function;
-// }
+export interface DataTableColumn {
+  field: string;
+  header: string;
+  sortable: boolean;
+  format: undefined | Function;
+}

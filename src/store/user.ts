@@ -43,6 +43,7 @@ export const useUserStore = defineStore('user', {
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
+          // TODO: attendances를 모두 가져오면 무거워진다. 이걸 빼고 가져오자.
           return docSnap.data() as UserData;
         } else {
           return null;

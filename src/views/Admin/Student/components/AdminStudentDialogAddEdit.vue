@@ -1,6 +1,6 @@
 <template>
   <Dialog
-    v-model:visible="dialog.status"
+    v-model:visible="dialog.isShow"
     modal
     position="top"
     :breakpoints="{ '1280px': '90vw', '450px': '90vw' }"
@@ -120,7 +120,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { SubmitType } from '@/types';
+
 import {
   BIRTH_DATE,
   BIRTH_MONTH,
@@ -128,11 +128,12 @@ import {
   GRADE_OPTIONS,
   GROUP_OPTIONS,
 } from '@/constants/common';
+import type { DialogLabel } from '@/types';
 
 const props = defineProps<{
   dialog: {
-    status: boolean;
-    label: SubmitType;
+    isShow: boolean;
+    label: DialogLabel;
   };
   errors: any;
   students: any[];
@@ -176,7 +177,7 @@ const handleCopyRow = (index: number) => emit('copyRow', index);
 
 const handleDeleteRow = (index: number) => emit('deleteRow', index);
 
-const handleSubmit = (submitType: SubmitType) => emit('submit', submitType);
+const handleSubmit = (dialogLabel: DialogLabel) => emit('submit', dialogLabel);
 </script>
 
 <style>

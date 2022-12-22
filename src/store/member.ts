@@ -1,7 +1,7 @@
-import arraySort from 'array-sort';
-
 import { defineStore } from 'pinia';
 
+import arraySort from 'array-sort';
+import { db, membersColl } from '@/firebase/config';
 import {
   addDoc,
   collection,
@@ -14,48 +14,41 @@ import {
   updateDoc,
   where,
 } from 'firebase/firestore';
-import { db, membersColl } from '@/firebase/config';
 
-import {
-  MemberData,
-  UserInfo,
-  MemberPosition,
-  UserRole,
-  Teacher,
-} from '@/types';
-
-import {
+import type { AccountData, MemberData } from '@/types';
+import type {
   MemberFetchAllParmas,
   MemberFetchByGradeGroupParams,
 } from '@/types/store';
 
-interface MembersCreateParams extends Pick<UserInfo, 'church' | 'department'> {
+interface MemberCreateMultipleParams
+  extends Pick<AccountData, 'church' | 'department'> {
   members: MemberData[];
 }
 
-// TODO: CreateParams와 같은 값이다. 리펙토링할 때 수정해보자
-interface ModifyParams extends Partial<MemberData>, Partial<Teacher> {
-  position: MemberPosition;
+interface MemberModifyMultipleParams
+  extends Pick<AccountData, 'church' | 'department'> {
+  members: MemberData[];
 }
 
-interface RemoveParams {
+interface MemberRemoveMultipleParams {
   uids: (string | undefined)[];
 }
 
 export const useMemberStore = defineStore('member', {
   state: () => ({}),
   actions: {
-    create(params: MembersCreateParams) {
+    createMultiple(params: MemberCreateMultipleParams) {
       const { church, department, members } = params;
 
       members.forEach(async (member) => {
-        const params = {
+        const param = {
           ...member,
           church,
           department,
           createdAt: serverTimestamp(),
         };
-        return await addDoc(collection(db, 'newMembers'), params);
+        return await addDoc(collection(db, 'newMembers'), param);
       });
     },
 
@@ -97,8 +90,11 @@ export const useMemberStore = defineStore('member', {
       return arraySort(members, ['grade', 'group', 'name']);
     },
 
-    async modify(params: ModifyParams) {
-      // const { _id, church, department, position, ...memberParams } = params;
+    async modifyMultiple(params: MemberModifyMultipleParams) {
+      const { church, department, members } = params;
+
+      console.log(members);
+
       // const q = query(
       //   membersColl,
       //   where('church', '==', church),
@@ -119,10 +115,8 @@ export const useMemberStore = defineStore('member', {
       // }
     },
 
-    async remove(params: RemoveParams) {
-      const { uids } = params;
-
-      uids.forEach(async (uid) => {
+    removeMultiple(params: MemberRemoveMultipleParams) {
+      params.uids.forEach(async (uid) => {
         if (uid) {
           await deleteDoc(doc(db, 'newMembers', uid));
         }

@@ -42,7 +42,6 @@
     />
 
     <!-- 관리자일 때 -->
-    <!-- CONTINUE HERE: 이제부터는 member가 아닌 user를 대상으로 하는 것이다. -->
     <CheckerTeachers
       v-else-if="isAdmin(accountStore.accountData?.role) && attendanceDate"
       v-model="dataSource"
