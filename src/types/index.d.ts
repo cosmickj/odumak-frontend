@@ -1,4 +1,5 @@
 import type { User } from 'firebase/auth/dist/auth';
+import type { Timestamp } from 'firebase/firestore';
 
 /** Common */
 export type Gender = 'male' | 'female';
@@ -31,7 +32,7 @@ export interface AccountData extends AuthData, UserData {}
 export interface MemberData {
   uid?: string;
   name: string;
-  birth: Date;
+  birth: Date | Timestamp;
   gender: Gender;
   church: string;
   department: string;
@@ -39,7 +40,7 @@ export interface MemberData {
   group: string;
   phone: string;
   address: string;
-  registeredAt: Date;
+  registeredAt: Date | Timestamp;
   remark: string;
   attendances: Attendance[];
   createdAt?: Date;

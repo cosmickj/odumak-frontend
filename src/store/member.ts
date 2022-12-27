@@ -26,8 +26,7 @@ interface MemberCreateMultipleParams
   members: MemberData[];
 }
 
-interface MemberModifyMultipleParams
-  extends Pick<AccountData, 'church' | 'department'> {
+interface MemberModifyMultipleParams {
   members: MemberData[];
 }
 
@@ -90,29 +89,38 @@ export const useMemberStore = defineStore('member', {
       return arraySort(members, ['grade', 'group', 'name']);
     },
 
-    async modifyMultiple(params: MemberModifyMultipleParams) {
-      const { church, department, members } = params;
+    modifyMultiple(params: MemberModifyMultipleParams) {
+      // const { members } = params;
 
-      console.log(members);
+      params.members.forEach(async (member) => {
+        const {
+          name,
+          birth,
+          gender,
+          grade,
+          group,
+          phone,
+          address,
+          registeredAt,
+          remark,
+          uid,
+        } = member;
 
-      // const q = query(
-      //   membersColl,
-      //   where('church', '==', church),
-      //   where('department', '==', department),
-      //   where('position', '==', position)
-      // );
-      // const qSnapshot = await getDocs(q);
-      // if (!qSnapshot.empty) {
-      //   const docId = qSnapshot.docs[0].id;
-      //   const docData = qSnapshot.docs[0].data();
-      //   docData.members.forEach((member: Student) => {
-      //     if (member._id === _id) Object.assign(member, memberParams);
-      //   });
-      //   return await updateDoc(doc(db, 'members', docId), {
-      //     members: docData.members,
-      //     updatedAt: serverTimestamp(),
-      //   });
-      // }
+        if (uid) {
+          await updateDoc(doc(db, 'newMembers', uid), {
+            name,
+            birth,
+            gender,
+            grade,
+            group,
+            phone,
+            address,
+            registeredAt,
+            remark,
+            updatedAt: serverTimestamp(),
+          });
+        }
+      });
     },
 
     removeMultiple(params: MemberRemoveMultipleParams) {

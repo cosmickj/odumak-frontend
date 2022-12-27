@@ -126,7 +126,7 @@ import { useAccountStore } from '@/store/account';
 import { useMemberStore } from '@/store/member';
 import { formatRole } from '@/utils/useFormat';
 
-import { v4 as uuidv4 } from 'uuid';
+// import { v4 as uuidv4 } from 'uuid';
 import { useVuelidate } from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 
@@ -229,7 +229,7 @@ const openDialogForAddTeacher = () => {
 
 const resetSelectedTeacher = () => {
   // TODO: 3번째 매개변수에 대해서 타입체킹이 되지 않는다
-  Object.assign(selectedTeacher, initSelectedTeacher, { _id: uuidv4() });
+  // Object.assign(selectedTeacher, initSelectedTeacher, { _id: uuidv4() });
 };
 
 const openDialogForEditTeacher = (teacher: Teacher) => {

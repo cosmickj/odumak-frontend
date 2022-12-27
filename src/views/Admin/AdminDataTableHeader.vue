@@ -40,8 +40,10 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
+import type { MemberData } from '@/types';
+
 const props = defineProps<{
-  selectedRows: any;
+  selection: MemberData[];
 }>();
 
 const emit = defineEmits(['export', 'add', 'edit', 'delete']);
@@ -54,5 +56,5 @@ const handleDelete = () => emit('delete');
 
 const handleExport = () => emit('export');
 
-const isDisabled = computed(() => props.selectedRows.body.length > 0);
+const isDisabled = computed(() => props.selection.length > 0);
 </script>

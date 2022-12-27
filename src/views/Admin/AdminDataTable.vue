@@ -1,6 +1,6 @@
 <template>
   <AdminDataTableHeader
-    :selected-rows="selectedRows"
+    :selection="selectionRef"
     @export="exportDataTable"
     @add="handleAdd"
     @edit="handleEdit"
@@ -13,12 +13,13 @@
         ref="dataTableRef"
         :value="dataSource"
         :loading="isLoading"
-        v-model:selection="selectedRows.body"
+        v-model:selection="selectionRef"
         lazy
         rowHover
         removableSort
         sortMode="multiple"
         responsiveLayout="scroll"
+        @update:selection="handleUpdateSelection"
       >
         <Column class="w-12" selectionMode="multiple" :exportable="false" />
 
@@ -56,10 +57,10 @@ const props = defineProps<{
   dataSource: MemberData[] | UserData[];
   isLoading: boolean;
   selectedColumns: any;
-  selectedRows: any;
+  selection: MemberData[];
 }>();
 
-const emit = defineEmits(['add', 'edit', 'delete']);
+const emit = defineEmits(['add', 'edit', 'delete', 'toggle']);
 
 const handleAdd = () => emit('add');
 
@@ -72,6 +73,11 @@ const dataTableRef = ref<DataTable | null>(null);
 const exportDataTable = () => {
   if (dataTableRef.value) dataTableRef.value.exportCSV();
 };
+
+// 상위 컴포넌트에서 받아온 props에 twoway-binding을 하기 위해서는 한 번 더 감싸줘야한다.
+const selectionRef = ref(props.selection);
+
+const handleUpdateSelection = () => emit('toggle', selectionRef.value);
 </script>
 
 <style scoped>

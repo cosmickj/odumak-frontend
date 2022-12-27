@@ -3,16 +3,17 @@
     :data-source="studentList"
     :is-loading="isLoading"
     :selected-columns="selectedColumns"
-    :selected-rows="selectedStudentList"
+    :selection="selectedStudentList.body"
     @add="openDialogToAddStudent"
     @edit="openDialogToEditStudent"
     @delete="openDialogToDeleteStudents"
+    @toggle="fetchSelectedStudentList"
   />
 
   <AdminStudentDialogAddEdit
     :dialog="addEditDialog"
     :errors="errors"
-    :students="selectedStudentList.body"
+    :student-list="selectedStudentList.body"
     @add-row="addSelectedStudent"
     @copy-row="copySelectedStudent"
     @delete-row="deleteSelectedStudent"
@@ -41,6 +42,7 @@ import { formatGender } from '@/utils/useFormat';
 import { useVuelidate } from '@vuelidate/core';
 import { required, helpers } from '@vuelidate/validators';
 
+import type { Timestamp } from '@firebase/firestore';
 import type { DataTableColumn, Dialog, DialogLabel, MemberData } from '@/types';
 
 const accountStore = useAccountStore();
@@ -61,6 +63,11 @@ const getStudentList = async () => {
     studentList.value = await memberStore.fetchAll({
       church: accountData.value.church,
       department: accountData.value.department,
+    });
+
+    studentList.value.forEach((student) => {
+      student.birth = (student.birth as Timestamp).toDate();
+      student.registeredAt = (student.registeredAt as Timestamp).toDate();
     });
   } catch (error) {
     console.log(error);
@@ -86,8 +93,13 @@ const initSelectedStudent: MemberData = {
 
 const selectedStudentList = reactive({ body: [] as MemberData[] });
 
+const fetchSelectedStudentList = (payload: MemberData[]) => {
+  selectedStudentList.body = payload;
+};
+
 const resetSelectedStudentList = () => {
   selectedStudentList.body.splice(0, selectedStudentList.body.length);
+  addEditDialog.isShow = false;
   v.value.$reset();
 };
 
@@ -117,7 +129,9 @@ const copySelectedStudent = (index: number) => {
 };
 
 const deleteSelectedStudent = (index: number) => {
-  selectedStudentList.body.splice(index, 1);
+  if (selectedStudentList.body.length > 1) {
+    selectedStudentList.body.splice(index, 1);
+  }
 };
 
 const openDialogToEditStudent = () => {
@@ -137,10 +151,10 @@ const submitSelectedStudentList = async (dialogLabel: DialogLabel) => {
     if (dialogLabel === '추가하기') {
       addSelectedStudentList();
     } else {
-      await editSelectedStudentList();
+      editSelectedStudentList();
     }
 
-    addEditDialog.isShow = false;
+    resetSelectedStudentList();
     await getStudentList();
   } catch (error) {
     console.log(error);
@@ -161,14 +175,13 @@ const addSelectedStudentList = () => {
   }
 };
 
-const editSelectedStudentList = async () => {
+const editSelectedStudentList = () => {
   try {
-    // await memberStore.modify({
-    //   church: accountData.value.church,
-    //   department: accountData.value.department,
-    //   position: 'student',
-    //   ...selectedStudent,
-    // });
+    memberStore.modifyMultiple({
+      // church: accountData.value.church,
+      // department: accountData.value.department,
+      members: selectedStudentList.body,
+    });
 
     alert('수정되었습니다.');
   } catch (error) {
