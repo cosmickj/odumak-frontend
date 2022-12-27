@@ -48,7 +48,7 @@
 <script setup lang="ts">
 import AdminDataTableHeader from '@/views/Admin/AdminDataTableHeader.vue';
 
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 
 import type DataTable from 'primevue/datatable';
 import type { MemberData, UserData } from '@/types';
@@ -74,8 +74,14 @@ const exportDataTable = () => {
   if (dataTableRef.value) dataTableRef.value.exportCSV();
 };
 
-// 상위 컴포넌트에서 받아온 props에 twoway-binding을 하기 위해서는 한 번 더 감싸줘야한다.
+// 상위 컴포넌트에서 받아온 props에 twoway-binding을 하기 위해서는 한 번 더 감싸줘야한다
+// TODO: 더 깔끔한 방법이 있을지 고민해보자
 const selectionRef = ref(props.selection);
+watch(
+  () => props.selection,
+  (newValue) => (selectionRef.value = newValue),
+  { deep: true }
+);
 
 const handleUpdateSelection = () => emit('toggle', selectionRef.value);
 </script>

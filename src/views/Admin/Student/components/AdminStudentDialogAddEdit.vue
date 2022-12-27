@@ -6,6 +6,7 @@
         <Button
           class="p-button-success"
           label="행 추가"
+          :disabled="dialog.label !== '추가하기'"
           @click="handleAddRow"
         />
         <Button
@@ -103,6 +104,7 @@
         <Button
           class="p-button-help"
           icon="pi pi-copy"
+          :disabled="dialog.label !== '추가하기'"
           @click="handleCopyRow(idx)"
         />
 

@@ -94,7 +94,7 @@ const initSelectedStudent: MemberData = {
 const selectedStudentList = reactive({ body: [] as MemberData[] });
 
 const fetchSelectedStudentList = (payload: MemberData[]) => {
-  selectedStudentList.body = payload;
+  selectedStudentList.body = payload.map((d) => createNewStudent(d));
 };
 
 const resetSelectedStudentList = () => {
@@ -150,7 +150,7 @@ const submitSelectedStudentList = async (dialogLabel: DialogLabel) => {
 
     if (dialogLabel === '추가하기') {
       addSelectedStudentList();
-    } else {
+    } else if (dialogLabel === '수정하기') {
       editSelectedStudentList();
     }
 
@@ -178,8 +178,6 @@ const addSelectedStudentList = () => {
 const editSelectedStudentList = () => {
   try {
     memberStore.modifyMultiple({
-      // church: accountData.value.church,
-      // department: accountData.value.department,
       members: selectedStudentList.body,
     });
 
