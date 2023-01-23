@@ -37,6 +37,7 @@ export interface MemberData {
   gender: Gender;
   church: string;
   department: string;
+  job: string;
   grade: string;
   group: string;
   phone: string;

@@ -1,16 +1,16 @@
 <template>
   <AdminDataTable
-    :data-source="studentList"
     :is-loading="isLoading"
-    :selected-columns="selectedColumns"
+    :data-source="studentList"
     :selection="selectedStudentList.body"
+    :selected-columns="selectedColumns"
     @add="openDialogToAddStudent"
     @edit="openDialogToEditStudent"
     @delete="openDialogToDeleteStudents"
     @toggle="fetchSelectedStudentList"
   />
 
-  <AdminStudentDialogAddEdit
+  <AdminDialogAddEdit
     :dialog="addEditDialog"
     :errors="errors"
     :student-list="selectedStudentList.body"
@@ -21,7 +21,7 @@
     @submit="submitSelectedStudentList"
   />
 
-  <AdminStudentDialogDelete
+  <AdminDialogDelete
     :dialog="deleteDialog"
     :selected-student-list="selectedStudentList.body"
     @cancel="deleteDialog.isShow = false"
@@ -31,8 +31,8 @@
 
 <script setup lang="ts">
 import AdminDataTable from '@/views/Admin/AdminDataTable.vue';
-import AdminStudentDialogAddEdit from './components/AdminStudentDialogAddEdit.vue';
-import AdminStudentDialogDelete from './components/AdminStudentDialogDelete.vue';
+import AdminDialogAddEdit from '../AdminDialogAddEdit.vue';
+import AdminDialogDelete from '../AdminDialogDelete.vue';
 
 import { computed, onMounted, reactive, ref } from 'vue';
 import { useAccountStore } from '@/store/account';
@@ -82,6 +82,7 @@ const initSelectedStudent: MemberData = {
   gender: 'male',
   church: '',
   department: '',
+  job: 'student',
   grade: '',
   group: '',
   phone: '',
