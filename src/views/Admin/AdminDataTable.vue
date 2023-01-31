@@ -7,42 +7,36 @@
     @delete="handleDelete"
   />
 
-  <div class="container">
-    <div class="overflow-hidden mb-12 rounded-2xl drop-shadow-lg">
-      <DataTable
-        ref="dataTableRef"
-        :value="dataSource"
-        :loading="isLoading"
-        v-model:selection="selectionRef"
-        lazy
-        rowHover
-        removableSort
-        sortMode="multiple"
-        responsiveLayout="scroll"
-        @update:selection="handleUpdateSelection"
-      >
-        <Column class="w-12" selectionMode="multiple" :exportable="false" />
+  <DataTable
+    lazy
+    rowHover
+    ref="dataTableRef"
+    :value="dataSource"
+    :loading="isLoading"
+    v-model:selection="selectionRef"
+    responsiveLayout="scroll"
+    @update:selection="handleUpdateSelection"
+  >
+    <Column class="w-12" selectionMode="multiple" :exportable="false" />
 
-        <Column
-          v-for="(column, idx) in selectedColumns"
-          :field="column.field"
-          :header="column.header"
-          :sortable="column.sortable"
-          :key="idx"
-        >
-          <template #body="slotProps">
-            <span v-if="column.format">
-              {{ column.format(slotProps.data[column.field]) }}
-            </span>
+    <Column
+      v-for="(column, idx) in selectedColumns"
+      :field="column.field"
+      :header="column.header"
+      :key="idx"
+      :style="`min-width: ${column.minWidth}rem`"
+    >
+      <template #body="slotProps">
+        <span v-if="column.format">
+          {{ column.format(slotProps.data[column.field]) }}
+        </span>
 
-            <span v-else>
-              {{ slotProps.data[column.field] }}
-            </span>
-          </template>
-        </Column>
-      </DataTable>
-    </div>
-  </div>
+        <span v-else>
+          {{ slotProps.data[column.field] }}
+        </span>
+      </template>
+    </Column>
+  </DataTable>
 </template>
 
 <script setup lang="ts">
@@ -77,6 +71,7 @@ const exportDataTable = () => {
 // 상위 컴포넌트에서 받아온 props에 twoway-binding을 하기 위해서는 한 번 더 감싸줘야한다
 // TODO: 더 깔끔한 방법이 있을지 고민해보자
 const selectionRef = ref(props.selection);
+
 watch(
   () => props.selection,
   (newValue) => (selectionRef.value = newValue),
@@ -85,12 +80,3 @@ watch(
 
 const handleUpdateSelection = () => emit('toggle', selectionRef.value);
 </script>
-
-<style scoped>
-.container {
-  width: 100%;
-  max-width: 1080px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-</style>

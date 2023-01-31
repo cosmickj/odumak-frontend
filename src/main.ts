@@ -66,6 +66,7 @@ import Password from 'primevue/password';
 import RadioButton from 'primevue/radiobutton';
 import SelectButton from 'primevue/selectbutton';
 import Tree from 'primevue/tree';
+import Image from 'primevue/image';
 
 app
   .component('Button', Button)
@@ -84,6 +85,7 @@ app
   .component('Password', Password)
   .component('RadioButton', RadioButton)
   .component('SelectButton', SelectButton)
-  .component('Tree', Tree);
+  .component('Tree', Tree)
+  .component('Image', Image);
 
 app.mount('#app');

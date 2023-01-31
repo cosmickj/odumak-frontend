@@ -54,7 +54,24 @@ const isLoading = ref(false);
 
 const studentList = ref<MemberData[]>([]);
 
-onMounted(async () => await getStudentList());
+const columns = ref<DataTableColumn[]>([
+  { field: 'name', header: '이름', minWidth: '6', format: undefined },
+  { field: 'birth', header: '생일', minWidth: '12', format: undefined },
+  { field: 'gender', header: '성별', minWidth: '6', format: formatGender },
+  { field: 'grade', header: '학년', minWidth: '6', format: undefined },
+  { field: 'group', header: '학급', minWidth: '6', format: undefined },
+  { field: 'phone', header: '연락처', minWidth: '6', format: undefined },
+  { field: 'address', header: '주소', minWidth: '6', format: undefined },
+  {
+    field: 'registeredAt',
+    header: '등록일',
+    minWidth: '12',
+    format: undefined,
+  },
+  { field: 'remark', header: '비고', minWidth: '6', format: undefined },
+]);
+
+const selectedColumns = ref(columns.value);
 
 const getStudentList = async () => {
   try {
@@ -224,15 +241,5 @@ const v = useVuelidate(rules, selectedStudentList);
 
 const errors = computed(() => v.value.$errors[0]?.$response?.$errors);
 
-const columns = ref<DataTableColumn[]>([
-  { field: 'grade', header: '학년', sortable: true, format: undefined },
-  { field: 'group', header: '학급', sortable: true, format: undefined },
-  { field: 'name', header: '이름', sortable: true, format: undefined },
-  { field: 'gender', header: '성별', sortable: false, format: formatGender },
-  { field: 'phone', header: '연락처', sortable: false, format: undefined },
-  { field: 'address', header: '주소', sortable: true, format: undefined },
-  { field: 'remark', header: '비고', sortable: false, format: undefined },
-]);
-
-const selectedColumns = ref(columns.value);
+onMounted(async () => await getStudentList());
 </script>

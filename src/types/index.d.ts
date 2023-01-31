@@ -88,6 +88,7 @@ export interface Option {
 export interface DataTableColumn {
   field: string;
   header: string;
-  sortable: boolean;
+  // sortable: boolean;
+  minWidth?: string;
   format: undefined | Function;
 }

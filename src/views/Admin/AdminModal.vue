@@ -7,7 +7,7 @@
       <Card style="width: 90vw">
         <template #content>
           <div class="text-center text-xl font-bold">
-            <p class="mb-2">오두막 관리자 페이지는</p>
+            <p class="mb-2">관리자 페이지는</p>
             <p>PC 화면에서 최적의 경험을 제공합니다.</p>
           </div>
         </template>

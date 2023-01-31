@@ -1,24 +1,34 @@
 <template>
-  <div class="wrapper">
-    <AdminHeader />
+  <div class="flex h-screen">
+    <div class="shrink-0 w-64 py-6 bg-black text-white">
+      <Image :src="logoSidebar" />
+      <div class="px-8">
+        <RouterLink class="block my-4" :to="{ name: 'AdminStudent' }">
+          <i class="mr-1 pi pi-home"></i>
+          학생 관리하기
+        </RouterLink>
 
-    <!-- CONTINUE HERE: 
-        1) 교사 가입시 승인 절차 만들기
-        2) 학생 관리 테이블과 교사 관리 테이블 코드 컴포넌트 합쳐보기
+        <RouterLink class="block my-4" :to="{ name: 'AdminTeacher' }">
+          <i class="mr-1 pi pi-heart"></i>
+          교사 관리하기
+        </RouterLink>
 
-        ++
-        현재 해야하는 것이 members에 학생, 교사를 모두 집어넣고 교사의 경우는 users와 비교하여 가입 여부도 판단하여야 한다.
-        현재 중복되는 코드가 많다...이걸 지금 리팩토링하려고 하지 말고, 기능 완성 이후에 리팩토링하자.
-    -->
-    <RouterView />
+        <RouterLink class="block my-4" :to="{ name: 'HomeView' }">
+          <i class="mr-1 pi pi-users"></i>
+          가입자 관리하기
+        </RouterLink>
+      </div>
+    </div>
 
-    <AdminModal />
+    <div class="flex-1 overflow-auto px-14 py-6 bg-zinc-700 text-white">
+      <RouterView />
+    </div>
   </div>
+
+  <AdminModal />
 </template>
 
 <script setup lang="ts">
-import AdminHeader from '@/views/Admin/AdminHeader.vue';
 import AdminModal from '@/views/Admin/AdminModal.vue';
+import logoSidebar from '@/assets/images/logo-sidebar.png';
 </script>
-
-<style scoped></style>

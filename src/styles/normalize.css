@@ -5,8 +5,8 @@
 html,
 body {
   font-family: 'NotoSansKR', sans-serif;
-  font-size: 10px;
-  overflow-x: hidden;
+  /* font-size: 10px; */
+  /* overflow-x: hidden; */
 }
 select {
   appearance: none;
