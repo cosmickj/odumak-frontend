@@ -80,10 +80,10 @@ export interface Dialog {
 //   createdAt?: Date;
 // }
 
-// export interface Option {
-//   label: string;
-//   value: string;
-// }
+export interface Option {
+  label: string;
+  value: string;
+}
 
 export interface DataTableColumn {
   field: string;

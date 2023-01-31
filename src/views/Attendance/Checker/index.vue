@@ -41,7 +41,6 @@
 </template>
 
 <script setup lang="ts">
-// import TheFinger from '@/components/TheFinger.vue';
 import TheLoader from '@/components/TheLoader.vue';
 import CheckerHeader from './components/CheckerHeader.vue';
 import CheckerStudents from './components/CheckerStudents.vue';

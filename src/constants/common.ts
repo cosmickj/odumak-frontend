@@ -1,14 +1,8 @@
 import type { Option } from '@/types';
 
-const CHURCH_OPTIONS: Option[] = [
-  //
-  { label: '영은교회', value: '영은교회' },
-];
+const CHURCH_OPTIONS: Option[] = [{ label: '영은교회', value: '영은교회' }];
 
-const DEPARTMENT_OPTIONS: Option[] = [
-  //
-  { label: '초등부', value: '초등부' },
-];
+const DEPARTMENT_OPTIONS: Option[] = [{ label: '초등부', value: '초등부' }];
 
 const GRADE_OPTIONS: Option[] = [
   { label: '3학년', value: '3' },

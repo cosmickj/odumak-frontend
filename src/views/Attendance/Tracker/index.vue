@@ -42,7 +42,6 @@
 </template>
 
 <script setup lang="ts">
-import TheFinger from '@/components/TheFinger.vue';
 import TheLoader from '@/components/TheLoader.vue';
 import TrackerStudentsDaily from './components/TrackerStudentsDaily.vue';
 import TrackerTeachersDaily from './components/TrackerTeachersDaily.vue';
