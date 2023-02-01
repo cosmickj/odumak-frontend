@@ -37,7 +37,7 @@ import AdminDialogDelete from '../AdminDialogDelete.vue';
 import { computed, onMounted, reactive, ref } from 'vue';
 import { useAccountStore } from '@/store/account';
 import { useMemberStore } from '@/store/member';
-import { formatGender } from '@/utils/useFormat';
+import { formatDate, formatGender } from '@/utils/useFormat';
 
 import { useVuelidate } from '@vuelidate/core';
 import { required, helpers } from '@vuelidate/validators';
@@ -56,7 +56,7 @@ const studentList = ref<MemberData[]>([]);
 
 const columns = ref<DataTableColumn[]>([
   { field: 'name', header: '이름', minWidth: '6', format: undefined },
-  { field: 'birth', header: '생일', minWidth: '12', format: undefined },
+  { field: 'birth', header: '생일', minWidth: '12', format: formatDate },
   { field: 'gender', header: '성별', minWidth: '6', format: formatGender },
   { field: 'grade', header: '학년', minWidth: '6', format: undefined },
   { field: 'group', header: '학급', minWidth: '6', format: undefined },
@@ -66,7 +66,7 @@ const columns = ref<DataTableColumn[]>([
     field: 'registeredAt',
     header: '등록일',
     minWidth: '12',
-    format: undefined,
+    format: formatDate,
   },
   { field: 'remark', header: '비고', minWidth: '6', format: undefined },
 ]);

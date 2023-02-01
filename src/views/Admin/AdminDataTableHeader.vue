@@ -2,14 +2,14 @@
   <div class="flex mb-6 justify-between">
     <div class="flex gap-x-3">
       <Button
-        class="p-button-success"
+        class="p-button-success p-button-sm"
         icon="pi pi-plus"
         label="추가하기"
         :disabled="isDisabled"
         @click="handleAdd"
       />
       <Button
-        class="p-button-danger"
+        class="p-button-danger p-button-sm"
         icon="pi pi-trash"
         label="삭제하기"
         :disabled="!isDisabled"
@@ -18,7 +18,7 @@
     </div>
 
     <Button
-      class="p-button-help"
+      class="p-button-help p-button-sm"
       icon="pi pi-external-link"
       label="내보내기"
       @click="handleExport"

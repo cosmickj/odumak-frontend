@@ -11,6 +11,8 @@ import { createApp } from 'vue';
 import App from '@/App.vue';
 
 import PrimeVue from 'primevue/config';
+import ToastService from 'primevue/toastservice';
+
 import VueCookies from 'vue-cookies';
 
 import { getCurrentUser } from '@/router';
@@ -26,6 +28,7 @@ app.use(router);
 app.use(createPinia());
 app.use(VueCookies);
 app.use(PrimeVue);
+app.use(ToastService);
 
 // Waiting for Auth to be Ready
 (async () => {
@@ -67,6 +70,7 @@ import RadioButton from 'primevue/radiobutton';
 import SelectButton from 'primevue/selectbutton';
 import Tree from 'primevue/tree';
 import Image from 'primevue/image';
+import Toast from 'primevue/toast';
 
 app
   .component('Button', Button)
@@ -86,6 +90,7 @@ app
   .component('RadioButton', RadioButton)
   .component('SelectButton', SelectButton)
   .component('Tree', Tree)
+  .component('Toast', Toast)
   .component('Image', Image);
 
 app.mount('#app');

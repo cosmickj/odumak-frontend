@@ -1,6 +1,6 @@
 <template>
   <div class="flex h-screen">
-    <div class="shrink-0 w-64 py-6 bg-black text-white">
+    <div class="shrink-0 w-52 py-6 bg-black text-white">
       <Image :src="logoSidebar" />
       <div class="px-8">
         <RouterLink class="block my-4" :to="{ name: 'AdminStudent' }">
@@ -20,7 +20,7 @@
       </div>
     </div>
 
-    <div class="flex-1 overflow-auto px-14 py-6 bg-zinc-700 text-white">
+    <div class="flex-1 overflow-auto px-8 py-6 bg-zinc-700 text-white">
       <RouterView />
     </div>
   </div>
