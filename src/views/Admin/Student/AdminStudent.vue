@@ -12,7 +12,7 @@
   <AdminDialogAddEdit
     :dialog="addEditDialog"
     :errors="errors"
-    :student-list="selectedStudentList.body"
+    :member-list="selectedStudentList.body"
     @add-row="addSelectedStudent"
     @copy-row="copySelectedStudent"
     @delete-row="deleteSelectedStudent"
@@ -30,13 +30,12 @@
 
 <script setup lang="ts">
 import AdminDataTable from '@/views/Admin/AdminDataTable.vue';
-import AdminDialogAddEdit from '../AdminDialogAddEdit.vue';
+import AdminDialogAddEdit from '../AdminDialogAdd.vue';
 import AdminDialogDelete from '../AdminDialogDelete.vue';
 
 import { computed, onMounted, reactive, ref } from 'vue';
 import { useAccountStore } from '@/store/account';
 import { useMemberStore } from '@/store/member';
-import { formatDate, formatGender } from '@/utils/useFormat';
 
 import { useVuelidate } from '@vuelidate/core';
 import { required, helpers } from '@vuelidate/validators';
