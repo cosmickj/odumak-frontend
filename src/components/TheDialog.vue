@@ -18,6 +18,5 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits(['update:visible']);
-
 const handleVisible = () => emit('update:visible', !props.visible);
 </script>

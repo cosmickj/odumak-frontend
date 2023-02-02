@@ -56,7 +56,9 @@ export interface Member {
 }
 
 export interface MemberFetchAllParmas
-  extends Pick<AccountData, 'church' | 'department'> {}
+  extends Pick<AccountData, 'church' | 'department'> {
+  job: 'student' | 'teacher';
+}
 
 export interface MemberFetchByGradeGroupParams
   extends Pick<AccountData, 'church' | 'department'> {

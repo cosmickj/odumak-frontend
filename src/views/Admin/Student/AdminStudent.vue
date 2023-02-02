@@ -3,7 +3,6 @@
     :is-loading="isLoading"
     :data-source="studentList"
     :selection="selectedStudentList.body"
-    :selected-columns="selectedColumns"
     @add="openDialogToAddStudent"
     @edit="openDialogToEditStudent"
     @delete="openDialogToDeleteStudents"
@@ -43,7 +42,7 @@ import { useVuelidate } from '@vuelidate/core';
 import { required, helpers } from '@vuelidate/validators';
 
 import type { Timestamp } from '@firebase/firestore';
-import type { DataTableColumn, Dialog, DialogLabel, MemberData } from '@/types';
+import type { Dialog, DialogLabel, MemberData } from '@/types';
 
 const accountStore = useAccountStore();
 const accountData = computed(() => accountStore.accountData!);
@@ -54,25 +53,6 @@ const isLoading = ref(false);
 
 const studentList = ref<MemberData[]>([]);
 
-const columns = ref<DataTableColumn[]>([
-  { field: 'name', header: '이름', minWidth: '6', format: undefined },
-  { field: 'birth', header: '생일', minWidth: '12', format: formatDate },
-  { field: 'gender', header: '성별', minWidth: '6', format: formatGender },
-  { field: 'grade', header: '학년', minWidth: '6', format: undefined },
-  { field: 'group', header: '학급', minWidth: '6', format: undefined },
-  { field: 'phone', header: '연락처', minWidth: '6', format: undefined },
-  { field: 'address', header: '주소', minWidth: '6', format: undefined },
-  {
-    field: 'registeredAt',
-    header: '등록일',
-    minWidth: '12',
-    format: formatDate,
-  },
-  { field: 'remark', header: '비고', minWidth: '6', format: undefined },
-]);
-
-const selectedColumns = ref(columns.value);
-
 const getStudentList = async () => {
   try {
     isLoading.value = true;
@@ -80,6 +60,7 @@ const getStudentList = async () => {
     studentList.value = await memberStore.fetchAll({
       church: accountData.value.church,
       department: accountData.value.department,
+      job: 'student',
     });
 
     studentList.value.forEach((student) => {

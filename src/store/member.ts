@@ -52,12 +52,13 @@ export const useMemberStore = defineStore('member', {
     },
 
     async fetchAll(params: MemberFetchAllParmas) {
-      const { church, department } = params;
+      const { church, department, job } = params;
 
       const q = query(
         membersColl,
         where('church', '==', church),
-        where('department', '==', department)
+        where('department', '==', department),
+        where('job', '==', job)
       );
       const qSnapshot = await getDocs(q);
 

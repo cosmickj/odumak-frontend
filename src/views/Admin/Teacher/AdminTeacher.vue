@@ -3,7 +3,6 @@
     :is-loading="isLoading"
     :data-source="teacherList"
     :selection="selectedTeacherList.body"
-    :selected-columns="selectedColumns"
     @add="openDialogToAddTeacher"
     @edit="openDialogToEditTeacher"
     @delete="openDialogToDeleteTeacherList"
@@ -42,7 +41,7 @@ import { formatRole } from '@/utils/useFormat';
 import { useVuelidate } from '@vuelidate/core';
 import { required, helpers } from '@vuelidate/validators';
 
-import type { DataTableColumn, Dialog, DialogLabel, MemberData } from '@/types';
+import type { Dialog, DialogLabel, MemberData } from '@/types';
 import type { Timestamp } from '@firebase/firestore';
 
 const accountStore = useAccountStore();
@@ -62,6 +61,7 @@ const getTeacherList = async () => {
     teacherList.value = await memberStore.fetchAll({
       church: accountData.value.church,
       department: accountData.value.department,
+      job: 'teacher',
     });
 
     teacherList.value.forEach((teacher) => {
@@ -222,14 +222,4 @@ const rules = {
 const v = useVuelidate(rules, selectedTeacherList);
 
 const errors = computed(() => v.value.$errors[0]?.$response?.$errors);
-
-const columns = ref<DataTableColumn[]>([
-  { field: 'grade', header: '담당 학년', sortable: true, format: undefined },
-  { field: 'group', header: '담당 학급', sortable: true, format: undefined },
-  { field: 'name', header: '이름', sortable: true, format: undefined },
-  { field: 'role', header: '담임 여부', sortable: false, format: formatRole },
-  { field: 'remark', header: '비고', sortable: false, format: undefined },
-]);
-
-const selectedColumns = ref(columns.value);
 </script>

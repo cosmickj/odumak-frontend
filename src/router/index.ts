@@ -82,6 +82,11 @@ const routes: Array<RouteRecordRaw> = [
         name: 'AdminTeacher',
         component: () => import('@/views/Admin/Teacher/AdminTeacher.vue'),
       },
+      {
+        path: 'users',
+        name: 'AdminUser',
+        component: () => import('@/views/Admin/User/AdminUser.vue'),
+      },
     ],
   },
 ];
