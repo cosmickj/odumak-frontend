@@ -4,19 +4,18 @@
     :data-source="studentList"
     :selection="selectedStudentList.body"
     @add="openDialogToAddStudent"
-    @edit="openDialogToEditStudent"
     @delete="openDialogToDeleteStudents"
     @toggle="fetchSelectedStudentList"
   />
 
-  <AdminDialogAddEdit
-    :dialog="addEditDialog"
+  <AdminDialogAdd
+    :is-dialog-visible="isDialogAddVisible"
     :errors="errors"
     :member-list="selectedStudentList.body"
+    @close="resetSelectedStudentList"
     @add-row="addSelectedStudent"
     @copy-row="copySelectedStudent"
     @delete-row="deleteSelectedStudent"
-    @hide="resetSelectedStudentList"
     @submit="submitSelectedStudentList"
   />
 
@@ -30,7 +29,7 @@
 
 <script setup lang="ts">
 import AdminDataTable from '@/views/Admin/AdminDataTable.vue';
-import AdminDialogAddEdit from '../AdminDialogAdd.vue';
+import AdminDialogAdd from '../AdminDialogAdd.vue';
 import AdminDialogDelete from '../AdminDialogDelete.vue';
 
 import { computed, onMounted, reactive, ref } from 'vue';
@@ -96,22 +95,18 @@ const fetchSelectedStudentList = (payload: MemberData[]) => {
 };
 
 const resetSelectedStudentList = () => {
+  isDialogAddVisible.value = false;
   selectedStudentList.body.splice(0, selectedStudentList.body.length);
-  addEditDialog.isShow = false;
-  v.value.$reset();
+  // addEditDialog.isShow = false;
+  // v.value.$reset();
 };
 
 const createNewStudent = (obj: MemberData) => Object.assign({}, obj);
 
-const addEditDialog = reactive<Dialog>({
-  isShow: false,
-  label: '추가하기',
-});
+const isDialogAddVisible = ref(false);
 
-// || 생성하기 or 수정하기
 const openDialogToAddStudent = () => {
-  addEditDialog.isShow = true;
-  addEditDialog.label = '추가하기';
+  isDialogAddVisible.value = true;
   addSelectedStudent();
 };
 
@@ -132,12 +127,12 @@ const deleteSelectedStudent = (index: number) => {
   }
 };
 
-const openDialogToEditStudent = () => {
-  if (selectedStudentList.body.length > 0) {
-    addEditDialog.isShow = true;
-    addEditDialog.label = '수정하기';
-  }
-};
+// const openDialogToEditStudent = () => {
+//   if (selectedStudentList.body.length > 0) {
+//     addEditDialog.isShow = true;
+//     addEditDialog.label = '수정하기';
+//   }
+// };
 
 const submitSelectedStudentList = async (dialogLabel: DialogLabel) => {
   try {

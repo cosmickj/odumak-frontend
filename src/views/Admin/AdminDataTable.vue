@@ -11,11 +11,11 @@
     ref="dataTableRef"
     lazy
     rowHover
-    edit-mode="cell"
     :value="dataSource"
     :loading="isLoading"
-    v-model:selection="selectionRef"
+    edit-mode="cell"
     responsiveLayout="scroll"
+    v-model:selection="selectionRef"
     @update:selection="handleUpdateSelection"
     @cell-edit-complete="onCellEditComplete"
   >
@@ -143,10 +143,10 @@ import type { DataTableCellEditCompleteEvent } from 'primevue/datatable/DataTabl
 import type { MemberData, UserData } from '@/types';
 
 const props = defineProps<{
-  dataSource: MemberData[] | UserData[];
   isLoading: boolean;
-  // selectedColumns: any;
+  dataSource: MemberData[] | UserData[];
   selection: MemberData[];
+  // selectedColumns: any;
 }>();
 
 const emit = defineEmits(['add', 'edit', 'delete', 'toggle']);
@@ -172,7 +172,6 @@ watch(
 
 const handleUpdateSelection = () => emit('toggle', selectionRef.value);
 
-// CONTINUE HERE
 const toast = useToast();
 const onCellEditComplete = (event: DataTableCellEditCompleteEvent) => {
   const { data, newData, field } = event;
