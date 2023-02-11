@@ -11,6 +11,7 @@ import {
   query,
   serverTimestamp,
   setDoc,
+  Timestamp,
   updateDoc,
   where,
 } from 'firebase/firestore';
@@ -67,6 +68,11 @@ export const useMemberStore = defineStore('member', {
         ...doc.data(),
       })) as MemberData[];
 
+      members.forEach((m) => {
+        m.birth = (m.birth as unknown as Timestamp).toDate();
+        m.registeredAt = (m.registeredAt as unknown as Timestamp).toDate();
+      });
+
       return arraySort(members, ['grade', 'group', 'name']);
     },
 
@@ -91,33 +97,18 @@ export const useMemberStore = defineStore('member', {
     },
 
     modifyMultiple(params: MemberModifyMultipleParams) {
-      // const { members } = params;
-
       params.members.forEach(async (member) => {
-        const {
-          name,
-          birth,
-          gender,
-          grade,
-          group,
-          phone,
-          address,
-          registeredAt,
-          remark,
-          uid,
-        } = member;
-
-        if (uid) {
-          await updateDoc(doc(db, 'newMembers', uid), {
-            name,
-            birth,
-            gender,
-            grade,
-            group,
-            phone,
-            address,
-            registeredAt,
-            remark,
+        if (member.uid) {
+          await updateDoc(doc(db, 'newMembers', member.uid), {
+            name: member.name,
+            birth: member.birth,
+            gender: member.gender,
+            grade: member.grade,
+            group: member.group,
+            phone: member.phone,
+            address: member.address,
+            registeredAt: member.registeredAt,
+            remark: member.remark,
             updatedAt: serverTimestamp(),
           });
         }

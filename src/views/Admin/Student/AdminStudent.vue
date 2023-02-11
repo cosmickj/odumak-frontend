@@ -2,26 +2,26 @@
   <AdminDataTable
     :is-loading="isLoading"
     :data-source="studentList"
-    :selection="selectedStudentList.body"
+    :selection="selectedStudents.body"
     @add="openDialogToAddStudent"
     @delete="openDialogToDeleteStudents"
-    @toggle="fetchSelectedStudentList"
+    @toggle="addSelectedStudents"
   />
 
   <AdminDialogAdd
     :is-dialog-visible="isDialogAddVisible"
+    :members="newStudents.body"
     :errors="errors"
-    :member-list="selectedStudentList.body"
-    @close="resetSelectedStudentList"
-    @add-row="addSelectedStudent"
-    @copy-row="copySelectedStudent"
-    @delete-row="deleteSelectedStudent"
-    @submit="submitSelectedStudentList"
+    @add="addNewStudent"
+    @copy="copyNewStudent"
+    @delete="deleteNewStudent"
+    @submit="submitNewStudents"
+    @close="resetNewStudents"
   />
 
   <AdminDialogDelete
     :dialog="deleteDialog"
-    :selected-student-list="selectedStudentList.body"
+    :selected-students="selectedStudents.body"
     @cancel="deleteDialog.isShow = false"
     @confirm="deleteStudentList"
   />
@@ -39,8 +39,7 @@ import { useMemberStore } from '@/store/member';
 import { useVuelidate } from '@vuelidate/core';
 import { required, helpers } from '@vuelidate/validators';
 
-import type { Timestamp } from '@firebase/firestore';
-import type { Dialog, DialogLabel, MemberData } from '@/types';
+import type { Dialog, MemberData } from '@/types';
 
 const accountStore = useAccountStore();
 const accountData = computed(() => accountStore.accountData!);
@@ -54,16 +53,10 @@ const studentList = ref<MemberData[]>([]);
 const getStudentList = async () => {
   try {
     isLoading.value = true;
-
     studentList.value = await memberStore.fetchAll({
       church: accountData.value.church,
       department: accountData.value.department,
       job: 'student',
-    });
-
-    studentList.value.forEach((student) => {
-      student.birth = (student.birth as Timestamp).toDate();
-      student.registeredAt = (student.registeredAt as Timestamp).toDate();
     });
   } catch (error) {
     console.log(error);
@@ -74,7 +67,7 @@ const getStudentList = async () => {
 
 const initSelectedStudent: MemberData = {
   name: '',
-  birth: new Date(`${new Date().getFullYear() - 10 + 1}-01-01`),
+  birth: new Date(),
   gender: 'male',
   church: '',
   department: '',
@@ -88,81 +81,81 @@ const initSelectedStudent: MemberData = {
   attendances: [],
 };
 
-const selectedStudentList = reactive({ body: [] as MemberData[] });
+const selectedStudents = reactive({ body: [] as MemberData[] });
 
-const fetchSelectedStudentList = (payload: MemberData[]) => {
-  selectedStudentList.body = payload.map((d) => createNewStudent(d));
+const addSelectedStudents = (payload: MemberData[]) => {
+  selectedStudents.body = payload.map((d) => createNewStudent(d));
 };
-
-const resetSelectedStudentList = () => {
-  isDialogAddVisible.value = false;
-  selectedStudentList.body.splice(0, selectedStudentList.body.length);
-  // addEditDialog.isShow = false;
-  // v.value.$reset();
-};
-
-const createNewStudent = (obj: MemberData) => Object.assign({}, obj);
 
 const isDialogAddVisible = ref(false);
 
 const openDialogToAddStudent = () => {
   isDialogAddVisible.value = true;
-  addSelectedStudent();
+  addNewStudent();
 };
 
-const addSelectedStudent = () => {
-  const newStudent = createNewStudent(initSelectedStudent);
-  selectedStudentList.body.push(newStudent);
+const newStudents = reactive({ body: [] as MemberData[] });
+
+const createNewStudent = (obj: MemberData) => Object.assign({}, obj);
+
+const addNewStudent = () => {
+  newStudents.body.push(createNewStudent(initSelectedStudent));
 };
 
-const copySelectedStudent = (index: number) => {
-  const targetStudent = selectedStudentList.body[index];
-  const newStudent = createNewStudent(targetStudent);
-  selectedStudentList.body.push(newStudent);
+const copyNewStudent = (index: number) => {
+  newStudents.body.push(createNewStudent(newStudents.body[index]));
 };
 
-const deleteSelectedStudent = (index: number) => {
-  if (selectedStudentList.body.length > 1) {
-    selectedStudentList.body.splice(index, 1);
+const deleteNewStudent = (index: number) => {
+  if (newStudents.body.length > 1) {
+    newStudents.body.splice(index, 1);
+  } else {
+    alert('더 이상 삭제할 수 없습니다.');
   }
 };
 
-// const openDialogToEditStudent = () => {
-//   if (selectedStudentList.body.length > 0) {
-//     addEditDialog.isShow = true;
-//     addEditDialog.label = '수정하기';
-//   }
-// };
+const resetNewStudents = () => {
+  isDialogAddVisible.value = false;
+  newStudents.body = [];
+  _v.value.$reset();
+};
 
-const submitSelectedStudentList = async (dialogLabel: DialogLabel) => {
+const rules = {
+  body: {
+    $each: helpers.forEach({
+      name: { required },
+      grade: { required },
+      group: { required },
+    }),
+  },
+};
+
+const _v = useVuelidate(rules, newStudents);
+
+const errors = computed(() => _v.value.$errors[0]?.$response?.$errors);
+
+const submitNewStudents = async () => {
   try {
-    const isFormCorrect = await v.value.body.$validate();
-    if (!isFormCorrect) {
-      return;
-    }
+    const isFormCorrect = await _v.value.body.$validate();
+    if (!isFormCorrect) return;
 
-    if (dialogLabel === '추가하기') {
-      addSelectedStudentList();
-    } else if (dialogLabel === '수정하기') {
-      editSelectedStudentList();
-    }
-
-    resetSelectedStudentList();
+    createNewStudents();
+    resetNewStudents();
     await getStudentList();
+
+    alert('추가되었습니다.');
   } catch (error) {
-    console.log(error);
+    alert(error);
   }
 };
 
-const addSelectedStudentList = () => {
+const createNewStudents = () => {
   try {
     memberStore.createMultiple({
       church: accountData.value.church,
       department: accountData.value.department,
-      members: selectedStudentList.body,
+      members: newStudents.body,
     });
-
-    alert('추가되었습니다.');
   } catch (error) {
     console.log(error);
   }
@@ -171,7 +164,7 @@ const addSelectedStudentList = () => {
 const editSelectedStudentList = () => {
   try {
     memberStore.modifyMultiple({
-      members: selectedStudentList.body,
+      members: selectedStudents.body,
     });
 
     alert('수정되었습니다.');
@@ -192,7 +185,7 @@ const openDialogToDeleteStudents = () => {
 
 const deleteStudentList = async () => {
   try {
-    const uids = selectedStudentList.body.map((student) => student.uid);
+    const uids = selectedStudents.body.map((student) => student.uid);
     memberStore.removeMultiple({ uids });
 
     deleteDialog.isShow = false;
@@ -201,20 +194,6 @@ const deleteStudentList = async () => {
     console.log(error);
   }
 };
-
-const rules = {
-  body: {
-    $each: helpers.forEach({
-      name: { required },
-      grade: { required },
-      group: { required },
-    }),
-  },
-};
-
-const v = useVuelidate(rules, selectedStudentList);
-
-const errors = computed(() => v.value.$errors[0]?.$response?.$errors);
 
 onMounted(async () => await getStudentList());
 </script>

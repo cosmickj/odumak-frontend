@@ -33,7 +33,8 @@ export interface AccountData extends AuthData, UserData {}
 export interface MemberData {
   uid?: string;
   name: string;
-  birth: Date | Timestamp;
+  // birth: Date | Timestamp;
+  birth: Date;
   gender: Gender;
   church: string;
   department: string;
@@ -42,7 +43,8 @@ export interface MemberData {
   group: string;
   phone: string;
   address: string;
-  registeredAt: Date | Timestamp;
+  // registeredAt: Date | Timestamp;
+  registeredAt: Date;
   remark: string;
   attendances: Attendance[];
   createdAt?: Date;

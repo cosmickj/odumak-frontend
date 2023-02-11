@@ -5,7 +5,6 @@
         class="p-button-success p-button-sm"
         icon="pi pi-plus"
         label="추가하기"
-        :disabled="isDisabled"
         @click="handleAdd"
       />
       <Button

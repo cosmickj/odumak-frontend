@@ -12,7 +12,7 @@
   <AdminDialogAddEdit
     :dialog="addEditDialog"
     :errors="errors"
-    :member-list="selectedTeacherList.body"
+    :members="selectedTeacherList.body"
     @add-row="addSelectedTeacher"
     @copy-row="copySelectedTeacher"
     @delete-row="deleteSelectedTeacher"
@@ -22,7 +22,7 @@
 
   <AdminDialogDelete
     :dialog="deleteDialog"
-    :selected-student-list="selectedTeacherList.body"
+    :selected-students="selectedTeacherList.body"
     @cancel="deleteDialog.isShow = false"
     @confirm="deleteTeacherList"
   />

@@ -3,12 +3,12 @@
     <div class="flex items-center text-xl">
       <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
 
-      <span v-if="selectedStudentList.length > 1">
-        정말로 선택한 어린이들을 삭제하시겠습니까?
+      <span v-if="selectedStudents.length > 1">
+        정말로 선택한 인원들을 삭제하시겠습니까?
       </span>
 
       <span v-else>
-        정말로 <strong>{{ selectedStudentList[0].name }}</strong> 어린이를
+        정말로 <strong>{{ selectedStudents[0].name }}</strong> 를(을)
         삭제하시겠습니까?
       </span>
     </div>
@@ -35,7 +35,7 @@ import type { Dialog } from '@/types';
 
 defineProps<{
   dialog: Dialog;
-  selectedStudentList: any[];
+  selectedStudents: any[];
 }>();
 
 const emit = defineEmits(['cancel', 'confirm']);

@@ -5,7 +5,7 @@
         <Button
           class="p-button-success p-button-sm"
           label="인원 추가"
-          @click="handleAddRow"
+          @click="handleAdd"
         />
         <Button
           class="p-button-warning p-button-sm"
@@ -15,30 +15,38 @@
       </div>
     </template>
 
-    <div class="shrink-0 w-full max-w-sm py-6 rounded-xl bg-slate-300">
+    <div
+      v-for="(member, idx) in members"
+      class="shrink-0 w-full max-w-sm py-6 rounded-xl bg-slate-300"
+      :key="idx"
+    >
       <div class="flex gap-x-5 mx-6">
         <div class="flex-1">
           <p>이름</p>
-          <InputText v-model="name" class="w-full" />
+          <InputText
+            v-model="member.name"
+            class="w-full"
+            :class="{ 'p-invalid': isInvalid(idx, 'name') }"
+          />
         </div>
 
         <div class="flex-1 flex flex-col">
           <p>성별</p>
           <div class="flex-1 flex items-center">
             <RadioButton
+              v-model="member.gender"
+              input-id="male"
               name="gender"
               value="male"
-              input-id="male"
-              v-model="gender"
             />
             <label for="male">남자</label>
 
             <RadioButton
               class="ml-2"
+              v-model="member.gender"
+              input-id="female"
               name="gender"
               value="female"
-              input-id="female"
-              v-model="gender"
             />
             <label for="female">여자</label>
           </div>
@@ -50,7 +58,7 @@
           <p>생년월일</p>
           <Calendar
             class="w-full"
-            v-model="birth"
+            v-model="member.birth"
             date-format="yy년 mm월 dd일"
             showButtonBar
           />
@@ -60,7 +68,7 @@
           <p>초등부 등록일</p>
           <Calendar
             class="w-full"
-            v-model="registeredAt"
+            v-model="member.registeredAt"
             date-format="yy년 mm월 dd일"
             showButtonBar
           />
@@ -71,8 +79,9 @@
         <div class="flex-1">
           <p>학년</p>
           <Dropdown
-            v-model="grade"
+            v-model="member.grade"
             class="w-full"
+            :class="{ 'p-invalid': isInvalid(idx, 'grade') }"
             :options="GRADE_OPTIONS"
             option-label="label"
             option-value="value"
@@ -83,8 +92,9 @@
         <div class="flex-1">
           <p>학급</p>
           <Dropdown
-            v-model="group"
+            v-model="member.group"
             class="w-full"
+            :class="{ 'p-invalid': isInvalid(idx, 'group') }"
             placeholder="학급"
             option-label="label"
             option-value="value"
@@ -96,25 +106,33 @@
       <div class="flex gap-x-5 mx-6 mb-2">
         <div class="flex-1">
           <p>주소</p>
-          <InputText v-model="name" class="w-full" />
+          <InputText v-model="member.address" class="w-full" />
         </div>
       </div>
 
       <div class="flex gap-x-5 mx-6 mb-2">
         <div class="flex-1">
           <p>연락처</p>
-          <InputText v-model="name" class="w-full" />
+          <InputText v-model="member.phone" class="w-full" />
         </div>
 
         <div class="flex-1">
           <p>비고</p>
-          <InputText v-model="name" class="w-full" />
+          <InputText v-model="member.remark" class="w-full" />
         </div>
       </div>
 
       <div class="flex justify-end gap-x-2 mx-6 mt-3">
-        <Button label="삭제하기" class="p-button-danger p-button-sm" />
-        <Button label="복사하기" class="p-button-help p-button-sm" />
+        <Button
+          label="삭제하기"
+          class="p-button-danger p-button-sm"
+          @click="handleDelete(idx)"
+        />
+        <Button
+          label="복사하기"
+          class="p-button-help p-button-sm"
+          @click="handleCopy(idx)"
+        />
       </div>
     </div>
   </TheDialog>
@@ -122,39 +140,29 @@
 
 <script setup lang="ts">
 import TheDialog from '@/components/TheDialog.vue';
-
-import { ref } from 'vue';
 import { GRADE_OPTIONS, GROUP_OPTIONS } from '@/constants/common';
-
 import type { MemberData } from '@/types';
 
 const props = defineProps<{
   isDialogVisible: boolean;
-  memberList: MemberData[];
+  members: MemberData[];
   errors: any;
 }>();
 
-// CONTINUE HERE: emit 용어 및 crud 기능 다시 붙이기
-const emit = defineEmits(['addRow', 'copyRow', 'deleteRow', 'submit', 'close']);
+const emit = defineEmits(['add', 'copy', 'delete', 'submit', 'close']);
 
-const handleClose = (payload: boolean) => emit('close', payload);
-const handleAddRow = () => emit('addRow');
-const handleCopyRow = (index: number) => emit('copyRow', index);
-const handleDeleteRow = (index: number) => emit('deleteRow', index);
+const handleClose = (payload: boolean) => {
+  if (confirm('작업한 내용이 모두 사라집니다. 정말 닫으시겠습니까?')) {
+    emit('close', payload);
+  }
+};
+const handleAdd = () => emit('add');
+const handleCopy = (index: number) => emit('copy', index);
+const handleDelete = (index: number) => emit('delete', index);
 const handleSubmit = () => emit('submit');
 
-//
-const name = ref('');
-const gender = ref('male');
-const birth = ref(new Date());
-const grade = ref('3');
-const group = ref('1');
-const registeredAt = ref(new Date());
-
-const isError = (index: number, key: string) => {
+const isInvalid = (index: number, key: string) => {
   if (props.errors && props.errors[index][key].length > 0) return true;
   else return false;
 };
-
-const isChecked = ref(false);
 </script>
