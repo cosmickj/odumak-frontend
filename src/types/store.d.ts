@@ -12,7 +12,7 @@ export interface AccountLoginParams {
   password: string;
 }
 
-// attendace.ts
+/** attendace.ts */
 export interface StudentsAttendance {
   date: Date;
   grade: string;
@@ -44,15 +44,9 @@ export interface AttendaceRemoveAttendanceParams
   extends AttendaceAddAttendanceParams {}
 
 /** member.ts */
-export interface Member {
-  church: string;
-  department: string;
-  members: Teacher[] | Student[];
-  position: MemberPosition;
-  createdAt: {
-    seconds: number;
-    nanoseconds: number;
-  };
+interface MemberCreateMultipleParams
+  extends Pick<AccountData, 'church' | 'department'> {
+  members: MemberData[];
 }
 
 export interface MemberFetchAllParmas
@@ -64,6 +58,16 @@ export interface MemberFetchByGradeGroupParams
   extends Pick<AccountData, 'church' | 'department'> {
   grade: string;
   group: string;
+}
+
+interface MemberModifySingleParams {
+  uid: string;
+  field: string;
+  value: string;
+}
+
+interface MemberRemoveMultipleParams {
+  uids: (string | undefined)[];
 }
 
 /** user.ts */

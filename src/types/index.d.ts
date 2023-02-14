@@ -1,5 +1,4 @@
 import type { User } from 'firebase/auth/dist/auth';
-import type { Timestamp } from 'firebase/firestore';
 
 /** Common */
 export type Gender = 'male' | 'female';
@@ -33,7 +32,6 @@ export interface AccountData extends AuthData, UserData {}
 export interface MemberData {
   uid?: string;
   name: string;
-  // birth: Date | Timestamp;
   birth: Date;
   gender: Gender;
   church: string;
@@ -43,7 +41,6 @@ export interface MemberData {
   group: string;
   phone: string;
   address: string;
-  // registeredAt: Date | Timestamp;
   registeredAt: Date;
   remark: string;
   attendances: Attendance[];
@@ -66,22 +63,6 @@ export interface Attendance {
 }
 
 /** Etc */
-export type DialogLabel = '추가하기' | '수정하기' | '삭제하기';
-
-export interface Dialog {
-  isShow: boolean;
-  label: DialogLabel;
-}
-
-// export interface DataSource {
-//   uid: string;
-//   name: string;
-//   status: AttendanceStatus;
-//   targetIdx: number;
-//   attendedAt: Date;
-//   createdAt?: Date;
-// }
-
 export interface Option {
   label: string;
   value: string;

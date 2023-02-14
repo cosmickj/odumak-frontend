@@ -4,8 +4,9 @@
     :data-source="studentList"
     :selection="selectedStudents.body"
     @add="openDialogToAddStudent"
-    @delete="openDialogToDeleteStudents"
-    @toggle="addSelectedStudents"
+    @edit="editSelectedStudent"
+    @delete="toggleIsDialogDeleteVisible"
+    @select="addSelectedStudents"
   />
 
   <AdminDialogAdd
@@ -20,9 +21,9 @@
   />
 
   <AdminDialogDelete
-    :dialog="deleteDialog"
+    :is-dialog-visible="isDialogDeleteVisible"
     :selected-students="selectedStudents.body"
-    @cancel="deleteDialog.isShow = false"
+    @cancel="isDialogDeleteVisible = false"
     @confirm="deleteStudentList"
   />
 </template>
@@ -39,7 +40,9 @@ import { useMemberStore } from '@/store/member';
 import { useVuelidate } from '@vuelidate/core';
 import { required, helpers } from '@vuelidate/validators';
 
-import type { Dialog, MemberData } from '@/types';
+import { useToast } from 'primevue/usetoast';
+import { DataTableCellEditCompleteEvent } from 'primevue/datatable';
+import type { MemberData } from '@/types';
 
 const accountStore = useAccountStore();
 const accountData = computed(() => accountStore.accountData!);
@@ -47,7 +50,6 @@ const accountData = computed(() => accountStore.accountData!);
 const memberStore = useMemberStore();
 
 const isLoading = ref(false);
-
 const studentList = ref<MemberData[]>([]);
 
 const getStudentList = async () => {
@@ -161,26 +163,37 @@ const createNewStudents = () => {
   }
 };
 
-const editSelectedStudentList = () => {
-  try {
-    memberStore.modifyMultiple({
-      members: selectedStudents.body,
-    });
+const toast = useToast();
 
-    alert('수정되었습니다.');
+const editSelectedStudent = async (payload: DataTableCellEditCompleteEvent) => {
+  try {
+    const { data, newData, field, newValue } = payload;
+
+    if (JSON.stringify(data) !== JSON.stringify(newData)) {
+      await memberStore.modifySingle({
+        uid: data.uid,
+        field: field,
+        value: newValue,
+      });
+
+      await getStudentList();
+
+      toast.add({
+        severity: 'success',
+        summary: `${data.name}`,
+        detail: '수정되었습니다',
+        life: 2000,
+      });
+    }
   } catch (error) {
     console.log(error);
   }
 };
 
-// || 삭제하기
-const deleteDialog = reactive<Dialog>({
-  isShow: false,
-  label: '삭제하기',
-});
+const isDialogDeleteVisible = ref(false);
 
-const openDialogToDeleteStudents = () => {
-  deleteDialog.isShow = true;
+const toggleIsDialogDeleteVisible = () => {
+  isDialogDeleteVisible.value = !isDialogDeleteVisible.value;
 };
 
 const deleteStudentList = async () => {
@@ -188,7 +201,7 @@ const deleteStudentList = async () => {
     const uids = selectedStudents.body.map((student) => student.uid);
     memberStore.removeMultiple({ uids });
 
-    deleteDialog.isShow = false;
+    toggleIsDialogDeleteVisible();
     await getStudentList();
   } catch (error) {
     console.log(error);

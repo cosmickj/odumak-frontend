@@ -1,6 +1,6 @@
-import { defineStore } from 'pinia';
-
 import arraySort from 'array-sort';
+
+import { defineStore } from 'pinia';
 import { db, membersColl } from '@/firebase/config';
 import {
   addDoc,
@@ -10,30 +10,19 @@ import {
   getDocs,
   query,
   serverTimestamp,
-  setDoc,
   Timestamp,
   updateDoc,
   where,
 } from 'firebase/firestore';
 
-import type { AccountData, MemberData } from '@/types';
+import type { MemberData } from '@/types';
 import type {
+  MemberCreateMultipleParams,
   MemberFetchAllParmas,
   MemberFetchByGradeGroupParams,
+  MemberModifySingleParams,
+  MemberRemoveMultipleParams,
 } from '@/types/store';
-
-interface MemberCreateMultipleParams
-  extends Pick<AccountData, 'church' | 'department'> {
-  members: MemberData[];
-}
-
-interface MemberModifyMultipleParams {
-  members: MemberData[];
-}
-
-interface MemberRemoveMultipleParams {
-  uids: (string | undefined)[];
-}
 
 export const useMemberStore = defineStore('member', {
   state: () => ({}),
@@ -96,22 +85,9 @@ export const useMemberStore = defineStore('member', {
       return arraySort(members, ['grade', 'group', 'name']);
     },
 
-    modifyMultiple(params: MemberModifyMultipleParams) {
-      params.members.forEach(async (member) => {
-        if (member.uid) {
-          await updateDoc(doc(db, 'newMembers', member.uid), {
-            name: member.name,
-            birth: member.birth,
-            gender: member.gender,
-            grade: member.grade,
-            group: member.group,
-            phone: member.phone,
-            address: member.address,
-            registeredAt: member.registeredAt,
-            remark: member.remark,
-            updatedAt: serverTimestamp(),
-          });
-        }
+    async modifySingle(params: MemberModifySingleParams) {
+      return await updateDoc(doc(db, 'newMembers', params.uid), {
+        [params.field]: params.value,
       });
     },
 

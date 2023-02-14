@@ -3,7 +3,6 @@
     :selection="selectionRef"
     @export="exportDataTable"
     @add="handleAdd"
-    @edit="handleEdit"
     @delete="handleDelete"
   />
 
@@ -16,8 +15,8 @@
     edit-mode="cell"
     responsiveLayout="scroll"
     v-model:selection="selectionRef"
-    @update:selection="handleUpdateSelection"
-    @cell-edit-complete="onCellEditComplete"
+    @update:selection="handleSelect"
+    @cell-edit-complete="handleEdit"
   >
     <template #empty>
       <p>등록된 인원이 없습니다.</p>
@@ -137,7 +136,6 @@ import AdminDataTableHeader from '@/views/Admin/AdminDataTableHeader.vue';
 import { ref, watch } from 'vue';
 import { formatDate, formatGender } from '@/utils/useFormat';
 
-import { useToast } from 'primevue/usetoast';
 import type DataTable from 'primevue/datatable';
 import type { DataTableCellEditCompleteEvent } from 'primevue/datatable/DataTable';
 import type { MemberData, UserData } from '@/types';
@@ -149,11 +147,12 @@ const props = defineProps<{
   // selectedColumns: any;
 }>();
 
-const emit = defineEmits(['add', 'edit', 'delete', 'toggle']);
+const emit = defineEmits(['add', 'edit', 'delete', 'select']);
 
 const handleAdd = () => emit('add');
-const handleEdit = () => emit('edit');
+const handleEdit = (ev: DataTableCellEditCompleteEvent) => emit('edit', ev);
 const handleDelete = () => emit('delete');
+const handleSelect = () => emit('select', selectionRef.value);
 
 const dataTableRef = ref<DataTable | null>(null);
 const exportDataTable = () => {
@@ -169,22 +168,6 @@ watch(
   (newValue) => (selectionRef.value = newValue),
   { deep: true }
 );
-
-const handleUpdateSelection = () => emit('toggle', selectionRef.value);
-
-const toast = useToast();
-const onCellEditComplete = (event: DataTableCellEditCompleteEvent) => {
-  const { data, newData, field } = event;
-
-  if (JSON.stringify(data) !== JSON.stringify(newData)) {
-    toast.add({
-      severity: 'success',
-      summary: `${data.name}`,
-      detail: '수정되었습니다',
-      life: 2000,
-    });
-  }
-};
 </script>
 
 <style scoped>

@@ -1,5 +1,11 @@
 <template>
-  <Dialog class="w-2/5" v-model:visible="dialog.isShow" header="삭제하기" modal>
+  <Dialog
+    class="w-2/5"
+    v-model:visible="visible"
+    modal
+    header="삭제하기"
+    :closable="false"
+  >
     <div class="flex items-center text-xl">
       <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
 
@@ -31,16 +37,22 @@
 </template>
 
 <script setup lang="ts">
-import type { Dialog } from '@/types';
+import { computed } from 'vue';
 
-defineProps<{
-  dialog: Dialog;
+const props = defineProps<{
+  isDialogVisible: boolean;
   selectedStudents: any[];
 }>();
 
 const emit = defineEmits(['cancel', 'confirm']);
 
 const handelCancel = () => emit('cancel');
-
 const handelConfirm = () => emit('confirm');
+
+const visible = computed({
+  get: () => props.isDialogVisible,
+  set: (val) => {
+    visible.value = val;
+  },
+});
 </script>
