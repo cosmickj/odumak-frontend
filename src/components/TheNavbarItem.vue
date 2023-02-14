@@ -6,8 +6,8 @@
     ]"
     :to="{ name: routeName }"
   >
-    <div class="flex w-20 h-20 items-center justify-center">
-      <i class="text-5xl" :class="icon"></i>
+    <div class="flex w-14 h-14 items-center justify-center">
+      <i class="text-2xl" :class="icon"></i>
     </div>
   </RouterLink>
 </template>
@@ -23,12 +23,12 @@ defineProps<{
 }>();
 
 const route = useRoute();
+
 const isHome = computed(() => {
   if (route.name === 'HomeView') {
     return true;
-  } else {
-    return false;
   }
+  return false;
 });
 </script>
 

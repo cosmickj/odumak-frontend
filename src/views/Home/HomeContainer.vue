@@ -1,47 +1,51 @@
 <template>
   <section class="p-5">
     <header class="mb-5">
-      <div class="flex my-2 text-3xl items-baseline justify-center">
+      <div class="flex my-2 text-xl items-baseline justify-center">
         <p>
           안녕하세요, <strong>{{ userName }}</strong> 선생님!
         </p>
       </div>
 
       <RouterLink v-if="isAdmin" :to="{ name: 'AdminStudent' }">
-        <div class="text-lg text-amber-500 text-center cursor-pointer">
+        <div class="text-sm text-amber-500 text-center cursor-pointer">
           <u>관리자 페이지 이동하기</u>
         </div>
       </RouterLink>
     </header>
 
-    <div class="grid gap-4 grid-cols-2 grid-rows-2">
-      <!-- 학생 일일 출석 현황 -->
+    <div class="grid gap-3 grid-cols-2 grid-rows-3 h-2/4">
+      <!-- CONTINUE: 홈 화면 재구성하기 -->
       <HomeMenu
+        class="col-start-1 col-end-2 row-start-1 row-end-3 bg-blue-300 text-blue-700"
+        job="student"
+        type="daily"
         icon="pi pi-users"
         route-name="AttendanceTracker"
-        position="student"
-        type="daily"
       />
-      <!-- 학생 누적 출석 현황 -->
+
       <HomeMenu
+        class="col-start-1 col-end-2 row-start-3 row-end-4 bg-red-300 text-red-700"
+        job="student"
+        type="total"
         icon="pi pi-users"
         route-name="AttendanceTracker"
-        position="student"
-        type="total"
       />
-      <!-- 교사 일일 출석 현황 -->
+
       <HomeMenu
-        icon="pi pi-heart"
-        route-name="AttendanceTracker"
-        position="teacher"
+        class="col-start-2 col-end-3 row-start-1 row-end-2 bg-green-300 text-green-700"
+        job="teacher"
         type="daily"
-      />
-      <!-- 교사 누적 출석 현황 -->
-      <HomeMenu
         icon="pi pi-heart"
         route-name="AttendanceTracker"
-        position="teacher"
+      />
+
+      <HomeMenu
+        class="col-start-2 col-end-3 row-start-2 row-end-4 bg-yellow-300 text-yellow-700"
+        job="teacher"
         type="total"
+        icon="pi pi-heart"
+        route-name="AttendanceTracker"
       />
     </div>
   </section>

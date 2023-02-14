@@ -34,7 +34,7 @@ const routes: Array<RouteRecordRaw> = [
         path: '',
         name: 'HomeView',
         components: {
-          default: () => import('@/views/Home/index.vue'),
+          default: () => import('@/views/Home/HomeContainer.vue'),
           GlobalNavbar: () => import('@/components/TheNavbar.vue'),
         },
       },
@@ -53,7 +53,7 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
-        path: 'attendance/tracker/:position/:type',
+        path: 'attendance/tracker/:job/:type',
         name: 'AttendanceTracker',
         components: {
           default: () => import('@/views/Attendance/Tracker/index.vue'),

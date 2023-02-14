@@ -1,33 +1,36 @@
 <template>
-  <router-link :to="{ name: routeName, params: { position, type } }">
-    <Card>
-      <template #title>
-        <div><i class="text-4xl" :class="icon"></i></div>
+  <router-link
+    class="rounded-lg"
+    :to="{ name: routeName, params: { job, type } }"
+  >
+    <div class="relative h-full p-4 text-base">
+      <p>
+        <span>{{ 누구 }}</span>
+        <span class="font-bold">{{ 분류 }}</span>
+      </p>
 
-        <div>{{ 누구 }}</div>
+      <p>출석현황</p>
 
-        <div class="text-yellow-500">{{ 분류 }}</div>
-
-        <div>출석현황</div>
-      </template>
-    </Card>
+      <span class="absolute bottom-4 right-4">
+        <i class="pi pi-angle-right"></i>
+      </span>
+    </div>
   </router-link>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { MemberPosition } from '@/types/index.js';
 
 const props = defineProps<{
   icon: string;
-  position: MemberPosition;
+  job: string;
   routeName: string;
   type: string;
 }>();
 
 const 누구 = computed(() => {
-  if (props.position === 'student') return '학생';
-  else if (props.position === 'teacher') return '교사';
+  if (props.job === 'student') return '학생';
+  else if (props.job === 'teacher') return '교사';
 });
 
 const 분류 = computed(() => {
@@ -36,17 +39,4 @@ const 분류 = computed(() => {
 });
 </script>
 
-<style scoped>
-:deep(.p-card) {
-  aspect-ratio: 1/1;
-}
-:deep(.p-card-body) {
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-:deep(.p-card-title) {
-  text-align: center;
-}
-</style>
+<style scoped></style>

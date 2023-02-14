@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isAuthReady" class="relative text-2xl">
+  <div v-if="isAuthReady" class="relative text-sm">
     <div
       class="sticky top-0 left-0 flex px-8 py-4 bg-slate-100 items-center justify-center font-semibold"
     >
@@ -11,24 +11,28 @@
     </div>
 
     <!-- 기본 정보 -->
-    <div class="flex flex-col px-8 pb-4">
+    <div class="flex flex-col px-8 pb-1">
       <label class="mb-2 text-xs" for="displayName">이름</label>
-      <InputText v-model="form.displayName" id="displayName" />
+      <InputText
+        v-model="form.displayName"
+        id="displayName"
+        class="p-inputtext-sm"
+      />
     </div>
-    <div class="flex flex-col px-8 pb-4">
+    <div class="flex flex-col px-8 pb-1">
       <label class="mb-2 text-xs" for="birth">생년월일</label>
-      <InputText id="birth" placeholder="생년월일" />
+      <InputText id="birth" placeholder="생년월일" class="p-inputtext-sm" />
     </div>
-    <div class="flex flex-col px-8 pb-4">
+    <div class="flex flex-col px-8 pb-1">
       <label class="mb-2 text-xs" for="phone">휴대폰 번호</label>
-      <InputText id="phone" placeholder="휴대폰 번호" />
+      <InputText id="phone" placeholder="휴대폰 번호" class="p-inputtext-sm" />
     </div>
 
     <!-- 교회 정보 -->
-    <div class="flex flex-col px-8 py-4">
-      <span class="text-xl font-semibold">교회 정보</span>
+    <div class="flex flex-col px-8 py-2">
+      <span class="text-base font-semibold">교회 정보</span>
     </div>
-    <div class="flex flex-col px-8 pb-4">
+    <div class="flex flex-col px-8 pb-1">
       <label class="mb-2 text-xs" for="church">교회 이름</label>
       <Dropdown
         v-model="form.church"
@@ -38,7 +42,7 @@
         placeholder="교회 이름"
       />
     </div>
-    <div class="flex flex-col px-8 pb-4">
+    <div class="flex flex-col px-8 pb-1">
       <label class="mb-2 text-xs" for="department">봉사 부서</label>
       <Dropdown
         v-model="form.department"
@@ -48,7 +52,7 @@
         placeholder="봉사 부서"
       />
     </div>
-    <div class="flex flex-col px-8 pb-4">
+    <div class="flex flex-col px-8 pb-1">
       <label class="mb-2 text-xs" for="role">담임 여부</label>
       <SelectButton
         v-model="form.role"
@@ -59,7 +63,7 @@
         placeholder="담당 학년"
       />
     </div>
-    <div class="flex flex-col px-8 pb-4">
+    <div class="flex flex-col px-8 pb-1">
       <label class="mb-2 text-xs" for="grade">담당 학년</label>
       <Dropdown
         v-model="form.grade"
@@ -69,7 +73,7 @@
         placeholder="담당 학년"
       />
     </div>
-    <div class="flex flex-col px-8 pb-4">
+    <div class="flex flex-col px-8 pb-1">
       <label class="mb-2 text-xs" for="group">담당 학급</label>
       <Dropdown
         v-model="form.group"
@@ -83,7 +87,7 @@
     <!-- 완료 버튼 -->
     <div class="absolute right-0 bottom-0 left-0 px-8 py-4">
       <Button
-        class="w-full p-button-info"
+        class="w-full p-button-info p-button-sm"
         label="수정 완료"
         @click="submitForm"
       />
