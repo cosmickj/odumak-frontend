@@ -23,11 +23,12 @@
     </div>
   </div>
 
-  <AdminModal />
+  <AdminWarning />
 </template>
 
 <script setup lang="ts">
-import AdminModal from '@/views/Admin/AdminModal.vue';
+import AdminWarning from '@/views/Admin/AdminWarning.vue';
+
 import logoSidebar from '@/assets/images/logo-sidebar.png';
 </script>
 

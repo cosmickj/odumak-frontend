@@ -1,7 +1,7 @@
 <template>
   <AdminDataTable
     :is-loading="isLoading"
-    :data-source="studentList"
+    :data-source="students"
     :selection="selectedStudents.body"
     @add="openDialogToAddStudent"
     @edit="editSelectedStudent"
@@ -41,7 +41,7 @@ import { useVuelidate } from '@vuelidate/core';
 import { required, helpers } from '@vuelidate/validators';
 
 import { useToast } from 'primevue/usetoast';
-import { DataTableCellEditCompleteEvent } from 'primevue/datatable';
+import type { DataTableCellEditCompleteEvent } from 'primevue/datatable';
 import type { MemberData } from '@/types';
 
 const accountStore = useAccountStore();
@@ -50,12 +50,12 @@ const accountData = computed(() => accountStore.accountData!);
 const memberStore = useMemberStore();
 
 const isLoading = ref(false);
-const studentList = ref<MemberData[]>([]);
+const students = ref<MemberData[]>([]);
 
-const getStudentList = async () => {
+const getStudents = async () => {
   try {
     isLoading.value = true;
-    studentList.value = await memberStore.fetchAll({
+    students.value = await memberStore.fetchAll({
       church: accountData.value.church,
       department: accountData.value.department,
       job: 'student',
@@ -85,6 +85,8 @@ const initSelectedStudent: MemberData = {
 
 const selectedStudents = reactive({ body: [] as MemberData[] });
 
+const createNewStudent = (obj: MemberData) => Object.assign({}, obj);
+
 const addSelectedStudents = (payload: MemberData[]) => {
   selectedStudents.body = payload.map((d) => createNewStudent(d));
 };
@@ -97,8 +99,6 @@ const openDialogToAddStudent = () => {
 };
 
 const newStudents = reactive({ body: [] as MemberData[] });
-
-const createNewStudent = (obj: MemberData) => Object.assign({}, obj);
 
 const addNewStudent = () => {
   newStudents.body.push(createNewStudent(initSelectedStudent));
@@ -116,12 +116,6 @@ const deleteNewStudent = (index: number) => {
   }
 };
 
-const resetNewStudents = () => {
-  isDialogAddVisible.value = false;
-  newStudents.body = [];
-  _v.value.$reset();
-};
-
 const rules = {
   body: {
     $each: helpers.forEach({
@@ -136,19 +130,10 @@ const _v = useVuelidate(rules, newStudents);
 
 const errors = computed(() => _v.value.$errors[0]?.$response?.$errors);
 
-const submitNewStudents = async () => {
-  try {
-    const isFormCorrect = await _v.value.body.$validate();
-    if (!isFormCorrect) return;
-
-    createNewStudents();
-    resetNewStudents();
-    await getStudentList();
-
-    alert('추가되었습니다.');
-  } catch (error) {
-    alert(error);
-  }
+const resetNewStudents = () => {
+  isDialogAddVisible.value = false;
+  newStudents.body = [];
+  _v.value.$reset();
 };
 
 const createNewStudents = () => {
@@ -160,6 +145,21 @@ const createNewStudents = () => {
     });
   } catch (error) {
     console.log(error);
+  }
+};
+
+const submitNewStudents = async () => {
+  try {
+    const isFormCorrect = await _v.value.body.$validate();
+    if (!isFormCorrect) return;
+
+    createNewStudents();
+    resetNewStudents();
+    await getStudents();
+
+    alert('추가되었습니다.');
+  } catch (error) {
+    alert(error);
   }
 };
 
@@ -176,7 +176,7 @@ const editSelectedStudent = async (payload: DataTableCellEditCompleteEvent) => {
         value: newValue,
       });
 
-      await getStudentList();
+      await getStudents();
 
       toast.add({
         severity: 'success',
@@ -202,11 +202,11 @@ const deleteStudentList = async () => {
     memberStore.removeMultiple({ uids });
 
     toggleIsDialogDeleteVisible();
-    await getStudentList();
+    await getStudents();
   } catch (error) {
     console.log(error);
   }
 };
 
-onMounted(async () => await getStudentList());
+onMounted(async () => await getStudents());
 </script>

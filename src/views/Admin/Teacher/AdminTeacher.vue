@@ -1,36 +1,36 @@
 <template>
   <AdminDataTable
     :is-loading="isLoading"
-    :data-source="teacherList"
-    :selection="selectedTeacherList.body"
+    :data-source="members"
+    :selection="selectedMembers.body"
     @add="openDialogToAddTeacher"
-    @edit="openDialogToEditTeacher"
-    @delete="openDialogToDeleteTeacherList"
-    @toggle="fetchSelectedTeacherList"
+    @edit="editSelectedMember"
+    @delete="toggleIsDialogDeleteVisible"
+    @toggle="addSelectedMembers"
   />
 
-  <AdminDialogAddEdit
-    :dialog="addEditDialog"
+  <AdminDialogAdd
+    :is-dialog-visible="isDialogAddVisible"
+    :members="newMembers.body"
     :errors="errors"
-    :members="selectedTeacherList.body"
-    @add-row="addSelectedTeacher"
-    @copy-row="copySelectedTeacher"
-    @delete-row="deleteSelectedTeacher"
-    @hide="resetSelectedTeacherList"
-    @submit="submitSelectedTeacherList"
+    @add="addNewMember"
+    @copy="copyNewMember"
+    @delete="deleteNewMember"
+    @submit="submitNewMembers"
+    @close="resetNewMembers"
   />
 
   <AdminDialogDelete
-    :dialog="deleteDialog"
-    :selected-students="selectedTeacherList.body"
-    @cancel="deleteDialog.isShow = false"
-    @confirm="deleteTeacherList"
+    :is-dialog-visible="isDialogDeleteVisible"
+    :selected-students="selectedMembers.body"
+    @cancel="isDialogDeleteVisible = false"
+    @confirm="deleteMembers"
   />
 </template>
 
 <script setup lang="ts">
 import AdminDataTable from '@/views/Admin/AdminDataTable.vue';
-import AdminDialogAddEdit from '../AdminDialogAdd.vue';
+import AdminDialogAdd from '../AdminDialogAdd.vue';
 import AdminDialogDelete from '../AdminDialogDelete.vue';
 
 import { computed, onMounted, reactive, ref } from 'vue';
@@ -40,8 +40,9 @@ import { useMemberStore } from '@/store/member';
 import { useVuelidate } from '@vuelidate/core';
 import { required, helpers } from '@vuelidate/validators';
 
-import type { Dialog, DialogLabel, MemberData } from '@/types';
-import type { Timestamp } from '@firebase/firestore';
+import { useToast } from 'primevue/usetoast';
+import type { DataTableCellEditCompleteEvent } from 'primevue/datatable';
+import type { MemberData } from '@/types';
 
 const accountStore = useAccountStore();
 const accountData = computed(() => accountStore.accountData!);
@@ -49,23 +50,15 @@ const accountData = computed(() => accountStore.accountData!);
 const memberStore = useMemberStore();
 
 const isLoading = ref(false);
-const teacherList = ref<MemberData[]>([]);
+const members = ref<MemberData[]>([]);
 
-onMounted(async () => await getTeacherList());
-
-const getTeacherList = async () => {
+const getMembers = async () => {
   try {
     isLoading.value = true;
-
-    teacherList.value = await memberStore.fetchAll({
+    members.value = await memberStore.fetchAll({
       church: accountData.value.church,
       department: accountData.value.department,
       job: 'teacher',
-    });
-
-    teacherList.value.forEach((teacher) => {
-      teacher.birth = (teacher.birth as Timestamp).toDate();
-      teacher.registeredAt = (teacher.registeredAt as Timestamp).toDate();
     });
   } catch (error) {
     console.log(error);
@@ -74,9 +67,9 @@ const getTeacherList = async () => {
   }
 };
 
-const initSelectedTeacher: MemberData = {
+const initSelectedMember: MemberData = {
   name: '',
-  birth: new Date(`${new Date().getFullYear() - 10 + 1}-01-01`),
+  birth: new Date(),
   gender: 'male',
   church: '',
   department: '',
@@ -90,121 +83,36 @@ const initSelectedTeacher: MemberData = {
   attendances: [],
 };
 
-const selectedTeacherList = reactive({ body: [] as MemberData[] });
+const selectedMembers = reactive({ body: [] as MemberData[] });
 
-const fetchSelectedTeacherList = (payload: MemberData[]) => {
-  selectedTeacherList.body = payload.map((d) => createNewTeacher(d));
+const createNewMember = (obj: MemberData) => Object.assign({}, obj);
+
+const addSelectedMembers = (payload: MemberData[]) => {
+  selectedMembers.body = payload.map((d) => createNewMember(d));
 };
 
-const resetSelectedTeacherList = () => {
-  selectedTeacherList.body.splice(0, selectedTeacherList.body.length);
-  addEditDialog.isShow = false;
-  v.value.$reset();
-};
+const isDialogAddVisible = ref(false);
 
-const createNewTeacher = (obj: MemberData) => Object.assign({}, obj);
-
-const addEditDialog = reactive<Dialog>({
-  isShow: false,
-  label: '추가하기',
-});
-
-// || 생성하기 or 수정하기
 const openDialogToAddTeacher = () => {
-  addEditDialog.isShow = true;
-  addEditDialog.label = '추가하기';
-  addSelectedTeacher();
+  isDialogAddVisible.value = true;
+  addNewMember();
 };
 
-const addSelectedTeacher = () => {
-  const newStudent = createNewTeacher(initSelectedTeacher);
-  selectedTeacherList.body.push(newStudent);
+const newMembers = reactive({ body: [] as MemberData[] });
+
+const addNewMember = () => {
+  newMembers.body.push(createNewMember(initSelectedMember));
 };
 
-const copySelectedTeacher = (index: number) => {
-  const targetStudent = selectedTeacherList.body[index];
-  const newStudent = createNewTeacher(targetStudent);
-  selectedTeacherList.body.push(newStudent);
+const copyNewMember = (index: number) => {
+  newMembers.body.push(createNewMember(newMembers.body[index]));
 };
 
-const deleteSelectedTeacher = (index: number) => {
-  if (selectedTeacherList.body.length > 1) {
-    selectedTeacherList.body.splice(index, 1);
-  }
-};
-
-const openDialogToEditTeacher = () => {
-  if (selectedTeacherList.body.length > 0) {
-    addEditDialog.isShow = true;
-    addEditDialog.label = '수정하기';
-  }
-};
-
-const submitSelectedTeacherList = async (dialogLabel: DialogLabel) => {
-  try {
-    const isFormCorrect = await v.value.body.$validate();
-    if (!isFormCorrect) {
-      return;
-    }
-
-    if (dialogLabel === '추가하기') {
-      addSelectedTeacherList();
-    } else if (dialogLabel === '수정하기') {
-      editSelectedTeacherList();
-    }
-
-    resetSelectedTeacherList();
-    await getTeacherList();
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-const addSelectedTeacherList = () => {
-  try {
-    memberStore.createMultiple({
-      church: accountData.value.church,
-      department: accountData.value.department,
-      members: selectedTeacherList.body,
-    });
-
-    alert('추가되었습니다.');
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-const editSelectedTeacherList = () => {
-  try {
-    memberStore.modifyMultiple({
-      members: selectedTeacherList.body,
-    });
-
-    alert('수정되었습니다.');
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-// || 삭제하기
-const deleteDialog = reactive<Dialog>({
-  isShow: false,
-  label: '삭제하기',
-});
-
-const openDialogToDeleteTeacherList = () => {
-  deleteDialog.isShow = true;
-};
-
-const deleteTeacherList = async () => {
-  try {
-    const uids = selectedTeacherList.body.map((student) => student.uid);
-    memberStore.removeMultiple({ uids });
-
-    deleteDialog.isShow = false;
-    await getTeacherList();
-  } catch (error) {
-    console.log(error);
+const deleteNewMember = (index: number) => {
+  if (newMembers.body.length > 1) {
+    newMembers.body.splice(index, 1);
+  } else {
+    alert('더 이상 삭제할 수 없습니다.');
   }
 };
 
@@ -218,7 +126,85 @@ const rules = {
   },
 };
 
-const v = useVuelidate(rules, selectedTeacherList);
+const _v = useVuelidate(rules, selectedMembers);
 
-const errors = computed(() => v.value.$errors[0]?.$response?.$errors);
+const errors = computed(() => _v.value.$errors[0]?.$response?.$errors);
+
+const resetNewMembers = () => {
+  isDialogAddVisible.value = false;
+  newMembers.body = [];
+  _v.value.$reset();
+};
+
+const createNewMembers = () => {
+  try {
+    memberStore.createMultiple({
+      church: accountData.value.church,
+      department: accountData.value.department,
+      members: newMembers.body,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const submitNewMembers = async () => {
+  try {
+    const isFormCorrect = await _v.value.body.$validate();
+    if (!isFormCorrect) return;
+
+    createNewMembers();
+    resetNewMembers();
+    await getMembers();
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const toast = useToast();
+
+const editSelectedMember = async (payload: DataTableCellEditCompleteEvent) => {
+  try {
+    const { data, newData, field, newValue } = payload;
+
+    if (JSON.stringify(data) !== JSON.stringify(newData)) {
+      await memberStore.modifySingle({
+        uid: data.uid,
+        field: field,
+        value: newValue,
+      });
+
+      await getMembers();
+
+      toast.add({
+        severity: 'success',
+        summary: `${data.name}`,
+        detail: '수정되었습니다',
+        life: 2000,
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const isDialogDeleteVisible = ref(false);
+
+const toggleIsDialogDeleteVisible = () => {
+  isDialogDeleteVisible.value = !isDialogDeleteVisible.value;
+};
+
+const deleteMembers = async () => {
+  try {
+    const uids = selectedMembers.body.map((student) => student.uid);
+    memberStore.removeMultiple({ uids });
+
+    toggleIsDialogDeleteVisible();
+    await getMembers();
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+onMounted(async () => await getMembers());
 </script>
