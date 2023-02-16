@@ -43,7 +43,8 @@ export interface MemberData {
   address: string;
   registeredAt: Date;
   remark: string;
-  attendances: Attendance[];
+  // attendances: Attendance[];
+  attendance?: 'offline' | 'online' | 'absence';
   createdAt?: Date;
 }
 

@@ -15,7 +15,6 @@
     </header>
 
     <div class="grid gap-3 grid-cols-2 grid-rows-3 h-2/4">
-      <!-- CONTINUE: 홈 화면 재구성하기 -->
       <HomeMenu
         class="col-start-1 col-end-2 row-start-1 row-end-3 bg-blue-300 text-blue-700"
         job="student"

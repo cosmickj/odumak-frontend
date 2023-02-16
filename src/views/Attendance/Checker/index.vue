@@ -1,10 +1,10 @@
 <template>
   <section class="flex flex-col h-full p-8">
-    <CheckerHeader />
+    <CheckerHeader @submit="onSubmit" />
 
     <Calendar
       v-model="attendanceDate"
-      class="pt-5"
+      class="my-5"
       touchUI
       input-class="text-center"
       placeholder="날짜를 선택해주세요"
@@ -13,52 +13,48 @@
       @date-select="getAttendances"
     />
 
-    <!-- <TheLoader v-if="isLoading" />
-
     <div
-      v-if="!isTeacher(accountStore.accountData?.role) && attendanceDate"
-      class="grow flex items-center justify-center text-xl"
+      v-for="(member, i) in members"
+      class="flex mt-[-1px] px-2 py-3 border border-slate-300 items-center justify-between"
+      :key="i"
     >
-      <p>담당 학급이 있는 선생님만 이용할 수 있습니다.</p>
+      <span>{{ member.name }}</span>
+
+      <SelectButton
+        v-model="member.attendance"
+        :options="[
+          { name: '현장', value: 'offline' },
+          { name: '온라인', value: 'online' },
+          { name: '결석', value: 'absence' },
+        ]"
+        option-label="name"
+        option-value="value"
+      />
+
+      <Button
+        icon="pi pi-chevron-down"
+        class="p-button-rounded p-button-text p-button-secondary p-button-sm"
+      />
     </div>
-
-    <CheckerStudents
-      v-else-if="isTeacher(accountStore.accountData?.role) && attendanceDate"
-      v-model="dataSource"
-      :attendance-date="attendanceDate"
-      :checksum="copyDataSource"
-      @submit="submitAttendance"
-    />
-
-    <CheckerTeachers
-      v-else-if="isAdmin(accountStore.accountData?.role) && attendanceDate"
-      v-model="dataSource"
-      :attendance-date="attendanceDate"
-      :checksum="copyDataSource"
-      @submit="submitAttendance"
-    /> -->
   </section>
 </template>
 
 <script setup lang="ts">
-import TheLoader from '@/components/TheLoader.vue';
 import CheckerHeader from './components/CheckerHeader.vue';
-import CheckerStudents from './components/CheckerStudents.vue';
-import CheckerTeachers from './components/CheckerTeachers.vue';
 
-import { ref, onMounted } from 'vue';
+import { computed, ref, onMounted } from 'vue';
 import { useAccountStore } from '@/store/account';
 import { useAttendanceStore } from '@/store/attendance';
 import { useMemberStore } from '@/store/member';
-import type { AttendanceStatus } from '@/types';
+import type { MemberData } from '@/types';
 
 const accountStore = useAccountStore();
 const attendanceStore = useAttendanceStore();
 const memberStore = useMemberStore();
 
+const accountData = computed(() => accountStore.accountData!);
+const members = ref<MemberData[]>([]);
 const isLoading = ref(false);
-
-const dataSource = ref([]);
 const copyDataSource = ref('');
 
 const attendanceDate = ref<Date>(getPreviousSunday());
@@ -66,95 +62,75 @@ const maxDate = getPreviousSunday();
 
 // https://bobbyhadz.com/blog/javascript-get-previous-sunday
 function getPreviousSunday(date = new Date()) {
-  const value = new Date();
-  value.setDate(date.getDate() - date.getDay());
-  value.setHours(0, 0, 0, 0);
-  return value;
+  const _date = new Date();
+  _date.setDate(date.getDate() - date.getDay());
+  _date.setHours(0, 0, 0, 0);
+  return _date;
 }
 
-onMounted(() => {
-  getAttendances();
+const getAttendances = async () => {
+  const role = accountData.value.role;
+
+  // if (role === 'admin') {
+  const members = await memberStore.fetchAll({
+    church: accountData.value.church,
+    department: accountData.value.department,
+    job: 'teacher',
+  });
+
+  const attendaces = await attendanceStore.fetchAttendances({
+    church: accountData.value.church,
+    department: accountData.value.department,
+    job: 'teacher',
+  });
+
+  members.forEach((member) => {
+    const result = attendaces.find((attendace) => attendace.data());
+    if (!result) {
+      member.attendance = 'offline';
+    }
+  });
+
+  return members;
+  // }
+
+  // else if (role === 'main' || role === 'sub') {}
+  // else {}
+};
+
+onMounted(async () => {
+  members.value = await getAttendances();
 });
 
-const getAttendances = async () => {
-  const role = accountStore.accountData?.role;
-
-  if (role === 'admin') {
-    //
-  } else if (role === 'main' || role === 'sub') {
-    //
-  } else {
-    //
-  }
-
-  // try {
-  //   isLoading.value = true;
-  //   dataSource.value = [];
-  //   copyDataSource.value = '';
-  //   if (!accountStore.accountData) return;
-  //   const targetMembers = await memberStore.fetchByGradeGroup({
-  //     church: accountStore.accountData.church,
-  //     department: accountStore.accountData.department,
-  //     grade: accountStore.accountData.grade,
-  //     group: accountStore.accountData.group,
-  //   });
-  //   // TODO: 추후 아래 로직을 attendace.ts의 action으로 분리하자
-  //   targetMembers.forEach((member) => {
-  //     let status: AttendanceStatus = 'offline';
-  //     let createdAt = new Date();
-  //     createdAt.setHours(0, 0, 0, 0);
-  //     const targetIdx = member.attendances.findIndex((attd) => {
-  //       const recordedAttendanceDate = attd.attendedAt.toDate().getTime();
-  //       const selectedAttendaceDate = attendanceDate.value?.getTime();
-  //       return recordedAttendanceDate === selectedAttendaceDate;
-  //     });
-  //     if (targetIdx !== -1) {
-  //       status = member.attendances[targetIdx].status;
-  //       createdAt = member.attendances[targetIdx].createdAt.toDate();
-  //     }
-  //     if (attendanceDate.value && member.uid) {
-  //       dataSource.value.push({
-  //         uid: member.uid,
-  //         name: member.name,
-  //         attendedAt: attendanceDate.value,
-  //         status,
-  //         targetIdx,
-  //         createdAt,
-  //       });
-  //     }
-  //   });
-  //   copyDataSource.value = JSON.stringify(dataSource.value);
-  // } catch (error) {
-  //   console.log(error);
-  // } finally {
-  //   isLoading.value = false;
-  // }
+// CONTINUE: 출석 체크한거 저장하기
+const onSubmit = () => {
+  console.table(members.value);
 };
 
-const submitAttendance = async () => {
-  try {
-    if (!accountStore.accountData) return;
+// const submitAttendance = async () => {
+//   try {
+//     if (!accountStore.accountData) return;
 
-    await attendanceStore.addAttendances({
-      attendances: dataSource.value,
-      church: accountStore.accountData.church,
-      checksum: copyDataSource.value,
-      department: accountStore.accountData.department,
-      grade: accountStore.accountData.grade,
-      group: accountStore.accountData.group,
-    });
-  } catch (error) {
-    console.log(error);
-  }
-};
+//     await attendanceStore.addAttendances({
+//       attendances: members.value,
+//       church: accountStore.accountData.church,
+//       checksum: copyDataSource.value,
+//       department: accountStore.accountData.department,
+//       grade: accountStore.accountData.grade,
+//       group: accountStore.accountData.group,
+//     });
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
 
-const isTeacher = (role) => {
-  if (role === 'main' || role === 'sub') return true;
-  return false;
-};
+// const isTeacher = (role) => {
+//   if (role === 'main' || role === 'sub') return true;
+//   return false;
+// };
 
-const isAdmin = (role) => {
-  if (role === 'admin') return true;
-  return false;
-};
+// const isAdmin = (role) => {
+//   if (role === 'admin') return true;
+//   return false;
+// };
 </script>
