@@ -13,17 +13,15 @@
       출석 체크
     </span>
 
-    <Button class="p-button-warning" label="저장" @click="handleSubmit" />
+    <Button
+      class="p-button-warning p-button-sm"
+      label="저장"
+      @click="handleSubmit"
+    />
   </header>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useAccountStore } from '@/store/account';
-
-const accountStore = useAccountStore();
-const accountData = computed(() => accountStore.accountData!);
-
 const emit = defineEmits(['submit']);
 
 const handleSubmit = () => emit('submit');

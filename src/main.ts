@@ -71,6 +71,7 @@ import SelectButton from 'primevue/selectbutton';
 import Tree from 'primevue/tree';
 import Image from 'primevue/image';
 import Toast from 'primevue/toast';
+import ProgressSpinner from 'primevue/progressspinner';
 
 app
   .component('Button', Button)
@@ -91,6 +92,7 @@ app
   .component('SelectButton', SelectButton)
   .component('Tree', Tree)
   .component('Toast', Toast)
-  .component('Image', Image);
+  .component('Image', Image)
+  .component('ProgressSpinner', ProgressSpinner);
 
 app.mount('#app');

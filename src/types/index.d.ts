@@ -36,31 +36,26 @@ export interface MemberData {
   gender: Gender;
   church: string;
   department: string;
-  job: string;
+  job: 'student' | 'teacher';
   grade: string;
   group: string;
   phone: string;
   address: string;
   registeredAt: Date;
   remark: string;
-  // attendances: Attendance[];
-  attendance?: 'offline' | 'online' | 'absence';
   createdAt?: Date;
 }
 
 /** Attendance */
-type AttendanceState = Pick<
-  MemberData,
-  'church' | 'department' | 'grade' | 'group'
->;
-
-type AttendanceStatus = 'offline' | 'online' | 'absence';
-
-export interface Attendance {
-  state: AttendanceState;
-  status: AttendanceStatus;
-  attendedAt: Date;
-  createdAt: Date;
+export interface AttendanceData
+  extends Pick<
+    MemberData,
+    'name' | 'church' | 'department' | 'job' | 'grade' | 'group'
+  > {
+  uid: string;
+  attendance: 'offline' | 'online' | 'absence';
+  //   attendedAt: Date;
+  //   createdAt: Date;
 }
 
 /** Etc */

@@ -1,13 +1,9 @@
 import { defineStore } from 'pinia';
-import { useMemberStore } from './member';
 
 import { db, attendancesColl } from '@/firebase/config';
 import {
   addDoc,
-  arrayRemove,
-  arrayUnion,
   doc,
-  getDoc,
   getDocs,
   query,
   serverTimestamp,
@@ -15,12 +11,17 @@ import {
   where,
 } from 'firebase/firestore';
 
-import type { Attendance, MemberData, UserRole } from '@/types';
-import type {
-  AttendaceAddAttendanceParams,
-  AttendaceAddAttendancesParams,
-  AttendaceRemoveAttendanceParams,
-} from '@/types/store';
+import { AttendanceData } from '@/types';
+
+interface AttendaceAddAttendanceParams {
+  name: string;
+  church: string;
+  department: string;
+  grade: string;
+  group: string;
+  job: 'student' | 'teacher';
+  attendance: 'online' | 'offline' | 'absence';
+}
 
 interface AttendaceFetchAttendancesParams {
   grade?: string;
@@ -30,54 +31,19 @@ interface AttendaceFetchAttendancesParams {
   job: 'student' | 'teacher';
 }
 
+interface AttendaceModifyAttendanceParams {
+  uid: string;
+  attendance: 'online' | 'offline' | 'absence';
+}
+
 export const useAttendanceStore = defineStore('attendance', {
   state: () => ({}),
   actions: {
-    async addAttendances(params: AttendaceAddAttendancesParams) {
-      const { attendances, checksum, church, department, grade, group } =
-        params;
-
-      attendances.forEach(async (attendance, index) => {
-        const _old = JSON.stringify(JSON.parse(checksum)[index]);
-        const _new = JSON.stringify(attendance);
-
-        if (attendance.targetIdx !== -1 && _old !== _new) {
-          await this.removeAttendance({
-            attendance: JSON.parse(_old),
-            church,
-            department,
-            grade,
-            group,
-          });
-        }
-
-        await this.addAttendance({
-          attendance,
-          church,
-          department,
-          grade,
-          group,
-        });
-      });
-    },
-
+    // CONTINUE: 저장할 때 저장 시간 및 출석 날짜도 추가하기
     async addAttendance(params: AttendaceAddAttendanceParams) {
-      const { attendance, church, department, grade, group } = params;
-
-      const _: Attendance = {
-        attendedAt: attendance.attendedAt,
-        status: attendance.status,
-        state: {
-          grade,
-          group,
-          church,
-          department,
-        },
-        createdAt: attendance.createdAt,
-      };
-
-      await updateDoc(doc(db, 'newMembers', attendance.uid), {
-        attendances: arrayUnion(_),
+      return await addDoc(attendancesColl, {
+        ...params,
+        createdAt: serverTimestamp(),
       });
     },
 
@@ -90,26 +56,16 @@ export const useAttendanceStore = defineStore('attendance', {
       );
       const qSnapshot = await getDocs(q);
 
-      return qSnapshot.docs.map((doc) => doc);
+      const result = qSnapshot.docs.map((doc) => ({
+        uid: doc.id,
+        ...doc.data(),
+      }));
+      return result as unknown as AttendanceData[];
     },
 
-    async removeAttendance(params: AttendaceRemoveAttendanceParams) {
-      const { attendance, church, department, grade, group } = params;
-
-      const _: Attendance = {
-        attendedAt: new Date(attendance.attendedAt),
-        status: attendance.status,
-        state: {
-          grade,
-          group,
-          church,
-          department,
-        },
-        createdAt: new Date(attendance.createdAt),
-      };
-
-      await updateDoc(doc(db, 'newMembers', attendance.uid), {
-        attendances: arrayRemove(_),
+    async modifyAttendance(params: AttendaceModifyAttendanceParams) {
+      return await updateDoc(doc(db, 'newAttendances', params.uid), {
+        attendance: params.attendance,
       });
     },
   },
