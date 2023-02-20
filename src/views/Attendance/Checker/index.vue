@@ -10,7 +10,7 @@
       placeholder="날짜를 선택해주세요"
       :max-date="maxDate"
       :disabledDays="[1, 2, 3, 4, 5, 6]"
-      @date-select="getAttendances"
+      @date-select="getAttendancesTemplate"
     />
 
     <ProgressSpinner v-if="isLoading" />
@@ -24,7 +24,7 @@
         <span>{{ member.name }}</span>
 
         <SelectButton
-          v-model="member.attendance"
+          v-model="member.attendance.status"
           :options="[
             { name: '현장', value: 'offline' },
             { name: '온라인', value: 'online' },
@@ -70,69 +70,79 @@ const maxDate = getPreviousSunday();
 const attendanceDate = ref<Date>(getPreviousSunday());
 
 const isLoading = ref(true);
-const attendances = ref<AttendanceData[]>([]);
+const attendances = ref<AttendanceData[] | undefined>([]);
 // const copyDataSource = ref('');
 
-const getAttendances = async () => {
-  isLoading.value = true;
+const getAttendancesTemplate = async () => {
+  try {
+    let template: AttendanceData[];
+    isLoading.value = true;
 
-  const role = accountData.value.role;
+    const role = accountData.value.role;
+    if (role === 'admin') {
+      const members = await memberStore.fetchAll({
+        church: accountData.value.church,
+        department: accountData.value.department,
+        job: 'teacher',
+      });
 
-  // if (role === 'admin') {
-  const members = await memberStore.fetchAll({
-    church: accountData.value.church,
-    department: accountData.value.department,
-    job: 'teacher',
-  });
+      const attendaces = await attendanceStore.fetchAttendances({
+        church: accountData.value.church,
+        department: accountData.value.department,
+        job: 'teacher',
+        attendanceDate: attendanceDate.value,
+      });
 
-  const attendaces = await attendanceStore.fetchAttendances({
-    church: accountData.value.church,
-    department: accountData.value.department,
-    job: 'teacher',
-  });
+      template = members.map((mem) => {
+        let uid = '';
+        let status: AttendanceData['attendance']['status'] = 'offline';
 
-  const result: AttendanceData[] = members.map((m) => {
-    let uid = '';
-    let attendance: AttendanceData['attendance'] = 'offline';
+        const hasRecord = attendaces.findIndex((attd) => {
+          return attd.name === mem.name;
+        });
 
-    const hasRecord = attendaces.findIndex((attd) => attd.name === m.name);
+        if (hasRecord !== -1) {
+          uid = attendaces[hasRecord].uid;
+          status = attendaces[hasRecord].attendance.status;
+        }
 
-    if (hasRecord !== -1) {
-      uid = attendaces[hasRecord].uid;
-      attendance = attendaces[hasRecord].attendance;
+        return {
+          uid,
+          name: mem.name,
+          church: mem.church,
+          department: mem.department,
+          grade: mem.grade,
+          group: mem.group,
+          job: 'teacher',
+          attendance: {
+            date: attendanceDate.value,
+            status,
+          },
+        };
+      });
+
+      attendances.value = template;
     }
 
-    return {
-      uid,
-      name: m.name,
-      church: m.church,
-      department: m.department,
-      grade: m.grade,
-      group: m.group,
-      job: 'teacher',
-      attendance,
-    };
-  });
-
-  isLoading.value = false;
-
-  return result;
-  // }
-
-  // else if (role === 'main' || role === 'sub') {}
-  // else {}
+    // else if (role === 'main' || role === 'sub') {}
+    // else {}
+  } catch (error) {
+    console.log(error);
+  } finally {
+    isLoading.value = false;
+  }
 };
 
-onMounted(async () => {
-  attendances.value = await getAttendances();
-});
+onMounted(async () => await getAttendancesTemplate());
 
 const onSubmit = () => {
-  attendances.value.forEach(async (attd) => {
+  attendances.value?.forEach(async (attd) => {
     if (attd.uid) {
       await attendanceStore.modifyAttendance({
         uid: attd.uid,
-        attendance: attd.attendance,
+        attendance: {
+          status: attd.attendance.status,
+        },
       });
     } else {
       await attendanceStore.addAttendance({
@@ -142,7 +152,11 @@ const onSubmit = () => {
         grade: attd.grade,
         group: attd.group,
         job: attd.job,
-        attendance: attd.attendance,
+        attendance: {
+          date: attendanceDate.value,
+          status: attd.attendance.status,
+        },
+        createdBy: accountData.value.name,
       });
     }
   });

@@ -7,6 +7,7 @@ import {
   getDocs,
   query,
   serverTimestamp,
+  Timestamp,
   updateDoc,
   where,
 } from 'firebase/firestore';
@@ -20,7 +21,11 @@ interface AttendaceAddAttendanceParams {
   grade: string;
   group: string;
   job: 'student' | 'teacher';
-  attendance: 'online' | 'offline' | 'absence';
+  attendance: {
+    date: Date;
+    status: 'online' | 'offline' | 'absence';
+  };
+  createdBy: string;
 }
 
 interface AttendaceFetchAttendancesParams {
@@ -29,17 +34,19 @@ interface AttendaceFetchAttendancesParams {
   church: string;
   department: string;
   job: 'student' | 'teacher';
+  attendanceDate: Date;
 }
 
 interface AttendaceModifyAttendanceParams {
   uid: string;
-  attendance: 'online' | 'offline' | 'absence';
+  attendance: {
+    status: 'online' | 'offline' | 'absence';
+  };
 }
 
 export const useAttendanceStore = defineStore('attendance', {
   state: () => ({}),
   actions: {
-    // CONTINUE: 저장할 때 저장 시간 및 출석 날짜도 추가하기
     async addAttendance(params: AttendaceAddAttendanceParams) {
       return await addDoc(attendancesColl, {
         ...params,
@@ -52,20 +59,33 @@ export const useAttendanceStore = defineStore('attendance', {
         attendancesColl,
         where('church', '==', params.church),
         where('department', '==', params.department),
-        where('job', '==', params.job)
+        where('job', '==', params.job),
+        where('attendance.date', '==', params.attendanceDate)
       );
       const qSnapshot = await getDocs(q);
 
-      const result = qSnapshot.docs.map((doc) => ({
+      const result: AttendanceData[] = qSnapshot.docs.map((doc) => ({
         uid: doc.id,
-        ...doc.data(),
+        name: doc.data().name,
+        church: doc.data().church,
+        department: doc.data().department,
+        job: doc.data().job,
+        grade: doc.data().grade,
+        group: doc.data().group,
+        attendance: {
+          date: (doc.data().attendance.date as Timestamp).toDate(),
+          status: doc.data().attendance.status,
+        },
+        createdAt: (doc.data().createdAt as Timestamp).toDate(),
+        createdBy: doc.data().createdBy,
       }));
-      return result as unknown as AttendanceData[];
+
+      return result;
     },
 
     async modifyAttendance(params: AttendaceModifyAttendanceParams) {
       return await updateDoc(doc(db, 'newAttendances', params.uid), {
-        attendance: params.attendance,
+        'attendance.status': params.attendance.status,
       });
     },
   },

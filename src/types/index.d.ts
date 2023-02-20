@@ -1,4 +1,5 @@
 import type { User } from 'firebase/auth/dist/auth';
+import { Timestamp } from 'firebase/firestore';
 
 /** Common */
 export type Gender = 'male' | 'female';
@@ -53,9 +54,12 @@ export interface AttendanceData
     'name' | 'church' | 'department' | 'job' | 'grade' | 'group'
   > {
   uid: string;
-  attendance: 'offline' | 'online' | 'absence';
-  //   attendedAt: Date;
-  //   createdAt: Date;
+  attendance: {
+    date: Date | Timestamp;
+    status: 'offline' | 'online' | 'absence';
+  };
+  createdAt?: Date;
+  createdBy?: string;
 }
 
 /** Etc */
