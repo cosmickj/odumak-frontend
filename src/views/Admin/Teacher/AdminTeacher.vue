@@ -6,7 +6,7 @@
     @add="openDialogToAddTeacher"
     @edit="editSelectedMember"
     @delete="toggleIsDialogDeleteVisible"
-    @toggle="addSelectedMembers"
+    @select="addSelectedMembers"
   />
 
   <AdminDialogAdd
@@ -80,7 +80,6 @@ const initSelectedMember: MemberData = {
   address: '',
   registeredAt: new Date(),
   remark: '',
-  attendances: [],
 };
 
 const selectedMembers = reactive({ body: [] as MemberData[] });
