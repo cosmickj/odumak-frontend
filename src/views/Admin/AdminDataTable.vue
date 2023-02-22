@@ -9,11 +9,13 @@
   <DataTable
     ref="dataTableRef"
     lazy
-    rowHover
+    row-hover
+    resizable-columns
+    column-resize-mode="fit"
+    responsive-layout="scroll"
+    edit-mode="cell"
     :value="dataSource"
     :loading="isLoading"
-    edit-mode="cell"
-    responsiveLayout="scroll"
     v-model:selection="selectionRef"
     @update:selection="handleSelect"
     @cell-edit-complete="handleEdit"
@@ -138,12 +140,12 @@ import { formatDate, formatGender } from '@/utils/useFormat';
 
 import type DataTable from 'primevue/datatable';
 import type { DataTableCellEditCompleteEvent } from 'primevue/datatable/DataTable';
-import type { MemberData, UserData } from '@/types';
+import type { MemberData } from '@/types';
 
 const props = defineProps<{
   isLoading: boolean;
-  dataSource: MemberData[] | UserData[];
-  selection: MemberData[];
+  dataSource: MemberData[];
+  selection?: MemberData[];
   // selectedColumns: any;
 }>();
 

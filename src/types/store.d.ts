@@ -79,6 +79,11 @@ export interface UserFetchSingleParams {
   uid: string;
 }
 
+export interface UserFetchMultipleByChurchAndDepartment {
+  church: string;
+  department: string;
+}
+
 export interface UserDeleteSingleParams {
   uid: string;
 }

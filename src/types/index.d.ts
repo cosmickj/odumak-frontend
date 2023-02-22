@@ -24,6 +24,7 @@ interface UserData {
   phone: string | null;
   isAccepted: boolean;
   isRejected: boolean;
+  rejectedReason?: string;
   createdAt: Date;
 }
 

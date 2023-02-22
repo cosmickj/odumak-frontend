@@ -1,12 +1,15 @@
 import { defineStore } from 'pinia';
 
-import { db } from '@/firebase/config';
+import { db, usersColl } from '@/firebase/config';
 import {
   deleteDoc,
   doc,
   getDoc,
+  getDocs,
+  query,
   serverTimestamp,
   setDoc,
+  where,
 } from 'firebase/firestore';
 
 import { Collection } from '@/enums';
@@ -15,6 +18,7 @@ import type {
   UserCreateSingleParams,
   UserDeleteSingleParams,
   UserFetchSingleParams,
+  UserFetchMultipleByChurchAndDepartment,
 } from '@/types/store';
 
 export const useUserStore = defineStore('user', {
@@ -43,7 +47,6 @@ export const useUserStore = defineStore('user', {
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-          // TODO: attendances를 모두 가져오면 무거워진다. 이걸 빼고 가져오자.
           return docSnap.data() as UserData;
         } else {
           return null;
@@ -51,6 +54,29 @@ export const useUserStore = defineStore('user', {
       } catch (error) {
         console.log(error);
       }
+    },
+    /**
+     * 관리자 페이지에서 가입자 전체 목록 읽어오기
+     */
+    async fetchMultipleByChurchAndDepartment(
+      params: UserFetchMultipleByChurchAndDepartment
+    ) {
+      const { church, department } = params;
+
+      const q = query(
+        usersColl,
+        where('church', '==', church),
+        where('department', '==', department),
+        where('role', '!=', 'admin')
+      );
+      const qSnapshot = await getDocs(q);
+
+      const result = qSnapshot.docs.map((doc) => ({
+        uid: doc.id,
+        ...doc.data(),
+      }));
+
+      return result as unknown as UserData[];
     },
     /**
      * 탈퇴 이후 유저 정보 삭제 함수

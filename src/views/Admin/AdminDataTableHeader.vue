@@ -31,7 +31,7 @@ import { computed } from 'vue';
 import type { MemberData } from '@/types';
 
 const props = defineProps<{
-  selection: MemberData[];
+  selection?: MemberData[];
 }>();
 
 const emit = defineEmits(['export', 'add', 'delete']);
@@ -40,5 +40,10 @@ const handleAdd = () => emit('add');
 const handleDelete = () => emit('delete');
 const handleExport = () => emit('export');
 
-const isDisabled = computed(() => props.selection.length > 0);
+const isDisabled = computed(() => {
+  if (props.selection) {
+    return props.selection.length > 0;
+  }
+  return false;
+});
 </script>
