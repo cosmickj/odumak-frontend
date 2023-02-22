@@ -1,13 +1,13 @@
 <template>
-  <section class="flex flex-col pt-20">
-    <h1 class="mb-3 px-7 text-4xl">아이들과 가까워지는 시간</h1>
-    <p class="mb-8 px-7 text-xl">오늘도 여러분의 섬김에 감사합니다</p>
+  <section class="flex flex-col pt-20 text-xs">
+    <h1 class="mb-3 px-7 text-xl">아이들과 가까워지는 시간</h1>
+    <p class="mb-8 px-7">오늘도 여러분의 섬김에 감사합니다</p>
 
     <form @submit.prevent="loginWithEmail">
       <div class="mx-7 mb-2">
         <InputText
           v-model="loginForm.email"
-          class="w-full"
+          class="w-full p-inputtext-sm"
           id="email"
           type="text"
           placeholder="이메일을 입력하세요"
@@ -17,7 +17,7 @@
       <div class="mx-7 mb-2">
         <Password
           v-model="loginForm.password"
-          class="w-full"
+          class="w-full p-inputtext-sm"
           id="password"
           placeholder="비밀번호를 입력하세요"
           inputStyle="width:inherit;"
@@ -29,7 +29,7 @@
       <!-- 로그인 버튼 -->
       <div class="mx-7 my-3">
         <Button
-          class="p-button-warning p-button-rounded w-full justify-center"
+          class="w-full p-button-warning p-button-sm"
           label="로그인"
           :loading="isLoading"
           loadingIcon="pi pi-spinner pi-spin"
@@ -45,16 +45,16 @@
       </div>
 
       <div class="mx-7 mt-8 flex justify-evenly items-center">
-        <span class="text-xl">계정이 없으신가요?</span>
+        <span>계정이 없으신가요?</span>
         <router-link :to="{ name: 'AccountSignup' }">
-          <span class="text-yellow-500 text-xl">회원가입</span>
+          <span class="text-yellow-500">회원가입</span>
         </router-link>
       </div>
     </form>
 
     <div class="relative flex flex-col justify-center px-7 my-12">
       <div class="separator bg-slate-300"></div>
-      <span class="absolute inset-x-0 w-fit mx-auto px-3 bg-slate-100 text-xl">
+      <span class="absolute inset-x-0 w-fit mx-auto px-3 bg-slate-100">
         또는
       </span>
     </div>
@@ -81,7 +81,7 @@
           class="absolute inset-0 w-screen h-screen bg-black bg-opacity-50 flex items-center justify-center"
         >
           <div ref="modal" class="bg-white rounded-lg shadow-lg">
-            <div class="text-2xl px-28 py-10">
+            <div class="px-28 py-10">
               <p>원할한 출석 관리를 위해</p>
               <p><span>회원가입</span>을 진행해주세요.</p>
             </div>
