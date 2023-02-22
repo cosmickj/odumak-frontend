@@ -1,46 +1,69 @@
 <template>
-  <section class="flex flex-col h-full p-8">
+  <main class="flex flex-col h-full p-8">
     <CheckerHeader @submit="onSubmit" />
 
-    <Calendar
-      v-model="attendanceDate"
-      class="my-5"
-      touchUI
-      input-class="text-center"
-      placeholder="날짜를 선택해주세요"
-      :max-date="maxDate"
-      :disabledDays="[1, 2, 3, 4, 5, 6]"
-      @date-select="getAttendancesTemplate"
-    />
+    <template v-if="accountData.isAccepted">
+      <Calendar
+        v-model="attendanceDate"
+        class="my-5"
+        touchUI
+        input-class="text-center"
+        placeholder="날짜를 선택해주세요"
+        :max-date="maxDate"
+        :disabledDays="[1, 2, 3, 4, 5, 6]"
+        @date-select="getAttendancesTemplate"
+      />
 
-    <ProgressSpinner v-if="isLoading" />
+      <ProgressSpinner v-if="isLoading" />
 
-    <section v-else>
-      <div
-        v-for="(member, i) in attendances"
-        class="flex mt-[-1px] px-2 py-3 border border-slate-300 items-center justify-between"
-        :key="i"
+      <section v-else>
+        <div
+          v-for="(member, i) in attendancesTemplate"
+          class="flex mt-[-1px] px-2 py-3 border border-slate-300 items-center justify-between"
+          :key="i"
+        >
+          <span>{{ member.name }}</span>
+
+          <SelectButton
+            v-model="member.attendance.status"
+            :options="[
+              { name: '현장', value: 'offline' },
+              { name: '온라인', value: 'online' },
+              { name: '결석', value: 'absence' },
+            ]"
+            option-label="name"
+            option-value="value"
+          />
+
+          <Button
+            icon="pi pi-chevron-down"
+            class="p-button-rounded p-button-text p-button-secondary p-button-sm"
+          />
+        </div>
+      </section>
+    </template>
+
+    <template v-else>
+      <Dialog
+        modal
+        header="승인이 필요합니다"
+        v-model:visible="visible"
+        :breakpoints="{ '450px': '85vw' }"
+        @hide="$router.push({ name: 'HomeView' })"
       >
-        <span>{{ member.name }}</span>
+        <p>서기 선생님의 승인 이전에는 출석 체크를 할 수 없습니다.</p>
 
-        <SelectButton
-          v-model="member.attendance.status"
-          :options="[
-            { name: '현장', value: 'offline' },
-            { name: '온라인', value: 'online' },
-            { name: '결석', value: 'absence' },
-          ]"
-          option-label="name"
-          option-value="value"
-        />
-
-        <Button
-          icon="pi pi-chevron-down"
-          class="p-button-rounded p-button-text p-button-secondary p-button-sm"
-        />
-      </div>
-    </section>
-  </section>
+        <template #footer>
+          <Button
+            label="알겠습니다"
+            class="p-button-info"
+            icon="pi pi-check"
+            @click="$router.push({ name: 'HomeView' })"
+          />
+        </template>
+      </Dialog>
+    </template>
+  </main>
 </template>
 
 <script setup lang="ts">
@@ -56,8 +79,6 @@ const accountStore = useAccountStore();
 const attendanceStore = useAttendanceStore();
 const memberStore = useMemberStore();
 
-const accountData = computed(() => accountStore.accountData!);
-
 // https://bobbyhadz.com/blog/javascript-get-previous-sunday
 const getPreviousSunday = (date = new Date()) => {
   const _date = new Date();
@@ -69,9 +90,13 @@ const getPreviousSunday = (date = new Date()) => {
 const maxDate = getPreviousSunday();
 const attendanceDate = ref<Date>(getPreviousSunday());
 
-const isLoading = ref(true);
-const attendances = ref<AttendanceData[] | undefined>([]);
+const isLoading = ref(false);
+const attendancesTemplate = ref<AttendanceData[] | undefined>([]);
 // const copyDataSource = ref('');
+
+const visible = ref(true);
+
+const accountData = computed(() => accountStore.accountData!);
 
 const getAttendancesTemplate = async () => {
   try {
@@ -121,7 +146,7 @@ const getAttendancesTemplate = async () => {
         };
       });
 
-      attendances.value = template;
+      attendancesTemplate.value = template;
     }
 
     // else if (role === 'main' || role === 'sub') {}
@@ -133,10 +158,12 @@ const getAttendancesTemplate = async () => {
   }
 };
 
-onMounted(async () => await getAttendancesTemplate());
+onMounted(async () => {
+  await getAttendancesTemplate();
+});
 
 const onSubmit = () => {
-  attendances.value?.forEach(async (attd) => {
+  attendancesTemplate.value?.forEach(async (attd) => {
     if (attd.uid) {
       await attendanceStore.modifyAttendance({
         uid: attd.uid,
