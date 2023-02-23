@@ -3,6 +3,8 @@
     :loading="loading"
     :users="users"
     v-model:users-selection="usersSelection"
+    @accept="acceptUsers"
+    @reject="rejectUsers"
   />
 </template>
 
@@ -35,7 +37,6 @@ const fetchUsers = async () => {
 onMounted(async () => {
   try {
     loading.value = true;
-
     await fetchUsers();
   } catch (error) {
     console.log(error);
@@ -43,6 +44,30 @@ onMounted(async () => {
     loading.value = false;
   }
 });
+
+const acceptUsers = () => {
+  usersSelection.value.forEach(async (user) => {
+    if (user.uid) {
+      await userStore.modifySingle({
+        uid: user.uid,
+        keyName: 'isAccepted',
+        keyValue: true,
+      });
+    }
+  });
+};
+
+const rejectUsers = () => {
+  usersSelection.value.forEach(async (user) => {
+    if (user.uid) {
+      await userStore.modifySingle({
+        uid: user.uid,
+        keyName: 'isRejected',
+        keyValue: true,
+      });
+    }
+  });
+};
 </script>
 
 <style scoped></style>

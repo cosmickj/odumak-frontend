@@ -84,6 +84,11 @@ export interface UserFetchMultipleByChurchAndDepartment {
   department: string;
 }
 
+export interface UserModifySingle {
+  uid: string;
+  [key: string]: any;
+}
+
 export interface UserDeleteSingleParams {
   uid: string;
 }

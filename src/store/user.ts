@@ -9,6 +9,7 @@ import {
   query,
   serverTimestamp,
   setDoc,
+  updateDoc,
   where,
 } from 'firebase/firestore';
 
@@ -19,6 +20,7 @@ import type {
   UserDeleteSingleParams,
   UserFetchSingleParams,
   UserFetchMultipleByChurchAndDepartment,
+  UserModifySingle,
 } from '@/types/store';
 
 export const useUserStore = defineStore('user', {
@@ -77,6 +79,12 @@ export const useUserStore = defineStore('user', {
       }));
 
       return result as unknown as UserData[];
+    },
+    async modifySingle(params: UserModifySingle) {
+      const { uid, keyName, keyValue } = params;
+      return await updateDoc(doc(db, 'newUsers', uid), {
+        [keyName]: keyValue,
+      });
     },
     /**
      * 탈퇴 이후 유저 정보 삭제 함수

@@ -6,12 +6,14 @@
         icon="pi pi-verified"
         label="승인하기"
         :disabled="!isSelected"
+        @click="handleAccept"
       />
       <Button
         class="p-button-danger p-button-sm"
         icon="pi pi-times-circle"
         label="거절하기"
         :disabled="!isSelected"
+        @click="handleReject"
       />
     </div>
 
@@ -69,8 +71,8 @@
 </template>
 
 <script setup lang="ts">
-import type { UserData } from '@/types';
 import { computed } from 'vue';
+import type { UserData } from '@/types';
 
 const props = defineProps<{
   loading: boolean;
@@ -78,7 +80,7 @@ const props = defineProps<{
   usersSelection: UserData[];
 }>();
 
-const emit = defineEmits(['update:usersSelection']);
+const emit = defineEmits(['update:usersSelection', 'accept', 'reject']);
 
 const selection = computed({
   get() {
@@ -95,6 +97,9 @@ const isSelected = computed(() => {
   }
   return false;
 });
+
+const handleAccept = () => emit('accept');
+const handleReject = () => emit('reject');
 </script>
 
 <style scoped></style>

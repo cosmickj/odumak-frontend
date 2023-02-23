@@ -14,6 +14,7 @@ type AuthData = {
 export type UserRole = 'admin' | 'main' | 'sub' | 'common';
 
 interface UserData {
+  uid?: string;
   name: string;
   birth: Date | null;
   church: string;
