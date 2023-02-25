@@ -12,7 +12,6 @@ import App from '@/App.vue';
 
 import PrimeVue from 'primevue/config';
 import ToastService from 'primevue/toastservice';
-
 import VueCookies from 'vue-cookies';
 
 import { getCurrentUser } from '@/router';
@@ -26,9 +25,9 @@ const app = createApp(App);
 
 app.use(router);
 app.use(createPinia());
-app.use(VueCookies);
 app.use(PrimeVue);
 app.use(ToastService);
+app.use(VueCookies);
 
 // Waiting for Auth to be Ready
 (async () => {
@@ -53,46 +52,48 @@ app.use(ToastService);
 })();
 
 import Button from 'primevue/button';
-import Card from 'primevue/card';
 import Calendar from 'primevue/calendar';
+import Card from 'primevue/card';
 import Checkbox from 'primevue/checkbox';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
+import DataView from 'primevue/dataview';
 import Dialog from 'primevue/dialog';
 import Dropdown from 'primevue/dropdown';
 import FileUpload from 'primevue/fileupload';
+import Image from 'primevue/image';
 import InputMask from 'primevue/inputmask';
-import InputText from 'primevue/inputtext';
 import InputSwitch from 'primevue/inputswitch';
+import InputText from 'primevue/inputtext';
 import MultiSelect from 'primevue/multiselect';
 import Password from 'primevue/password';
+import ProgressSpinner from 'primevue/progressspinner';
 import RadioButton from 'primevue/radiobutton';
 import SelectButton from 'primevue/selectbutton';
-import Tree from 'primevue/tree';
-import Image from 'primevue/image';
 import Toast from 'primevue/toast';
-import ProgressSpinner from 'primevue/progressspinner';
+import Tree from 'primevue/tree';
 
 app
   .component('Button', Button)
-  .component('Card', Card)
   .component('Calendar', Calendar)
+  .component('Card', Card)
   .component('Checkbox', Checkbox)
   .component('Column', Column)
   .component('DataTable', DataTable)
+  .component('DataView', DataView)
   .component('Dialog', Dialog)
   .component('Dropdown', Dropdown)
   .component('FileUpload', FileUpload)
+  .component('Image', Image)
   .component('InputMask', InputMask)
-  .component('InputText', InputText)
   .component('InputSwitch', InputSwitch)
+  .component('InputText', InputText)
   .component('MultiSelect', MultiSelect)
   .component('Password', Password)
+  .component('ProgressSpinner', ProgressSpinner)
   .component('RadioButton', RadioButton)
   .component('SelectButton', SelectButton)
-  .component('Tree', Tree)
   .component('Toast', Toast)
-  .component('Image', Image)
-  .component('ProgressSpinner', ProgressSpinner);
+  .component('Tree', Tree);
 
 app.mount('#app');
