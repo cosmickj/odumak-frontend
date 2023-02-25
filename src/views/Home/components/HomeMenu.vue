@@ -1,12 +1,9 @@
 <template>
-  <router-link
-    class="rounded-lg"
-    :to="{ name: routeName, params: { job, type } }"
-  >
+  <router-link class="rounded-lg" :to="{ name: routeName, params: { job } }">
     <div class="relative h-full p-4 text-base">
       <p>
-        <span>{{ 누구 }}</span>
-        <span class="font-bold">{{ 분류 }}</span>
+        <span>{{ who }}</span>
+        <span class="font-bold">{{ what }}</span>
       </p>
 
       <p>출석현황</p>
@@ -23,20 +20,14 @@ import { computed } from 'vue';
 
 const props = defineProps<{
   icon: string;
-  job: string;
+  job: 'student' | 'teacher';
+  type: 'daily' | 'total';
   routeName: string;
-  type: string;
 }>();
 
-const 누구 = computed(() => {
-  if (props.job === 'student') return '학생';
-  else if (props.job === 'teacher') return '교사';
-});
+const WhoMap = { student: '학생', teacher: '교사' };
+const who = computed(() => WhoMap[props.job]);
 
-const 분류 = computed(() => {
-  if (props.type === 'daily') return '일일';
-  else if (props.type === 'total') return '누적';
-});
+const WhatMap = { daily: '일일', total: '누적' };
+const what = computed(() => WhatMap[props.type]);
 </script>
-
-<style scoped></style>

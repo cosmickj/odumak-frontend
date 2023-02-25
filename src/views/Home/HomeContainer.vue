@@ -20,7 +20,7 @@
         job="student"
         type="daily"
         icon="pi pi-users"
-        route-name="AttendanceTracker"
+        route-name="AttendanceTrackerDaily"
       />
 
       <HomeMenu
@@ -28,7 +28,7 @@
         job="student"
         type="total"
         icon="pi pi-users"
-        route-name="AttendanceTracker"
+        route-name="AttendanceTrackerTotal"
       />
 
       <HomeMenu
@@ -36,7 +36,7 @@
         job="teacher"
         type="daily"
         icon="pi pi-heart"
-        route-name="AttendanceTracker"
+        route-name="AttendanceTrackerDaily"
       />
 
       <HomeMenu
@@ -44,7 +44,7 @@
         job="teacher"
         type="total"
         icon="pi pi-heart"
-        route-name="AttendanceTracker"
+        route-name="AttendanceTrackerTotal"
       />
     </div>
   </section>

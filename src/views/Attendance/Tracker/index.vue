@@ -1,122 +1,80 @@
 <template>
-  <div class="overflow-auto p-8 bg-slate-100">
-    <TheLoader v-if="isLoading" />
+  <div class="overflow-auto flex flex-col h-full p-4">
+    <p class="text-2xl text-center">{{ headerText }} 일일 출석현황</p>
 
-    <div class="text-3xl text-center">{{ title }} 출석현황</div>
-
-    <!-- TODO: 누적 현황 작업 이후에 v-if 제거 -->
     <Calendar
-      v-if="type === 'daily'"
+      touchUI
       v-model="attendanceDate"
-      class="w-full pt-5"
-      :touchUI="true"
-      :disabledDays="[1, 2, 3, 4, 5, 6]"
-      :placeholder="'날짜를 선택해주세요'"
+      class="my-5"
       input-class="text-center"
+      placeholder="날짜를 선택해주세요"
+      :max-date="maxDate"
+      :disabledDays="[1, 2, 3, 4, 5, 6]"
       @date-select="onAttendanceDateSelect"
     />
 
-    <!-- TODO: 누적 현황 작업 이후에 v-if 제거 -->
-    <TheFinger v-if="!attendanceDate && type === 'daily'" />
+    <ProgressSpinner v-if="isLoading" />
 
-    <TrackerStudentsDaily
-      v-if="position === 'student' && type === 'daily'"
-      :attendance-date="attendanceDate"
-      :students-attendance="studentsAttendance"
-    />
-
-    <TrackerTeachersDaily
-      v-else-if="position === 'teacher' && type === 'daily'"
-      :attendance-date="attendanceDate"
-      :teachers-attendance="teachersAttendance"
-    />
-
-    <TrackerStudentsTotal
-      v-else-if="position === 'student' && type === 'total'"
-    />
-
-    <TrackerTeachersTotal
-      v-else-if="position === 'teacher' && type === 'total'"
-    />
+    <RouterView v-else />
   </div>
 </template>
 
 <script setup lang="ts">
-import TheLoader from '@/components/TheLoader.vue';
-import TrackerStudentsDaily from './components/TrackerStudentsDaily.vue';
-import TrackerTeachersDaily from './components/TrackerTeachersDaily.vue';
-import TrackerStudentsTotal from './components/TrackerStudentsTotal.vue';
-import TrackerTeachersTotal from './components/TrackerTeachersTotal.vue';
-
-import { computed, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { computed, ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAccountStore } from '@/store/account';
 import { useAttendanceStore } from '@/store/attendance';
 
-import type { MemberPosition, Teacher } from '@/types';
-import { useAccountStore } from '@/store/account';
+const router = useRouter();
+const accountStore = useAccountStore();
+const attendanceStore = useAttendanceStore();
 
-const route = useRoute();
+// https://bobbyhadz.com/blog/javascript-get-previous-sunday
+const getPreviousSunday = (date = new Date()) => {
+  const _date = new Date();
+  _date.setDate(date.getDate() - date.getDay());
+  _date.setHours(0, 0, 0, 0);
+  return _date;
+};
 
-const account = useAccountStore();
-const attendance = useAttendanceStore();
+const maxDate = getPreviousSunday();
+const attendanceDate = ref<Date>(getPreviousSunday());
 
-// const userData = computed(() => account.userData);
-const position = computed(() => route.params.position as MemberPosition);
-const type = computed(() => route.params.type);
-
-const title = computed(() => {
-  let result = [];
-
-  if (position.value === 'student') {
-    result.push('학생');
-  }
-  //
-  else if (position.value === 'teacher') {
-    result.push('교사');
-  }
-
-  if (type.value === 'daily') {
-    result.push('일일');
-  }
-  //
-  else if (type.value === 'total') {
-    result.push('누적');
-  }
-
-  return result.join(' ');
+const job = computed(() => {
+  return router.currentRoute.value.params.job as 'student' | 'teacher';
 });
+const HeaderTextMap = { student: '학생', teacher: '교사' };
+const headerText = computed(() => HeaderTextMap[job.value]);
 
 const isLoading = ref(false);
-const attendanceDate = ref<Date>();
+const attendancesRecord = ref<any[]>([]);
 
-const studentsAttendance = ref<any[]>([]);
-const teachersAttendance = ref<Teacher[]>([]);
+const accountData = computed(() => accountStore.accountData!);
 
-const onAttendanceDateSelect = async () => {
+const getAttendancesRecord = async () => {
   try {
-    // isLoading.value = true;
-    // const params = {
-    //   attendanceDate: attendanceDate.value!,
-    //   church: userData.value?.church!,
-    //   department: userData.value?.department!,
-    // };
-    // if (position.value === 'student') {
-    //   const result = await attendance.fetchStudentsAttendanceByDate(params);
-    //   studentsAttendance.value = result;
-    // } else {
-    //   const result = await attendance.fetchTeachersAttendanceByDate(params);
-    //   teachersAttendance.value = result;
-    // }
+    isLoading.value = true;
+
+    attendancesRecord.value = await attendanceStore.fetchAttendances({
+      church: accountData.value.church,
+      department: accountData.value.department,
+      job: job.value,
+      attendanceDate: attendanceDate.value,
+    });
   } catch (error) {
     console.log(error);
   } finally {
     isLoading.value = false;
   }
 };
+
+onMounted(async () => {
+  await getAttendancesRecord();
+});
+
+const onAttendanceDateSelect = () => {
+  console.log('onAttendanceDateSelect');
+};
 </script>
 
-<style scoped>
-:deep(.p-column-header-content) {
-  justify-content: center;
-}
-</style>
+<style scoped></style>

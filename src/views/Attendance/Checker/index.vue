@@ -4,9 +4,9 @@
 
     <template v-if="accountData.isAccepted">
       <Calendar
+        touchUI
         v-model="attendanceDate"
         class="my-5"
-        touchUI
         input-class="text-center"
         placeholder="날짜를 선택해주세요"
         :max-date="maxDate"

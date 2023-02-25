@@ -53,12 +53,25 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
-        path: 'attendance/tracker/:job/:type',
-        name: 'AttendanceTracker',
+        path: 'attendance/tracker',
         components: {
           default: () => import('@/views/Attendance/Tracker/index.vue'),
           GlobalNavbar: () => import('@/components/TheNavbar.vue'),
         },
+        children: [
+          {
+            path: '/:job/daily',
+            name: 'AttendanceTrackerDaily',
+            component: () =>
+              import('@/views/Attendance/Tracker/TrackerDaily.vue'),
+          },
+          {
+            path: '/:job/total',
+            name: 'AttendanceTrackerTotal',
+            component: () =>
+              import('@/views/Attendance/Tracker/TrackerTotal.vue'),
+          },
+        ],
       },
       {
         path: 'attendance/checker/',
