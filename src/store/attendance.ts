@@ -45,7 +45,11 @@ interface AttendaceModifyAttendanceParams {
 }
 
 export const useAttendanceStore = defineStore('attendance', {
-  state: () => ({}),
+  state: () => ({
+    attendancesRecord: {
+      daily: [] as AttendanceData[],
+    },
+  }),
   actions: {
     async addAttendance(params: AttendaceAddAttendanceParams) {
       return await addDoc(attendancesColl, {
@@ -80,7 +84,7 @@ export const useAttendanceStore = defineStore('attendance', {
         createdBy: doc.data().createdBy,
       }));
 
-      return result;
+      this.attendancesRecord.daily = result;
     },
 
     async modifyAttendance(params: AttendaceModifyAttendanceParams) {

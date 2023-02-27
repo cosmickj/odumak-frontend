@@ -51,6 +51,7 @@ app.use(VueCookies);
   accountStore.isAuthReady = true;
 })();
 
+import Avatar from 'primevue/avatar';
 import Button from 'primevue/button';
 import Calendar from 'primevue/calendar';
 import Card from 'primevue/card';
@@ -74,6 +75,7 @@ import Toast from 'primevue/toast';
 import Tree from 'primevue/tree';
 
 app
+  .component('Avatar', Avatar)
   .component('Button', Button)
   .component('Calendar', Calendar)
   .component('Card', Card)

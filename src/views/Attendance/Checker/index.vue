@@ -130,7 +130,7 @@ const getAttendancesTemplate = async () => {
       job: requestJob.value,
     });
 
-    const attendaces = await attendanceStore.fetchAttendances({
+    await attendanceStore.fetchAttendances({
       church: accountData.value.church,
       department: accountData.value.department,
       job: requestJob.value,
@@ -142,13 +142,16 @@ const getAttendancesTemplate = async () => {
       let uid = '';
       let status: AttendanceData['attendance']['status'] = 'offline';
 
-      const hasRecord = attendaces.findIndex((attd) => {
-        return attd.name === mem.name;
-      });
+      const hasRecord = attendanceStore.attendancesRecord.daily.findIndex(
+        (attd) => {
+          return attd.name === mem.name;
+        }
+      );
 
       if (hasRecord !== -1) {
-        uid = attendaces[hasRecord].uid;
-        status = attendaces[hasRecord].attendance.status;
+        uid = attendanceStore.attendancesRecord.daily[hasRecord].uid;
+        status =
+          attendanceStore.attendancesRecord.daily[hasRecord].attendance.status;
       }
 
       return {
