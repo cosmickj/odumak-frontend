@@ -1,9 +1,11 @@
 <template>
   <main class="h-screen flex sm:bg-gray-200 items-center justify-center">
-    <div class="w-full sm:max-w-xl h-full sm:max-h-240 bg-slate-100 shadow-lg">
+    <div
+      class="w-full sm:max-w-sm h-full sm:max-h-[46rem] bg-slate-100 shadow-lg"
+    >
       <div v-if="account.isAuthReady" class="flex flex-col h-full">
-        <RouterView class="grow"></RouterView>
-        <RouterView name="GlobalNavbar"></RouterView>
+        <RouterView class="grow" />
+        <RouterView name="GlobalNavbar" />
       </div>
     </div>
   </main>

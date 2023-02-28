@@ -63,12 +63,11 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import type { Student } from '@/types';
 import { multiSortMeta } from '../data';
 
 interface Props {
   attendanceDate: Date | undefined | null;
-  studentsAttendance: Student[];
+  studentsAttendance: any[];
 }
 
 const props = withDefaults(defineProps<Props>(), {

@@ -2,10 +2,7 @@ import axios from 'axios';
 
 const createInstance = () => {
   return axios.create({
-    baseURL: import.meta.env.VITE_ADMIN_SERVER,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-    },
+    baseURL: import.meta.env.VITE_OAUTH_GATEWAY_URL,
   });
 };
 

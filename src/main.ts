@@ -1,74 +1,101 @@
 import '@/styles/normalize.css';
 import '@/styles/global.css';
-
-import { createApp } from 'vue';
-import App from '@/App.vue';
-import router from '@/router';
-import { createPinia } from 'pinia';
-
-import VueCookies from 'vue-cookies';
-import PrimeVue from 'primevue/config';
-
 import 'primevue/resources/primevue.min.css';
 import 'primevue/resources/themes/saga-blue/theme.css';
 import 'primeicons/primeicons.css';
-import Button from 'primevue/button';
-import Card from 'primevue/card';
-import Calendar from 'primevue/calendar';
-import Checkbox from 'primevue/checkbox';
-import Column from 'primevue/column';
-import DataTable from 'primevue/datatable';
-import Dropdown from 'primevue/dropdown';
-import InputText from 'primevue/inputtext';
-import Password from 'primevue/password';
-import RadioButton from 'primevue/radiobutton';
-import SelectButton from 'primevue/selectbutton';
-import Tree from 'primevue/tree';
 import '@/index.css'; // Tailwind CSS
-import 'animate.css';
 
-const pinia = createPinia();
+import router from '@/router';
+import { createPinia } from 'pinia';
+import { createApp } from 'vue';
+import App from '@/App.vue';
+
+import PrimeVue from 'primevue/config';
+import ToastService from 'primevue/toastservice';
+import VueCookies from 'vue-cookies';
+
+import { getCurrentUser } from '@/router';
+import { useAccountStore } from '@/store/account';
+import { useUserStore } from '@/store/user';
+
+import type { UserData } from '@/types';
+import type { User } from 'firebase/auth/dist/auth';
+
 const app = createApp(App);
 
 app.use(router);
-app.use(pinia);
-app.use(VueCookies);
+app.use(createPinia());
 app.use(PrimeVue);
-
-import { getCurrentUser } from '@/router';
-import { useAccountStore } from './store/account';
-import type { User } from 'firebase/auth/dist/auth';
-import type { AccountData } from '@/types/store';
+app.use(ToastService);
+app.use(VueCookies);
 
 // Waiting for Auth to be Ready
 (async () => {
-  const account = useAccountStore();
+  const accountStore = useAccountStore();
+  const userStore = useUserStore();
+
   const currentUser = (await getCurrentUser()) as User;
+
   if (currentUser) {
-    const result = (await account.fetchAccount({
+    const result = (await userStore.fetchSingle({
       uid: currentUser.uid,
-    })) as AccountData;
-    account.userData = {
+    })) as UserData;
+
+    accountStore.accountData = {
+      uid: currentUser.uid,
       email: currentUser.email!,
-      name: currentUser.displayName!,
-      uid: currentUser.uid,
+      displayName: currentUser.displayName!,
       ...result,
     };
   }
-  account.isAuthReady = true;
+  accountStore.isAuthReady = true;
 })();
 
-app.component('Button', Button);
-app.component('Card', Card);
-app.component('Calendar', Calendar);
-app.component('Checkbox', Checkbox);
-app.component('Column', Column);
-app.component('DataTable', DataTable);
-app.component('Dropdown', Dropdown);
-app.component('InputText', InputText);
-app.component('Password', Password);
-app.component('RadioButton', RadioButton);
-app.component('SelectButton', SelectButton);
-app.component('Tree', Tree);
+import Avatar from 'primevue/avatar';
+import Button from 'primevue/button';
+import Calendar from 'primevue/calendar';
+import Card from 'primevue/card';
+import Checkbox from 'primevue/checkbox';
+import Column from 'primevue/column';
+import DataTable from 'primevue/datatable';
+import DataView from 'primevue/dataview';
+import Dialog from 'primevue/dialog';
+import Dropdown from 'primevue/dropdown';
+import FileUpload from 'primevue/fileupload';
+import Image from 'primevue/image';
+import InputMask from 'primevue/inputmask';
+import InputSwitch from 'primevue/inputswitch';
+import InputText from 'primevue/inputtext';
+import MultiSelect from 'primevue/multiselect';
+import Password from 'primevue/password';
+import ProgressSpinner from 'primevue/progressspinner';
+import RadioButton from 'primevue/radiobutton';
+import SelectButton from 'primevue/selectbutton';
+import Toast from 'primevue/toast';
+import Tree from 'primevue/tree';
+
+app
+  .component('Avatar', Avatar)
+  .component('Button', Button)
+  .component('Calendar', Calendar)
+  .component('Card', Card)
+  .component('Checkbox', Checkbox)
+  .component('Column', Column)
+  .component('DataTable', DataTable)
+  .component('DataView', DataView)
+  .component('Dialog', Dialog)
+  .component('Dropdown', Dropdown)
+  .component('FileUpload', FileUpload)
+  .component('Image', Image)
+  .component('InputMask', InputMask)
+  .component('InputSwitch', InputSwitch)
+  .component('InputText', InputText)
+  .component('MultiSelect', MultiSelect)
+  .component('Password', Password)
+  .component('ProgressSpinner', ProgressSpinner)
+  .component('RadioButton', RadioButton)
+  .component('SelectButton', SelectButton)
+  .component('Toast', Toast)
+  .component('Tree', Tree);
 
 app.mount('#app');

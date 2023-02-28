@@ -1,56 +1,79 @@
-export interface UserInfo {
+import type { User } from 'firebase/auth/dist/auth';
+import { Timestamp } from 'firebase/firestore';
+
+/** Common */
+export type Gender = 'male' | 'female';
+
+/** Account */
+type Key = 'uid' | 'email' | 'displayName';
+
+type AuthData = {
+  -readonly [k in Key]: User[k];
+};
+
+export type UserRole = 'admin' | 'main' | 'sub' | 'common';
+
+interface UserData {
+  uid?: string;
   name: string;
-  email: string;
+  birth: Date | null;
+  church: string;
+  department: string;
+  grade: string;
+  group: string;
+  role: UserRole;
+  phone: string | null;
+  isAccepted: boolean;
+  isRejected: boolean;
+  rejectedReason?: string;
   createdAt: Date;
 }
 
-export interface Student {
+export interface AccountData extends AuthData, UserData {}
+
+/** Member */
+export interface MemberData {
+  uid?: string;
+  name: string;
+  birth: Date;
+  gender: Gender;
+  church: string;
+  department: string;
+  job: 'student' | 'teacher';
   grade: string;
   group: string;
-  teacher?: string;
-  name: string;
-  gender?: string;
-  birth?: string;
-  phone?: string;
-  address?: string;
-  remark?: string;
-  attendance?: string;
-}
-export interface Teacher {
-  attendance?: string;
-  grade: string;
-  group: string;
-  name: string;
-  role: TeacherRole;
+  phone: string;
+  address: string;
+  registeredAt: Date;
+  remark: string;
+  createdAt?: Date;
 }
 
+/** Attendance */
+export interface AttendanceData
+  extends Pick<
+    MemberData,
+    'name' | 'church' | 'department' | 'job' | 'grade' | 'group'
+  > {
+  uid: string;
+  attendance: {
+    date: Date | Timestamp;
+    status: 'offline' | 'online' | 'absence';
+  };
+  createdAt?: Date;
+  createdBy?: string;
+}
+
+/** Etc */
 export interface Option {
   label: string;
   value: string;
 }
 
-export interface AddStudentParams {
-  index?: number | null;
-  grade: string | null;
-  group: string | null;
-  name: string;
-  gender: string | null;
-  birth: Date | null;
-  phone: string;
-  teacher: string;
-  address: string;
-  remark: string;
+export interface DataTableColumn {
+  field: string;
+  header: string;
+  // sortable: boolean;
+  minWidth?: string;
+  format: undefined | Function;
 }
-
-export interface AddTeacherParams {
-  index?: number | null;
-  grade: string | null;
-  group: string | null;
-  name: string;
-  role: string | null;
-  remark: string;
-}
-
-export type TeacherRole = 'admin' | 'main' | 'sub' | 'common';
-
-export type MemberPosition = 'student' | 'teacher';

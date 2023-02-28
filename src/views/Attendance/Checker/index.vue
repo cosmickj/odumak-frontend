@@ -1,138 +1,175 @@
 <template>
-  <section class="flex flex-col h-full p-8">
-    <CheckerHeader :user-data="userData" />
+  <main class="overflow-auto flex flex-col h-full p-5">
+    <CheckerHeader @submit="onSubmit" />
 
-    <Calendar
-      v-if="
-        userData?.role === 'main' ||
-        userData?.role === 'sub' ||
-        userData?.role === 'admin'
-      "
-      v-model="attendanceDate"
-      class="pt-5"
-      :touchUI="true"
-      :disabledDays="[1, 2, 3, 4, 5, 6]"
-      placeholder="날짜를 선택해주세요"
-      input-class="text-center"
-      @date-select="requestAttendance"
-    />
+    <template v-if="accountData.isAccepted">
+      <Calendar
+        touchUI
+        v-model="attendanceDate"
+        class="my-5"
+        input-class="text-center"
+        placeholder="날짜를 선택해주세요"
+        :max-date="maxDate"
+        :disabledDays="[1, 2, 3, 4, 5, 6]"
+        @date-select="getAttendancesTemplate"
+      />
 
-    <TheFinger
-      v-if="userData?.role !== 'common' && !attendanceDate"
-      class="pt-5"
-    />
+      <ProgressSpinner v-if="isLoading" />
 
-    <TheLoader v-if="isLoading" />
+      <section v-else>
+        <CheckerTeachers
+          v-if="accountData.role === 'admin'"
+          :attendances-template="attendancesTemplate"
+        />
+        <CheckerStudents
+          v-else-if="accountData.role === 'main' || accountData.role === 'sub'"
+          :attendances-template="attendancesTemplate"
+        />
+        <Dialog
+          v-else
+          modal
+          header="담임이 아닙니다"
+          v-model:visible="visible"
+          :breakpoints="{ '450px': '85vw' }"
+          @hide="navigateToHomeView"
+        >
+          <p>출석 체크는 담임, 부담임 선생님만 이용할 수 있습니다.</p>
 
-    <!-- 선생님일 때 -->
-    <CheckerStudents
-      v-if="
-        (userData?.role === 'main' || userData?.role === 'sub') &&
-        attendanceDate
-      "
-      v-model="dataSource"
-      :document-id="documentId"
-      :attendance-date="attendanceDate"
-      @submit="submitAttendance"
-    />
+          <template #footer>
+            <Button
+              label="알겠습니다"
+              class="p-button-info"
+              icon="pi pi-check"
+              @click="navigateToHomeView"
+            />
+          </template>
+        </Dialog>
+      </section>
+    </template>
 
-    <!-- 관리자일 때 -->
-    <CheckerTeachers
-      v-else-if="userData?.role === 'admin' && attendanceDate"
-      v-model="dataSource"
-      :document-id="documentId"
-      :attendance-date="attendanceDate"
-      @submit="submitAttendance"
-    />
+    <template v-else>
+      <Dialog
+        modal
+        header="승인이 필요합니다"
+        v-model:visible="visible"
+        :breakpoints="{ '450px': '85vw' }"
+        @hide="navigateToHomeView"
+      >
+        <p>서기 선생님의 승인 이전에는 출석 체크를 할 수 없습니다.</p>
 
-    <!-- 일반교사일 때 -->
-    <div
-      v-else-if="userData?.role === 'common'"
-      class="grow flex items-center justify-center"
-    >
-      <p class="text-xl">담당 학급이 있는 선생님만 이용할 수 있습니다.</p>
-    </div>
-  </section>
+        <template #footer>
+          <Button
+            label="알겠습니다"
+            class="p-button-info"
+            icon="pi pi-check"
+            @click="navigateToHomeView"
+          />
+        </template>
+      </Dialog>
+    </template>
+  </main>
 </template>
 
 <script setup lang="ts">
-import TheFinger from '@/components/TheFinger.vue';
-import TheLoader from '@/components/TheLoader.vue';
 import CheckerHeader from './components/CheckerHeader.vue';
 import CheckerStudents from './components/CheckerStudents.vue';
 import CheckerTeachers from './components/CheckerTeachers.vue';
 
-import { computed, ref } from 'vue';
+import { computed, ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { useAccountStore } from '@/store/account';
 import { useAttendanceStore } from '@/store/attendance';
 import { useMemberStore } from '@/store/member';
-import { getPositionFromRole } from '@/utils/position';
-import type { Student, Teacher } from '@/types';
+import type { AttendanceData } from '@/types';
 
-const account = useAccountStore();
-const attendance = useAttendanceStore();
-const member = useMemberStore();
+const router = useRouter();
+const accountStore = useAccountStore();
+const attendanceStore = useAttendanceStore();
+const memberStore = useMemberStore();
 
-const userData = computed(() => account.userData);
+// https://bobbyhadz.com/blog/javascript-get-previous-sunday
+const getPreviousSunday = (date = new Date()) => {
+  const _date = new Date();
+  _date.setDate(date.getDate() - date.getDay());
+  _date.setHours(0, 0, 0, 0);
+  return _date;
+};
+
+const maxDate = getPreviousSunday();
+const attendanceDate = ref<Date>(getPreviousSunday());
 
 const isLoading = ref(false);
+const attendancesTemplate = ref<AttendanceData[] | undefined>([]);
+// const copyDataSource = ref('');
 
-const documentId = ref('');
+const visible = ref(true);
 
-const dataSource = ref<Student[] | Teacher[]>([]);
+const accountData = computed(() => accountStore.accountData!);
 
-const attendanceDate = ref<Date>();
+const RequestJobMap = {
+  admin: 'teacher' as const,
+  main: 'student' as const,
+  sub: 'student' as const,
+  common: null,
+};
+const requestJob = computed(() => RequestJobMap[accountData.value.role]);
 
-const requestAttendance = async () => {
+const getAttendancesTemplate = async () => {
   try {
-    documentId.value = '';
-    dataSource.value = [];
-    const role = userData.value?.role;
-    // 교사의 학생 출석 입력
-    if (role === 'main' || role === 'sub') {
-      const members = await member.fetchMembers({
-        church: userData.value?.church,
-        department: userData.value?.department,
-        grade: userData.value?.grade,
-        group: userData.value?.group,
-        position: 'student',
-        role,
-      });
+    isLoading.value = true;
 
-      const result = await attendance.fetchAttendance({
-        attendanceDate: attendanceDate.value,
-        church: userData.value?.church,
-        department: userData.value?.department,
-        grade: userData.value?.grade,
-        group: userData.value?.group,
-        members,
-        position: 'student',
-        role,
-      });
-
-      documentId.value = result!.documentId;
-      dataSource.value = result!.attendanceRecord;
+    if (!requestJob.value) {
+      return;
     }
-    // 관리자의 교사 출석 입력
-    else if (role === 'admin') {
-      const members = await member.fetchMembers({
-        church: userData.value?.church,
-        department: userData.value?.department,
-        position: 'teacher',
-        role,
-      });
 
-      const result = await attendance.fetchAttendance({
-        attendanceDate: attendanceDate.value,
-        church: userData.value?.church,
-        department: userData.value?.department,
-        members,
-        position: 'teacher',
-        role,
-      });
-      documentId.value = result!.documentId;
-      dataSource.value = result!.attendanceRecord;
-    }
+    let template: AttendanceData[];
+
+    const members = await memberStore.fetchAll({
+      church: accountData.value.church,
+      department: accountData.value.department,
+      job: requestJob.value,
+    });
+
+    await attendanceStore.fetchAttendances({
+      church: accountData.value.church,
+      department: accountData.value.department,
+      job: requestJob.value,
+      attendanceDate: attendanceDate.value,
+    });
+
+    // TODO: requestJob에서 null값이 나오다 보니 타입에러가 나오는 상태이다.
+    template = members.map((mem) => {
+      let uid = '';
+      let status: AttendanceData['attendance']['status'] = 'offline';
+
+      const hasRecord = attendanceStore.attendancesRecord.daily.findIndex(
+        (attd) => {
+          return attd.name === mem.name;
+        }
+      );
+
+      if (hasRecord !== -1) {
+        uid = attendanceStore.attendancesRecord.daily[hasRecord].uid;
+        status =
+          attendanceStore.attendancesRecord.daily[hasRecord].attendance.status;
+      }
+
+      return {
+        uid,
+        name: mem.name,
+        church: mem.church,
+        department: mem.department,
+        grade: mem.grade,
+        group: mem.group,
+        job: requestJob.value,
+        attendance: {
+          date: attendanceDate.value,
+          status,
+        },
+      };
+    });
+
+    attendancesTemplate.value = template;
   } catch (error) {
     console.log(error);
   } finally {
@@ -140,42 +177,42 @@ const requestAttendance = async () => {
   }
 };
 
-const submitAttendance = async () => {
+onMounted(async () => {
+  await getAttendancesTemplate();
+});
+
+const onSubmit = () => {
   try {
-    const role = userData.value?.role!;
-    const position = getPositionFromRole(role);
+    attendancesTemplate.value?.forEach(async (attd) => {
+      if (attd.uid) {
+        await attendanceStore.modifyAttendance({
+          uid: attd.uid,
+          attendance: {
+            status: attd.attendance.status,
+          },
+        });
+      } else {
+        await attendanceStore.addAttendance({
+          name: attd.name,
+          church: attd.church,
+          department: attd.department,
+          grade: attd.grade,
+          group: attd.group,
+          job: attd.job,
+          attendance: {
+            date: attendanceDate.value,
+            status: attd.attendance.status,
+          },
+          createdBy: accountData.value.name,
+        });
+      }
+    });
 
-    let response;
-    if (role === 'admin') {
-      response = await attendance.addAttendance({
-        documentId: documentId.value,
-        attendanceDate: attendanceDate.value,
-        createUser: userData.value?.name,
-        church: userData.value?.church,
-        department: userData.value?.department,
-        position,
-        records: dataSource.value,
-      });
-    }
-    // role === 'teacher'
-    else {
-      response = await attendance.addAttendance({
-        documentId: documentId.value,
-        attendanceDate: attendanceDate.value,
-        createUser: userData.value?.name,
-        church: userData.value?.church,
-        department: userData.value?.department,
-        grade: userData.value?.grade,
-        group: userData.value?.group,
-        position,
-        records: dataSource.value,
-      });
-    }
-
-    documentId.value = response.documentId;
-    alert(response.message);
+    alert('저장되었습니다!');
   } catch (error) {
     console.log(error);
   }
 };
+
+const navigateToHomeView = () => router.push({ name: 'HomeView' });
 </script>
