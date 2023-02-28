@@ -1,7 +1,7 @@
 <template>
   <section class="p-5">
-    <header class="mb-5">
-      <div class="flex my-2 text-xl items-baseline justify-center">
+    <header>
+      <div class="flex text-xl items-baseline justify-center">
         <p>
           안녕하세요, <strong>{{ userName }}</strong> 선생님!
         </p>
@@ -14,7 +14,7 @@
       </RouterLink>
     </header>
 
-    <div class="grid gap-3 grid-cols-2 grid-rows-3 h-2/4">
+    <div class="grid gap-3 grid-cols-2 grid-rows-3 h-2/4 mt-5">
       <HomeMenu
         class="col-start-1 col-end-2 row-start-1 row-end-3 bg-blue-300 text-blue-700"
         job="student"

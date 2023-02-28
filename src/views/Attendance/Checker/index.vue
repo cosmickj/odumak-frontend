@@ -1,5 +1,5 @@
 <template>
-  <main class="overflow-auto flex flex-col h-full p-4">
+  <main class="overflow-auto flex flex-col h-full p-5">
     <CheckerHeader @submit="onSubmit" />
 
     <template v-if="accountData.isAccepted">

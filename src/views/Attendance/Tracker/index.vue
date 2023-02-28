@@ -1,6 +1,6 @@
 <template>
-  <div class="overflow-auto flex flex-col h-full p-4">
-    <p class="text-2xl text-center">{{ headerText }} 일일 출석현황</p>
+  <div class="overflow-auto flex flex-col h-full p-5">
+    <p class="text-xl text-center">{{ headerText }} 일일 출석현황</p>
 
     <RouterView />
   </div>
