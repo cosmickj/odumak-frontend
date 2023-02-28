@@ -2,7 +2,7 @@
   <Calendar
     touchUI
     v-model="attendanceDate"
-    class="my-5"
+    class="mt-5"
     input-class="text-center"
     placeholder="날짜를 선택해주세요"
     :max-date="maxDate"
@@ -10,15 +10,13 @@
     @date-select="onAttendanceDateSelect"
   />
 
-  <!-- CONTINUE -->
   <DataView
-    class="relative flex-1"
     data-key="uid"
     :layout="layout"
     :value="attendanceStore.attendancesRecord.daily"
   >
     <template #header>
-      <div class="flex">
+      <div class="flex justify-between">
         <div>
           <!-- <Dropdown
             v-model="sortKey"
@@ -32,6 +30,7 @@
           v-model="layout"
           option-label="icon"
           option-value="value"
+          :unselectable="false"
           :options="[
             { icon: 'pi pi-bars', value: 'list' },
             { icon: 'pi pi-table', value: 'grid' },
@@ -45,10 +44,9 @@
     </template>
 
     <template #empty>
-      <!-- <div class="absolute top-6 left-1/2 w-44 translate-x-[-50%]">
+      <div class="absolute left-1/2 translate-x-[-50%]">
         입력된 내용이 없습니다
-      </div> -->
-      <div>입력된 내용이 없습니다</div>
+      </div>
     </template>
 
     <template #list="slotProps">
@@ -87,7 +85,8 @@
         <template #content>
           <div class="flex flex-col gap-2 items-center justify-center">
             <Avatar icon="pi pi-user" size="large" shape="circle" />
-            <p>{{ slotProps.data.name }}</p>
+            <p>{{ slotProps.data.grade }} - {{ slotProps.data.group }}</p>
+            <p class="font-bold">{{ slotProps.data.name }}</p>
             <div class="flex gap-3 mt-2">
               <Avatar
                 label="현"
@@ -179,11 +178,21 @@ const statusAbsence = (attd: string) => {
 </script>
 
 <style>
-.p-dataview-content {
+.p-dataview.p-dataview-list .p-dataview-content > .p-grid > div {
+  border: unset;
+}
+.p-dataview .p-dataview-header {
+  background: unset;
+  border: unset;
+}
+.p-dataview .p-dataview-content {
   height: 100%;
   background: unset;
 }
-.p-dataview-grid .p-dataview-content .p-grid {
+.p-dataview-list .p-grid {
+  gap: 6px;
+}
+.p-dataview-grid .p-grid {
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
 }
@@ -191,7 +200,7 @@ const statusAbsence = (attd: string) => {
   padding: unset;
 }
 @media (max-width: 300px) {
-  .p-dataview-grid .p-dataview-content .p-grid {
+  .p-dataview-grid .p-grid {
     grid-template-columns: repeat(1, 1fr);
   }
 }

@@ -59,6 +59,8 @@ export const useAttendanceStore = defineStore('attendance', {
     },
 
     async fetchAttendances(params: AttendaceFetchAttendancesParams) {
+      this.attendancesRecord.daily = [];
+
       const q = query(
         attendancesColl,
         where('church', '==', params.church),
