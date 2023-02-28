@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { useMemberStore } from './member';
+
 import { db, attendancesColl } from '@/firebase/config';
 import {
   addDoc,
@@ -7,211 +7,92 @@ import {
   getDocs,
   query,
   serverTimestamp,
+  Timestamp,
   updateDoc,
   where,
 } from 'firebase/firestore';
-import type { MemberPosition, Student, Teacher, TeacherRole } from '@/types';
+
+import { AttendanceData } from '@/types';
+
+interface AttendaceAddAttendanceParams {
+  name: string;
+  church: string;
+  department: string;
+  grade: string;
+  group: string;
+  job: 'student' | 'teacher';
+  attendance: {
+    date: Date;
+    status: 'online' | 'offline' | 'absence';
+  };
+  createdBy: string;
+}
+
+interface AttendaceFetchAttendancesParams {
+  grade?: string;
+  group?: string;
+  church: string;
+  department: string;
+  job: 'student' | 'teacher';
+  attendanceDate: Date;
+}
+
+interface AttendaceModifyAttendanceParams {
+  uid: string;
+  attendance: {
+    status: 'online' | 'offline' | 'absence';
+  };
+}
 
 export const useAttendanceStore = defineStore('attendance', {
-  state: () => {
-    return {};
-  },
+  state: () => ({
+    attendancesRecord: {
+      daily: [] as AttendanceData[],
+    },
+  }),
   actions: {
-    // 학생 일일 출석 확인하기
-    async fetchStudentsAttendanceByDate(payload: {
-      attendanceDate: Date;
-      church: string;
-      department: string;
-    }) {
+    async addAttendance(params: AttendaceAddAttendanceParams) {
+      return await addDoc(attendancesColl, {
+        ...params,
+        createdAt: serverTimestamp(),
+      });
+    },
+
+    async fetchAttendances(params: AttendaceFetchAttendancesParams) {
+      this.attendancesRecord.daily = [];
+
       const q = query(
         attendancesColl,
-        where('attendanceDate', '==', payload.attendanceDate),
-        where('church', '==', payload.church),
-        where('department', '==', payload.department)
+        where('church', '==', params.church),
+        where('department', '==', params.department),
+        where('job', '==', params.job),
+        where('attendance.date', '==', params.attendanceDate)
       );
+      const qSnapshot = await getDocs(q);
 
-      const querySnapshot = await getDocs(q);
+      const result: AttendanceData[] = qSnapshot.docs.map((doc) => ({
+        uid: doc.id,
+        name: doc.data().name,
+        church: doc.data().church,
+        department: doc.data().department,
+        job: doc.data().job,
+        grade: doc.data().grade,
+        group: doc.data().group,
+        attendance: {
+          date: (doc.data().attendance.date as Timestamp).toDate(),
+          status: doc.data().attendance.status,
+        },
+        createdAt: (doc.data().createdAt as Timestamp).toDate(),
+        createdBy: doc.data().createdBy,
+      }));
 
-      const attendanceList = querySnapshot.docs
-        .map((doc) => doc.data().records)
-        .flat();
-
-      const member = useMemberStore();
-      let studentList = (await member.fetchMembers({
-        church: payload.church,
-        department: payload.department,
-        position: 'student',
-      })) as Student[];
-
-      // TODO: 알고리즘 개선 필요
-      for (const attendance of attendanceList) {
-        for (const student of studentList) {
-          if (student.name === attendance.name) {
-            student.attendance = attendance.attendance;
-            break;
-          }
-        }
-      }
-      return studentList;
+      this.attendancesRecord.daily = result;
     },
 
-    // 교사 일일 출석 확인하기
-    async fetchTeachersAttendanceByDate(payload: {
-      attendanceDate: Date;
-      church: string;
-      department: string;
-    }) {
-      const q = query(
-        attendancesColl,
-        where('attendanceDate', '==', payload.attendanceDate),
-        where('church', '==', payload.church),
-        where('department', '==', payload.department)
-      );
-
-      const querySnapshot = await getDocs(q);
-
-      const attendanceList = querySnapshot.docs
-        .map((docs) => docs.data().records)
-        .flat();
-
-      const member = useMemberStore();
-      let teahcerList = (await member.fetchMembers({
-        church: payload.church,
-        department: payload.department,
-        position: 'teacher',
-      })) as Teacher[];
-
-      // TODO: 알고리즘 개선 필요
-      for (const attendance of attendanceList) {
-        for (const teacher of teahcerList) {
-          if (teacher.name === attendance.name) {
-            teacher.attendance = attendance.attendance;
-            break;
-          }
-        }
-      }
-      return teahcerList;
-    },
-
-    async fetchAttendance(payload: {
-      attendanceDate: Date | undefined;
-      church: string | undefined;
-      department: string | undefined;
-      grade?: string;
-      group?: string;
-      members: any;
-      position: MemberPosition;
-      role: TeacherRole;
-    }) {
-      const {
-        attendanceDate,
-        church,
-        department,
-        grade,
-        group,
-        members,
-        position,
-        role,
-      } = payload;
-
-      let querySnapshot;
-      if (role === 'admin') {
-        const q = query(
-          attendancesColl,
-          where('attendanceDate', '==', attendanceDate),
-          where('church', '==', church),
-          where('department', '==', department),
-          where('position', '==', position)
-        );
-        querySnapshot = await getDocs(q);
-      } else if (role === 'main' || role === 'sub') {
-        const q = query(
-          attendancesColl,
-          where('attendanceDate', '==', attendanceDate),
-          where('church', '==', church),
-          where('department', '==', department),
-          where('grade', '==', grade),
-          where('group', '==', group),
-          where('position', '==', position)
-        );
-        querySnapshot = await getDocs(q);
-      } else {
-        return;
-      }
-
-      /** TODO : 이 부분에서 함수 나누기 */
-      // 출석 기록 O
-      if (querySnapshot.docs.length) {
-        return {
-          documentId: querySnapshot.docs[0].id,
-          attendanceRecord: querySnapshot.docs[0].data().records,
-        };
-      }
-      // 최초 등록
-      else {
-        /** TODO : any 타입 정리하기 */
-        let attendanceRecord: any[] = [];
-        if (position === 'student') {
-          /** TODO : any 타입 정리하기 */
-          members.forEach((member: any) => {
-            const { grade, group, name, teacher } = member;
-            attendanceRecord.push({
-              grade,
-              group,
-              name,
-              teacher, // here
-              attendance: 'offline',
-            });
-          });
-        } else if (position === 'teacher') {
-          /** TODO : any 타입 정리하기 */
-          members.forEach((member: any) => {
-            const { grade, group, name, role } = member;
-            attendanceRecord.push({
-              grade,
-              group,
-              name,
-              role, // here
-              attendance: 'offline',
-            });
-          });
-        }
-        return { documentId: '', attendanceRecord };
-      }
-    },
-
-    async addAttendance(payload: {
-      documentId: string;
-      attendanceDate: Date | undefined;
-      createUser: string | undefined;
-      church: string | undefined;
-      department: string | undefined;
-      grade?: string | undefined;
-      group?: string | undefined;
-      position: MemberPosition;
-      records: any;
-    }) {
-      const { documentId, ...info } = payload;
-      // 문서 수정
-      if (documentId) {
-        await updateDoc(doc(db, 'attendances', documentId), {
-          records: info.records,
-          updateUser: info.createUser,
-          updatedAt: serverTimestamp(),
-        });
-        return { message: '수정되었습니다.', documentId };
-      }
-      // 문서 제출
-      else {
-        const params = {
-          ...info,
-          createdAt: serverTimestamp(),
-          updateUser: info.createUser,
-          updatedAt: serverTimestamp(),
-        };
-        const result = await addDoc(attendancesColl, params);
-        return { message: '제출되었습니다.', documentId: result.id };
-      }
+    async modifyAttendance(params: AttendaceModifyAttendanceParams) {
+      return await updateDoc(doc(db, 'newAttendances', params.uid), {
+        'attendance.status': params.attendance.status,
+      });
     },
   },
 });

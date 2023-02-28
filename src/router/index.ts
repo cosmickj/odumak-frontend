@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import { auth } from '@/firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
-import { useAccountStore } from '@/store/account';
+import { useUserStore } from '@/store/user';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -27,14 +27,14 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/',
-    meta: { requiresAuth: true },
     component: () => import('@/layouts/DefaultLayout.vue'),
+    meta: { requiresAuth: true },
     children: [
       {
         path: '',
         name: 'HomeView',
         components: {
-          default: () => import('@/views/Home/index.vue'),
+          default: () => import('@/views/Home/HomeContainer.vue'),
           GlobalNavbar: () => import('@/components/TheNavbar.vue'),
         },
       },
@@ -43,16 +43,35 @@ const routes: Array<RouteRecordRaw> = [
         name: 'UserView',
         components: {
           default: () => import('@/views/User/index.vue'),
-          GlobalNavbar: () => import('@/components/TheNavbar.vue'),
         },
       },
       {
-        path: 'attendance/tracker/:position/:type',
-        name: 'AttendanceTracker',
+        path: 'user/edit',
+        name: 'UserEditView',
+        components: {
+          default: () => import('@/views/User/UserEdit.vue'),
+        },
+      },
+      {
+        path: 'attendance/tracker',
         components: {
           default: () => import('@/views/Attendance/Tracker/index.vue'),
           GlobalNavbar: () => import('@/components/TheNavbar.vue'),
         },
+        children: [
+          {
+            path: '/:job/daily',
+            name: 'AttendanceTrackerDaily',
+            component: () =>
+              import('@/views/Attendance/Tracker/TrackerDaily.vue'),
+          },
+          {
+            path: '/:job/total',
+            name: 'AttendanceTrackerTotal',
+            component: () =>
+              import('@/views/Attendance/Tracker/TrackerTotal.vue'),
+          },
+        ],
       },
       {
         path: 'attendance/checker/',
@@ -76,6 +95,11 @@ const routes: Array<RouteRecordRaw> = [
         name: 'AdminTeacher',
         component: () => import('@/views/Admin/Teacher/AdminTeacher.vue'),
       },
+      {
+        path: 'users',
+        name: 'AdminUser',
+        component: () => import('@/views/Admin/User/AdminUser.vue'),
+      },
     ],
   },
 ];
@@ -85,31 +109,29 @@ const router = createRouter({
   routes,
 });
 
-// router.beforeEach(async (to, from, next) => {
-//   const user = await getCurrentUser();
-//   const needAuth = to.matched.some((record) => record.meta.requiresAuth);
-//   const needAdmin = to.matched.some((record) => record.meta.requiresAdmin);
+router.beforeEach(async (to, from, next) => {
+  const currentUser = await getCurrentUser();
+  const needAuth = to.matched.some((record) => record.meta.requiresAuth);
+  const needAdmin = to.matched.some((record) => record.meta.requiresAdmin);
 
-//   if ((needAuth && user) || (!needAuth && !user)) {
-//     if (needAdmin) {
-//       const account = useAccountStore();
-//       const userData = await account.fetchAccount({ uid: user.uid });
-//       if (userData!.role !== 'admin') {
-//         next('/');
-//       } else {
-//         next();
-//       }
-//     } else {
-//       next();
-//     }
-//   } else if (!needAuth && user) {
-//     next('/');
-//   } else {
-//     next('/account/login');
-//   }
-// });
+  if ((needAuth && currentUser) || (!needAuth && !currentUser)) {
+    if (needAdmin) {
+      const userStore = useUserStore();
+      const userData = await userStore.fetchSingle({ uid: currentUser.uid });
 
-// router auth checker
+      if (userData!.role !== 'admin') next('/');
+      else next();
+    } else {
+      next();
+    }
+  } else if (!needAuth && currentUser) {
+    next('/');
+  } else {
+    next('/account/login');
+  }
+});
+
+// Router Auth Checker
 export const getCurrentUser = (): any => {
   return new Promise((resolve, reject) => {
     const removeListener = onAuthStateChanged(

@@ -1,25 +1,18 @@
-import type { MemberPosition, TeacherRole } from '.';
+import { UserData } from './index';
 
-// account.ts
-export interface AccountData {
-  grade: string;
-  group: string;
-  role: TeacherRole;
-  church: string;
-  department: string;
-  createdAt: {
-    nanoseconds: number;
-    seconds: number;
-  };
-}
-
-export interface UserData extends AccountData {
-  uid: string;
+/** account.ts */
+export interface AccountSignupParams {
   email: string;
+  password: string;
   name: string;
 }
 
-// attendace.ts
+export interface AccountLoginParams {
+  email: string;
+  password: string;
+}
+
+/** attendace.ts */
 export interface StudentsAttendance {
   date: Date;
   grade: string;
@@ -33,14 +26,69 @@ export interface TeachersAttendance {
   teachersAttendance: Teacher[];
 }
 
-// member.ts
-export interface Members {
+export interface AttendaceAddAttendancesParams
+  extends Omit<AttendaceAddAttendanceParams, 'attendance'> {
+  attendances: DataSource[];
+  checksum: string;
+}
+
+export interface AttendaceAddAttendanceParams {
+  attendance: DataSource;
   church: string;
   department: string;
-  members: Teacher[] | Student[];
-  position: MemberPosition;
-  createdAt: {
-    seconds: number;
-    nanoseconds: number;
-  };
+  grade: string;
+  group: string;
+}
+
+export interface AttendaceRemoveAttendanceParams
+  extends AttendaceAddAttendanceParams {}
+
+/** member.ts */
+interface MemberCreateMultipleParams
+  extends Pick<AccountData, 'church' | 'department'> {
+  members: MemberData[];
+}
+
+export interface MemberFetchAllParmas
+  extends Pick<AccountData, 'church' | 'department'> {
+  job: 'student' | 'teacher';
+}
+
+export interface MemberFetchByGradeGroupParams
+  extends Pick<AccountData, 'church' | 'department'> {
+  grade: string;
+  group: string;
+}
+
+interface MemberModifySingleParams {
+  uid: string;
+  field: string;
+  value: string;
+}
+
+interface MemberRemoveMultipleParams {
+  uids: (string | undefined)[];
+}
+
+/** user.ts */
+export interface UserCreateSingleParams extends Omit<UserData, 'createdAt'> {
+  uid: string;
+}
+
+export interface UserFetchSingleParams {
+  uid: string;
+}
+
+export interface UserFetchMultipleByChurchAndDepartment {
+  church: string;
+  department: string;
+}
+
+export interface UserModifySingle {
+  uid: string;
+  [key: string]: any;
+}
+
+export interface UserDeleteSingleParams {
+  uid: string;
 }

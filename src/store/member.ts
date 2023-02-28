@@ -1,202 +1,102 @@
+import arraySort from 'array-sort';
+
 import { defineStore } from 'pinia';
+import { db, membersColl } from '@/firebase/config';
 import {
   addDoc,
+  collection,
+  deleteDoc,
   doc,
   getDocs,
   query,
   serverTimestamp,
-  setDoc,
+  Timestamp,
   updateDoc,
   where,
 } from 'firebase/firestore';
-import { db, membersColl } from '@/firebase/config';
-import arraySort from 'array-sort';
-import {
-  Student,
-  UserInfo,
-  MemberPosition,
-  TeacherRole,
-  Teacher,
-} from '@/types';
 
-interface FetchAllParmas extends Pick<UserInfo, 'church' | 'department'> {
-  position: MemberPosition;
-}
-
-interface CreateParams extends Pick<UserInfo, 'church' | 'department'> {
-  members: Student[] | Teacher[];
-  position: MemberPosition;
-}
-
-interface CreateTemplateParams extends Pick<UserInfo, 'church' | 'department'> {
-  members: [];
-  position: MemberPosition;
-  createdAt: unknown;
-}
-
-// TODO: CreateParams와 같은 값이다. 리펙토링할 때 수정해보자
-interface ModifyParams
-  extends Partial<Student>,
-    Partial<Teacher>,
-    Pick<UserInfo, 'church' | 'department'> {
-  position: MemberPosition;
-}
-
-interface RemoveParams extends Pick<UserInfo, 'church' | 'department'> {
-  ids: string[];
-  position: MemberPosition;
-}
+import type { MemberData } from '@/types';
+import type {
+  MemberCreateMultipleParams,
+  MemberFetchAllParmas,
+  MemberFetchByGradeGroupParams,
+  MemberModifySingleParams,
+  MemberRemoveMultipleParams,
+} from '@/types/store';
 
 export const useMemberStore = defineStore('member', {
   state: () => ({}),
   actions: {
-    async fetchAll(params: FetchAllParmas) {
-      const { church, department, position } = params;
+    createMultiple(params: MemberCreateMultipleParams) {
+      const { church, department, members } = params;
 
-      const q = query(
-        membersColl,
-        where('church', '==', church),
-        where('department', '==', department),
-        where('position', '==', position)
-      );
-      const qSnapshot = await getDocs(q);
-
-      if (qSnapshot.empty) {
-        await this.createTemplate({
+      members.forEach(async (member) => {
+        const param = {
+          ...member,
           church,
           department,
-          members: [],
-          position,
           createdAt: serverTimestamp(),
-        });
-        await this.fetchAll(params);
-      } else {
-        const members = qSnapshot.docs[0].data().members;
-        members.forEach((member: any) => {
-          member.birth = member.birth.toDate();
-          member.registeredAt = member.registeredAt.toDate();
-        });
-        return arraySort(members, ['grade', 'group', 'name']);
-      }
+        };
+        return await addDoc(collection(db, 'newMembers'), param);
+      });
     },
 
-    async create(params: CreateParams) {
-      const { church, department, position, members } = params;
+    async fetchAll(params: MemberFetchAllParmas) {
+      const { church, department, job } = params;
 
       const q = query(
         membersColl,
         where('church', '==', church),
         where('department', '==', department),
-        where('position', '==', position)
+        where('job', '==', job)
       );
       const qSnapshot = await getDocs(q);
 
-      if (!qSnapshot.empty) {
-        const docId = qSnapshot.docs[0].id;
-        const docData = qSnapshot.docs[0].data();
-        docData.members.push(...members);
+      const members = qSnapshot.docs.map((doc) => ({
+        uid: doc.id,
+        ...doc.data(),
+      })) as MemberData[];
 
-        return await setDoc(doc(db, 'members', docId), docData);
-      }
+      members.forEach((m) => {
+        m.birth = (m.birth as unknown as Timestamp).toDate();
+        m.registeredAt = (m.registeredAt as unknown as Timestamp).toDate();
+      });
+
+      return arraySort(members, ['grade', 'group', 'name']);
     },
 
-    async createTemplate(params: CreateTemplateParams) {
-      return await addDoc(membersColl, params);
-    },
-
-    async modify(params: ModifyParams) {
-      const { _id, church, department, position, ...memberParams } = params;
+    async fetchByGradeGroup(params: MemberFetchByGradeGroupParams) {
+      const { church, department, grade, group } = params;
 
       const q = query(
         membersColl,
         where('church', '==', church),
         where('department', '==', department),
-        where('position', '==', position)
+        where('grade', '==', grade),
+        where('group', '==', group)
       );
       const qSnapshot = await getDocs(q);
 
-      if (!qSnapshot.empty) {
-        const docId = qSnapshot.docs[0].id;
-        const docData = qSnapshot.docs[0].data();
+      const members = qSnapshot.docs.map((doc) => ({
+        uid: doc.id,
+        ...doc.data(),
+      })) as MemberData[];
 
-        docData.members.forEach((member: Student) => {
-          if (member._id === _id) Object.assign(member, memberParams);
-        });
-
-        return await updateDoc(doc(db, 'members', docId), {
-          members: docData.members,
-          updatedAt: serverTimestamp(),
-        });
-      }
+      return arraySort(members, ['grade', 'group', 'name']);
     },
 
-    async remove(params: RemoveParams) {
-      const { ids, church, department, position } = params;
-
-      const q = query(
-        membersColl,
-        where('church', '==', church),
-        where('department', '==', department),
-        where('position', '==', position)
-      );
-      const qSnapshot = await getDocs(q);
-
-      if (!qSnapshot.empty) {
-        const docId = qSnapshot.docs[0].id;
-        const docData = qSnapshot.docs[0].data();
-
-        const members = docData.members.filter((member: Student) => {
-          return !ids.includes(member._id);
-        });
-
-        return await updateDoc(doc(db, 'members', docId), {
-          members,
-          updatedAt: serverTimestamp(),
-        });
-      }
+    async modifySingle(params: MemberModifySingleParams) {
+      return await updateDoc(doc(db, 'newMembers', params.uid), {
+        [params.field]: params.value,
+      });
     },
 
-    async fetchMembers(payload: {
-      church: string | undefined;
-      department: string | undefined;
-      grade?: string;
-      group?: string;
-      position: MemberPosition;
-      role?: TeacherRole;
-    }) {
-      try {
-        const { church, department, grade, group, position, role } = payload;
-
-        const q = query(
-          membersColl,
-          where('church', '==', church),
-          where('department', '==', department),
-          where('position', '==', position)
-        );
-
-        const querySnapshot = await getDocs(q);
-
-        if (querySnapshot.docs.length) {
-          let members = querySnapshot.docs[0].data().members;
-          members.forEach(
-            (member: any, idx: number) => (member['index'] = idx)
-          );
-
-          if (role === 'admin') {
-            // pass
-          } else if (role === 'main' || role === 'sub') {
-            /** TODO : any 타입 정리하기 */
-            members = members.filter(
-              (member: any) => member.grade === grade && member.group === group
-            );
-          }
-          return arraySort(members, ['grade', 'group', 'name']);
-        } else {
-          return [];
+    removeMultiple(params: MemberRemoveMultipleParams) {
+      params.uids.forEach(async (uid) => {
+        if (uid) {
+          await deleteDoc(doc(db, 'newMembers', uid));
         }
-      } catch (error) {
-        console.log(error);
-      }
+      });
     },
   },
 });

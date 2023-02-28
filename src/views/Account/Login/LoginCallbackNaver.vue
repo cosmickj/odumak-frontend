@@ -1,12 +1,17 @@
 <template>
-  <div>Loading...</div>
+  <div class="h-screen flex items-center justify-center">
+    <span class="text-4xl">Loading...</span>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAccountStore } from '@/store/account';
+import { useUserStore } from '@/store/user';
+
 import { getNaverOAuth, getCustomToken } from '@/api/oauth';
+
 import { auth } from '@/firebase/config';
 import {
   signInWithCustomToken,
@@ -27,7 +32,9 @@ interface NaverOAuth {
 }
 
 const router = useRouter();
+
 const accountStore = useAccountStore();
+const userStore = useUserStore();
 
 onMounted(async () => {
   try {
@@ -52,36 +59,37 @@ onMounted(async () => {
 
     // #003 파이어베이스 커스텀 토큰 발급 및 로그인
     const { data: customToken } = await getCustomToken(id);
-    const { user } = await signInWithCustomToken(auth, customToken);
+    const { user: account } = await signInWithCustomToken(auth, customToken);
 
     // #004 해당 유저에게 필요한 데이터가 없을 경우 업데이트 진행
-    if (!auth.currentUser) {
-      return;
-    }
-    if (!user.displayName) {
+    if (!auth.currentUser) return;
+    if (!account.displayName) {
       await updateProfile(auth.currentUser, { displayName: name });
     }
-    if (!user.photoURL) {
+    if (!account.photoURL) {
       await updateProfile(auth.currentUser, { photoURL: profile_image });
     }
-    if (!user.email) {
+    if (!account.email) {
       await updateEmail(auth.currentUser, email);
     }
 
     // #005 오두막 서비스에 필요한 유저 데이터를 저장할 document 생성
-    const hasDoc = await accountStore.fetchAccount({ uid: id });
-    if (!hasDoc) {
-      await accountStore.createUser({
+    const user = await userStore.fetchSingle({ uid: id });
+    if (!user) {
+      await userStore.createSingle({
         uid: id,
         church: '',
         department: '',
-        role: '',
+        role: 'common',
         grade: '',
         group: '',
+        isAccepted: false,
+        isRejected: false,
       });
+    } else {
+      accountStore.composeUserData(account, user);
+      router.push({ name: 'HomeView' });
     }
-
-    router.push({ name: 'HomeView' });
   } catch (error) {
     console.log(error);
   }
