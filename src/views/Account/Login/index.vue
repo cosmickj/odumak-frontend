@@ -61,9 +61,9 @@
 
       <div class="mx-5 mt-8 flex justify-evenly items-center">
         <span>계정이 없으신가요?</span>
-        <router-link :to="{ name: 'AccountSignup' }">
-          <span class="text-yellow-500">회원가입</span>
-        </router-link>
+        <RouterLink class="text-yellow-500" :to="{ name: 'AccountSignup' }">
+          회원가입
+        </RouterLink>
       </div>
     </form>
 
