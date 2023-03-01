@@ -1,5 +1,5 @@
 <template>
-  <main class="h-screen flex sm:bg-gray-200 items-center justify-center">
+  <main class="h-[100svh] flex sm:bg-gray-200 items-center justify-center">
     <div
       class="w-full sm:max-w-sm h-full sm:max-h-[46rem] bg-slate-100 shadow-lg"
     >

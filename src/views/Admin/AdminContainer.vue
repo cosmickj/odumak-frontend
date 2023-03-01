@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-screen">
+  <div class="flex h-[100svh]">
     <div class="shrink-0 flex flex-col justify-between w-52 py-6 bg-black">
       <div class="flex flex-col gap-1 text-white">
         <Image :src="logoSidebar" />
