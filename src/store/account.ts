@@ -48,13 +48,14 @@ export const useAccountStore = defineStore('account', {
      */
     async login(params: AccountLoginParams) {
       try {
+        const userStore = useUserStore();
+
         const { user: authData } = await signInWithEmailAndPassword(
           auth,
           params.email,
           params.password
         );
 
-        const userStore = useUserStore();
         const fetchSingleResponse = await userStore.fetchSingle({
           uid: authData.uid,
         });
@@ -65,7 +66,7 @@ export const useAccountStore = defineStore('account', {
           throw Error('로그인 과정에서 오류가 발생하였습니다.');
         }
       } catch (error) {
-        console.log(error);
+        throw Error((error as Error).message);
       }
     },
     /**

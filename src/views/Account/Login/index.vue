@@ -6,6 +6,7 @@
     <form @submit.prevent="loginWithEmail">
       <div class="mx-5 mb-2">
         <InputText
+          autofocus
           v-model="v$.email.$model"
           id="email"
           class="w-full p-inputtext-sm"
@@ -52,11 +53,8 @@
         />
       </div>
 
-      <div v-if="isError" class="mx-5 my-3">
-        <span class="text-red-500">
-          이메일 또는 비밀번호를 다시 확인하세요. 등록되지 않은 이메일이거나,
-          이메일 또는 비밀번호를 잘못 입력하셨습니다.
-        </span>
+      <div v-if="errorMessage" class="mx-5 my-3">
+        <span class="p-error">{{ errorMessage }}</span>
       </div>
 
       <div class="mx-5 mt-8 flex justify-evenly items-center">
@@ -77,14 +75,14 @@
     <div class="flex justify-center">
       <img
         class="mx-4 cursor-pointer max-w-[48px]"
-        :src="loginKakao"
         alt="카카오 로그인"
+        :src="loginKakao"
       />
       <img
         id="naver_id_login"
         class="mx-4 cursor-pointer max-w-[48px]"
-        :src="loginNaver"
         alt="네이버 로그인"
+        :src="loginNaver"
         @click="loginWithNaver"
       />
     </div>
@@ -154,9 +152,10 @@ onMounted(() => {
   naver_id_login.init_naver_id_login();
 });
 
-const isSubmitted = ref(false);
 const isLoading = ref(false);
-const isError = ref(false);
+const isSubmitted = ref(false);
+
+const errorMessage = ref<string | undefined>('');
 
 const initLoginState = {
   email: '',
@@ -171,15 +170,25 @@ const rules = {
 
 const v$ = useVuelidate(rules, loginState);
 
+const handleError = (message: string) => {
+  if (message.includes('auth/auth/user-not-found')) {
+    return '이메일을 다시 확인해주세요.';
+  }
+  if (message.includes('auth/wrong-password')) {
+    return '비밀번호가 다시 확인해주세요.';
+  }
+  if (message.includes('auth/too-many-requests')) {
+    return '로그인 시도 실패로 인해 이 계정에 대한 액세스가 일시적으로 비활성화되었습니다. 암호를 재설정하여 즉시 복원하거나 나중에 다시 시도할 수 있습니다.';
+  }
+};
+
 const loginWithEmail = async () => {
   try {
+    isLoading.value = true;
     isSubmitted.value = true;
 
     const isFormValid = await v$.value.$validate();
     if (!isFormValid) return;
-
-    isLoading.value = true;
-    isError.value = false;
 
     await accountStore.login({
       email: loginState.email.trimEnd(),
@@ -188,7 +197,7 @@ const loginWithEmail = async () => {
 
     router.push({ name: 'HomeView' });
   } catch (error) {
-    isError.value = true;
+    errorMessage.value = handleError((error as Error).message);
   } finally {
     isLoading.value = false;
   }
