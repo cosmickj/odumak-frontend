@@ -1,6 +1,6 @@
 <template>
-  <section class="flex flex-col justify-center">
-    <div class="grid grid-cols-1 gap-2 px-8">
+  <section class="overflow-auto p-5 text-sm">
+    <div class="grid grid-cols-1 gap-2">
       <div>
         <p>교회</p>
         <Dropdown
@@ -33,14 +33,13 @@
         <p>이메일</p>
         <InputText
           v-model="email"
-          class="w-full"
+          class="w-full p-inputtext-sm"
           :class="{ 'p-invalid': error.email.status }"
           placeholder="이메일을 입력하세요."
           type="email"
           required
         />
-        <div v-if="error.email.status" class="text-red-500">
-          <i class="pi pi-info-circle"></i>
+        <div v-if="error.email.status" class="mt-1 p-error">
           {{ error.email.message }}
         </div>
       </div>
@@ -49,15 +48,14 @@
         <p>비밀번호</p>
         <Password
           v-model="password"
-          class="w-full"
+          class="w-full p-inputtext-sm"
           :class="{ 'p-invalid': error.password.status }"
           inputStyle="width:inherit;"
           placeholder="비밀번호를 입력하세요."
           :feedback="false"
           toggleMask
         />
-        <div v-if="error.password.status" class="text-red-500">
-          <i class="pi pi-info-circle"></i>
+        <div v-if="error.password.status" class="mt-1 p-error">
           {{ error.password.message }}
         </div>
       </div>
@@ -66,15 +64,14 @@
         <p>비밀번호 확인</p>
         <Password
           v-model="confirmedPassword"
-          class="w-full"
+          class="w-full p-inputtext-sm"
           :class="{ 'p-invalid': error.confirmedPassword.status }"
           inputStyle="width:inherit;"
           placeholder="비밀번호를 입력하세요."
           :feedback="false"
           toggleMask
         />
-        <div v-if="error.confirmedPassword.status" class="text-red-500">
-          <i class="pi pi-info-circle"></i>
+        <div v-if="error.confirmedPassword.status" class="mt-1 p-error">
           {{ error.confirmedPassword.message }}
         </div>
       </div>
@@ -85,13 +82,12 @@
         <p>이름</p>
         <InputText
           v-model="name"
-          class="w-full"
+          class="w-full p-inputtext-sm"
           :class="{ 'p-invalid': error.name.status }"
           type="text"
           placeholder="이름을 입력하세요."
         />
-        <div v-if="error.name.status" class="text-red-500">
-          <i class="pi pi-info-circle"></i>
+        <div v-if="error.name.status" class="mt-1 p-error">
           {{ error.name.message }}
         </div>
       </div>
@@ -101,6 +97,7 @@
         <SelectButton
           v-model="role"
           class="grid grid-cols-3"
+          :unselectable="false"
           :options="roleOptions"
           optionLabel="name"
           optionValue="value"
@@ -111,7 +108,7 @@
       <Transition>
         <div v-if="role === 'main' || role === 'sub'">
           <p>학년반</p>
-          <div class="grid grid-cols-3 gap-3">
+          <div class="grid grid-cols-3 gap-2">
             <Dropdown
               v-model="grade"
               :options="gradeOptions"
@@ -131,30 +128,27 @@
 
             <div class="self-center">
               <Checkbox v-model="isNewGroup" inputId="isNew" :binary="true" />
-              <label for="isNew" class="ml-2 text-lg">새친구 학급</label>
+              <label for="isNew" class="ml-2 text-sm">새친구 학급</label>
             </div>
           </div>
         </div>
       </Transition>
 
       <Button
-        class="mt-5 p-button-warning p-button-rounded"
+        class="mt-5 p-button-warning p-button-sm"
         label="회원가입"
         :loading="isLoading"
         loadingIcon="pi pi-spinner pi-spin"
         @click="onSubmit"
       />
-      <div v-if="isError" class="text-red-500">{{ errorMessage }}</div>
+      <div v-if="isError" class="mt-1 p-error">{{ errorMessage }}</div>
+    </div>
 
-      <div class="mt-3 flex items-center justify-evenly">
-        <span class="text-xl">계정이 있으신가요?</span>
-        <RouterLink
-          :to="{ name: 'AccountLogin' }"
-          class="text-xl text-yellow-500"
-        >
-          로그인
-        </RouterLink>
-      </div>
+    <div class="mt-6 flex gap-2 items-center justify-center">
+      <span>계정이 있으신가요?</span>
+      <RouterLink class="text-yellow-500" :to="{ name: 'AccountLogin' }">
+        로그인
+      </RouterLink>
     </div>
   </section>
 </template>

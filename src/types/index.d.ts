@@ -14,7 +14,7 @@ type AuthData = {
 export type UserRole = 'admin' | 'main' | 'sub' | 'common';
 
 interface UserData {
-  uid?: string;
+  uid: string;
   name: string;
   birth: Date | null;
   church: string;
@@ -25,8 +25,8 @@ interface UserData {
   phone: string | null;
   isAccepted: boolean;
   isRejected: boolean;
-  rejectedReason?: string;
-  createdAt: Date;
+  rejectedReason: string;
+  createdAt?: Date;
 }
 
 export interface AccountData extends AuthData, UserData {}

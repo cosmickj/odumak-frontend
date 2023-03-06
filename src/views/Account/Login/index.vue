@@ -1,33 +1,49 @@
 <template>
   <section class="flex flex-col pt-20 text-xs">
-    <h1 class="mb-3 px-7 text-xl">아이들과 가까워지는 시간</h1>
-    <p class="mb-8 px-7">오늘도 여러분의 섬김에 감사합니다</p>
+    <h1 class="mb-3 px-5 text-xl">아이들과 가까워지는 시간</h1>
+    <p class="mb-8 px-5">당신의 섬김에 감사합니다</p>
 
     <form @submit.prevent="loginWithEmail">
-      <div class="mx-7 mb-2">
+      <div class="mx-5 mb-2">
         <InputText
-          v-model="loginForm.email"
-          class="w-full p-inputtext-sm"
+          autofocus
+          v-model="v$.email.$model"
           id="email"
+          class="w-full p-inputtext-sm"
+          :class="{ 'p-invalid': v$.email.$invalid && isSubmitted }"
           type="text"
           placeholder="이메일을 입력하세요"
         />
+        <p
+          v-if="v$.email.$invalid && isSubmitted"
+          class="mt-1"
+          :class="{ 'p-error': v$.email.$invalid && isSubmitted }"
+        >
+          이메일을 입력해주세요.
+        </p>
       </div>
 
-      <div class="mx-7 mb-2">
+      <div class="mx-5 mb-2">
         <Password
-          v-model="loginForm.password"
-          class="w-full p-inputtext-sm"
-          id="password"
-          placeholder="비밀번호를 입력하세요"
-          inputStyle="width:inherit;"
-          :feedback="false"
           toggleMask
+          v-model="v$.password.$model"
+          id="password"
+          class="w-full p-inputtext-sm"
+          :class="{ 'p-invalid': v$.password.$invalid && isSubmitted }"
+          :feedback="false"
+          inputStyle="width:inherit;"
+          placeholder="비밀번호를 입력하세요"
         />
+        <p
+          v-if="v$.password.$invalid && isSubmitted"
+          class="mt-1"
+          :class="{ 'p-error': v$.password.$invalid && isSubmitted }"
+        >
+          비밀번호를 입력해주세요.
+        </p>
       </div>
 
-      <!-- 로그인 버튼 -->
-      <div class="mx-7 my-3">
+      <div class="mx-5 my-3">
         <Button
           class="w-full p-button-warning p-button-sm"
           label="로그인"
@@ -37,23 +53,20 @@
         />
       </div>
 
-      <div v-if="isError" class="mx-7 my-3">
-        <span class="text-red-500">
-          이메일 또는 비밀번호를 다시 확인하세요. 등록되지 않은 이메일이거나,
-          이메일 또는 비밀번호를 잘못 입력하셨습니다.
-        </span>
+      <div v-if="errorMessage" class="mx-5 my-3">
+        <span class="p-error">{{ errorMessage }}</span>
       </div>
 
-      <div class="mx-7 mt-8 flex justify-evenly items-center">
+      <div class="mx-5 mt-8 flex justify-evenly items-center">
         <span>계정이 없으신가요?</span>
-        <router-link :to="{ name: 'AccountSignup' }">
-          <span class="text-yellow-500">회원가입</span>
-        </router-link>
+        <RouterLink class="text-yellow-500" :to="{ name: 'AccountSignup' }">
+          회원가입
+        </RouterLink>
       </div>
     </form>
 
-    <div class="relative flex flex-col justify-center px-7 my-12">
-      <div class="separator bg-slate-300"></div>
+    <div class="relative flex flex-col justify-center px-5 my-12">
+      <div class="h-[1px] bg-slate-300"></div>
       <span class="absolute inset-x-0 w-fit mx-auto px-3 bg-slate-100">
         또는
       </span>
@@ -61,105 +74,132 @@
 
     <div class="flex justify-center">
       <img
-        class="mx-4 cursor-pointer oauth-btn"
-        :src="loginKakao"
+        class="mx-4 cursor-pointer max-w-[48px]"
         alt="카카오 로그인"
+        :src="loginKakao"
       />
       <img
         id="naver_id_login"
-        class="mx-4 cursor-pointer oauth-btn"
-        :src="loginNaver"
+        class="mx-4 cursor-pointer max-w-[48px]"
         alt="네이버 로그인"
+        :src="loginNaver"
         @click="loginWithNaver"
       />
     </div>
 
-    <Teleport to="#modal">
-      <Transition name="modal">
-        <div
-          v-if="isModalOpen"
-          class="absolute inset-0 w-screen h-screen bg-black bg-opacity-50 flex items-center justify-center"
-        >
-          <div ref="modal" class="bg-white rounded-lg shadow-lg">
-            <div class="px-28 py-10">
-              <p>원할한 출석 관리를 위해</p>
-              <p><span>회원가입</span>을 진행해주세요.</p>
-            </div>
+    <Dialog
+      modal
+      header="회원가입 안내"
+      v-model:visible="isDialogVisible"
+      :breakpoints="{ '960px': '75vw', '640px': '90vw' }"
+      :style="{ width: '50vw' }"
+    >
+      <p>원할한 출석 관리를 위해 회원가입을 진행해주세요.</p>
 
-            <div class="flex items-center justify-end px-10 pb-5">
-              <router-link :to="{ name: 'AccountLogin' }" @click="closeModal">
-                <Button
-                  label="이미 계정이 있어요"
-                  class="p-button-text p-button-plain"
-                />
-              </router-link>
+      <template #footer>
+        <Button
+          class="p-button-text"
+          label="이미 계정 있어요"
+          @click="setDialog"
+        />
 
-              <router-link :to="{ name: 'AccountSignup' }">
-                <Button label="좋아요" type="button" class="p-button-warning" />
-              </router-link>
-            </div>
-          </div>
-        </div>
-      </Transition>
-    </Teleport>
+        <RouterLink :to="{ name: 'AccountSignup' }">
+          <Button
+            class="p-button-info"
+            label="좋아요"
+            icon="pi pi-check"
+            autofocus
+          />
+        </RouterLink>
+      </template>
+    </Dialog>
   </section>
 </template>
 
 <script setup lang="ts">
-import { inject, onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAccountStore } from '@/store/account';
+import { useCookies } from '@vueuse/integrations/useCookies';
+import { useVuelidate } from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
+
 import loginKakao from '@/assets/images/login-kakao.png';
 import loginNaver from '@/assets/images/login-naver.png';
 
-import { useRouter } from 'vue-router';
-import { useAccountStore } from '@/store/account';
-import type { VueCookies } from 'vue-cookies/types/index';
-
+const cookies = useCookies(['has_account']);
 const router = useRouter();
-const account = useAccountStore();
-const $cookies = inject<VueCookies>('$cookies');
+const accountStore = useAccountStore();
 
-const isModalOpen = ref(false);
+const isDialogVisible = ref(false);
+
+const setDialog = () => {
+  cookies.set('has_account', true);
+  isDialogVisible.value = false;
+};
 
 onMounted(() => {
-  // if (!$cookies?.get('has_account')) {
-  //   setTimeout(() => (isModalOpen.value = true), 800);
-  // }
+  if (!cookies.get('has_account')) {
+    setTimeout(() => (isDialogVisible.value = true), 500);
+  }
 
   const naver_id_login = new window.naver_id_login(
     import.meta.env.VITE_NAVER_CLIENT_ID,
     import.meta.env.VITE_NAVER_CALLBACK_URL
   );
-  var state = naver_id_login.getUniqState();
+  const state = naver_id_login.getUniqState();
   naver_id_login.setState(state);
   naver_id_login.init_naver_id_login();
 });
 
-const closeModal = () => {
-  $cookies?.set('has_account', true, '14d');
-  isModalOpen.value = false;
-};
-
 const isLoading = ref(false);
-const isError = ref(false);
+const isSubmitted = ref(false);
 
-const initLoginForm = {
+const errorMessage = ref<string | undefined>('');
+
+const initLoginState = {
   email: '',
   password: '',
 };
-const loginForm = reactive({ ...initLoginForm });
+const loginState = reactive({ ...initLoginState });
+
+const rules = {
+  email: { required },
+  password: { required },
+};
+
+const v$ = useVuelidate(rules, loginState);
+
+const handleError = (message: string) => {
+  if (message.includes('auth/auth/user-not-found')) {
+    return '이메일을 다시 확인해주세요.';
+  }
+  if (message.includes('auth/wrong-password')) {
+    return '비밀번호가 다시 확인해주세요.';
+  }
+  if (message.includes('auth/too-many-requests')) {
+    return '로그인 시도 실패로 인해 이 계정에 대한 액세스가 일시적으로 비활성화되었습니다. 암호를 재설정하여 즉시 복원하거나 나중에 다시 시도할 수 있습니다.';
+  }
+};
 
 const loginWithEmail = async () => {
   try {
     isLoading.value = true;
-    isError.value = false;
-    await account.login({
-      email: loginForm.email.trimEnd(),
-      password: loginForm.password.trimEnd(),
+    isSubmitted.value = true;
+
+    const isFormValid = await v$.value.$validate();
+    if (!isFormValid) return;
+
+    await accountStore.login({
+      email: loginState.email.trimEnd(),
+      password: loginState.password.trimEnd(),
     });
+
     router.push({ name: 'HomeView' });
   } catch (error) {
+    errorMessage.value = handleError((error as Error).message);
+  } finally {
     isLoading.value = false;
-    isError.value = true;
   }
 };
 
@@ -169,21 +209,3 @@ const loginWithNaver = () => {
   target.click();
 };
 </script>
-
-<style scoped>
-.separator {
-  height: 1px;
-}
-.oauth-btn {
-  max-width: 48px;
-}
-.modal-enter-active,
-.modal-leave-active {
-  transition: all 0.25s ease;
-}
-.modal-enter-from,
-.modal-leave-to {
-  opacity: 0;
-  transform: scale(1.1);
-}
-</style>

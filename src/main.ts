@@ -12,7 +12,6 @@ import App from '@/App.vue';
 
 import PrimeVue from 'primevue/config';
 import ToastService from 'primevue/toastservice';
-import VueCookies from 'vue-cookies';
 
 import { getCurrentUser } from '@/router';
 import { useAccountStore } from '@/store/account';
@@ -27,7 +26,6 @@ app.use(router);
 app.use(createPinia());
 app.use(PrimeVue);
 app.use(ToastService);
-app.use(VueCookies);
 
 // Waiting for Auth to be Ready
 (async () => {

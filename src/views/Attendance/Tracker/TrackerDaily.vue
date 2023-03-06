@@ -1,4 +1,6 @@
 <template>
+  <p class="text-xl text-center">{{ headerText }} 일일 출석현황</p>
+
   <Calendar
     touchUI
     v-model="attendanceDate"
@@ -121,6 +123,13 @@ const router = useRouter();
 const accountStore = useAccountStore();
 const attendanceStore = useAttendanceStore();
 
+const job = computed(() => {
+  return router.currentRoute.value.params.job as 'student' | 'teacher';
+});
+const JobMap = { student: '학생', teacher: '교사' };
+
+const headerText = computed(() => JobMap[job.value]);
+
 // https://bobbyhadz.com/blog/javascript-get-previous-sunday
 const getPreviousSunday = (date = new Date()) => {
   const _date = new Date();
@@ -133,9 +142,6 @@ const maxDate = getPreviousSunday();
 const attendanceDate = ref<Date>(getPreviousSunday());
 
 const accountData = computed(() => accountStore.accountData!);
-const job = computed(() => {
-  return router.currentRoute.value.params.job as 'student' | 'teacher';
-});
 
 const getAttendancesRecord = async () => {
   try {

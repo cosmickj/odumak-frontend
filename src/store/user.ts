@@ -30,14 +30,14 @@ export const useUserStore = defineStore('user', {
      */
     async createSingle(params: UserCreateSingleParams) {
       try {
-        const { uid, ...createSingleParams } = params;
+        const { uid, ...newUser } = params;
 
         await setDoc(doc(db, Collection.USERS, uid), {
-          ...createSingleParams,
+          ...newUser,
           createdAt: serverTimestamp(),
         });
       } catch (error) {
-        console.log(error);
+        throw Error((error as Error).message);
       }
     },
     /**
@@ -50,11 +50,10 @@ export const useUserStore = defineStore('user', {
 
         if (docSnap.exists()) {
           return docSnap.data() as UserData;
-        } else {
-          return null;
         }
+        return null;
       } catch (error) {
-        console.log(error);
+        throw Error((error as Error).message);
       }
     },
     /**
@@ -93,7 +92,7 @@ export const useUserStore = defineStore('user', {
       try {
         await deleteDoc(doc(db, Collection.USERS, params.uid));
       } catch (error) {
-        console.log(error);
+        throw Error((error as Error).message);
       }
     },
   },

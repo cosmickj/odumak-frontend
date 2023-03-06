@@ -1,5 +1,5 @@
 <template>
-  <router-link class="rounded-lg" :to="{ name: routeName, params: { job } }">
+  <RouterLink class="rounded-lg" :to="{ name: routeName, params: { job } }">
     <div class="relative h-full p-4 text-base">
       <p>
         <span>{{ who }}</span>
@@ -12,7 +12,7 @@
         <i class="pi pi-angle-right"></i>
       </span>
     </div>
-  </router-link>
+  </RouterLink>
 </template>
 
 <script setup lang="ts">

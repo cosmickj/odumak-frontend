@@ -114,21 +114,22 @@ router.beforeEach(async (to, from, next) => {
   const needAuth = to.matched.some((record) => record.meta.requiresAuth);
   const needAdmin = to.matched.some((record) => record.meta.requiresAdmin);
 
-  if ((needAuth && currentUser) || (!needAuth && !currentUser)) {
-    if (needAdmin) {
-      const userStore = useUserStore();
-      const userData = await userStore.fetchSingle({ uid: currentUser.uid });
-
-      if (userData!.role !== 'admin') next('/');
-      else next();
-    } else {
-      next();
-    }
-  } else if (!needAuth && currentUser) {
-    next('/');
-  } else {
-    next('/account/login');
+  if (!currentUser && needAuth) {
+    return next({ name: 'AccountLogin' });
   }
+
+  if (needAdmin) {
+    const userStore = useUserStore();
+    const userData = await userStore.fetchSingle({
+      uid: currentUser.uid,
+    });
+
+    if (userData?.role !== 'admin') {
+      return next({ name: 'HomeView' });
+    }
+  }
+
+  return next();
 });
 
 // Router Auth Checker

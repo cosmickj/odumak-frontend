@@ -48,13 +48,14 @@ export const useAccountStore = defineStore('account', {
      */
     async login(params: AccountLoginParams) {
       try {
+        const userStore = useUserStore();
+
         const { user: authData } = await signInWithEmailAndPassword(
           auth,
           params.email,
           params.password
         );
 
-        const userStore = useUserStore();
         const fetchSingleResponse = await userStore.fetchSingle({
           uid: authData.uid,
         });
@@ -65,7 +66,7 @@ export const useAccountStore = defineStore('account', {
           throw Error('로그인 과정에서 오류가 발생하였습니다.');
         }
       } catch (error) {
-        console.log(error);
+        throw Error((error as Error).message);
       }
     },
     /**
@@ -76,7 +77,7 @@ export const useAccountStore = defineStore('account', {
         await signOut(auth);
         this.accountData = null;
       } catch (error) {
-        console.log(error);
+        throw Error((error as Error).message);
       }
     },
     /**
@@ -84,16 +85,20 @@ export const useAccountStore = defineStore('account', {
      */
     async delete() {
       try {
-        const userStore = useUserStore();
-        const currentUser = auth.currentUser;
+        const { currentUser } = auth;
 
         if (currentUser) {
           await deleteUser(currentUser);
-          await userStore.deleteSingle({ uid: currentUser.uid });
+
+          const userStore = useUserStore();
+          await userStore.deleteSingle({
+            uid: currentUser.uid,
+          });
         }
+
         this.accountData = null;
       } catch (error) {
-        console.log(error);
+        throw Error((error as Error).message);
       }
     },
     /**
@@ -101,7 +106,6 @@ export const useAccountStore = defineStore('account', {
      */
     composeAccountData(authData: AuthData, userData: UserData) {
       this.accountData = {
-        uid: authData.uid,
         email: authData.email || '이메일이 존재하지 않습니다.',
         displayName: authData.displayName || '이름이 존재하지 않습니다.',
         ...userData,
