@@ -1,6 +1,6 @@
 <template>
   <div class="h-screen flex items-center justify-center">
-    <span class="text-4xl">Loading...</span>
+    <ProgressSpinner stroke-width="3" animation-duration="1.5s" />
   </div>
 </template>
 
@@ -9,7 +9,6 @@ import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAccountStore } from '@/store/account';
 import { useUserStore } from '@/store/user';
-
 import { getNaverOAuth, getCustomToken } from '@/api/oauth';
 
 import { auth } from '@/firebase/config';
@@ -42,9 +41,7 @@ onMounted(async () => {
     const queryList = router.currentRoute.value.hash
       .substring(1)
       .split('&')
-      .map((q) => {
-        return q.split('=');
-      });
+      .map((q) => q.split('='));
     const obj = Object.fromEntries(queryList);
 
     // #002 Access Token을 통한 네이버 로그인 정보 조회
@@ -62,7 +59,9 @@ onMounted(async () => {
     const { user: account } = await signInWithCustomToken(auth, customToken);
 
     // #004 해당 유저에게 필요한 데이터가 없을 경우 업데이트 진행
-    if (!auth.currentUser) return;
+    if (!auth.currentUser) {
+      return;
+    }
     if (!account.displayName) {
       await updateProfile(auth.currentUser, { displayName: name });
     }
@@ -74,24 +73,34 @@ onMounted(async () => {
     }
 
     // #005 오두막 서비스에 필요한 유저 데이터를 저장할 document 생성
-    const user = await userStore.fetchSingle({ uid: id });
-    if (!user) {
-      await userStore.createSingle({
+    const user = await userStore.fetchSingle({
+      uid: id,
+    });
+
+    if (user === null) {
+      const newUser = {
         uid: id,
+        name,
+        birth: null,
         church: '',
         department: '',
-        role: 'common',
         grade: '',
         group: '',
+        phone: '',
+        role: 'common' as const,
         isAccepted: false,
         isRejected: false,
-      });
+        rejectedReason: '',
+      };
+      await userStore.createSingle(newUser);
+      accountStore.composeAccountData(account, newUser);
     } else {
-      accountStore.composeUserData(account, user);
-      router.push({ name: 'HomeView' });
+      accountStore.composeAccountData(account, user);
     }
+
+    router.push({ name: 'HomeView' });
   } catch (error) {
-    console.log(error);
+    throw Error((error as Error).message);
   }
 });
 </script>

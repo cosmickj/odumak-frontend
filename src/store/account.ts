@@ -77,7 +77,7 @@ export const useAccountStore = defineStore('account', {
         await signOut(auth);
         this.accountData = null;
       } catch (error) {
-        console.log(error);
+        throw Error((error as Error).message);
       }
     },
     /**
@@ -85,16 +85,20 @@ export const useAccountStore = defineStore('account', {
      */
     async delete() {
       try {
-        const userStore = useUserStore();
-        const currentUser = auth.currentUser;
+        const { currentUser } = auth;
 
         if (currentUser) {
           await deleteUser(currentUser);
-          await userStore.deleteSingle({ uid: currentUser.uid });
+
+          const userStore = useUserStore();
+          await userStore.deleteSingle({
+            uid: currentUser.uid,
+          });
         }
+
         this.accountData = null;
       } catch (error) {
-        console.log(error);
+        throw Error((error as Error).message);
       }
     },
     /**
@@ -102,7 +106,6 @@ export const useAccountStore = defineStore('account', {
      */
     composeAccountData(authData: AuthData, userData: UserData) {
       this.accountData = {
-        uid: authData.uid,
         email: authData.email || '이메일이 존재하지 않습니다.',
         displayName: authData.displayName || '이름이 존재하지 않습니다.',
         ...userData,
