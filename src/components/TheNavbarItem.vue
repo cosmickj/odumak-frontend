@@ -1,13 +1,14 @@
 <template>
   <RouterLink
     :class="[
-      { 'button-important': isImportant },
+      { 'button-important': important },
       { 'button-important--hide': !isHome },
     ]"
     :to="{ name: routeName }"
   >
-    <div class="flex w-14 h-14 items-center justify-center">
+    <div class="relative flex w-14 h-14 items-center justify-center">
       <i class="text-2xl" :class="icon"></i>
+      <slot></slot>
     </div>
   </RouterLink>
 </template>
@@ -19,7 +20,7 @@ import { useRoute } from 'vue-router';
 defineProps<{
   icon: string;
   routeName: string;
-  isImportant?: boolean;
+  important?: boolean;
 }>();
 
 const route = useRoute();
