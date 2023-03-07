@@ -17,10 +17,7 @@
       </p>
 
       <RouterLink :to="{ name: 'UserEditView' }">
-        <Button
-          class="p-button-secondary p-button-text p-button-sm"
-          label="수정"
-        />
+        <Button class="p-button-warning p-button-sm" label="수정" />
       </RouterLink>
     </header>
 
