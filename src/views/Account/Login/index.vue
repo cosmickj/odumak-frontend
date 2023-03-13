@@ -1,9 +1,34 @@
 <template>
-  <section class="flex flex-col pt-20 text-xs">
-    <h1 class="mb-3 px-5 text-xl">아이들과 가까워지는 시간</h1>
-    <p class="mb-8 px-5">당신의 섬김에 감사합니다</p>
+  <section class="flex flex-col pt-14 px-5 text-lg text-center">
+    <h1 class="mb-3 text-2xl font-bold">오두막</h1>
+    <p class="mb-8">아이들과 가까워지는 시간</p>
 
-    <form @submit.prevent="loginWithEmail">
+    <div class="flex flex-col justify-between">
+      <div class="flex flex-col gap-3">
+        <div
+          class="flex gap-2 p-1 rounded bg-[#03C75A] items-center justify-center cursor-pointer select-none"
+          @click="loginWithNaver"
+        >
+          <Image id="naver_id_login" :src="naver" alt="" image-class="w-8" />
+          <span class="leading-8 text-white">네이버로 로그인</span>
+        </div>
+
+        <div
+          class="flex gap-2 p-1 rounded bg-gray-200 items-center justify-center cursor-pointer select-none"
+        >
+          <span class="leading-8">이메일로 로그인</span>
+        </div>
+      </div>
+
+      <div>
+        <div
+          class="flex gap-2 p-1 rounded bg-gray-200 items-center justify-center cursor-pointer select-none"
+        >
+          <span class="leading-8">이메일 회원가입</span>
+        </div>
+      </div>
+    </div>
+    <!-- <form @submit.prevent="loginWithEmail">
       <div class="mx-5 mb-2">
         <InputText
           autofocus
@@ -45,7 +70,7 @@
 
       <div class="mx-5 my-3">
         <Button
-          class="w-full p-button-warning p-button-sm"
+          class="w-full p-button-secondary p-button-sm"
           label="로그인"
           :loading="isLoading"
           loadingIcon="pi pi-spinner pi-spin"
@@ -85,7 +110,7 @@
         :src="loginNaver"
         @click="loginWithNaver"
       />
-    </div>
+    </div> -->
 
     <Dialog
       modal
@@ -126,6 +151,8 @@ import { required } from '@vuelidate/validators';
 
 import loginKakao from '@/assets/images/login-kakao.png';
 import loginNaver from '@/assets/images/login-naver.png';
+
+import naver from '@/assets/images/naver-login-icon.png';
 
 const cookies = useCookies(['has_account']);
 const router = useRouter();
