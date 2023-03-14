@@ -31,7 +31,7 @@
             class="w-full"
             :class="{ 'p-invalid': v$.password.$invalid && isSubmitted }"
             :feedback="false"
-            inputStyle="width:inherit;"
+            input-class="w-full"
             placeholder="비밀번호를 입력하세요"
           />
           <p
@@ -100,6 +100,7 @@
             label="좋아요"
             icon="pi pi-check"
             autofocus
+            @click="setDialog"
           />
         </RouterLink>
       </template>

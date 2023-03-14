@@ -1,16 +1,21 @@
 <template>
   <section class="overflow-auto flex flex-col px-5 py-8 justify-between">
     <div>
-      <div class="relative mb-4 text-center text-2xl">
-        <RouterLink class="absolute left-0" :to="{ name: 'AccountLogin' }">
-          <Button class="p-button-text p-button-secondary" icon="pi pi-times" />
+      <div class="relative mb-5 text-2xl text-end">
+        <RouterLink :to="{ name: 'AccountLogin' }">
+          <Button text rounded severity="secondary" icon="pi pi-times" />
         </RouterLink>
-        <h1>회원가입</h1>
+
+        <h1
+          class="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%]"
+        >
+          회원가입
+        </h1>
       </div>
 
       <div class="flex flex-col gap-4">
         <div class="flex flex-col gap-2 text-sm">
-          <p class="text-base">회원 정보</p>
+          <p class="text-lg">회원 정보</p>
 
           <InputText
             v-model="name"
@@ -39,7 +44,7 @@
             v-model="password"
             class="w-full"
             :class="{ 'p-invalid': error.password.status }"
-            inputStyle="width:inherit;"
+            input-class="w-full"
             placeholder="비밀번호를 입력하세요."
             :feedback="false"
             toggleMask
@@ -52,7 +57,7 @@
             v-model="confirmedPassword"
             class="w-full"
             :class="{ 'p-invalid': error.confirmedPassword.status }"
-            inputStyle="width:inherit;"
+            input-class="w-full"
             placeholder="비밀번호를 한 번 더 입력하세요."
             :feedback="false"
             toggleMask
@@ -63,7 +68,7 @@
         </div>
 
         <div class="flex flex-col gap-2 text-sm">
-          <p class="text-base">교회 및 부서 정보</p>
+          <p class="text-lg">교회 및 부서 정보</p>
           <Dropdown
             class="w-full"
             v-model="church"
@@ -96,7 +101,6 @@
 
           <Transition>
             <div v-if="role === 'main' || role === 'sub'">
-              <p>학년반</p>
               <div class="grid grid-cols-3 gap-2">
                 <Dropdown
                   v-model="grade"
