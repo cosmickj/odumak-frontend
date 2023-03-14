@@ -1,90 +1,81 @@
 <template>
-  <section class="flex flex-col pt-20 text-xs">
-    <h1 class="mb-3 px-5 text-xl">아이들과 가까워지는 시간</h1>
-    <p class="mb-8 px-5">당신의 섬김에 감사합니다</p>
-
-    <form @submit.prevent="loginWithEmail">
-      <div class="mx-5 mb-2">
-        <InputText
-          autofocus
-          v-model="v$.email.$model"
-          id="email"
-          class="w-full p-inputtext-sm"
-          :class="{ 'p-invalid': v$.email.$invalid && isSubmitted }"
-          type="text"
-          placeholder="이메일을 입력하세요"
-        />
-        <p
-          v-if="v$.email.$invalid && isSubmitted"
-          class="mt-1"
-          :class="{ 'p-error': v$.email.$invalid && isSubmitted }"
-        >
-          이메일을 입력해주세요.
-        </p>
-      </div>
-
-      <div class="mx-5 mb-2">
-        <Password
-          toggleMask
-          v-model="v$.password.$model"
-          id="password"
-          class="w-full p-inputtext-sm"
-          :class="{ 'p-invalid': v$.password.$invalid && isSubmitted }"
-          :feedback="false"
-          inputStyle="width:inherit;"
-          placeholder="비밀번호를 입력하세요"
-        />
-        <p
-          v-if="v$.password.$invalid && isSubmitted"
-          class="mt-1"
-          :class="{ 'p-error': v$.password.$invalid && isSubmitted }"
-        >
-          비밀번호를 입력해주세요.
-        </p>
-      </div>
-
-      <div class="mx-5 my-3">
-        <Button
-          class="w-full p-button-warning p-button-sm"
-          label="로그인"
-          :loading="isLoading"
-          loadingIcon="pi pi-spinner pi-spin"
-          type="submit"
-        />
-      </div>
-
-      <div v-if="errorMessage" class="mx-5 my-3">
-        <span class="p-error">{{ errorMessage }}</span>
-      </div>
-
-      <div class="mx-5 mt-8 flex justify-evenly items-center">
-        <span>계정이 없으신가요?</span>
-        <RouterLink class="text-yellow-500" :to="{ name: 'AccountSignup' }">
-          회원가입
-        </RouterLink>
-      </div>
-    </form>
-
-    <div class="relative flex flex-col justify-center px-5 my-12">
-      <div class="h-[1px] bg-slate-300"></div>
-      <span class="absolute inset-x-0 w-fit mx-auto px-3 bg-slate-100">
-        또는
-      </span>
+  <section class="flex flex-col px-5 py-8">
+    <div class="text-lg text-center">
+      <h1 class="mb-3 text-2xl font-bold">오두막</h1>
+      <p class="mb-8">아이들과 가까워지는 시간</p>
     </div>
 
-    <div class="flex justify-center">
-      <img
-        class="mx-4 cursor-pointer max-w-[48px]"
-        alt="카카오 로그인"
-        :src="loginKakao"
-      />
-      <img
-        id="naver_id_login"
-        class="mx-4 cursor-pointer max-w-[48px]"
-        alt="네이버 로그인"
-        :src="loginNaver"
-        @click="loginWithNaver"
-      />
+    <div class="flex-1 flex flex-col justify-between">
+      <div class="flex flex-col gap-5">
+        <form class="flex flex-col gap-3" @submit.prevent="loginWithEmail">
+          <InputText
+            autofocus
+            v-model="v$.email.$model"
+            id="email"
+            class="w-full"
+            :class="{ 'p-invalid': v$.email.$invalid && isSubmitted }"
+            type="text"
+            placeholder="이메일을 입력하세요"
+          />
+          <p
+            v-if="v$.email.$invalid && isSubmitted"
+            :class="{ 'p-error': v$.email.$invalid && isSubmitted }"
+          >
+            이메일을 입력해주세요.
+          </p>
+
+          <Password
+            toggleMask
+            v-model="v$.password.$model"
+            id="password"
+            class="w-full"
+            :class="{ 'p-invalid': v$.password.$invalid && isSubmitted }"
+            :feedback="false"
+            input-class="w-full"
+            placeholder="비밀번호를 입력하세요"
+          />
+          <p
+            v-if="v$.password.$invalid && isSubmitted"
+            :class="{ 'p-error': v$.password.$invalid && isSubmitted }"
+          >
+            비밀번호를 입력해주세요.
+          </p>
+
+          <Button
+            :loading="isLoading"
+            class="p-button-secondary text-lg"
+            type="submit"
+            label="로그인"
+          />
+        </form>
+
+        <div class="relative flex flex-col justify-center my-2">
+          <div class="h-[1px] bg-slate-300"></div>
+          <span class="absolute inset-x-0 w-fit mx-auto px-3 bg-slate-100">
+            또는
+          </span>
+        </div>
+
+        <div
+          class="flex gap-2 p-2 rounded bg-[#03C75A] items-center justify-center cursor-pointer select-none"
+          @click="loginWithNaver"
+        >
+          <Image
+            id="naver_id_login"
+            :src="loginNaver"
+            alt=""
+            image-class="w-8"
+          />
+          <span class="leading-8 text-white text-lg">네이버로 시작하기</span>
+        </div>
+      </div>
+
+      <RouterLink
+        class="flex p-2 rounded border-2 border-gray-300 items-center justify-center"
+        :to="{ name: 'AccountSignup' }"
+      >
+        이메일 회원가입
+      </RouterLink>
     </div>
 
     <Dialog
@@ -109,6 +100,7 @@
             label="좋아요"
             icon="pi pi-check"
             autofocus
+            @click="setDialog"
           />
         </RouterLink>
       </template>
@@ -125,7 +117,7 @@ import { useVuelidate } from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 
 import loginKakao from '@/assets/images/login-kakao.png';
-import loginNaver from '@/assets/images/login-naver.png';
+import loginNaver from '@/assets/images/naver-login-icon.png';
 
 const cookies = useCookies(['has_account']);
 const router = useRouter();

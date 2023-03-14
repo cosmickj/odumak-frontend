@@ -1,154 +1,147 @@
 <template>
-  <section class="overflow-auto p-5 text-sm">
-    <div class="grid grid-cols-1 gap-2">
-      <div>
-        <p>교회</p>
-        <Dropdown
-          class="w-full"
-          v-model="church"
-          :options="churchOptions"
-          optionLabel="name"
-          optionValue="value"
-          placeholder="교회 선택"
-          :disabled="true"
-        />
+  <section class="overflow-auto flex flex-col px-5 py-8 justify-between">
+    <div>
+      <div class="relative mb-5 text-2xl text-end">
+        <RouterLink :to="{ name: 'AccountLogin' }">
+          <Button text rounded severity="secondary" icon="pi pi-times" />
+        </RouterLink>
+
+        <h1
+          class="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%]"
+        >
+          회원가입
+        </h1>
       </div>
 
-      <div>
-        <p>소속</p>
-        <Dropdown
-          class="w-full"
-          v-model="department"
-          :options="departmentOptions"
-          optionLabel="name"
-          optionValue="value"
-          placeholder="소속 선택"
-          :disabled="true"
-        />
-      </div>
+      <div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-2 text-sm">
+          <p class="text-lg">회원 정보</p>
 
-      <div class="my-3 bg-slate-300 border border-slate-300"></div>
+          <InputText
+            v-model="name"
+            class="w-full"
+            :class="{ 'p-invalid': error.name.status }"
+            type="text"
+            placeholder="이름을 입력하세요."
+          />
+          <div v-if="error.name.status" class="p-error">
+            {{ error.name.message }}
+          </div>
 
-      <div>
-        <p>이메일</p>
-        <InputText
-          v-model="email"
-          class="w-full p-inputtext-sm"
-          :class="{ 'p-invalid': error.email.status }"
-          placeholder="이메일을 입력하세요."
-          type="email"
-          required
-        />
-        <div v-if="error.email.status" class="mt-1 p-error">
-          {{ error.email.message }}
-        </div>
-      </div>
+          <InputText
+            v-model="email"
+            class="w-full"
+            :class="{ 'p-invalid': error.email.status }"
+            placeholder="이메일을 입력하세요."
+            type="email"
+            required
+          />
+          <div v-if="error.email.status" class="p-error">
+            {{ error.email.message }}
+          </div>
 
-      <div>
-        <p>비밀번호</p>
-        <Password
-          v-model="password"
-          class="w-full p-inputtext-sm"
-          :class="{ 'p-invalid': error.password.status }"
-          inputStyle="width:inherit;"
-          placeholder="비밀번호를 입력하세요."
-          :feedback="false"
-          toggleMask
-        />
-        <div v-if="error.password.status" class="mt-1 p-error">
-          {{ error.password.message }}
-        </div>
-      </div>
+          <Password
+            v-model="password"
+            class="w-full"
+            :class="{ 'p-invalid': error.password.status }"
+            input-class="w-full"
+            placeholder="비밀번호를 입력하세요."
+            :feedback="false"
+            toggleMask
+          />
+          <div v-if="error.password.status" class="p-error">
+            {{ error.password.message }}
+          </div>
 
-      <div>
-        <p>비밀번호 확인</p>
-        <Password
-          v-model="confirmedPassword"
-          class="w-full p-inputtext-sm"
-          :class="{ 'p-invalid': error.confirmedPassword.status }"
-          inputStyle="width:inherit;"
-          placeholder="비밀번호를 입력하세요."
-          :feedback="false"
-          toggleMask
-        />
-        <div v-if="error.confirmedPassword.status" class="mt-1 p-error">
-          {{ error.confirmedPassword.message }}
-        </div>
-      </div>
-
-      <div class="my-3 bg-slate-300 border border-slate-300"></div>
-
-      <div>
-        <p>이름</p>
-        <InputText
-          v-model="name"
-          class="w-full p-inputtext-sm"
-          :class="{ 'p-invalid': error.name.status }"
-          type="text"
-          placeholder="이름을 입력하세요."
-        />
-        <div v-if="error.name.status" class="mt-1 p-error">
-          {{ error.name.message }}
-        </div>
-      </div>
-
-      <div>
-        <p>담당</p>
-        <SelectButton
-          v-model="role"
-          class="grid grid-cols-3"
-          :unselectable="false"
-          :options="roleOptions"
-          optionLabel="name"
-          optionValue="value"
-          placeholder="담당 학년"
-        />
-      </div>
-
-      <Transition>
-        <div v-if="role === 'main' || role === 'sub'">
-          <p>학년반</p>
-          <div class="grid grid-cols-3 gap-2">
-            <Dropdown
-              v-model="grade"
-              :options="gradeOptions"
-              optionLabel="name"
-              optionValue="value"
-              :disabled="isNewGroup"
-              placeholder="담당 학년"
-            />
-            <Dropdown
-              v-model="group"
-              :options="groupOptions"
-              optionLabel="name"
-              optionValue="value"
-              :disabled="isNewGroup"
-              placeholder="담당 학급"
-            />
-
-            <div class="self-center">
-              <Checkbox v-model="isNewGroup" inputId="isNew" :binary="true" />
-              <label for="isNew" class="ml-2 text-sm">새친구 학급</label>
-            </div>
+          <Password
+            v-model="confirmedPassword"
+            class="w-full"
+            :class="{ 'p-invalid': error.confirmedPassword.status }"
+            input-class="w-full"
+            placeholder="비밀번호를 한 번 더 입력하세요."
+            :feedback="false"
+            toggleMask
+          />
+          <div v-if="error.confirmedPassword.status" class="p-error">
+            {{ error.confirmedPassword.message }}
           </div>
         </div>
-      </Transition>
 
-      <Button
-        class="mt-5 p-button-warning p-button-sm"
-        label="회원가입"
-        :loading="isLoading"
-        loadingIcon="pi pi-spinner pi-spin"
-        @click="onSubmit"
-      />
-      <div v-if="isError" class="mt-1 p-error">{{ errorMessage }}</div>
+        <div class="flex flex-col gap-2 text-sm">
+          <p class="text-lg">교회 및 부서 정보</p>
+          <Dropdown
+            class="w-full"
+            v-model="church"
+            :options="churchOptions"
+            optionLabel="name"
+            optionValue="value"
+            placeholder="교회 선택"
+            :disabled="true"
+          />
+
+          <Dropdown
+            class="w-full"
+            v-model="department"
+            :options="departmentOptions"
+            optionLabel="name"
+            optionValue="value"
+            placeholder="소속 선택"
+            :disabled="true"
+          />
+
+          <SelectButton
+            v-model="role"
+            class="grid grid-cols-3"
+            :unselectable="false"
+            :options="roleOptions"
+            optionLabel="name"
+            optionValue="value"
+            placeholder="담당 학년"
+          />
+
+          <Transition>
+            <div v-if="role === 'main' || role === 'sub'">
+              <div class="grid grid-cols-3 gap-2">
+                <Dropdown
+                  v-model="grade"
+                  :options="gradeOptions"
+                  optionLabel="name"
+                  optionValue="value"
+                  :disabled="isNewGroup"
+                  placeholder="담당 학년"
+                />
+                <Dropdown
+                  v-model="group"
+                  :options="groupOptions"
+                  optionLabel="name"
+                  optionValue="value"
+                  :disabled="isNewGroup"
+                  placeholder="담당 학급"
+                />
+
+                <div class="self-center">
+                  <Checkbox
+                    v-model="isNewGroup"
+                    inputId="isNew"
+                    :binary="true"
+                  />
+                  <label for="isNew" class="ml-2 text-sm">새친구 학급</label>
+                </div>
+              </div>
+            </div>
+          </Transition>
+        </div>
+      </div>
     </div>
 
-    <div class="mt-6 flex gap-2 items-center justify-center">
-      <span>계정이 있으신가요?</span>
-      <RouterLink class="text-yellow-500" :to="{ name: 'AccountLogin' }">
-        로그인
-      </RouterLink>
+    <div>
+      <Button
+        :loading="isLoading"
+        class="w-full p-button-warning"
+        label="제출하기"
+        @click="onSubmit"
+      />
+      <div v-if="isError" class="p-error">{{ errorMessage }}</div>
     </div>
   </section>
 </template>
@@ -294,6 +287,7 @@ const onSubmit = async () => {
         phone: null,
         isAccepted: false,
         isRejected: false,
+        rejectedReason: '',
       });
 
       await accountStore.login({

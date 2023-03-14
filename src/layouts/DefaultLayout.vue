@@ -3,7 +3,7 @@
     <div
       class="w-full sm:max-w-sm h-full sm:max-h-[46rem] bg-slate-100 shadow-lg"
     >
-      <div v-if="account.isAuthReady" class="flex flex-col h-full">
+      <div v-if="isAuthReady" class="relative flex flex-col h-full">
         <RouterView class="grow" />
         <RouterView name="GlobalNavbar" />
       </div>
@@ -12,7 +12,8 @@
 </template>
 
 <script setup lang="ts">
+import { storeToRefs } from 'pinia';
 import { useAccountStore } from '@/store/account';
 
-const account = useAccountStore();
+const { isAuthReady } = storeToRefs(useAccountStore());
 </script>
