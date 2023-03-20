@@ -1,5 +1,5 @@
 <template>
-  <section class="p-5">
+  <section class="px-5 py-8">
     <header>
       <div class="flex text-xl items-baseline justify-center">
         <p>

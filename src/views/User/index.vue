@@ -1,77 +1,89 @@
 <template>
-  <main v-if="accountStore.isAuthReady" class="overflow-auto">
-    <header
-      class="sticky top-0 left-0 flex px-5 py-2 bg-slate-50 items-center justify-between"
-    >
-      <RouterLink :to="{ name: 'HomeView' }">
-        <Button
-          icon="pi pi-arrow-left"
-          class="p-button-text p-button-secondary"
-        />
-      </RouterLink>
+  <section v-if="accountStore.isAuthReady" class="overflow-auto bg-slate-200">
+    <header class="sticky top-0 left-0 px-1 bg-slate-100">
+      <div class="relative flex items-center justify-between">
+        <RouterLink :to="{ name: 'HomeView' }">
+          <Button
+            icon="pi pi-angle-left"
+            class="p-button-text p-button-secondary"
+          />
+        </RouterLink>
 
-      <p
-        class="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] text-xl"
-      >
-        내 정보
-      </p>
+        <p
+          class="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%]"
+        >
+          {{ accountStore.accountData?.name }}님의 정보
+        </p>
 
-      <RouterLink :to="{ name: 'UserEditView' }">
-        <Button class="p-button-warning p-button-sm" label="수정" />
-      </RouterLink>
+        <RouterLink :to="{ name: 'UserEditView' }">
+          <Button class="p-button-text p-button-secondary" label="수정" />
+        </RouterLink>
+      </div>
     </header>
 
-    <div class="bg-slate-50 text-sm">
-      <!-- TODO: 추후에 사진도 넣어보자 -->
+    <div class="bg-slate-100">
+      <div class="flex px-5 py-3 items-center justify-center">
+        <Avatar :image="youngeunElementLogo" size="xlarge" shape="circle" />
+      </div>
+
       <div class="flex px-5 py-2 items-center justify-between">
         <span>이름</span>
         <span>{{ accountStore.accountData?.displayName }}</span>
       </div>
+
       <div class="flex px-5 py-2 items-center justify-between">
         <span>생년월일</span>
         <span>{{ accountStore.accountData?.birth || '없음' }}</span>
       </div>
+
       <div class="flex px-5 py-2 items-center justify-between">
         <span>휴대폰 번호</span>
         <span>{{ accountStore.accountData?.phone || '없음' }}</span>
       </div>
+
       <div class="flex px-5 py-2 items-center justify-between">
         <span>이메일</span>
         <span>{{ accountStore.accountData?.email }}</span>
       </div>
     </div>
 
-    <div class="mt-6 bg-slate-50">
+    <div class="mt-3 bg-slate-100">
       <div class="flex px-5 py-2 font-semibold items-center justify-between">
-        <span>교회 정보</span>
+        <span>소속 정보</span>
       </div>
+
       <div class="flex px-5 py-2 items-center justify-between">
         <span>교회 이름</span>
         <span :class="{ 'text-gray-400': isNan(church) }">
           {{ church }}
         </span>
       </div>
+
       <div class="flex px-5 py-2 items-center justify-between">
         <span>봉사 부서</span>
         <span :class="{ 'text-gray-400': isNan(department) }">
           {{ department }}
         </span>
       </div>
+
       <div class="px-5 py-2">
         <p class="h-[1px] bg-slate-200"></p>
       </div>
+
       <div class="flex px-5 py-2 items-center justify-between">
         <span>담임 여부</span>
         <span :class="{ 'text-gray-400': isNan(role) }">
           {{ role }}
         </span>
       </div>
+
       <div class="flex px-5 py-2 items-center justify-between">
         <span>담당 학년</span>
         <span :class="{ 'text-gray-400': isNan(grade) }">
           {{ grade }}
         </span>
       </div>
+
       <div class="flex px-5 py-2 items-center justify-between">
         <span>담당 학급</span>
         <span :class="{ 'text-gray-400': isNan(group) }">
@@ -80,33 +92,34 @@
       </div>
     </div>
 
-    <div class="mt-6 bg-slate-50 text-red-500">
+    <div class="mt-3 bg-slate-100 text-red-500">
       <div
         class="flex px-5 py-2 items-center justify-between cursor-pointer"
         @click="logoutAccount"
       >
         <span>로그아웃</span>
-        <i class="pi pi-sign-out text-2xl"></i>
+        <i class="pi pi-sign-out"></i>
       </div>
     </div>
 
-    <div class="my-8 text-xs">
-      <div class="flex px-5 py-2 items-center justify-center">
-        <span
-          class="underline underline-offset-2 cursor-pointer"
-          @click="deleteAccount"
-        >
-          계정을 삭제하시겠습니까?
-        </span>
+    <div class="mt-3 mb-8 bg-slate-100">
+      <div
+        class="flex px-5 py-2 items-center justify-between cursor-pointer"
+        @click="deleteAccount"
+      >
+        <span>탈퇴하기</span>
+        <i class="pi pi-angle-right"></i>
       </div>
     </div>
-  </main>
+  </section>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAccountStore } from '@/store/account';
+
+import youngeunElementLogo from '@/assets/images/youngeun-element-logo.png';
 
 const router = useRouter();
 const accountStore = useAccountStore();

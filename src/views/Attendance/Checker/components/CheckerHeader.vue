@@ -2,7 +2,7 @@
   <header class="relative flex items-center justify-between">
     <RouterLink :to="{ name: 'HomeView' }">
       <Button
-        icon="pi pi-arrow-left"
+        icon="pi pi-angle-left"
         class="p-button-text p-button-secondary"
       />
     </RouterLink>
