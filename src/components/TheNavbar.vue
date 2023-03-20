@@ -31,8 +31,7 @@
         <template #content>
           <div class="text-lg break-keep">
             출석 입력을 위해 필요한
-            <span class="text-yellow-500">추가 정보를 입력</span>한 후
-            <span class="text-yellow-500">승인</span>을 기다려주세요.
+            <span class="text-yellow-500">추가 정보를 입력</span>해주세요.
           </div>
         </template>
       </Card>
@@ -49,10 +48,10 @@ import { onBeforeRouteLeave } from 'vue-router';
 import { useCookies } from '@vueuse/integrations/useCookies';
 import { useAccountStore } from '@/store/account';
 
-const cookies = useCookies(['notice_later']);
+const cookies = useCookies(['odmk_notice_later']);
 const { accountData } = useAccountStore();
 
-const isClosed = ref(cookies.get('notice_later') || false);
+const isClosed = ref(cookies.get('odmk_notice_later') || false);
 
 const isCoachMarkVisible = computed(() => {
   if (isClosed.value) {
@@ -88,7 +87,7 @@ onBeforeRouteLeave((to) => {
     const expires = new Date();
     expires.setDate(expires.getDate() + 1);
 
-    cookies.set('notice_later', true, {
+    cookies.set('odmk_notice_later', true, {
       expires,
     });
 

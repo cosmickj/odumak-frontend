@@ -119,19 +119,19 @@ import { required } from '@vuelidate/validators';
 import loginKakao from '@/assets/images/login-kakao.png';
 import loginNaver from '@/assets/images/naver-login-icon.png';
 
-const cookies = useCookies(['has_account']);
+const cookies = useCookies(['odmk_has_account']);
 const router = useRouter();
 const accountStore = useAccountStore();
 
 const isDialogVisible = ref(false);
 
 const setDialog = () => {
-  cookies.set('has_account', true);
+  cookies.set('odmk_has_account', true);
   isDialogVisible.value = false;
 };
 
 onMounted(() => {
-  if (!cookies.get('has_account')) {
+  if (!cookies.get('odmk_has_account')) {
     setTimeout(() => (isDialogVisible.value = true), 500);
   }
 

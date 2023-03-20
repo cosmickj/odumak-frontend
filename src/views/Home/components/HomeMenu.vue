@@ -1,6 +1,6 @@
 <template>
   <RouterLink class="rounded-lg" :to="{ name: routeName, params: { job } }">
-    <div class="relative h-full p-4 text-base">
+    <div class="relative h-full p-3 text-base">
       <p>
         <span>{{ who }}</span>
         <span class="font-bold">{{ what }}</span>
