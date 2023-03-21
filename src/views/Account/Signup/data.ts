@@ -9,7 +9,7 @@ const departmentOptions = [
 const roleOptions = [
   { name: '담임', value: 'main' },
   { name: '부담임', value: 'sub' },
-  { name: '일반 교사', value: 'common' },
+  { name: '해당 없음', value: 'common' },
 ];
 const gradeOptions = [
   { name: '1학년', value: '1' },

@@ -17,6 +17,7 @@ import {
   updateEmail,
   updateProfile,
 } from '@firebase/auth';
+import { UserData } from '@/types';
 
 interface NaverOAuth {
   message: string;
@@ -78,8 +79,10 @@ onMounted(async () => {
     });
 
     if (user === null) {
-      const newUser = {
+      const newUser: UserData = {
         uid: id,
+        provider: 'naver' as const,
+        profileImage: profile_image,
         name,
         birth: null,
         church: '',

@@ -31,7 +31,7 @@ const GENDER: Option[] = [
 const TEACHER_ROLE: Option[] = [
   { label: '담임', value: 'main' },
   { label: '부담임', value: 'sub' },
-  { label: '일반교사', value: 'common' },
+  { label: '해당 없음', value: 'common' },
 ];
 
 // const getBirthYear = () => {

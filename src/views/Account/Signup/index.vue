@@ -277,6 +277,8 @@ const onSubmit = async () => {
     } else {
       await userStore.createSingle({
         uid: signupResult.result.user.uid,
+        provider: 'email',
+        profileImage: null,
         name: name.value,
         birth: null,
         church: church.value,
