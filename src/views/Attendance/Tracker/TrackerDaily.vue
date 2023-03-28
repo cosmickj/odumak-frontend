@@ -2,7 +2,6 @@
   <p class="text-xl text-center">{{ headerText }} 일일 출석현황</p>
 
   <Calendar
-    touchUI
     v-model="attendanceDate"
     class="mt-5"
     input-class="text-center"
@@ -126,8 +125,8 @@ const attendanceStore = useAttendanceStore();
 const job = computed(() => {
   return router.currentRoute.value.params.job as 'student' | 'teacher';
 });
-const JobMap = { student: '학생', teacher: '교사' };
 
+const JobMap = { student: '학생', teacher: '교사' };
 const headerText = computed(() => JobMap[job.value]);
 
 // https://bobbyhadz.com/blog/javascript-get-previous-sunday
@@ -164,7 +163,7 @@ const onAttendanceDateSelect = async () => {
   await getAttendancesRecord();
 };
 
-const layout = ref('list');
+const layout = ref<'list' | 'grid'>('list');
 
 const statusOffline = (attd: string) => {
   return attd === 'offline'

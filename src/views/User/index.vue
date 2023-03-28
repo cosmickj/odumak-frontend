@@ -57,7 +57,9 @@
       <div class="flex px-5 py-2 items-center justify-between">
         <!-- TODO: CSS 적용하기 -->
         <span>가입 방식</span>
-        <span>{{ accountStore.accountData?.provider.toUpperCase() }} 연동</span>
+        <span>
+          {{ accountStore.accountData?.provider?.toUpperCase() }} 연동
+        </span>
       </div>
     </div>
 

@@ -1,5 +1,3 @@
-import { defineStore } from 'pinia';
-
 import { db, attendancesColl } from '@/firebase/config';
 import {
   addDoc,
@@ -11,7 +9,8 @@ import {
   updateDoc,
   where,
 } from 'firebase/firestore';
-
+import { defineStore } from 'pinia';
+import { useMemberStore } from './member';
 import { AttendanceData } from '@/types';
 
 interface AttendaceAddAttendanceParams {
@@ -61,6 +60,13 @@ export const useAttendanceStore = defineStore('attendance', {
     async fetchAttendances(params: AttendaceFetchAttendancesParams) {
       this.attendancesRecord.daily = [];
 
+      const memberStore = useMemberStore();
+      const members = await memberStore.fetchAll({
+        church: params.church,
+        department: params.department,
+        job: params.job,
+      });
+
       const q = query(
         attendancesColl,
         where('church', '==', params.church),
@@ -70,23 +76,34 @@ export const useAttendanceStore = defineStore('attendance', {
       );
       const qSnapshot = await getDocs(q);
 
-      const result: AttendanceData[] = qSnapshot.docs.map((doc) => ({
-        uid: doc.id,
-        name: doc.data().name,
-        church: doc.data().church,
-        department: doc.data().department,
-        job: doc.data().job,
-        grade: doc.data().grade,
-        group: doc.data().group,
-        attendance: {
-          date: (doc.data().attendance.date as Timestamp).toDate(),
-          status: doc.data().attendance.status,
-        },
-        createdAt: (doc.data().createdAt as Timestamp).toDate(),
-        createdBy: doc.data().createdBy,
-      }));
+      const attendanceData = qSnapshot.docs.map((doc) => doc.data());
 
-      this.attendancesRecord.daily = result;
+      const attendances: AttendanceData[] = members.map((member) => {
+        const memberAttendance = attendanceData.find((attendance) => {
+          return (
+            attendance.name === member.name &&
+            attendance.church === member.church &&
+            attendance.department === member.department &&
+            attendance.job === member.job
+          );
+        });
+
+        return {
+          uid: member.uid || '',
+          name: member.name,
+          church: member.church,
+          department: member.department,
+          grade: member.grade,
+          group: member.group,
+          job: member.job,
+          attendance: memberAttendance?.attendance || {
+            status: '',
+            date: null,
+          },
+        };
+      });
+
+      this.attendancesRecord.daily = attendances;
     },
 
     async modifyAttendance(params: AttendaceModifyAttendanceParams) {
