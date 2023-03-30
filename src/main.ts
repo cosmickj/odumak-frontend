@@ -61,9 +61,8 @@ import Dialog from 'primevue/dialog';
 import Dropdown from 'primevue/dropdown';
 import FileUpload from 'primevue/fileupload';
 import Image from 'primevue/image';
-
-import InputSwitch from 'primevue/inputswitch';
 import InputNumber from 'primevue/inputnumber';
+import InputSwitch from 'primevue/inputswitch';
 import InputText from 'primevue/inputtext';
 import MultiSelect from 'primevue/multiselect';
 import Password from 'primevue/password';
@@ -71,7 +70,9 @@ import ProgressSpinner from 'primevue/progressspinner';
 import RadioButton from 'primevue/radiobutton';
 import SelectButton from 'primevue/selectbutton';
 import Toast from 'primevue/toast';
+import Toolbar from 'primevue/toolbar';
 import Tree from 'primevue/tree';
+import OverlayPanel from 'primevue/overlaypanel';
 
 app
   .component('Avatar', Avatar)
@@ -86,8 +87,8 @@ app
   .component('Dropdown', Dropdown)
   .component('FileUpload', FileUpload)
   .component('Image', Image)
-  .component('InputSwitch', InputSwitch)
   .component('InputNumber', InputNumber)
+  .component('InputSwitch', InputSwitch)
   .component('InputText', InputText)
   .component('MultiSelect', MultiSelect)
   .component('Password', Password)
@@ -95,6 +96,8 @@ app
   .component('RadioButton', RadioButton)
   .component('SelectButton', SelectButton)
   .component('Toast', Toast)
-  .component('Tree', Tree);
+  .component('Toolbar', Toolbar)
+  .component('Tree', Tree)
+  .component('OverlayPanel', OverlayPanel);
 
 app.mount('#app');

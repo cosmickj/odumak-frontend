@@ -1,5 +1,8 @@
 <template>
-  <RouterLink class="rounded-lg" :to="{ name: routeName, params: { job } }">
+  <RouterLink
+    class="rounded-lg aspect-square"
+    :to="{ name: routeName, params: { job } }"
+  >
     <div class="relative h-full p-3 text-base">
       <p>
         <span>{{ who }}</span>
