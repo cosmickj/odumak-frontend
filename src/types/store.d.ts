@@ -73,6 +73,7 @@ interface MemberRemoveMultipleParams {
 /** user.ts */
 export interface UserCreateSingleParams extends Omit<UserData, 'createdAt'> {
   uid: string;
+  provider: 'naver' | 'kakao' | 'email';
 }
 
 export interface UserFetchSingleParams {

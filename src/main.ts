@@ -40,10 +40,10 @@ app.use(ToastService);
     })) as UserData;
 
     accountStore.accountData = {
+      ...result,
       uid: currentUser.uid,
       email: currentUser.email!,
-      displayName: currentUser.displayName!,
-      ...result,
+      name: currentUser.displayName!,
     };
   }
   accountStore.isAuthReady = true;
@@ -61,7 +61,7 @@ import Dialog from 'primevue/dialog';
 import Dropdown from 'primevue/dropdown';
 import FileUpload from 'primevue/fileupload';
 import Image from 'primevue/image';
-import InputMask from 'primevue/inputmask';
+import InputNumber from 'primevue/inputnumber';
 import InputSwitch from 'primevue/inputswitch';
 import InputText from 'primevue/inputtext';
 import MultiSelect from 'primevue/multiselect';
@@ -70,7 +70,9 @@ import ProgressSpinner from 'primevue/progressspinner';
 import RadioButton from 'primevue/radiobutton';
 import SelectButton from 'primevue/selectbutton';
 import Toast from 'primevue/toast';
+import Toolbar from 'primevue/toolbar';
 import Tree from 'primevue/tree';
+import OverlayPanel from 'primevue/overlaypanel';
 
 app
   .component('Avatar', Avatar)
@@ -85,7 +87,7 @@ app
   .component('Dropdown', Dropdown)
   .component('FileUpload', FileUpload)
   .component('Image', Image)
-  .component('InputMask', InputMask)
+  .component('InputNumber', InputNumber)
   .component('InputSwitch', InputSwitch)
   .component('InputText', InputText)
   .component('MultiSelect', MultiSelect)
@@ -94,6 +96,8 @@ app
   .component('RadioButton', RadioButton)
   .component('SelectButton', SelectButton)
   .component('Toast', Toast)
-  .component('Tree', Tree);
+  .component('Toolbar', Toolbar)
+  .component('Tree', Tree)
+  .component('OverlayPanel', OverlayPanel);
 
 app.mount('#app');

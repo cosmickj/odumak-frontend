@@ -4,13 +4,14 @@
       <Button
         class="p-button-success p-button-sm"
         icon="pi pi-plus"
-        label="추가하기"
+        :label="isMobile ? '' : '추가하기'"
         @click="handleAdd"
-      />
+      >
+      </Button>
       <Button
         class="p-button-danger p-button-sm"
         icon="pi pi-trash"
-        label="삭제하기"
+        :label="isMobile ? '' : '삭제하기'"
         :disabled="!isDisabled"
         @click="handleDelete"
       />
@@ -19,7 +20,7 @@
     <Button
       class="p-button-help p-button-sm"
       icon="pi pi-external-link"
-      label="내보내기"
+      :label="isMobile ? '' : '내보내기'"
       @click="handleExport"
     />
   </div>
@@ -27,7 +28,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-
+import { breakpointsTailwind, useBreakpoints } from '@vueuse/core';
 import type { MemberData } from '@/types';
 
 const props = defineProps<{
@@ -39,6 +40,10 @@ const emit = defineEmits(['export', 'add', 'delete']);
 const handleAdd = () => emit('add');
 const handleDelete = () => emit('delete');
 const handleExport = () => emit('export');
+
+const breakpoints = useBreakpoints(breakpointsTailwind);
+
+const isMobile = breakpoints.smallerOrEqual('sm');
 
 const isDisabled = computed(() => {
   if (props.selection) {

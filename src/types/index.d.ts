@@ -15,6 +15,8 @@ export type UserRole = 'admin' | 'main' | 'sub' | 'common';
 
 interface UserData {
   uid: string;
+  provider: 'naver' | 'kakao' | 'email';
+  profileImage: string | null;
   name: string;
   birth: Date | null;
   church: string;

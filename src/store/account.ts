@@ -28,7 +28,7 @@ export const useAccountStore = defineStore('account', {
   }),
   actions: {
     /**
-     * 회원가입
+     * 이메일 회원가입
      */
     async signup(params: AccountSignupParams) {
       try {
@@ -38,6 +38,7 @@ export const useAccountStore = defineStore('account', {
           params.password
         );
         await updateProfile(signupResponse.user, { displayName: params.name });
+        // TODO: 이메일 회원가입할 때 기본 프로필 사진 설정하기
         return response(baseResponse.SUCCESS, signupResponse);
       } catch (err) {
         return errResponse(baseResponse.NETWORK_ERROR);

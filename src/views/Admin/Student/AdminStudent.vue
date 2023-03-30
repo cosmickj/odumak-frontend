@@ -80,7 +80,6 @@ const initSelectedStudent: MemberData = {
   address: '',
   registeredAt: new Date(),
   remark: '',
-  attendances: [],
 };
 
 const selectedStudents = reactive({ body: [] as MemberData[] });

@@ -79,10 +79,22 @@ export const useUserStore = defineStore('user', {
 
       return result as unknown as UserData[];
     },
+    /**
+     * 유저 정보 수정 함수 - 속성 1개
+     */
     async modifySingle(params: UserModifySingle) {
       const { uid, keyName, keyValue } = params;
       return await updateDoc(doc(db, 'newUsers', uid), {
         [keyName]: keyValue,
+      });
+    },
+    /**
+     * 유저 정보 수정 함수 - 속성 n개
+     */
+    async modifyMultiple(payload: any) {
+      const { uid, ...params } = payload;
+      return await updateDoc(doc(db, 'newUsers', uid), {
+        ...params,
       });
     },
     /**

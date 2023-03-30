@@ -1,6 +1,6 @@
 <template>
-  <section v-if="isAuthReady" class="overflow-auto bg-slate-200">
-    <header class="sticky top-0 left-0 px-1 bg-slate-200">
+  <section v-if="isAuthReady" class="overflow-auto flex flex-col bg-slate-200">
+    <header class="z-10 sticky top-0 left-0 px-1 pt-1 bg-slate-200">
       <RouterLink :to="{ name: 'UserView' }">
         <Button
           icon="pi pi-angle-left"
@@ -15,32 +15,40 @@
       </span>
     </header>
 
-    <div class="text-xs">
+    <div class="flex-1 text-xs">
       <div class="flex flex-col px-5 py-2">
-        <label for="displayName " class="mb-1">이름</label>
+        <label for="name " class="mb-1"> 이름 </label>
         <InputText
-          v-model="form.displayName"
-          id="displayName"
+          v-model="formState.name"
+          id="name"
           class="rounded-lg"
+          :class="{ 'p-invalid': v$.name.$error }"
         />
       </div>
 
       <div class="flex flex-col px-5 py-2">
         <label for="birth" class="mb-1">생년월일</label>
-        <InputText id="birth" placeholder="생년월일" class="rounded-lg" />
+        <Calendar id="birth" placeholder="생년월일" input-class="rounded-lg" />
       </div>
 
       <div class="flex flex-col px-5 py-2">
         <label for="phone" class="mb-1">휴대폰 번호</label>
-        <InputText id="phone" placeholder="휴대폰 번호" class="rounded-lg" />
+        <InputText
+          v-model="formState.phone"
+          id="phone"
+          placeholder="휴대폰 번호"
+          type="number"
+          class="rounded-lg"
+        />
       </div>
 
-      <p class="px-5 mt-8 mb-2 text-base font-semibold">소속 정보</p>
+      <p class="px-5 mt-7 mb-2 text-base font-semibold">소속 정보</p>
 
       <div class="flex flex-col px-5 py-2">
         <label for="church" class="mb-1">교회 이름</label>
         <Dropdown
-          v-model="form.church"
+          v-model="formState.church"
+          :class="{ 'p-invalid': v$.church.$error }"
           :options="CHURCH_OPTIONS"
           optionLabel="label"
           optionValue="value"
@@ -51,7 +59,8 @@
       <div class="flex flex-col px-5 py-2">
         <label for="department" class="mb-1">봉사 부서</label>
         <Dropdown
-          v-model="form.department"
+          v-model="formState.department"
+          :class="{ 'p-invalid': v$.department.$error }"
           :options="DEPARTMENT_OPTIONS"
           optionLabel="label"
           optionValue="value"
@@ -62,9 +71,9 @@
       <div class="flex flex-col px-5 py-2">
         <label for="role" class="mb-1">담임 여부</label>
         <SelectButton
-          v-model="form.role"
+          unselectable
+          v-model="formState.role"
           class="flex"
-          :unselectable="false"
           :options="TEACHER_ROLE"
           optionLabel="label"
           optionValue="value"
@@ -72,10 +81,11 @@
         />
       </div>
 
-      <div class="flex flex-col px-5 py-2">
+      <div v-if="formState.role !== 'common'" class="flex flex-col px-5 py-2">
         <label for="grade" class="mb-1">담당 학년</label>
         <Dropdown
-          v-model="form.grade"
+          v-model="formState.grade"
+          :class="{ 'p-invalid': v$.grade.$error }"
           :options="GRADE_OPTIONS"
           optionLabel="label"
           optionValue="value"
@@ -83,32 +93,34 @@
         />
       </div>
 
-      <div class="flex flex-col px-5 py-2">
+      <div v-if="formState.role !== 'common'" class="flex flex-col px-5 py-2">
         <label for="group" class="mb-1">담당 학급</label>
         <Dropdown
-          v-model="form.group"
+          v-model="formState.group"
+          :class="{ 'p-invalid': v$.group.$error }"
           :options="GROUP_OPTIONS"
           optionLabel="label"
           optionValue="value"
           placeholder="담당 학급"
         />
       </div>
+    </div>
 
-      <section class="sticky bottom-0 mt-6 px-5 pb-4 bg-slate-200">
-        <Button
-          class="w-full p-button-warning"
-          label="수정 완료"
-          @click="submitForm"
-        />
-      </section>
+    <div class="sticky bottom-0 mt-10 px-5 pb-4 bg-slate-200">
+      <Button
+        class="w-full p-button-warning"
+        label="수정 완료"
+        :disabled="!isChanged"
+        @click="submitForm"
+      />
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { reactive, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { computed, reactive, ref, watch } from 'vue';
 import { useAccountStore } from '@/store/account';
+import { useUserStore } from '@/store/user';
 import {
   GRADE_OPTIONS,
   GROUP_OPTIONS,
@@ -116,22 +128,70 @@ import {
   CHURCH_OPTIONS,
   DEPARTMENT_OPTIONS,
 } from '@/constants/common';
+import useVuelidate from '@vuelidate/core';
+import { helpers, required, requiredIf } from '@vuelidate/validators';
 
-const router = useRouter();
 const { isAuthReady, accountData } = useAccountStore();
+const userStore = useUserStore();
 
-const form = reactive({ ...accountData });
+const isChanged = ref(false);
+const formState = reactive({ ...accountData });
 
 watch(
-  form,
-  () => {
-    console.log('watch');
+  formState,
+  (newValue) => {
+    if (JSON.stringify(newValue) !== JSON.stringify(accountData)) {
+      isChanged.value = true;
+    } else {
+      isChanged.value = false;
+    }
   },
   { deep: true }
 );
 
-const submitForm = () => {
-  console.log(form);
+watch(
+  () => formState.role,
+  (newValue) => {
+    if (newValue === 'common') {
+      formState.grade = '';
+      formState.group = '';
+    }
+  }
+);
+
+const rules = computed(() => ({
+  name: {
+    required: helpers.withMessage('이름을 입력해주세요.', required),
+  },
+  church: { required },
+  department: { required },
+  grade: {
+    requiredIf: requiredIf(formState.role !== 'common'),
+  },
+  group: {
+    requiredIf: requiredIf(formState.role !== 'common'),
+  },
+}));
+
+// @ts-ignore
+const v$ = useVuelidate(rules, formState);
+
+const submitForm = async () => {
+  try {
+    const isFormCorrect = await v$.value.$validate();
+    if (!isFormCorrect) {
+      return;
+    }
+    await userStore.modifyMultiple({
+      uid: accountData?.uid,
+      ...formState,
+    });
+    alert('수정되었습니다.');
+  } catch (error) {
+    throw Error((error as Error).message);
+  } finally {
+    isChanged.value = false;
+  }
 };
 </script>
 
