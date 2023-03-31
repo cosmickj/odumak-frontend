@@ -1,6 +1,6 @@
 <template>
   <RouterLink
-    class="rounded-lg aspect-square"
+    class="aspect-square rounded-lg"
     :to="{ name: routeName, params: { job } }"
   >
     <div class="relative h-full p-3 text-base">
