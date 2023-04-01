@@ -1,12 +1,59 @@
 <template>
   <section class="px-5 py-8">
-    <header class="mb-4 text-xl text-center">
-      안녕하세요, <strong>{{ accountName }}</strong> 선생님!
+    <header class="mb-4 text-xl">
+      <p>안녕하세요!</p>
+      <div class="flex items-center justify-between">
+        <p>
+          <strong>{{ accountData?.name }}</strong> 선생님
+        </p>
+
+        <RouterLink
+          v-if="!accountData?.isAccepted"
+          :to="{ name: 'UserEditView' }"
+        >
+          <Button
+            class="text-xs"
+            icon="pi pi-plus"
+            label="추가 정보 입력하기"
+            severity="danger"
+            outlined
+          />
+        </RouterLink>
+
+        <Dialog
+          modal
+          v-model:visible="visible"
+          class="w-1/3"
+          position="bottom"
+          header="승인이 필요합니다"
+          :breakpoints="{ '640px': '90vw' }"
+        >
+          <div class="break-keep">
+            <span class="font-semibold">
+              추가정보(교회, 당담부서, 학급 등)
+            </span>
+            를 입력해주세요.
+          </div>
+
+          <template #footer>
+            <RouterLink :to="{ name: 'UserEditView' }">
+              <Button
+                autofocus
+                outlined
+                class="text-xs"
+                icon="pi pi-plus"
+                label="추가 정보 입력하기"
+                severity="danger"
+              />
+            </RouterLink>
+          </template>
+        </Dialog>
+      </div>
     </header>
 
     <div class="grid grid-cols-2 gap-3">
       <RouterLink
-        v-if="isAdmin"
+        v-if="accountData?.role === 'admin'"
         :to="{ name: 'AdminStudent' }"
         class="col-span-2 bg-purple-300 text-purple-700 rounded-lg"
       >
@@ -55,18 +102,25 @@
 
 <script setup lang="ts">
 import HomeMenu from './components/HomeMenu.vue';
-
-import { computed } from 'vue';
+import { ref } from 'vue';
+import { onBeforeRouteLeave } from 'vue-router';
 import { useAccountStore } from '@/store/account';
 
 const { accountData } = useAccountStore();
 
-const accountName = computed(() => accountData?.name);
+const visible = ref(false);
 
-const isAdmin = computed(() => {
-  if (accountData?.role === 'admin') {
-    return true;
+onBeforeRouteLeave((to, from, next) => {
+  if ((to.name as string).includes('Attendance')) {
+    visible.value = true;
+  } else {
+    next();
   }
-  return false;
 });
 </script>
+
+<style scoped>
+:deep(.pi.pi-plus.p-button-icon) {
+  font-size: 0.75rem;
+}
+</style>

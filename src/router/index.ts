@@ -54,6 +54,7 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         path: 'attendance/tracker',
+        meta: { requiresAccept: true },
         components: {
           default: () => import('@/views/Attendance/Tracker/index.vue'),
           GlobalNavbar: () => import('@/components/TheNavbar.vue'),
@@ -74,8 +75,9 @@ const routes: Array<RouteRecordRaw> = [
         ],
       },
       {
-        path: 'attendance/checker/',
+        path: 'attendance/checker',
         name: 'AttendanceChecker',
+        meta: { requiresAccept: true },
         component: () => import('@/views/Attendance/Checker/index.vue'),
       },
     ],
@@ -113,20 +115,23 @@ router.beforeEach(async (to, from, next) => {
   const currentUser = await getCurrentUser();
   const needAuth = to.matched.some((record) => record.meta.requiresAuth);
   const needAdmin = to.matched.some((record) => record.meta.requiresAdmin);
+  const needAccept = to.matched.some((record) => record.meta.requiresAccept);
 
-  if (!currentUser && needAuth) {
+  if (needAuth && !currentUser) {
     return next({ name: 'AccountLogin' });
   }
 
-  if (needAdmin) {
-    const userStore = useUserStore();
-    const userData = await userStore.fetchSingle({
-      uid: currentUser.uid,
-    });
+  const userStore = useUserStore();
+  const userData = await userStore.fetchSingle({
+    uid: currentUser.uid,
+  });
 
-    if (userData?.role !== 'admin') {
-      return next({ name: 'HomeView' });
-    }
+  if (needAccept && !userData?.isAccepted) {
+    return next({ name: 'HomeView' });
+  }
+
+  if (needAdmin && userData?.role !== 'admin') {
+    return next({ name: 'HomeView' });
   }
 
   return next();

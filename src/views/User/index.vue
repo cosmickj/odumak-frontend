@@ -22,21 +22,17 @@
     </header>
 
     <div class="bg-slate-100">
-      <div class="flex px-5 py-3 items-center justify-center">
+      <div class="flex flex-col gap-2 px-5 py-3 items-center text-xs">
         <Avatar :image="youngeunElementLogo" size="xlarge" shape="circle" />
+
+        <span v-if="accountStore.accountData?.isAccepted">승인 완료</span>
+        <span v-else class="text-red-600">승인 대기</span>
       </div>
 
       <div class="flex px-5 py-2 items-center justify-between">
-        <div class="flex">
-          <span class="mr-3">이름</span>
+        <span class="mr-3">이름</span>
 
-          <span v-if="accountStore.accountData?.isAccepted">(승인 완료)</span>
-          <span v-else class="text-red-600">(승인 대기)</span>
-        </div>
-
-        <span>
-          {{ accountStore.accountData?.name }}
-        </span>
+        <span>{{ accountStore.accountData?.name }}</span>
       </div>
 
       <div class="flex px-5 py-2 items-center justify-between">

@@ -24,8 +24,6 @@ const app = createApp(App);
 
 app.use(router);
 app.use(createPinia());
-app.use(PrimeVue);
-app.use(ToastService);
 
 // Waiting for Auth to be Ready
 (async () => {
@@ -48,6 +46,9 @@ app.use(ToastService);
   }
   accountStore.isAuthReady = true;
 })();
+
+app.use(PrimeVue);
+app.use(ToastService);
 
 import Avatar from 'primevue/avatar';
 import Button from 'primevue/button';
