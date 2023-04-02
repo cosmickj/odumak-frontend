@@ -6,7 +6,7 @@
     ]"
     :to="{ name: routeName }"
   >
-    <div class="relative flex w-14 h-14 items-center justify-center">
+    <div class="relative flex w-12 h-12 items-center justify-center">
       <i class="text-2xl" :class="icon"></i>
       <slot></slot>
     </div>
@@ -36,7 +36,7 @@ const isHome = computed(() => {
 <style scoped>
 .button-important {
   position: relative;
-  bottom: 26px;
+  bottom: 20px;
   background: rgb(234, 179, 8);
   border: 4px solid rgb(241, 245, 249);
   border-radius: 50%;

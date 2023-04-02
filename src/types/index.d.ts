@@ -19,11 +19,11 @@ interface UserData {
   profileImage: string | null;
   name: string;
   birth: Date | null;
-  church: string;
-  department: string;
-  grade: string;
-  group: string;
-  role: UserRole;
+  church: string | null;
+  department: string | null;
+  grade: string | null;
+  group: string | null;
+  role: UserRole | null;
   phone: string | null;
   isAccepted: boolean;
   isRejected: boolean;
