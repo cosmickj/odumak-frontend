@@ -117,21 +117,21 @@ router.beforeEach(async (to, from, next) => {
   const needAdmin = to.matched.some((record) => record.meta.requiresAdmin);
   const needAccept = to.matched.some((record) => record.meta.requiresAccept);
 
-  if (needAuth && !currentUser) {
+  if (!currentUser && needAuth) {
     return next({ name: 'AccountLogin' });
   }
 
-  const userStore = useUserStore();
-  const userData = await userStore.fetchSingle({
-    uid: currentUser.uid,
-  });
-
-  if (needAccept && !userData?.isAccepted) {
-    return next({ name: 'HomeView' });
-  }
-
-  if (needAdmin && userData?.role !== 'admin') {
-    return next({ name: 'HomeView' });
+  if (currentUser) {
+    const userStore = useUserStore();
+    const userData = await userStore.fetchSingle({
+      uid: currentUser.uid,
+    });
+    if (needAccept && !userData?.isAccepted) {
+      return next({ name: 'HomeView' });
+    }
+    if (needAdmin && userData?.role !== 'admin') {
+      return next({ name: 'HomeView' });
+    }
   }
 
   return next();
