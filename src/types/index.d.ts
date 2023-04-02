@@ -1,4 +1,4 @@
-import type { User } from 'firebase/auth/dist/auth';
+import type { User as FirebaseUser } from 'firebase/auth/dist/auth';
 import { Timestamp } from 'firebase/firestore';
 
 /** Common */
@@ -8,7 +8,7 @@ export type Gender = 'male' | 'female';
 type Key = 'uid' | 'email' | 'displayName';
 
 type AuthData = {
-  -readonly [k in Key]: User[k];
+  -readonly [k in Key]: FirebaseUser[k];
 };
 
 export type UserRole = 'admin' | 'main' | 'sub' | 'common';
@@ -31,7 +31,9 @@ interface UserData {
   createdAt?: Date;
 }
 
-export interface AccountData extends AuthData, UserData {}
+export interface AccountData extends UserData {
+  email: string;
+}
 
 /** Member */
 export interface MemberData {

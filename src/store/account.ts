@@ -107,9 +107,9 @@ export const useAccountStore = defineStore('account', {
      */
     composeAccountData(authData: AuthData, userData: UserData) {
       this.accountData = {
-        email: authData.email || '이메일이 존재하지 않습니다.',
-        displayName: authData.displayName || '이름이 존재하지 않습니다.',
         ...userData,
+        email: authData.email || '이메일이 존재하지 않습니다.',
+        name: authData.displayName || '이름이 존재하지 않습니다.',
       };
       this.isAuthReady = true;
     },
