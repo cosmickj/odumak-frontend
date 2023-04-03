@@ -145,8 +145,8 @@ const accountData = computed(() => accountStore.accountData!);
 const getAttendancesRecord = async () => {
   try {
     await attendanceStore.fetchAttendances({
-      church: accountData.value.church,
-      department: accountData.value.department,
+      church: accountData.value.church!,
+      department: accountData.value.department!,
       job: job.value,
       attendanceDate: attendanceDate.value,
     });

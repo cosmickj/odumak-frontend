@@ -29,8 +29,8 @@ const fetchUsers = async () => {
   }
 
   users.value = await userStore.fetchMultipleByChurchAndDepartment({
-    church: accountStore.accountData.church,
-    department: accountStore.accountData.department,
+    church: accountStore.accountData.church!,
+    department: accountStore.accountData.department!,
   });
 };
 

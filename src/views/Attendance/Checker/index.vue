@@ -112,7 +112,7 @@ const RequestJobMap = {
   sub: 'student' as const,
   common: null,
 };
-const requestJob = computed(() => RequestJobMap[accountData.value.role]);
+const requestJob = computed(() => RequestJobMap[accountData.value.role!]);
 
 const getAttendancesTemplate = async () => {
   try {
@@ -131,13 +131,14 @@ const getAttendancesTemplate = async () => {
     });
 
     await attendanceStore.fetchAttendances({
-      church: accountData.value.church,
-      department: accountData.value.department,
+      church: accountData.value.church!,
+      department: accountData.value.department!,
       job: requestJob.value,
       attendanceDate: attendanceDate.value,
     });
 
     // TODO: requestJob에서 null값이 나오다 보니 타입에러가 나오는 상태이다.
+    // @ts-ignore
     template = members.map((mem) => {
       let uid = '';
       let status: AttendanceData['attendance']['status'] = 'offline';

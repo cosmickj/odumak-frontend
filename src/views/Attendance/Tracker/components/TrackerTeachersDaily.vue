@@ -25,12 +25,18 @@
     <Column field="class" header="담당학급" bodyStyle="text-align:center">
       <template #body="slotProps">
         <span>
-          {{ translateAssignedClass(slotProps.data.grade, slotProps.data.group) }}
+          {{
+            translateAssignedClass(slotProps.data.grade, slotProps.data.group)
+          }}
         </span>
       </template>
     </Column>
 
-    <Column field="attendance" header="출석현황" bodyClass="flex justify-center">
+    <Column
+      field="attendance"
+      header="출석현황"
+      bodyClass="flex justify-center"
+    >
       <template #body="slotProps">
         <span :class="`attendance-${slotProps.data.attendance}`">
           {{ translateAttendance(slotProps.data.attendance) }}
@@ -48,11 +54,11 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import type { Teacher } from '@/types';
+import type { MemberData } from '@/types';
 
 interface Props {
   attendanceDate: Date | undefined | null;
-  teachersAttendance: Teacher[];
+  teachersAttendance: MemberData[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
