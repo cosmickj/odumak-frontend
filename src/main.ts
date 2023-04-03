@@ -27,23 +27,28 @@ app.use(createPinia());
 
 // Waiting for Auth to be Ready
 (async () => {
-  const currentUser = (await getCurrentUser()) as User;
-  if (currentUser) {
-    const userStore = useUserStore();
-    const userData = await userStore.fetchSingle({
-      uid: currentUser.uid,
-    });
+  try {
+    const currentUser = (await getCurrentUser()) as User;
+    const accountStore = useAccountStore();
 
-    if (userData) {
-      const accountStore = useAccountStore();
-      accountStore.accountData = {
-        ...userData,
+    if (currentUser) {
+      const userStore = useUserStore();
+      const userData = await userStore.fetchSingle({
         uid: currentUser.uid,
-        email: currentUser.email!,
-        name: currentUser.displayName!,
-      };
-      accountStore.isAuthReady = true;
+      });
+
+      if (userData) {
+        accountStore.accountData = {
+          ...userData,
+          uid: currentUser.uid,
+          email: currentUser.email!,
+          name: currentUser.displayName!,
+        };
+      }
     }
+    accountStore.isAuthReady = true;
+  } catch (error) {
+    console.log(error);
   }
 })();
 
