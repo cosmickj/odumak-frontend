@@ -80,6 +80,30 @@ const routes: Array<RouteRecordRaw> = [
         meta: { requiresAccept: true },
         component: () => import('@/views/Attendance/Checker/index.vue'),
       },
+      {
+        path: '/waypoint',
+        component: () => import('@/views/Waypoint/WaypointContainer.vue'),
+        children: [
+          {
+            path: 'group',
+            name: 'GroupCheck',
+            component: () =>
+              import('@/views/Waypoint/partials/WaypointGroupCheck.vue'),
+          },
+          {
+            path: 'teacher',
+            name: 'TeacherCheck',
+            component: () =>
+              import('@/views/Waypoint/partials/WaypointTeacherCheck.vue'),
+          },
+          {
+            path: 'member',
+            name: 'MemberCheck',
+            component: () =>
+              import('@/views/Waypoint/partials/WaypointMemberCheck.vue'),
+          },
+        ],
+      },
     ],
   },
   {

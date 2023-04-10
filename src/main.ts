@@ -79,6 +79,8 @@ import Toast from 'primevue/toast';
 import Toolbar from 'primevue/toolbar';
 import Tree from 'primevue/tree';
 import OverlayPanel from 'primevue/overlaypanel';
+import Steps from 'primevue/steps';
+import ToggleButton from 'primevue/togglebutton';
 
 app
   .component('Avatar', Avatar)
@@ -104,6 +106,8 @@ app
   .component('Toast', Toast)
   .component('Toolbar', Toolbar)
   .component('Tree', Tree)
+  .component('Steps', Steps)
+  .component('ToggleButton', ToggleButton)
   .component('OverlayPanel', OverlayPanel);
 
 app.mount('#app');
