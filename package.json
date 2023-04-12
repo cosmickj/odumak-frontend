@@ -23,6 +23,7 @@
     "vue-router": "4.1.6"
   },
   "devDependencies": {
+    "@faker-js/faker": "^7.6.0",
     "@types/array-sort": "1.0.0",
     "@types/node": "18.15.3",
     "@vitejs/plugin-vue": "4.0.0",

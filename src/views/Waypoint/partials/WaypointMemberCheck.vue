@@ -2,11 +2,17 @@
   <div class="flex-1 flex flex-col justify-between">
     <div>
       <p class="break-keep">
-        {{ formState.church }} {{ formState.department }} 000 선생님이
+        <span class="mr-1">{{ formState.church }}</span>
+        <span class="mr-1">{{ formState.department }}</span>
+        <span>{{ teacher?.name }} 선생님이</span>
         맞으시다면 담당 학생을 모두 선택 후 제출하기를 눌러주세요
       </p>
 
-      <div class="grid grid-cols-3 gap-3 p-4">
+      <pre>
+        {{ dummy }}
+      </pre>
+
+      <!-- <div class="grid grid-cols-3 gap-3 p-4">
         <ToggleButton
           v-for="(item, i) in items"
           class="flex aspect-square bg-white rounded-md items-center justify-center shadow"
@@ -15,7 +21,7 @@
           :off-label="item.name"
           :key="i"
         />
-      </div>
+      </div> -->
     </div>
 
     <div class="flex justify-between">
@@ -26,13 +32,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onActivated, ref } from 'vue';
+import { useMemberStore } from '@/store/member';
+import { faker } from '@faker-js/faker/locale/ko';
 
-defineProps<{
+const props = defineProps<{
   formState: any;
 }>();
 
 const emit = defineEmits(['prevPage', 'nextPage']);
+
+const memberStore = useMemberStore();
 
 const items = ref([
   { name: 'aaa', checked: false },
@@ -45,6 +55,36 @@ const items = ref([
   { name: 'hhh', checked: false },
   { name: 'iii', checked: false },
 ]);
+
+const teacher = ref();
+const students = ref<any[]>([]);
+
+const dummy = ref<any[]>([]);
+
+onActivated(async () => {
+  try {
+    const members = await memberStore.fetchByGradeGroup({
+      church: props.formState.church,
+      department: props.formState.department,
+      grade: props.formState.grade,
+      group: props.formState.group,
+    });
+
+    teacher.value = members.find((mem) => mem.job === 'teacher');
+    students.value = members.filter((mem) => mem.job === 'student');
+
+    for (let i = 0; i < 9; i++) {
+      if (i > 2) {
+        dummy.value.push(`${faker.name.lastName()}${faker.name.firstName()}`);
+      } else {
+        const student = students.value.pop();
+        dummy.value.push(student.name);
+      }
+    }
+  } catch (error) {
+    console.log(error);
+  }
+});
 
 const prevPage = () => {
   emit('prevPage', { index: 2 });

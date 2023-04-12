@@ -47,11 +47,11 @@ interface FormState {
 }
 
 const formState = reactive<FormState>({
-  church: '',
-  department: '',
-  role: '',
-  grade: '',
-  group: '',
+  church: '테스트',
+  department: '테스트',
+  role: 'main',
+  grade: '3',
+  group: '1',
 });
 
 const prevPage = (payload: { index: number }) => {
