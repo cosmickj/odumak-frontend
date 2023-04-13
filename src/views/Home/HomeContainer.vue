@@ -6,16 +6,6 @@
         <p>
           <strong>{{ accountData?.name }}</strong> 선생님
         </p>
-
-        <!-- <Button
-          v-if="!accountData?.isAccepted"
-          outlined
-          class="text-xs"
-          severity="danger"
-          icon="pi pi-plus"
-          label="추가 정보 입력하기"
-          @click="waypointPage"
-        /> -->
       </div>
     </header>
 

@@ -48,6 +48,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'user/edit',
         name: 'UserEditView',
+        meta: { requiresAccept: true },
         components: {
           default: () => import('@/views/User/UserEdit.vue'),
         },
@@ -151,6 +152,7 @@ router.beforeEach(async (to, from, next) => {
       uid: currentUser.uid,
     });
     if (needAccept && !userData?.isAccepted) {
+      alert('승인 받은 유저만 접근할 수 있습니다.');
       return next({ name: 'HomeView' });
     }
     if (needAdmin && userData?.role !== 'admin') {
