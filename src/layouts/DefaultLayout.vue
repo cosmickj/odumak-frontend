@@ -1,10 +1,8 @@
 <template>
-  <main class="h-[100svh] flex sm:bg-gray-200 items-center justify-center">
-    <div
-      class="w-full sm:max-w-sm h-full sm:max-h-[46rem] bg-slate-100 shadow-lg"
-    >
-      <div v-if="isAuthReady" class="relative flex flex-col h-full">
-        <RouterView class="grow" />
+  <main class="h-[100svh] sm:bg-gray-200">
+    <div class="sm:max-w-[360px] h-full mx-auto bg-slate-100 shadow-lg">
+      <div v-if="isAuthReady" class="flex flex-col h-full">
+        <RouterView class="overflow-auto flex-1" />
         <RouterView name="GlobalNavbar" />
       </div>
     </div>

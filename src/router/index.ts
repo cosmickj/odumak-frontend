@@ -83,6 +83,7 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         path: '/waypoint',
+        meta: { requiresAuth: true },
         component: () => import('@/views/Waypoint/WaypointContainer.vue'),
         children: [
           {

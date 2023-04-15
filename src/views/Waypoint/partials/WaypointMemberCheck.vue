@@ -1,7 +1,7 @@
 <template>
   <div class="flex-1 flex flex-col justify-between">
     <div>
-      <div class="break-keep text-xl">
+      <div class="break-keep text-base">
         <p class="mr-1 text-orange-400">
           {{ formState.church }} {{ formState.department }}
           {{ teacher?.name }} 선생님
@@ -16,7 +16,7 @@
           :key="i"
         >
           <ToggleButton
-            class="flex aspect-square bg-white rounded-md items-center justify-center shadow"
+            class="flex aspect-square bg-white rounded-md text-xs xs:text-base items-center justify-center shadow"
             v-model="candidate.checked"
             :on-label="candidate.name"
             :off-label="candidate.name"
@@ -41,16 +41,20 @@ import { useUserStore } from '@/store/user';
 import { faker } from '@faker-js/faker/locale/ko';
 import type { MemberData } from '@/types';
 
-const props = defineProps<{
-  formState: any;
-}>();
-
-const emit = defineEmits(['prevPage']);
-
 const router = useRouter();
 const accountStore = useAccountStore();
 const memberStore = useMemberStore();
 const userStore = useUserStore();
+
+const props = defineProps<{
+  formState: any;
+}>();
+
+if (!props.formState.church || !props.formState.department) {
+  router.push({ name: 'GroupCheck' });
+}
+
+const emit = defineEmits(['prevPage']);
 
 const teacher = ref<MemberData>();
 const students = ref<MemberData[]>([]);

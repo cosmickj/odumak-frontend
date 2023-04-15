@@ -225,7 +225,7 @@ const deleteAccount = async () => {
       router.push({ name: 'AccountLogin' });
     }
   } catch (error) {
-    console.log(error);
+    alert('다시 로그인 후 시도해주세요.');
   }
 };
 

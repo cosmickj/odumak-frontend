@@ -47,17 +47,24 @@
 
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
+import { useRouter } from 'vue-router';
 import useVuelidate from '@vuelidate/core';
 import { required, requiredIf } from '@vuelidate/validators';
 import { GRADE_OPTIONS, GROUP_OPTIONS, TEACHER_ROLE } from '@/constants/common';
 
+const router = useRouter();
+
+const props = defineProps<{
+  formState: any;
+}>();
+
+if (!props.formState.church || !props.formState.department) {
+  router.push({ name: 'GroupCheck' });
+}
+
 const emit = defineEmits(['prevPage', 'nextPage']);
 
-const formState = reactive({
-  role: 'main',
-  grade: '',
-  group: '',
-});
+const formState = reactive(Object.assign({}, props.formState));
 
 const rules = computed(() => ({
   role: { required },

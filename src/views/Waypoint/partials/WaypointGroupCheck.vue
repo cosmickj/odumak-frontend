@@ -44,10 +44,11 @@ const emit = defineEmits(['nextPage']);
 
 const router = useRouter();
 
-const formState = reactive({
-  church: '',
-  department: '',
-});
+const props = defineProps<{
+  formState: any;
+}>();
+
+const formState = reactive(Object.assign({}, props.formState));
 
 const rules = computed(() => ({
   church: { required },
