@@ -17,7 +17,7 @@
 
     <div
       v-for="(member, idx) in members"
-      class="shrink-0 w-full max-w-sm py-6 rounded-xl bg-slate-300"
+      class="shrink-0 w-full max-w-sm py-6 rounded-xl bg-stone-500 text-white"
       :key="idx"
     >
       <div class="flex gap-x-5 mx-6">
@@ -53,28 +53,6 @@
         </div>
       </div>
 
-      <div class="flex gap-x-5 mx-6">
-        <div class="flex-1">
-          <p>생년월일</p>
-          <Calendar
-            class="w-full"
-            v-model="member.birth"
-            date-format="yy년 mm월 dd일"
-            showButtonBar
-          />
-        </div>
-
-        <div class="flex-1">
-          <p>초등부 등록일</p>
-          <Calendar
-            class="w-full"
-            v-model="member.registeredAt"
-            date-format="yy년 mm월 dd일"
-            showButtonBar
-          />
-        </div>
-      </div>
-
       <div class="flex gap-x-5 mx-6 mb-2">
         <div class="flex-1">
           <p>학년</p>
@@ -99,6 +77,42 @@
             option-label="label"
             option-value="value"
             :options="GROUP_OPTIONS"
+          />
+        </div>
+      </div>
+
+      <div class="flex mx-6">
+        <div class="flex-1">
+          <div class="flex items-center justify-between">
+            <span>생년월일</span>
+            <div class="flex gap-2 items-center justify-between">
+              <span>나중에 입력</span>
+              <InputSwitch
+                v-model="member.birthLater"
+                @change="onChange(idx)"
+              />
+            </div>
+          </div>
+
+          <Calendar
+            class="w-full"
+            v-model="member.birth"
+            date-format="yy년 mm월 dd일"
+            placeholder="생년월일을 입력해주세요"
+            :disabled="member.birthLater"
+            showButtonBar
+          />
+        </div>
+      </div>
+
+      <div class="flex mx-6">
+        <div class="flex-1">
+          <p>초등부 첫 출석 주일</p>
+          <Calendar
+            class="w-full"
+            v-model="member.registeredAt"
+            date-format="yy년 mm월 dd일"
+            showButtonBar
           />
         </div>
       </div>
@@ -141,11 +155,11 @@
 <script setup lang="ts">
 import TheDialog from '@/components/TheDialog.vue';
 import { GRADE_OPTIONS, GROUP_OPTIONS } from '@/constants/common';
-import type { MemberData } from '@/types';
+import type { SelectedMember } from '../Student/AdminStudent.vue';
 
 const props = defineProps<{
   isDialogVisible: boolean;
-  members: MemberData[];
+  members: SelectedMember[];
   errors: any;
 }>();
 
@@ -162,7 +176,27 @@ const handleDelete = (index: number) => emit('delete', index);
 const handleSubmit = () => emit('submit');
 
 const isInvalid = (index: number, key: string) => {
-  if (props.errors && props.errors[index][key].length > 0) return true;
-  else return false;
+  if (props.errors && props.errors[index][key].length > 0) {
+    return true;
+  }
+  return false;
+};
+
+const onChange = (index: number) => {
+  const member = props.members[index];
+
+  if (member.birthLater) {
+    member.birth = undefined;
+  } else {
+    const date = new Date();
+    const grade = member.grade ? ~~member.grade + 6 : 9;
+    const year = date.getFullYear() - grade;
+
+    date.setFullYear(year);
+    date.setMonth(0);
+    date.setDate(1);
+
+    member.birth = date;
+  }
 };
 </script>

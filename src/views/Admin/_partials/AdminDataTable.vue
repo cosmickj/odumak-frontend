@@ -133,7 +133,7 @@
 </template>
 
 <script setup lang="ts">
-import AdminDataTableHeader from '@/views/Admin/AdminDataTableHeader.vue';
+import AdminDataTableHeader from '@/views/Admin/_partials/AdminDataTableHeader.vue';
 
 import { ref, watch } from 'vue';
 import { formatDate, formatGender } from '@/utils/useFormat';
@@ -141,11 +141,12 @@ import { formatDate, formatGender } from '@/utils/useFormat';
 import type DataTable from 'primevue/datatable';
 import type { DataTableCellEditCompleteEvent } from 'primevue/datatable/DataTable';
 import type { MemberData } from '@/types';
+import type { SelectedMember } from '../Student/AdminStudent.vue';
 
 const props = defineProps<{
   isLoading: boolean;
   dataSource: MemberData[];
-  selection?: MemberData[];
+  selection?: SelectedMember[];
   // selectedColumns: any;
 }>();
 

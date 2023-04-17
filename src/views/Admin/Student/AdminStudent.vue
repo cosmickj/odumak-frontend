@@ -29,9 +29,9 @@
 </template>
 
 <script setup lang="ts">
-import AdminDataTable from '@/views/Admin/AdminDataTable.vue';
-import AdminDialogAdd from '../AdminDialogAdd.vue';
-import AdminDialogDelete from '../AdminDialogDelete.vue';
+import AdminDataTable from '@/views/Admin/_partials/AdminDataTable.vue';
+import AdminDialogAdd from '../_partials/AdminDialogAdd.vue';
+import AdminDialogDelete from '../_partials/AdminDialogDelete.vue';
 
 import { computed, onMounted, reactive, ref } from 'vue';
 import { useAccountStore } from '@/store/account';
@@ -43,6 +43,10 @@ import { required, helpers } from '@vuelidate/validators';
 import { useToast } from 'primevue/usetoast';
 import type { DataTableCellEditCompleteEvent } from 'primevue/datatable';
 import type { MemberData } from '@/types';
+
+export interface SelectedMember extends Partial<MemberData> {
+  birthLater: true;
+}
 
 const accountStore = useAccountStore();
 const accountData = computed(() => accountStore.accountData!);
@@ -67,9 +71,10 @@ const getStudents = async () => {
   }
 };
 
-const initSelectedStudent: MemberData = {
+const initSelectedStudent: SelectedMember = {
   name: '',
-  birth: new Date(),
+  birth: undefined,
+  birthLater: true,
   gender: 'male',
   church: '',
   department: '',
@@ -82,11 +87,11 @@ const initSelectedStudent: MemberData = {
   remark: '',
 };
 
-const selectedStudents = reactive({ body: [] as MemberData[] });
+const selectedStudents = reactive({ body: [] as SelectedMember[] });
 
-const createNewStudent = (obj: MemberData) => Object.assign({}, obj);
+const createNewStudent = (obj: SelectedMember) => Object.assign({}, obj);
 
-const addSelectedStudents = (payload: MemberData[]) => {
+const addSelectedStudents = (payload: SelectedMember[]) => {
   selectedStudents.body = payload.map((d) => createNewStudent(d));
 };
 
@@ -97,7 +102,7 @@ const openDialogToAddStudent = () => {
   addNewStudent();
 };
 
-const newStudents = reactive({ body: [] as MemberData[] });
+const newStudents = reactive({ body: [] as SelectedMember[] });
 
 const addNewStudent = () => {
   newStudents.body.push(createNewStudent(initSelectedStudent));
@@ -125,14 +130,14 @@ const rules = {
   },
 };
 
-const _v = useVuelidate(rules, newStudents);
+const $v = useVuelidate(rules, newStudents);
 
-const errors = computed(() => _v.value.$errors[0]?.$response?.$errors);
+const errors = computed(() => $v.value.$errors[0]?.$response?.$errors);
 
 const resetNewStudents = () => {
   isDialogAddVisible.value = false;
-  newStudents.body = [];
-  _v.value.$reset();
+  newStudents.body.splice(0, newStudents.body.length);
+  $v.value.$reset();
 };
 
 const createNewStudents = () => {
@@ -149,7 +154,7 @@ const createNewStudents = () => {
 
 const submitNewStudents = async () => {
   try {
-    const isFormCorrect = await _v.value.body.$validate();
+    const isFormCorrect = await $v.value.body.$validate();
     if (!isFormCorrect) return;
 
     createNewStudents();

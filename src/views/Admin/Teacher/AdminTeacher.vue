@@ -29,9 +29,9 @@
 </template>
 
 <script setup lang="ts">
-import AdminDataTable from '@/views/Admin/AdminDataTable.vue';
-import AdminDialogAdd from '../AdminDialogAdd.vue';
-import AdminDialogDelete from '../AdminDialogDelete.vue';
+import AdminDataTable from '@/views/Admin/_partials/AdminDataTable.vue';
+import AdminDialogAdd from '../_partials/AdminDialogAdd.vue';
+import AdminDialogDelete from '../_partials/AdminDialogDelete.vue';
 
 import { computed, onMounted, reactive, ref } from 'vue';
 import { useAccountStore } from '@/store/account';
