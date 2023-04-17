@@ -43,6 +43,7 @@ import { required, helpers } from '@vuelidate/validators';
 import { useToast } from 'primevue/usetoast';
 import type { DataTableCellEditCompleteEvent } from 'primevue/datatable';
 import type { MemberData } from '@/types';
+import { SelectedMember } from '../Student/AdminStudent.vue';
 
 const accountStore = useAccountStore();
 const accountData = computed(() => accountStore.accountData!);
@@ -67,9 +68,10 @@ const getMembers = async () => {
   }
 };
 
-const initSelectedMember: MemberData = {
+const initSelectedMember: SelectedMember = {
   name: '',
-  birth: new Date(),
+  birth: null,
+  birthLater: true,
   gender: 'male',
   church: '',
   department: '',
@@ -82,11 +84,11 @@ const initSelectedMember: MemberData = {
   remark: '',
 };
 
-const selectedMembers = reactive({ body: [] as MemberData[] });
+const selectedMembers = reactive({ body: [] as SelectedMember[] });
 
-const createNewMember = (obj: MemberData) => Object.assign({}, obj);
+const createNewMember = (obj: SelectedMember) => Object.assign({}, obj);
 
-const addSelectedMembers = (payload: MemberData[]) => {
+const addSelectedMembers = (payload: SelectedMember[]) => {
   selectedMembers.body = payload.map((d) => createNewMember(d));
 };
 
@@ -97,7 +99,7 @@ const openDialogToAddTeacher = () => {
   addNewMember();
 };
 
-const newMembers = reactive({ body: [] as MemberData[] });
+const newMembers = reactive({ body: [] as SelectedMember[] });
 
 const addNewMember = () => {
   newMembers.body.push(createNewMember(initSelectedMember));

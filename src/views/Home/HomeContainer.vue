@@ -95,7 +95,7 @@ const { accountData } = useAccountStore();
 const isVisible = ref(false);
 
 onBeforeRouteLeave((to, from, next) => {
-  if ((to.name as string).includes('Attendance')) {
+  if ((to.name as string).includes('Attendance') && !accountData?.isAccepted) {
     isVisible.value = true;
   } else {
     next();

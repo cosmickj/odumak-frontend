@@ -186,7 +186,7 @@ const onChange = (index: number) => {
   const member = props.members[index];
 
   if (member.birthLater) {
-    member.birth = undefined;
+    member.birth = null;
   } else {
     const date = new Date();
     const grade = member.grade ? ~~member.grade + 6 : 9;

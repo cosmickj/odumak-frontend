@@ -44,7 +44,7 @@ import { useToast } from 'primevue/usetoast';
 import type { DataTableCellEditCompleteEvent } from 'primevue/datatable';
 import type { MemberData } from '@/types';
 
-export interface SelectedMember extends Partial<MemberData> {
+export interface SelectedMember extends MemberData {
   birthLater: true;
 }
 
@@ -73,7 +73,7 @@ const getStudents = async () => {
 
 const initSelectedStudent: SelectedMember = {
   name: '',
-  birth: undefined,
+  birth: null,
   birthLater: true,
   gender: 'male',
   church: '',
