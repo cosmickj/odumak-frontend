@@ -59,6 +59,7 @@ import Avatar from 'primevue/avatar';
 import Button from 'primevue/button';
 import Calendar from 'primevue/calendar';
 import Card from 'primevue/card';
+import Chart from 'primevue/chart';
 import Checkbox from 'primevue/checkbox';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
@@ -87,6 +88,7 @@ app
   .component('Button', Button)
   .component('Calendar', Calendar)
   .component('Card', Card)
+  .component('Chart', Chart)
   .component('Checkbox', Checkbox)
   .component('Column', Column)
   .component('DataTable', DataTable)
