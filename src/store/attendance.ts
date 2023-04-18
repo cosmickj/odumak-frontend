@@ -5,13 +5,12 @@ import {
   getDocs,
   query,
   serverTimestamp,
-  Timestamp,
   updateDoc,
   where,
 } from 'firebase/firestore';
 import { defineStore } from 'pinia';
 import { useMemberStore } from './member';
-import { AttendanceData } from '@/types';
+import type { AttendanceData } from '@/types';
 
 interface AttendaceAddAttendanceParams {
   name: string;
@@ -87,19 +86,17 @@ export const useAttendanceStore = defineStore('attendance', {
             attendance.job === member.job
           );
         });
+        const attendance = { status: '', date: null };
 
         return {
-          uid: member.uid || '',
+          uid: memberAttendance?.uid || '',
           name: member.name,
           church: member.church,
           department: member.department,
           grade: member.grade,
           group: member.group,
           job: member.job,
-          attendance: memberAttendance?.attendance || {
-            status: '',
-            date: null,
-          },
+          attendance: memberAttendance?.attendance || attendance,
         };
       });
 
