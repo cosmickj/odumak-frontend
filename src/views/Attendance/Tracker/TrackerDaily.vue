@@ -105,7 +105,15 @@
     </template>
   </DataView>
 
-  <Chart v-else class="mt-4" type="pie" :data="chartData" />
+  <div v-else>
+    <Chart type="doughnut" :data="chartData" />
+
+    <p v-if="chartData" class="mt-4 flex gap-2 items-baseline justify-center">
+      <span class="text-sm">미입력:</span>
+      <span class="text-xl text-gray-600 font-bold">{{ emptyCount }}</span>
+      <span class="text-sm">/ {{ totalCount }}명</span>
+    </p>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -152,20 +160,31 @@ const getAttendancesRecord = async () => {
 };
 
 const chartData = ref();
+const emptyCount = ref(0);
+const totalCount = ref(0);
 
 const setChartData = () => {
   const documentStyle = getComputedStyle(document.body);
 
-  const data = attendanceStore.attendancesRecord.daily.reduce(
+  const rawData = attendanceStore.attendancesRecord.daily.reduce(
     (total, record) => {
-      const currCount = total[record.attendance.status] ?? 0;
+      const status = record.attendance.status
+        ? record.attendance.status
+        : 'empty';
+      const currCount = total[status] ?? 0;
+
       return {
         ...total,
-        [record.attendance.status]: currCount + 1,
+        [status]: currCount + 1,
       };
     },
-    {} as { offline: number; online: number; absence: number }
+    { offline: 0, online: 0, absence: 0, empty: 0 }
   );
+
+  const { empty, ...data } = rawData;
+
+  emptyCount.value = empty;
+  totalCount.value = attendanceStore.attendancesRecord.daily.length;
 
   return {
     labels: Object.keys(data),
