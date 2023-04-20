@@ -1,6 +1,6 @@
-import type { MemberPosition, UserRole } from '@/types';
+import type { UserRole } from '@/types';
 
-const getPositionFromRole = (role: UserRole): MemberPosition => {
+const getPositionFromRole = (role: UserRole): any => {
   if (role === 'admin') {
     return 'teacher';
   }

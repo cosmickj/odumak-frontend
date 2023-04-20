@@ -1,11 +1,11 @@
 <template>
   <div
-    v-for="(member, i) in attendancesTemplate"
+    v-for="(attendance, i) in attendances"
     class="mt-[-1px] p-2 border border-slate-300 items-center justify-between"
     :key="i"
   >
     <div class="flex items-center justify-between">
-      <span>{{ member.name }}</span>
+      <span>{{ attendance.name }}</span>
 
       <Button
         icon="pi pi-chevron-down"
@@ -14,7 +14,7 @@
     </div>
 
     <SelectButton
-      v-model="member.attendance.status"
+      v-model="attendance.attendance.status"
       class="flex [&>*]:flex-1"
       :options="[
         { name: '현장', value: 'offline' },
@@ -31,6 +31,6 @@
 import type { AttendanceData } from '@/types';
 
 defineProps<{
-  attendancesTemplate: AttendanceData[] | undefined;
+  attendances: AttendanceData[];
 }>();
 </script>

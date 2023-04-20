@@ -1,10 +1,13 @@
 import { Gender, UserRole } from '@/types';
 
-const formatDate = (date: Date) => {
-  const _year = date.getFullYear();
-  const _month = date.getMonth() + 1;
-  const _date = date.getDate();
-  return `${_year}년 ${_month}월 ${_date}일`;
+const formatDate = (date: Date | null) => {
+  if (date) {
+    const _year = date.getFullYear();
+    const _month = date.getMonth() + 1;
+    const _date = date.getDate();
+    return `${_year}년 ${_month}월 ${_date}일`;
+  }
+  return '입력 필요';
 };
 
 const formatGender = (value: Gender) => {

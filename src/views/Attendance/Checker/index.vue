@@ -11,7 +11,7 @@
         placeholder="날짜를 선택해주세요"
         :max-date="maxDate"
         :disabledDays="[1, 2, 3, 4, 5, 6]"
-        @date-select="getAttendancesTemplate"
+        @date-select="getAttendances"
       />
 
       <ProgressSpinner v-if="isLoading" />
@@ -19,11 +19,11 @@
       <section v-else>
         <CheckerTeachers
           v-if="accountData.role === 'admin'"
-          :attendances-template="attendancesTemplate"
+          :attendances="attendances"
         />
         <CheckerStudents
           v-else-if="accountData.role === 'main' || accountData.role === 'sub'"
-          :attendances-template="attendancesTemplate"
+          :attendances-template="attendances"
         />
         <Dialog
           v-else
@@ -31,7 +31,7 @@
           header="담임이 아닙니다"
           v-model:visible="visible"
           :breakpoints="{ '450px': '85vw' }"
-          @hide="navigateToHomeView"
+          @hide="navigateHome"
         >
           <p>출석 체크는 담임, 부담임 선생님만 이용할 수 있습니다.</p>
 
@@ -40,7 +40,7 @@
               label="알겠습니다"
               class="p-button-info"
               icon="pi pi-check"
-              @click="navigateToHomeView"
+              @click="navigateHome"
             />
           </template>
         </Dialog>
@@ -53,7 +53,7 @@
         header="승인이 필요합니다"
         v-model:visible="visible"
         :breakpoints="{ '450px': '85vw' }"
-        @hide="navigateToHomeView"
+        @hide="navigateHome"
       >
         <p>서기 선생님의 승인 이전에는 출석 체크를 할 수 없습니다.</p>
 
@@ -62,7 +62,7 @@
             label="알겠습니다"
             class="p-button-info"
             icon="pi pi-check"
-            @click="navigateToHomeView"
+            @click="navigateHome"
           />
         </template>
       </Dialog>
@@ -79,13 +79,11 @@ import { computed, ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAccountStore } from '@/store/account';
 import { useAttendanceStore } from '@/store/attendance';
-import { useMemberStore } from '@/store/member';
 import type { AttendanceData } from '@/types';
 
 const router = useRouter();
 const accountStore = useAccountStore();
 const attendanceStore = useAttendanceStore();
-const memberStore = useMemberStore();
 
 // https://bobbyhadz.com/blog/javascript-get-previous-sunday
 const getPreviousSunday = (date = new Date()) => {
@@ -99,8 +97,7 @@ const maxDate = getPreviousSunday();
 const attendanceDate = ref<Date>(getPreviousSunday());
 
 const isLoading = ref(false);
-const attendancesTemplate = ref<AttendanceData[] | undefined>([]);
-// const copyDataSource = ref('');
+const attendances = ref<AttendanceData[]>([]);
 
 const visible = ref(true);
 
@@ -112,9 +109,9 @@ const RequestJobMap = {
   sub: 'student' as const,
   common: null,
 };
-const requestJob = computed(() => RequestJobMap[accountData.value.role]);
+const requestJob = computed(() => RequestJobMap[accountData.value.role!]);
 
-const getAttendancesTemplate = async () => {
+const getAttendances = async () => {
   try {
     isLoading.value = true;
 
@@ -122,54 +119,14 @@ const getAttendancesTemplate = async () => {
       return;
     }
 
-    let template: AttendanceData[];
-
-    const members = await memberStore.fetchAll({
-      church: accountData.value.church,
-      department: accountData.value.department,
-      job: requestJob.value,
-    });
-
     await attendanceStore.fetchAttendances({
-      church: accountData.value.church,
-      department: accountData.value.department,
+      church: accountData.value.church!,
+      department: accountData.value.department!,
       job: requestJob.value,
       attendanceDate: attendanceDate.value,
     });
 
-    // TODO: requestJob에서 null값이 나오다 보니 타입에러가 나오는 상태이다.
-    template = members.map((mem) => {
-      let uid = '';
-      let status: AttendanceData['attendance']['status'] = 'offline';
-
-      const hasRecord = attendanceStore.attendancesRecord.daily.findIndex(
-        (attd) => {
-          return attd.name === mem.name;
-        }
-      );
-
-      if (hasRecord !== -1) {
-        uid = attendanceStore.attendancesRecord.daily[hasRecord].uid;
-        status =
-          attendanceStore.attendancesRecord.daily[hasRecord].attendance.status;
-      }
-
-      return {
-        uid,
-        name: mem.name,
-        church: mem.church,
-        department: mem.department,
-        grade: mem.grade,
-        group: mem.group,
-        job: requestJob.value,
-        attendance: {
-          date: attendanceDate.value,
-          status,
-        },
-      };
-    });
-
-    attendancesTemplate.value = template;
+    attendances.value = attendanceStore.attendancesRecord.daily;
   } catch (error) {
     console.log(error);
   } finally {
@@ -178,30 +135,30 @@ const getAttendancesTemplate = async () => {
 };
 
 onMounted(async () => {
-  await getAttendancesTemplate();
+  await getAttendances();
 });
 
 const onSubmit = () => {
   try {
-    attendancesTemplate.value?.forEach(async (attd) => {
-      if (attd.uid) {
+    attendances.value.forEach(async (attendance) => {
+      if (attendance.uid) {
         await attendanceStore.modifyAttendance({
-          uid: attd.uid,
+          uid: attendance.uid,
           attendance: {
-            status: attd.attendance.status,
+            status: attendance.attendance.status,
           },
         });
       } else {
         await attendanceStore.addAttendance({
-          name: attd.name,
-          church: attd.church,
-          department: attd.department,
-          grade: attd.grade,
-          group: attd.group,
-          job: attd.job,
+          name: attendance.name,
+          church: attendance.church,
+          department: attendance.department,
+          grade: attendance.grade,
+          group: attendance.group,
+          job: attendance.job,
           attendance: {
             date: attendanceDate.value,
-            status: attd.attendance.status,
+            status: attendance.attendance.status,
           },
           createdBy: accountData.value.name,
         });
@@ -214,5 +171,5 @@ const onSubmit = () => {
   }
 };
 
-const navigateToHomeView = () => router.push({ name: 'HomeView' });
+const navigateHome = () => router.push({ name: 'HomeView' });
 </script>

@@ -27,23 +27,28 @@ app.use(createPinia());
 
 // Waiting for Auth to be Ready
 (async () => {
-  const currentUser = (await getCurrentUser()) as User;
-  if (currentUser) {
-    const userStore = useUserStore();
-    const userData = await userStore.fetchSingle({
-      uid: currentUser.uid,
-    });
+  try {
+    const currentUser = (await getCurrentUser()) as User;
+    const accountStore = useAccountStore();
 
-    if (userData) {
-      const accountStore = useAccountStore();
-      accountStore.accountData = {
-        ...userData,
+    if (currentUser) {
+      const userStore = useUserStore();
+      const userData = await userStore.fetchSingle({
         uid: currentUser.uid,
-        email: currentUser.email!,
-        name: currentUser.displayName!,
-      };
-      accountStore.isAuthReady = true;
+      });
+
+      if (userData) {
+        accountStore.accountData = {
+          ...userData,
+          uid: currentUser.uid,
+          email: currentUser.email!,
+          name: currentUser.displayName!,
+        };
+      }
     }
+    accountStore.isAuthReady = true;
+  } catch (error) {
+    console.log(error);
   }
 })();
 
@@ -54,6 +59,7 @@ import Avatar from 'primevue/avatar';
 import Button from 'primevue/button';
 import Calendar from 'primevue/calendar';
 import Card from 'primevue/card';
+import Chart from 'primevue/chart';
 import Checkbox from 'primevue/checkbox';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
@@ -74,12 +80,15 @@ import Toast from 'primevue/toast';
 import Toolbar from 'primevue/toolbar';
 import Tree from 'primevue/tree';
 import OverlayPanel from 'primevue/overlaypanel';
+import Steps from 'primevue/steps';
+import ToggleButton from 'primevue/togglebutton';
 
 app
   .component('Avatar', Avatar)
   .component('Button', Button)
   .component('Calendar', Calendar)
   .component('Card', Card)
+  .component('Chart', Chart)
   .component('Checkbox', Checkbox)
   .component('Column', Column)
   .component('DataTable', DataTable)
@@ -99,6 +108,8 @@ app
   .component('Toast', Toast)
   .component('Toolbar', Toolbar)
   .component('Tree', Tree)
+  .component('Steps', Steps)
+  .component('ToggleButton', ToggleButton)
   .component('OverlayPanel', OverlayPanel);
 
 app.mount('#app');

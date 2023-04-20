@@ -48,6 +48,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'user/edit',
         name: 'UserEditView',
+        meta: { requiresAccept: true },
         components: {
           default: () => import('@/views/User/UserEdit.vue'),
         },
@@ -79,6 +80,31 @@ const routes: Array<RouteRecordRaw> = [
         name: 'AttendanceChecker',
         meta: { requiresAccept: true },
         component: () => import('@/views/Attendance/Checker/index.vue'),
+      },
+      {
+        path: '/waypoint',
+        meta: { requiresAuth: true },
+        component: () => import('@/views/Waypoint/WaypointContainer.vue'),
+        children: [
+          {
+            path: 'group',
+            name: 'GroupCheck',
+            component: () =>
+              import('@/views/Waypoint/partials/WaypointGroupCheck.vue'),
+          },
+          {
+            path: 'teacher',
+            name: 'TeacherCheck',
+            component: () =>
+              import('@/views/Waypoint/partials/WaypointTeacherCheck.vue'),
+          },
+          {
+            path: 'member',
+            name: 'MemberCheck',
+            component: () =>
+              import('@/views/Waypoint/partials/WaypointMemberCheck.vue'),
+          },
+        ],
       },
     ],
   },
@@ -127,6 +153,7 @@ router.beforeEach(async (to, from, next) => {
       uid: currentUser.uid,
     });
     if (needAccept && !userData?.isAccepted) {
+      alert('승인 받은 유저만 접근할 수 있습니다.');
       return next({ name: 'HomeView' });
     }
     if (needAdmin && userData?.role !== 'admin') {

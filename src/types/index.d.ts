@@ -39,7 +39,7 @@ export interface AccountData extends UserData {
 export interface MemberData {
   uid?: string;
   name: string;
-  birth: Date;
+  birth: Date | null;
   gender: Gender;
   church: string;
   department: string;

@@ -11,39 +11,33 @@
     @date-select="onAttendanceDateSelect"
   />
 
+  <div class="flex py-2 justify-end">
+    <SelectButton
+      v-model="layout"
+      unselectable
+      option-label="icon"
+      option-value="value"
+      :options="[
+        { icon: 'pi pi-chart-pie', value: 'chart' },
+        { icon: 'pi pi-bars', value: 'list' },
+        { icon: 'pi pi-table', value: 'grid' },
+      ]"
+    >
+      <template #option="slotProps">
+        <i :class="slotProps.option.icon"></i>
+      </template>
+    </SelectButton>
+  </div>
+
+  <!-- CONTINUE: paginator에 대해 높이 조정하기 -->
   <DataView
+    v-if="layout !== 'chart'"
     data-key="uid"
+    paginator
+    :rows="5"
     :layout="layout"
     :value="attendanceStore.attendancesRecord.daily"
   >
-    <template #header>
-      <div class="flex justify-between">
-        <div>
-          <!-- <Dropdown
-            v-model="sortKey"
-            :options="sortOptions"
-            optionLabel="label"
-            placeholder="Sort By Price"
-            @change="onSortChange($event)"
-          /> -->
-        </div>
-        <SelectButton
-          v-model="layout"
-          option-label="icon"
-          option-value="value"
-          :unselectable="false"
-          :options="[
-            { icon: 'pi pi-bars', value: 'list' },
-            { icon: 'pi pi-table', value: 'grid' },
-          ]"
-        >
-          <template #option="slotProps">
-            <i :class="slotProps.option.icon"></i>
-          </template>
-        </SelectButton>
-      </div>
-    </template>
-
     <template #empty>
       <div class="absolute left-1/2 translate-x-[-50%]">
         입력된 내용이 없습니다
@@ -110,6 +104,16 @@
       </Card>
     </template>
   </DataView>
+
+  <div v-else>
+    <Chart type="doughnut" :data="chartData" />
+
+    <p v-if="chartData" class="mt-4 flex gap-2 items-baseline justify-center">
+      <span class="text-sm">미입력:</span>
+      <span class="text-xl text-gray-600 font-bold">{{ emptyCount }}</span>
+      <span class="text-sm">/ {{ totalCount }}명</span>
+    </p>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -145,8 +149,8 @@ const accountData = computed(() => accountStore.accountData!);
 const getAttendancesRecord = async () => {
   try {
     await attendanceStore.fetchAttendances({
-      church: accountData.value.church,
-      department: accountData.value.department,
+      church: accountData.value.church!,
+      department: accountData.value.department!,
       job: job.value,
       attendanceDate: attendanceDate.value,
     });
@@ -155,15 +159,64 @@ const getAttendancesRecord = async () => {
   }
 };
 
+const chartData = ref();
+const emptyCount = ref(0);
+const totalCount = ref(0);
+
+const setChartData = () => {
+  const documentStyle = getComputedStyle(document.body);
+
+  const rawData = attendanceStore.attendancesRecord.daily.reduce(
+    (total, record) => {
+      const status = record.attendance.status
+        ? record.attendance.status
+        : 'empty';
+      const currCount = total[status] ?? 0;
+
+      return {
+        ...total,
+        [status]: currCount + 1,
+      };
+    },
+    { offline: 0, online: 0, absence: 0, empty: 0 }
+  );
+
+  const { empty, ...data } = rawData;
+
+  emptyCount.value = empty;
+  totalCount.value = attendanceStore.attendancesRecord.daily.length;
+
+  return {
+    labels: Object.keys(data),
+    datasets: [
+      {
+        data: Object.values(data),
+        backgroundColor: [
+          documentStyle.getPropertyValue('--green-500'),
+          documentStyle.getPropertyValue('--yellow-500'),
+          documentStyle.getPropertyValue('--red-500'),
+        ],
+        hoverBackgroundColor: [
+          documentStyle.getPropertyValue('--green-400'),
+          documentStyle.getPropertyValue('--yellow-400'),
+          documentStyle.getPropertyValue('--red-400'),
+        ],
+      },
+    ],
+  };
+};
+
 onMounted(async () => {
   await getAttendancesRecord();
+
+  chartData.value = setChartData();
 });
 
 const onAttendanceDateSelect = async () => {
   await getAttendancesRecord();
 };
 
-const layout = ref<'list' | 'grid'>('list');
+const layout = ref<'list' | 'grid' | 'chart'>('chart');
 
 const statusOffline = (attd: string) => {
   return attd === 'offline'
@@ -191,7 +244,6 @@ const statusAbsence = (attd: string) => {
   border: unset;
 }
 .p-dataview .p-dataview-content {
-  height: 100%;
   background: unset;
 }
 .p-dataview-list .p-grid {

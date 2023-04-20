@@ -57,9 +57,15 @@ export const useMemberStore = defineStore('member', {
         ...doc.data(),
       })) as MemberData[];
 
-      members.forEach((m) => {
-        m.birth = (m.birth as unknown as Timestamp).toDate();
-        m.registeredAt = (m.registeredAt as unknown as Timestamp).toDate();
+      members.forEach((member) => {
+        if (member.birth) {
+          member.birth = (member.birth as unknown as Timestamp).toDate();
+        }
+        if (member.registeredAt) {
+          member.registeredAt = (
+            member.registeredAt as unknown as Timestamp
+          ).toDate();
+        }
       });
 
       return arraySort(members, ['grade', 'group', 'name']);
