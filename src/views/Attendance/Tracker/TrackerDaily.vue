@@ -29,19 +29,26 @@
     </SelectButton>
   </div>
 
-  <!-- CONTINUE: paginator에 대해 높이 조정하기 -->
+  <p v-if="layout !== 'chart'" class="mb-2 p-input-icon-left">
+    <i class="pi pi-search" />
+    <InputText
+      class="w-full p-inputtext-sm"
+      placeholder="검색하기"
+      @update:model-value="filterKeyword"
+    />
+  </p>
+
   <DataView
     v-if="layout !== 'chart'"
     data-key="uid"
     paginator
-    :rows="5"
+    :rows="6"
+    :page-link-size="2"
     :layout="layout"
-    :value="attendanceStore.attendancesRecord.daily"
+    :value="attendanceData"
   >
     <template #empty>
-      <div class="absolute left-1/2 translate-x-[-50%]">
-        입력된 내용이 없습니다
-      </div>
+      <div>입력된 내용이 없습니다</div>
     </template>
 
     <template #list="slotProps">
@@ -145,6 +152,7 @@ const maxDate = getPreviousSunday();
 const attendanceDate = ref<Date>(getPreviousSunday());
 
 const accountData = computed(() => accountStore.accountData!);
+const attendanceData = ref<any[]>([]);
 
 const getAttendancesRecord = async () => {
   try {
@@ -154,6 +162,7 @@ const getAttendancesRecord = async () => {
       job: job.value,
       attendanceDate: attendanceDate.value,
     });
+    attendanceData.value = attendanceStore.attendancesRecord.daily;
   } catch (error) {
     console.log(error);
   }
@@ -233,6 +242,16 @@ const statusAbsence = (attd: string) => {
     ? 'bg-red-500 border border-red-500 text-white'
     : 'bg-slate-100 border border-slate-100';
 };
+
+const filterKeyword = (keyword: string) => {
+  if (!keyword) {
+    return;
+  }
+  // CONTINUE: 필터를 위해 데이터 복사가 필요하다
+  attendanceData.value = attendanceData.value.filter((d) => {
+    return d.name.startsWith(keyword);
+  });
+};
 </script>
 
 <style>
@@ -252,6 +271,9 @@ const statusAbsence = (attd: string) => {
 .p-dataview-grid .p-grid {
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
+}
+.p-paginator-bottom {
+  margin-top: 8px;
 }
 .p-card .p-card-content {
   padding: unset;

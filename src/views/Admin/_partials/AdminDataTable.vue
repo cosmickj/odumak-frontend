@@ -8,12 +8,14 @@
 
   <DataTable
     ref="dataTableRef"
-    lazy
     row-hover
     resizable-columns
     column-resize-mode="fit"
     responsive-layout="scroll"
     edit-mode="cell"
+    paginator
+    :rows="10"
+    :rows-per-page-options="[5, 10, 15, 20]"
     :value="dataSource"
     :loading="isLoading"
     v-model:selection="selectionRef"
