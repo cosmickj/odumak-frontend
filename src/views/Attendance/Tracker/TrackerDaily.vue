@@ -7,48 +7,73 @@
     input-class="text-center"
     placeholder="날짜를 선택해주세요"
     :max-date="maxDate"
-    :disabledDays="[1, 2, 3, 4, 5, 6]"
+    :disabled-days="[1, 2, 3, 4, 5, 6]"
     @date-select="onAttendanceDateSelect"
   />
 
-  <div class="flex py-2 justify-end">
-    <SelectButton
-      v-model="layout"
-      unselectable
-      option-label="icon"
-      option-value="value"
-      :options="[
-        { icon: 'pi pi-chart-pie', value: 'chart' },
-        { icon: 'pi pi-bars', value: 'list' },
-        { icon: 'pi pi-table', value: 'grid' },
-      ]"
-    >
-      <template #option="slotProps">
-        <i :class="slotProps.option.icon"></i>
-      </template>
-    </SelectButton>
+  <div class="flex gap-x-4 py-2 items-center">
+    <div class="flex-2">
+      <SelectButton
+        v-model="layout"
+        unselectable
+        option-label="icon"
+        option-value="value"
+        :options="[
+          { icon: 'pi pi-chart-pie', value: 'chart' },
+          { icon: 'pi pi-bars', value: 'list' },
+          { icon: 'pi pi-table', value: 'grid' },
+        ]"
+      >
+        <template #option="slotProps">
+          <i :class="slotProps.option.icon"></i>
+        </template>
+      </SelectButton>
+    </div>
+
+    <div class="flex-1">
+      <InputText
+        v-model="filterKeyword"
+        class="w-full"
+        :disabled="layout === 'chart'"
+        placeholder="검색하기"
+      />
+    </div>
   </div>
 
-  <p v-if="layout !== 'chart'" class="mb-2 p-input-icon-left">
-    <i class="pi pi-search" />
-    <InputText
-      class="w-full p-inputtext-sm"
-      placeholder="검색하기"
-      @update:model-value="filterKeyword"
+  <div class="flex gap-x-2 mb-2">
+    <Dropdown
+      class="w-full"
+      show-clear
+      v-model="filterGrade"
+      :options="GRADE_OPTIONS"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="학년"
     />
-  </p>
+
+    <Dropdown
+      class="w-full"
+      show-clear
+      v-model="filterGroup"
+      :options="GROUP_OPTIONS"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="학급"
+    />
+  </div>
 
   <DataView
     v-if="layout !== 'chart'"
     data-key="uid"
     paginator
+    paginator-template="PrevPageLink PageLinks NextPageLink RowsPerPageDropdown"
     :rows="6"
-    :page-link-size="2"
+    :page-link-size="3"
     :layout="layout"
-    :value="attendanceData"
+    :value="filteredAttendanceData"
   >
     <template #empty>
-      <div>입력된 내용이 없습니다</div>
+      <div>해당되는 내용이 없습니다</div>
     </template>
 
     <template #list="slotProps">
@@ -89,20 +114,17 @@
             <Avatar icon="pi pi-user" size="large" shape="circle" />
             <p>{{ slotProps.data.grade }} - {{ slotProps.data.group }}</p>
             <p class="font-bold">{{ slotProps.data.name }}</p>
-            <div class="flex gap-3 mt-2">
+            <div class="flex mt-2">
               <Avatar
                 label="현"
-                shape="circle"
                 :class="statusOffline(slotProps.data.attendance.status)"
               />
               <Avatar
                 label="온"
-                shape="circle"
                 :class="statusOnline(slotProps.data.attendance.status)"
               />
               <Avatar
                 label="결"
-                shape="circle"
                 :class="statusAbsence(slotProps.data.attendance.status)"
               />
             </div>
@@ -124,10 +146,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue';
+import { computed, ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAccountStore } from '@/store/account';
 import { useAttendanceStore } from '@/store/attendance';
+import { GRADE_OPTIONS, GROUP_OPTIONS } from '@/constants/common';
 
 const router = useRouter();
 const accountStore = useAccountStore();
@@ -152,6 +175,7 @@ const maxDate = getPreviousSunday();
 const attendanceDate = ref<Date>(getPreviousSunday());
 
 const accountData = computed(() => accountStore.accountData!);
+
 const attendanceData = ref<any[]>([]);
 
 const getAttendancesRecord = async () => {
@@ -168,6 +192,35 @@ const getAttendancesRecord = async () => {
   }
 };
 
+const filterGrade = ref<string | null>(null);
+const filterGroup = ref<string | null>(null);
+const filterKeyword = ref('');
+
+const filteredAttendanceData = computed(() => {
+  let _attendanceData = [...attendanceData.value];
+
+  if (filterGrade.value) {
+    _attendanceData = _attendanceData.filter((d) => {
+      return d.grade === filterGrade.value;
+    });
+  }
+  if (filterGroup.value) {
+    _attendanceData = _attendanceData.filter((d) => {
+      return d.group === filterGroup.value;
+    });
+  }
+  if (filterKeyword.value) {
+    _attendanceData = _attendanceData.filter((d) => {
+      return (
+        d.name.startsWith(filterKeyword.value) ||
+        d.name.includes(filterKeyword.value)
+      );
+    });
+  }
+
+  return _attendanceData;
+});
+
 const chartData = ref();
 const emptyCount = ref(0);
 const totalCount = ref(0);
@@ -175,7 +228,7 @@ const totalCount = ref(0);
 const setChartData = () => {
   const documentStyle = getComputedStyle(document.body);
 
-  const rawData = attendanceStore.attendancesRecord.daily.reduce(
+  const rawData = filteredAttendanceData.value.reduce(
     (total, record) => {
       const status = record.attendance.status
         ? record.attendance.status
@@ -193,7 +246,7 @@ const setChartData = () => {
   const { empty, ...data } = rawData;
 
   emptyCount.value = empty;
-  totalCount.value = attendanceStore.attendancesRecord.daily.length;
+  totalCount.value = filteredAttendanceData.value.length;
 
   return {
     labels: Object.keys(data),
@@ -217,12 +270,19 @@ const setChartData = () => {
 
 onMounted(async () => {
   await getAttendancesRecord();
-
   chartData.value = setChartData();
 });
 
+watch(
+  () => filteredAttendanceData.value,
+  () => {
+    chartData.value = setChartData();
+  }
+);
+
 const onAttendanceDateSelect = async () => {
   await getAttendancesRecord();
+  chartData.value = setChartData();
 };
 
 const layout = ref<'list' | 'grid' | 'chart'>('chart');
@@ -241,16 +301,6 @@ const statusAbsence = (attd: string) => {
   return attd === 'absence'
     ? 'bg-red-500 border border-red-500 text-white'
     : 'bg-slate-100 border border-slate-100';
-};
-
-const filterKeyword = (keyword: string) => {
-  if (!keyword) {
-    return;
-  }
-  // CONTINUE: 필터를 위해 데이터 복사가 필요하다
-  attendanceData.value = attendanceData.value.filter((d) => {
-    return d.name.startsWith(keyword);
-  });
 };
 </script>
 
@@ -271,6 +321,12 @@ const filterKeyword = (keyword: string) => {
 .p-dataview-grid .p-grid {
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
+}
+.p-dataview-grid .p-grid .p-col {
+  grid-column: 1/-1;
+}
+.p-paginator {
+  padding: 0.5rem 0;
 }
 .p-paginator-bottom {
   margin-top: 8px;
