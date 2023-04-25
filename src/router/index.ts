@@ -110,8 +110,8 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/admin',
-    component: () => import('@/views/Admin/AdminContainer.vue'),
     meta: { requiresAuth: true, requiresAdmin: true },
+    component: () => import('@/views/Admin/AdminContainer.vue'),
     children: [
       {
         path: 'students',

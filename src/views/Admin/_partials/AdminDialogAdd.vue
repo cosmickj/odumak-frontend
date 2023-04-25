@@ -20,7 +20,7 @@
       class="shrink-0 w-full max-w-sm py-6 rounded-xl bg-stone-500 text-white"
       :key="idx"
     >
-      <div class="flex gap-x-5 mx-6">
+      <div class="flex gap-x-5 mx-6 mb-2">
         <div class="flex-1">
           <p>이름</p>
           <InputText
@@ -52,6 +52,19 @@
           </div>
         </div>
       </div>
+
+      <!-- <div class="flex flex-col gap-x-5 mx-6 mb-2">
+        <label for="role" class="mb-1">담임 여부</label>
+        <SelectButton
+          unselectable
+          v-model="member.role"
+          class="flex"
+          :options="TEACHER_ROLE"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="담당 학년"
+        />
+      </div> -->
 
       <div class="flex gap-x-5 mx-6 mb-2">
         <div class="flex-1">
@@ -89,7 +102,7 @@
               <span>나중에 입력</span>
               <InputSwitch
                 v-model="member.birthLater"
-                @change="onChange(idx)"
+                @change="toggleBirth(idx)"
               />
             </div>
           </div>
@@ -154,8 +167,10 @@
 
 <script setup lang="ts">
 import TheDialog from '@/components/TheDialog.vue';
-import { GRADE_OPTIONS, GROUP_OPTIONS } from '@/constants/common';
+import { useRoute } from 'vue-router';
+import { GRADE_OPTIONS, GROUP_OPTIONS, TEACHER_ROLE } from '@/constants/common';
 import type { SelectedMember } from '../Student/AdminStudent.vue';
+import { computed } from 'vue';
 
 const props = defineProps<{
   isDialogVisible: boolean;
@@ -182,7 +197,7 @@ const isInvalid = (index: number, key: string) => {
   return false;
 };
 
-const onChange = (index: number) => {
+const toggleBirth = (index: number) => {
   const member = props.members[index];
 
   if (member.birthLater) {
@@ -199,4 +214,8 @@ const onChange = (index: number) => {
     member.birth = date;
   }
 };
+
+const { path } = useRoute();
+
+const target = computed(() => path.split('/').pop());
 </script>
