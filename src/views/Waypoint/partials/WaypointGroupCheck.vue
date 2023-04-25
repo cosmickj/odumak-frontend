@@ -27,7 +27,12 @@
     </div>
 
     <div class="flex justify-between">
-      <Button text severity="secondary" label="홈으로" @click="homePage" />
+      <Button
+        text
+        severity="secondary"
+        label="홈으로"
+        @click="router.push({ name: 'HomeView' })"
+      />
       <Button severity="warning" label="다음으로" @click="nextPage" />
     </div>
   </div>
@@ -35,14 +40,18 @@
 
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAccountStore } from '@/store/account';
+import { useMemberStore } from '@/store/member';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import { CHURCH_OPTIONS, DEPARTMENT_OPTIONS } from '@/constants/common';
-import { useRouter } from 'vue-router';
 
 const emit = defineEmits(['nextPage']);
 
 const router = useRouter();
+const accountStore = useAccountStore();
+const memberStore = useMemberStore();
 
 const props = defineProps<{
   formState: any;
@@ -57,14 +66,22 @@ const rules = computed(() => ({
 
 const v$ = useVuelidate(rules, formState);
 
-const homePage = () => {
-  router.push({ name: 'HomeView' });
-};
-
 const nextPage = async () => {
   const isFormCorrect = await v$.value.$validate();
   if (!isFormCorrect) {
     return;
+  }
+
+  const member = await memberStore.fetchByName({
+    church: formState.church,
+    department: formState.department,
+    name: accountStore.accountData?.name,
+  });
+
+  if (!member.length) {
+    alert(
+      `관리자에게 문의해주시기 바랍니다. ${accountStore.accountData?.name} 선생님은 현재 ${formState.department} ${formState.church}에 등록되어 있지 않아 승인이 불가능합니다.`
+    );
   }
 
   emit('nextPage', { index: 0, formState });

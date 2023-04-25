@@ -46,7 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import useVuelidate from '@vuelidate/core';
 import { required, requiredIf } from '@vuelidate/validators';
@@ -65,6 +65,13 @@ if (!props.formState.church || !props.formState.department) {
 const emit = defineEmits(['prevPage', 'nextPage']);
 
 const formState = reactive(Object.assign({}, props.formState));
+
+watch(formState, (newValue) => {
+  if (newValue.role === 'common') {
+    formState.grade = '';
+    formState.group = '';
+  }
+});
 
 const rules = computed(() => ({
   role: { required },
