@@ -45,14 +45,14 @@ const routes: Array<RouteRecordRaw> = [
           default: () => import('@/views/User/index.vue'),
         },
       },
-      {
-        path: 'user/edit',
-        name: 'UserEditView',
-        meta: { requiresAccept: true },
-        components: {
-          default: () => import('@/views/User/UserEdit.vue'),
-        },
-      },
+      // {
+      //   path: 'user/edit',
+      //   name: 'UserEditView',
+      //   meta: { requiresAccept: true },
+      //   components: {
+      //     default: () => import('@/views/User/UserEdit.vue'),
+      //   },
+      // },
       {
         path: 'attendance/tracker',
         meta: { requiresAccept: true },

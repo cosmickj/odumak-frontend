@@ -15,15 +15,19 @@
           {{ accountStore.accountData?.name }}님의 정보
         </p>
 
-        <RouterLink :to="{ name: 'UserEditView' }">
+        <!-- <RouterLink :to="{ name: 'UserEditView' }">
           <Button class="p-button-text p-button-secondary" label="수정" />
-        </RouterLink>
+        </RouterLink> -->
       </div>
     </header>
 
     <div class="bg-slate-100">
       <div class="flex flex-col gap-2 px-5 py-3 items-center text-xs">
-        <Avatar :image="youngeunElementLogo" size="xlarge" shape="circle" />
+        <Avatar
+          :image="accountStore.accountData?.profileImage || youngeunElementLogo"
+          size="xlarge"
+          shape="circle"
+        />
 
         <span v-if="accountStore.accountData?.isAccepted">승인 완료</span>
         <span v-else class="text-red-600">승인 대기</span>
@@ -232,7 +236,10 @@ const deleteAccount = async () => {
 const isVisible = ref(false);
 
 onBeforeRouteLeave((to, from, next) => {
-  if ((to.name as string).includes('UserEdit')) {
+  if (
+    (to.name as string).includes('UserEdit') &&
+    !accountStore.accountData?.isAccepted
+  ) {
     isVisible.value = true;
   } else {
     next();
