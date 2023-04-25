@@ -13,11 +13,11 @@ const routes: Array<RouteRecordRaw> = [
         name: 'AccountLogin',
         component: () => import('@/views/Account/Login/index.vue'),
       },
-      {
-        path: 'signup',
-        name: 'AccountSignup',
-        component: () => import('@/views/Account/Signup/index.vue'),
-      },
+      // {
+      //   path: 'signup',
+      //   name: 'AccountSignup',
+      //   component: () => import('@/views/Account/Signup/index.vue'),
+      // },
     ],
   },
   {
@@ -45,14 +45,14 @@ const routes: Array<RouteRecordRaw> = [
           default: () => import('@/views/User/index.vue'),
         },
       },
-      {
-        path: 'user/edit',
-        name: 'UserEditView',
-        meta: { requiresAccept: true },
-        components: {
-          default: () => import('@/views/User/UserEdit.vue'),
-        },
-      },
+      // {
+      //   path: 'user/edit',
+      //   name: 'UserEditView',
+      //   meta: { requiresAccept: true },
+      //   components: {
+      //     default: () => import('@/views/User/UserEdit.vue'),
+      //   },
+      // },
       {
         path: 'attendance/tracker',
         meta: { requiresAccept: true },
@@ -110,8 +110,8 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/admin',
-    component: () => import('@/views/Admin/AdminContainer.vue'),
     meta: { requiresAuth: true, requiresAdmin: true },
+    component: () => import('@/views/Admin/AdminContainer.vue'),
     children: [
       {
         path: 'students',

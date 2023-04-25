@@ -1,12 +1,27 @@
 <template>
   <div class="flex-1 flex flex-col justify-between">
     <div>
-      <div class="break-keep text-base">
-        <p class="mr-1 text-orange-400">
-          {{ formState.church }} {{ formState.department }}
-          {{ teacher?.name }} 선생님
+      <div class="text-lg">
+        <p v-if="formState.role !== 'common'">
+          <span class="text-orange-400">
+            {{ formState.church }} {{ formState.department }}
+            {{ formState.grade }}학년 {{ formState.group }}반
+          </span>
+          <span>
+            담당 확인을 위해 아래 이름 중 담당 학생을 모두 선택 후 제출하기를
+            눌러주세요
+          </span>
         </p>
-        <p>확인을 위해 담당 학생을 모두 선택 후 제출하기를 눌러주세요</p>
+
+        <p v-else>
+          <span class="text-orange-400">
+            {{ formState.church }} {{ formState.department }}
+          </span>
+          <span>
+            소속 확인을 위해 아래 이름 중 같은 소속 선생님을 모두 선택 후
+            제출하기를 눌러주세요
+          </span>
+        </p>
       </div>
 
       <div class="grid grid-cols-3 gap-3 py-4">
@@ -35,11 +50,13 @@
 <script setup lang="ts">
 import { onActivated, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { getCurrentUser } from '@/router';
 import { useAccountStore } from '@/store/account';
 import { useMemberStore } from '@/store/member';
 import { useUserStore } from '@/store/user';
 import { faker } from '@faker-js/faker/locale/ko';
 import type { MemberData } from '@/types';
+import type { User } from 'firebase/auth';
 
 const router = useRouter();
 const accountStore = useAccountStore();
@@ -56,8 +73,32 @@ if (!props.formState.church || !props.formState.department) {
 
 const emit = defineEmits(['prevPage']);
 
-const teacher = ref<MemberData>();
-const students = ref<MemberData[]>([]);
+const members = ref<MemberData[]>([]);
+
+onActivated(async () => {
+  try {
+    const { church, department, grade, group } = props.formState;
+
+    if (props.formState.role === 'common') {
+      members.value = await memberStore.fetchAll({
+        church,
+        department,
+        job: 'teacher',
+      });
+    } else {
+      members.value = await memberStore.fetchByGradeGroup({
+        church,
+        department,
+        grade,
+        group,
+      });
+    }
+
+    candidates.value = shuffle(getCandidates(members.value));
+  } catch (error) {
+    console.log(error);
+  }
+});
 
 class Candidate {
   constructor(
@@ -92,56 +133,53 @@ const shuffle = (array: Candidate[]) => {
   return array;
 };
 
-onActivated(async () => {
-  try {
-    const { church, department, grade, group } = props.formState;
-
-    const members = await memberStore.fetchByGradeGroup({
-      church,
-      department,
-      grade,
-      group,
-    });
-
-    members.forEach((member) => {
-      if (member.job === 'teacher') {
-        teacher.value = member;
-      } else if (member.job === 'student') {
-        students.value.push(member);
-      }
-    });
-
-    candidates.value = shuffle(getCandidates(students.value));
-  } catch (error) {
-    console.log(error);
-  }
-});
-
 const toggleButtonRefs = ref<HTMLDivElement[]>([]);
 
 const complete = async () => {
-  const isCorrect = candidates.value.every((candidate) => {
-    return candidate.checked === candidate.answer;
-  });
-
-  if (!isCorrect) {
-    toggleButtonRefs.value.forEach((ele) => {
-      ele.classList.add('wrong-answer');
+  try {
+    const isCorrect = candidates.value.every((candidate) => {
+      return candidate.checked === candidate.answer;
     });
 
-    setTimeout(() => {
+    if (!isCorrect) {
       toggleButtonRefs.value.forEach((ele) => {
-        ele.classList.remove('wrong-answer');
+        ele.classList.add('wrong');
       });
-    }, 900);
-  } else {
-    await userStore.modifyMultiple({
-      uid: accountStore.accountData?.uid,
-      ...props.formState,
-    });
 
-    alert('인증되었습니다! 감사합니다!');
-    router.push({ name: 'HomeView' });
+      setTimeout(() => {
+        toggleButtonRefs.value.forEach((ele) => {
+          ele.classList.remove('wrong');
+        });
+      }, 900);
+    } else {
+      await userStore.modifyMultiple({
+        uid: accountStore.accountData?.uid,
+        isAccepted: true,
+        ...props.formState,
+      });
+
+      alert('인증되었습니다! 감사합니다!');
+
+      const currentUser = (await getCurrentUser()) as User;
+      if (currentUser) {
+        const userStore = useUserStore();
+        const userData = await userStore.fetchSingle({
+          uid: currentUser.uid,
+        });
+
+        if (userData) {
+          accountStore.accountData = {
+            ...userData,
+            uid: currentUser.uid,
+            email: currentUser.email!,
+            name: currentUser.displayName!,
+          };
+        }
+      }
+      router.push({ name: 'HomeView' });
+    }
+  } catch (error) {
+    console.log(error);
   }
 };
 
@@ -151,7 +189,7 @@ const prevPage = () => {
 </script>
 
 <style scoped>
-.wrong-answer {
+.wrong {
   animation: shake 0.3s 3;
   border-radius: 6px;
   box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.5);

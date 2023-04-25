@@ -91,6 +91,26 @@ export const useMemberStore = defineStore('member', {
       return arraySort(members, ['grade', 'group', 'name']);
     },
 
+    async fetchByName(params: {
+      church: string;
+      department: string;
+      name?: string;
+    }) {
+      const { church, department, name } = params;
+
+      const q = query(
+        membersColl,
+        where('church', '==', church),
+        where('department', '==', department),
+        where('name', '==', name)
+      );
+      const qSnapshot = await getDocs(q);
+
+      const member = qSnapshot.docs.map((doc) => doc.data());
+
+      return member;
+    },
+
     async modifySingle(params: MemberModifySingleParams) {
       return await updateDoc(doc(db, 'newMembers', params.uid), {
         [params.field]: params.value,

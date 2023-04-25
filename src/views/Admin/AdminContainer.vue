@@ -88,7 +88,7 @@
       </OverlayPanel>
     </div>
 
-    <div class="flex-1 overflow-auto px-8 py-6 bg-zinc-700 text-white">
+    <div class="flex-1 overflow-auto px-8 py-4 bg-zinc-700 text-white">
       <RouterView />
     </div>
   </div>
