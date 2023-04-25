@@ -13,11 +13,11 @@ const routes: Array<RouteRecordRaw> = [
         name: 'AccountLogin',
         component: () => import('@/views/Account/Login/index.vue'),
       },
-      {
-        path: 'signup',
-        name: 'AccountSignup',
-        component: () => import('@/views/Account/Signup/index.vue'),
-      },
+      // {
+      //   path: 'signup',
+      //   name: 'AccountSignup',
+      //   component: () => import('@/views/Account/Signup/index.vue'),
+      // },
     ],
   },
   {
