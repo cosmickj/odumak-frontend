@@ -5,12 +5,20 @@
       <p class="mb-8">아이들과 가까워지는 곳</p>
     </div>
 
-    <div class="flex-1 flex flex-col justify-end">
+    <div class="flex-1 flex flex-col gap-2 justify-end">
       <div
-        class="flex gap-2 p-2 rounded bg-[#03C75A] items-center justify-center cursor-pointer select-none"
+        class="flex gap-2 p-2 rounded bg-[#fee500] items-center justify-center cursor-pointer select-none"
+        @click="loginWithKakao"
+      >
+        <Image id="kakao-login-btn" :src="loginKakao" image-class="w-8" />
+        <span class="leading-8 text-lg">카카오톡으로 시작하기</span>
+      </div>
+
+      <div
+        class="flex gap-2 p-2 rounded bg-[#03c75a] items-center justify-center cursor-pointer select-none"
         @click="loginWithNaver"
       >
-        <Image id="naver_id_login" :src="loginNaver" alt="" image-class="w-8" />
+        <Image id="naver_id_login" :src="loginNaver" image-class="w-8" />
         <span class="leading-8 text-white text-lg">네이버로 시작하기</span>
       </div>
     </div>
@@ -121,6 +129,7 @@ onMounted(() => {
     setTimeout(() => (isDialogVisible.value = true), 500);
   }
 
+  /*----- Setup Naver -----*/
   const naver_id_login = new window.naver_id_login(
     import.meta.env.VITE_NAVER_CLIENT_ID,
     import.meta.env.VITE_NAVER_CALLBACK_URL
@@ -129,6 +138,12 @@ onMounted(() => {
   naver_id_login.setState(state);
   naver_id_login.init_naver_id_login();
 });
+
+const loginWithKakao = () => {
+  window.Kakao.Auth.authorize({
+    redirectUri: import.meta.env.VITE_KAKAO_CALLBACK_URL,
+  });
+};
 
 const loginWithNaver = () => {
   const id = '#naver_id_login_anchor';

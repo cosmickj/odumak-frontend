@@ -20,6 +20,9 @@ import { useUserStore } from '@/store/user';
 import type { UserData } from '@/types';
 import type { User } from 'firebase/auth/dist/auth';
 
+/*----- Setup Kakao -----*/
+window.Kakao.init(import.meta.env.VITE_KAKAO_CLIENT_ID);
+
 const app = createApp(App);
 
 app.use(router);
