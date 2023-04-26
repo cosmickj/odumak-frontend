@@ -27,7 +27,11 @@ const accountStore = useAccountStore();
 
 const items = ref([
   {
-    label: '소속 정보',
+    label: '이름',
+    to: { name: 'NameCheck' },
+  },
+  {
+    label: '소속',
     to: { name: 'GroupCheck' },
   },
   {
@@ -35,12 +39,13 @@ const items = ref([
     to: { name: 'TeacherCheck' },
   },
   {
-    label: '퀴즈 퀴즈',
+    label: '퀴즈',
     to: { name: 'MemberCheck' },
   },
 ]);
 
 interface FormState {
+  name: string;
   church: string;
   department: string;
   role: string;
@@ -49,6 +54,7 @@ interface FormState {
 }
 
 const formState = reactive<FormState>({
+  name: accountStore.accountData?.name || '',
   church: accountStore.accountData?.church || '',
   department: accountStore.accountData?.department || '',
   role: accountStore.accountData?.role || 'common',

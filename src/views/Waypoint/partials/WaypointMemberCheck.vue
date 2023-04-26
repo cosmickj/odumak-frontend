@@ -91,6 +91,7 @@ onActivated(async () => {
         department,
         grade,
         group,
+        job: 'student',
       });
     }
 
@@ -145,28 +146,27 @@ const complete = async () => {
       toggleButtonRefs.value.forEach((ele) => {
         ele.classList.add('wrong');
       });
-
       setTimeout(() => {
         toggleButtonRefs.value.forEach((ele) => {
           ele.classList.remove('wrong');
         });
       }, 900);
-    } else {
+    }
+    //
+    else {
+      alert('인증되었습니다! 감사합니다!');
+
       await userStore.modifyMultiple({
         uid: accountStore.accountData?.uid,
         isAccepted: true,
         ...props.formState,
       });
 
-      alert('인증되었습니다! 감사합니다!');
-
       const currentUser = (await getCurrentUser()) as User;
       if (currentUser) {
-        const userStore = useUserStore();
         const userData = await userStore.fetchSingle({
           uid: currentUser.uid,
         });
-
         if (userData) {
           accountStore.accountData = {
             ...userData,
@@ -184,7 +184,7 @@ const complete = async () => {
 };
 
 const prevPage = () => {
-  emit('prevPage', { index: 2 });
+  emit('prevPage', { index: 3 });
 };
 </script>
 

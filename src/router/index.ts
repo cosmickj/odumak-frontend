@@ -87,6 +87,12 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/Waypoint/WaypointContainer.vue'),
         children: [
           {
+            path: 'name',
+            name: 'NameCheck',
+            component: () =>
+              import('@/views/Waypoint/partials/WaypointNameCheck.vue'),
+          },
+          {
             path: 'group',
             name: 'GroupCheck',
             component: () =>

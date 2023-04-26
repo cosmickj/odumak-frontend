@@ -72,14 +72,15 @@ export const useMemberStore = defineStore('member', {
     },
 
     async fetchByGradeGroup(params: MemberFetchByGradeGroupParams) {
-      const { church, department, grade, group } = params;
+      const { church, department, grade, group, job } = params;
 
       const q = query(
         membersColl,
         where('church', '==', church),
         where('department', '==', department),
         where('grade', '==', grade),
-        where('group', '==', group)
+        where('group', '==', group),
+        where('job', '==', job)
       );
       const qSnapshot = await getDocs(q);
 
