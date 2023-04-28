@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 
-import { db, usersColl } from '@/firebase/config';
+import { auth, db, usersColl } from '@/firebase/config';
 import {
   deleteDoc,
   doc,
@@ -12,22 +12,28 @@ import {
   updateDoc,
   where,
 } from 'firebase/firestore';
+import { deleteUser, signOut } from 'firebase/auth';
 
 import { Collection } from '@/enums';
 import type { UserData } from '@/types';
 import type {
   UserCreateSingleParams,
-  UserDeleteSingleParams,
   UserFetchSingleParams,
   UserFetchMultipleByChurchAndDepartment,
   UserModifySingle,
 } from '@/types/store';
 
+interface UserStoreState {
+  isAuthReady: boolean;
+  userData: UserData | null;
+}
+
 export const useUserStore = defineStore('user', {
+  state: (): UserStoreState => ({
+    isAuthReady: false,
+    userData: null,
+  }),
   actions: {
-    /**
-     * 회원가입 이후 유저 정보 생성 함수
-     */
     async createSingle(params: UserCreateSingleParams) {
       try {
         const { uid, ...newUser } = params;
@@ -40,16 +46,15 @@ export const useUserStore = defineStore('user', {
         throw Error((error as Error).message);
       }
     },
-    /**
-     * 로그인 이후 유저 정보 읽기 함수
-     */
+
     async fetchSingle(params: UserFetchSingleParams) {
       try {
         const docRef = doc(db, Collection.USERS, params.uid);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-          return docSnap.data() as UserData;
+          return (this.userData = docSnap.data() as UserData);
+          // return docSnap.data() as UserData;
         }
         return null;
       } catch (error) {
@@ -97,12 +102,24 @@ export const useUserStore = defineStore('user', {
         ...params,
       });
     },
-    /**
-     * 탈퇴 이후 유저 정보 삭제 함수
-     */
-    async deleteSingle(params: UserDeleteSingleParams) {
+
+    async deleteSingle() {
       try {
-        await deleteDoc(doc(db, Collection.USERS, params.uid));
+        const { currentUser } = auth;
+
+        if (currentUser) {
+          await deleteUser(currentUser);
+          await deleteDoc(doc(db, Collection.USERS, currentUser.uid));
+        }
+      } catch (error) {
+        throw Error((error as Error).message);
+      }
+    },
+
+    async logout() {
+      try {
+        await signOut(auth);
+        this.userData = null;
       } catch (error) {
         throw Error((error as Error).message);
       }

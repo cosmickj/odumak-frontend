@@ -86,7 +86,7 @@ const rules = computed(() => ({
 const v$ = useVuelidate(rules, formState);
 
 const prevPage = () => {
-  emit('prevPage', { index: 1 });
+  emit('prevPage', { index: 2 });
 };
 
 const nextPage = async () => {
@@ -95,7 +95,7 @@ const nextPage = async () => {
     return;
   }
 
-  emit('nextPage', { index: 1, formState });
+  emit('nextPage', { index: 2, formState });
 };
 </script>
 

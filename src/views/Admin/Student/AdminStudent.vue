@@ -34,7 +34,7 @@ import AdminDialogAdd from '../_partials/AdminDialogAdd.vue';
 import AdminDialogDelete from '../_partials/AdminDialogDelete.vue';
 
 import { computed, onMounted, reactive, ref } from 'vue';
-import { useAccountStore } from '@/store/account';
+import { useUserStore } from '@/store/user';
 import { useMemberStore } from '@/store/member';
 
 import { useVuelidate } from '@vuelidate/core';
@@ -48,8 +48,8 @@ export interface SelectedMember extends MemberData {
   birthLater: true;
 }
 
-const accountStore = useAccountStore();
-const accountData = computed(() => accountStore.accountData!);
+const userStore = useUserStore();
+const accountData = computed(() => userStore.userData!);
 
 const memberStore = useMemberStore();
 

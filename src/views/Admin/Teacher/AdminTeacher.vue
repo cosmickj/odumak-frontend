@@ -34,7 +34,7 @@ import AdminDialogAdd from '../_partials/AdminDialogAdd.vue';
 import AdminDialogDelete from '../_partials/AdminDialogDelete.vue';
 
 import { computed, onMounted, reactive, ref } from 'vue';
-import { useAccountStore } from '@/store/account';
+import { useUserStore } from '@/store/user';
 import { useMemberStore } from '@/store/member';
 
 import { useVuelidate } from '@vuelidate/core';
@@ -45,8 +45,8 @@ import type { DataTableCellEditCompleteEvent } from 'primevue/datatable';
 import type { MemberData } from '@/types';
 import { SelectedMember } from '../Student/AdminStudent.vue';
 
-const accountStore = useAccountStore();
-const accountData = computed(() => accountStore.accountData!);
+const userStore = useUserStore();
+const userData = computed(() => userStore.userData!);
 
 const memberStore = useMemberStore();
 
@@ -57,8 +57,8 @@ const getMembers = async () => {
   try {
     isLoading.value = true;
     members.value = await memberStore.fetchAll({
-      church: accountData.value.church,
-      department: accountData.value.department,
+      church: userData.value.church,
+      department: userData.value.department,
       job: 'teacher',
     });
   } catch (error) {
@@ -140,8 +140,8 @@ const resetNewMembers = () => {
 const createNewMembers = () => {
   try {
     memberStore.createMultiple({
-      church: accountData.value.church,
-      department: accountData.value.department,
+      church: userData.value.church,
+      department: userData.value.department,
       members: newMembers.body,
     });
   } catch (error) {

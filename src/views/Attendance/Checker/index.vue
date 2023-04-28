@@ -2,7 +2,7 @@
   <main class="overflow-auto flex flex-col h-full p-5">
     <CheckerHeader @submit="onSubmit" />
 
-    <template v-if="accountData.isAccepted">
+    <template v-if="userData.isAccepted">
       <Calendar
         touchUI
         v-model="attendanceDate"
@@ -18,11 +18,11 @@
 
       <section v-else>
         <CheckerTeachers
-          v-if="accountData.role === 'admin'"
+          v-if="userData.role === 'admin'"
           :attendances="attendances"
         />
         <CheckerStudents
-          v-else-if="accountData.role === 'main' || accountData.role === 'sub'"
+          v-else-if="userData.role === 'main' || userData.role === 'sub'"
           :attendances-template="attendances"
         />
         <Dialog
@@ -77,12 +77,12 @@ import CheckerTeachers from './components/CheckerTeachers.vue';
 
 import { computed, ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAccountStore } from '@/store/account';
+import { useUserStore } from '@/store/user';
 import { useAttendanceStore } from '@/store/attendance';
 import type { AttendanceData } from '@/types';
 
 const router = useRouter();
-const accountStore = useAccountStore();
+const userStore = useUserStore();
 const attendanceStore = useAttendanceStore();
 
 // https://bobbyhadz.com/blog/javascript-get-previous-sunday
@@ -101,7 +101,7 @@ const attendances = ref<AttendanceData[]>([]);
 
 const visible = ref(true);
 
-const accountData = computed(() => accountStore.accountData!);
+const userData = computed(() => userStore.userData!);
 
 const RequestJobMap = {
   admin: 'teacher' as const,
@@ -109,7 +109,7 @@ const RequestJobMap = {
   sub: 'student' as const,
   common: null,
 };
-const requestJob = computed(() => RequestJobMap[accountData.value.role!]);
+const requestJob = computed(() => RequestJobMap[userData.value.role!]);
 
 const getAttendances = async () => {
   try {
@@ -120,8 +120,8 @@ const getAttendances = async () => {
     }
 
     await attendanceStore.fetchAttendances({
-      church: accountData.value.church!,
-      department: accountData.value.department!,
+      church: userData.value.church!,
+      department: userData.value.department!,
       job: requestJob.value,
       attendanceDate: attendanceDate.value,
     });
@@ -160,7 +160,7 @@ const onSubmit = () => {
             date: attendanceDate.value,
             status: attendance.attendance.status,
           },
-          createdBy: accountData.value.name,
+          createdBy: userData.value.name,
         });
       }
     });

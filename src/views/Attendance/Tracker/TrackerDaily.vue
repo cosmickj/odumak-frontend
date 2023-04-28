@@ -148,12 +148,12 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAccountStore } from '@/store/account';
+import { useUserStore } from '@/store/user';
 import { useAttendanceStore } from '@/store/attendance';
 import { GRADE_OPTIONS, GROUP_OPTIONS } from '@/constants/common';
 
 const router = useRouter();
-const accountStore = useAccountStore();
+const userStore = useUserStore();
 const attendanceStore = useAttendanceStore();
 
 const job = computed(() => {
@@ -174,15 +174,15 @@ const getPreviousSunday = (date = new Date()) => {
 const maxDate = getPreviousSunday();
 const attendanceDate = ref<Date>(getPreviousSunday());
 
-const accountData = computed(() => accountStore.accountData!);
+const userData = computed(() => userStore.userData!);
 
 const attendanceData = ref<any[]>([]);
 
 const getAttendancesRecord = async () => {
   try {
     await attendanceStore.fetchAttendances({
-      church: accountData.value.church!,
-      department: accountData.value.department!,
+      church: userData.value.church!,
+      department: userData.value.department!,
       job: job.value,
       attendanceDate: attendanceDate.value,
     });

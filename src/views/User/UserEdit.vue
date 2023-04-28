@@ -119,7 +119,6 @@
 
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue';
-import { useAccountStore } from '@/store/account';
 import { useUserStore } from '@/store/user';
 import {
   GRADE_OPTIONS,
@@ -131,16 +130,16 @@ import {
 import useVuelidate from '@vuelidate/core';
 import { helpers, required, requiredIf } from '@vuelidate/validators';
 
-const { isAuthReady, accountData } = useAccountStore();
+const { isAuthReady, userData } = useUserStore();
 const userStore = useUserStore();
 
 const isChanged = ref(false);
-const formState = reactive({ ...accountData });
+const formState = reactive({ ...userData });
 
 watch(
   formState,
   (newValue) => {
-    if (JSON.stringify(newValue) !== JSON.stringify(accountData)) {
+    if (JSON.stringify(newValue) !== JSON.stringify(userData)) {
       isChanged.value = true;
     } else {
       isChanged.value = false;
@@ -183,7 +182,7 @@ const submitForm = async () => {
       return;
     }
     await userStore.modifyMultiple({
-      uid: accountData?.uid,
+      uid: userData?.uid,
       ...formState,
     });
     alert('수정되었습니다.');

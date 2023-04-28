@@ -58,6 +58,7 @@ export interface MemberFetchByGradeGroupParams
   extends Pick<AccountData, 'church' | 'department'> {
   grade: string;
   group: string;
+  job: 'student' | 'teacher';
 }
 
 interface MemberModifySingleParams {

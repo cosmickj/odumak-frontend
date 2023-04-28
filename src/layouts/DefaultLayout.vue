@@ -13,7 +13,7 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { useAccountStore } from '@/store/account';
+import { useUserStore } from '@/store/user';
 
-const { isAuthReady } = storeToRefs(useAccountStore());
+const { isAuthReady } = storeToRefs(useUserStore());
 </script>

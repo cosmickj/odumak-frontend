@@ -1,11 +1,12 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+import { useUserStore } from '@/store/user';
 import { auth } from '@/firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
-import { useUserStore } from '@/store/user';
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/account',
+    meta: { requiresAuth: false },
     component: () => import('@/layouts/DefaultLayout.vue'),
     children: [
       {
@@ -26,9 +27,14 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/views/Account/Login/LoginCallbackNaver.vue'),
   },
   {
+    path: '/callback/kakao',
+    name: 'CallbackKakao',
+    component: () => import('@/views/Account/Login/LoginCallbackKakao.vue'),
+  },
+  {
     path: '/',
-    component: () => import('@/layouts/DefaultLayout.vue'),
     meta: { requiresAuth: true },
+    component: () => import('@/layouts/DefaultLayout.vue'),
     children: [
       {
         path: '',
@@ -87,6 +93,12 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/Waypoint/WaypointContainer.vue'),
         children: [
           {
+            path: 'name',
+            name: 'NameCheck',
+            component: () =>
+              import('@/views/Waypoint/partials/WaypointNameCheck.vue'),
+          },
+          {
             path: 'group',
             name: 'GroupCheck',
             component: () =>
@@ -139,6 +151,7 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   const currentUser = await getCurrentUser();
+
   const needAuth = to.matched.some((record) => record.meta.requiresAuth);
   const needAdmin = to.matched.some((record) => record.meta.requiresAdmin);
   const needAccept = to.matched.some((record) => record.meta.requiresAccept);
@@ -152,6 +165,9 @@ router.beforeEach(async (to, from, next) => {
     const userData = await userStore.fetchSingle({
       uid: currentUser.uid,
     });
+    if (!needAuth) {
+      return next({ name: 'HomeView' });
+    }
     if (needAccept && !userData?.isAccepted) {
       alert('승인 받은 유저만 접근할 수 있습니다.');
       return next({ name: 'HomeView' });

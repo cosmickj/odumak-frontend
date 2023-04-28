@@ -14,11 +14,10 @@ import PrimeVue from 'primevue/config';
 import ToastService from 'primevue/toastservice';
 
 import { getCurrentUser } from '@/router';
-import { useAccountStore } from '@/store/account';
 import { useUserStore } from '@/store/user';
 
-import type { UserData } from '@/types';
-import type { User } from 'firebase/auth/dist/auth';
+/*----- Setup Kakao -----*/
+window.Kakao.init(import.meta.env.VITE_KAKAO_CLIENT_ID);
 
 const app = createApp(App);
 
@@ -28,25 +27,13 @@ app.use(createPinia());
 // Waiting for Auth to be Ready
 (async () => {
   try {
-    const currentUser = (await getCurrentUser()) as User;
-    const accountStore = useAccountStore();
+    const currentUser = await getCurrentUser();
+    const userStore = useUserStore();
 
     if (currentUser) {
-      const userStore = useUserStore();
-      const userData = await userStore.fetchSingle({
-        uid: currentUser.uid,
-      });
-
-      if (userData) {
-        accountStore.accountData = {
-          ...userData,
-          uid: currentUser.uid,
-          email: currentUser.email!,
-          name: currentUser.displayName!,
-        };
-      }
+      await userStore.fetchSingle({ uid: currentUser.uid });
     }
-    accountStore.isAuthReady = true;
+    userStore.isAuthReady = true;
   } catch (error) {
     console.log(error);
   }

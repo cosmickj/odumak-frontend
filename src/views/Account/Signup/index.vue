@@ -149,7 +149,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAccountStore } from '@/store/account';
+// import { useAccountStore } from '@/store/account';
 import { useUserStore } from '@/store/user';
 
 import useVuelidate from '@vuelidate/core';
@@ -166,7 +166,7 @@ import type { UserRole } from '@/types';
 
 const router = useRouter();
 
-const accountStore = useAccountStore();
+// const accountStore = useAccountStore();
 const userStore = useUserStore();
 
 const email = ref('');
@@ -265,40 +265,40 @@ const onSubmit = async () => {
     const isFormCorrect = await v$.value.$validate();
     if (!isFormCorrect) return;
 
-    const signupResult = await accountStore.signup({
-      email: email.value,
-      password: password.value,
-      name: name.value,
-    });
+    // const signupResult = await accountStore.signup({
+    //   email: email.value,
+    //   password: password.value,
+    //   name: name.value,
+    // });
 
-    if (!signupResult.isSuccess) {
-      isError.value = true;
-      errorMessage.value = signupResult.message;
-    } else {
-      await userStore.createSingle({
-        uid: signupResult.result.user.uid,
-        provider: 'email',
-        profileImage: null,
-        name: name.value,
-        birth: null,
-        church: church.value,
-        department: department.value,
-        grade: grade.value,
-        group: group.value,
-        role: role.value,
-        phone: null,
-        isAccepted: false,
-        isRejected: false,
-        rejectedReason: '',
-      });
+    // if (!signupResult.isSuccess) {
+    //   isError.value = true;
+    //   errorMessage.value = signupResult.message;
+    // } else {
+    //   await userStore.createSingle({
+    //     uid: signupResult.result.user.uid,
+    //     provider: 'email',
+    //     profileImage: null,
+    //     name: name.value,
+    //     birth: null,
+    //     church: church.value,
+    //     department: department.value,
+    //     grade: grade.value,
+    //     group: group.value,
+    //     role: role.value,
+    //     phone: null,
+    //     isAccepted: false,
+    //     isRejected: false,
+    //     rejectedReason: '',
+    //   });
 
-      await accountStore.login({
-        email: email.value,
-        password: password.value,
-      });
+    //   await accountStore.login({
+    //     email: email.value,
+    //     password: password.value,
+    //   });
 
-      router.push({ name: 'HomeView' });
-    }
+    //   router.push({ name: 'HomeView' });
+    // }
   } catch (error) {
     console.log((error as Error).message);
   } finally {
