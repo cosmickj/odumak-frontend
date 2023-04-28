@@ -3,15 +3,29 @@
     <header class="mb-4 text-xl">
       <p>안녕하세요!</p>
       <div class="flex items-center justify-between">
-        <p>
-          <strong>{{ accountData?.name }}</strong> 선생님
-        </p>
+        <span>
+          <strong>{{ userData?.name }}</strong> 선생님
+        </span>
+
+        <span
+          v-if="userData?.provider === 'naver'"
+          class="px-2 py-1 bg-[#2db400] text-white uppercase text-sm rounded"
+        >
+          {{ userData?.provider }} 연동
+        </span>
+
+        <span
+          v-else-if="userData?.provider === 'kakao'"
+          class="px-2 py-1 bg-[#fee500] text-black uppercase text-sm rounded"
+        >
+          {{ userData?.provider }} 연동
+        </span>
       </div>
     </header>
 
     <div class="grid grid-cols-2 gap-3">
       <RouterLink
-        v-if="accountData?.role === 'admin'"
+        v-if="userData?.role === 'admin'"
         :to="{ name: 'AdminStudent' }"
         class="col-span-2 bg-purple-300 text-purple-700 rounded-lg"
       >
@@ -87,15 +101,15 @@
 import HomeMenu from './components/HomeMenu.vue';
 import { ref } from 'vue';
 import { onBeforeRouteLeave, useRouter } from 'vue-router';
-import { useAccountStore } from '@/store/account';
+import { useUserStore } from '@/store/user';
 
 const router = useRouter();
-const { accountData } = useAccountStore();
+const { userData } = useUserStore();
 
 const isVisible = ref(false);
 
 onBeforeRouteLeave((to, from, next) => {
-  if ((to.name as string).includes('Attendance') && !accountData?.isAccepted) {
+  if ((to.name as string).includes('Attendance') && !userData?.isAccepted) {
     isVisible.value = true;
   } else {
     next();

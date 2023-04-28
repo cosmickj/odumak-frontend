@@ -51,17 +51,15 @@
 import { onActivated, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { getCurrentUser } from '@/router';
-import { useAccountStore } from '@/store/account';
-import { useMemberStore } from '@/store/member';
 import { useUserStore } from '@/store/user';
+import { useMemberStore } from '@/store/member';
 import { faker } from '@faker-js/faker/locale/ko';
 import type { MemberData } from '@/types';
 import type { User } from 'firebase/auth';
 
 const router = useRouter();
-const accountStore = useAccountStore();
-const memberStore = useMemberStore();
 const userStore = useUserStore();
+const memberStore = useMemberStore();
 
 const props = defineProps<{
   formState: any;
@@ -157,7 +155,7 @@ const complete = async () => {
       alert('인증되었습니다! 감사합니다!');
 
       await userStore.modifyMultiple({
-        uid: accountStore.accountData?.uid,
+        uid: userStore.userData?.uid,
         isAccepted: true,
         ...props.formState,
       });
@@ -168,7 +166,7 @@ const complete = async () => {
           uid: currentUser.uid,
         });
         if (userData) {
-          accountStore.accountData = {
+          userStore.userData = {
             ...userData,
             uid: currentUser.uid,
             email: currentUser.email!,

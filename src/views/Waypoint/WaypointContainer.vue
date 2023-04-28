@@ -18,12 +18,12 @@
 </template>
 
 <script setup lang="ts">
-import { useAccountStore } from '@/store/account';
 import { reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useUserStore } from '@/store/user';
 
 const router = useRouter();
-const accountStore = useAccountStore();
+const userStore = useUserStore();
 
 const items = ref([
   {
@@ -54,12 +54,12 @@ interface FormState {
 }
 
 const formState = reactive<FormState>({
-  name: accountStore.accountData?.name || '',
-  church: accountStore.accountData?.church || '',
-  department: accountStore.accountData?.department || '',
-  role: accountStore.accountData?.role || 'common',
-  grade: accountStore.accountData?.grade || '',
-  group: accountStore.accountData?.group || '',
+  name: userStore.userData?.name || '',
+  church: userStore.userData?.church || '',
+  department: userStore.userData?.department || '',
+  role: userStore.userData?.role || 'common',
+  grade: userStore.userData?.grade || '',
+  group: userStore.userData?.group || '',
 });
 
 const prevPage = (payload: { index: number }) => {

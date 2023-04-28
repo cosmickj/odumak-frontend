@@ -1,29 +1,30 @@
-import type { User as FirebaseUser } from 'firebase/auth/dist/auth';
+// import type { User as FirebaseUser } from 'firebase/auth/dist/auth';
 import { Timestamp } from 'firebase/firestore';
 
 /** Common */
 export type Gender = 'male' | 'female';
 
 /** Account */
-type Key = 'uid' | 'email' | 'displayName';
+// type Key = 'uid' | 'email' | 'displayName';
 
-type AuthData = {
-  -readonly [k in Key]: FirebaseUser[k];
-};
+// type AuthData = {
+//   -readonly [k in Key]: FirebaseUser[k];
+// };
 
 export type UserRole = 'admin' | 'main' | 'sub' | 'common';
 
-interface UserData {
+export interface UserData {
   uid: string;
-  provider: 'naver' | 'kakao' | 'email';
+  email: string;
+  provider: 'naver' | 'kakao';
   profileImage: string | null;
   name: string;
   birth: Date | null;
   church: string | null;
   department: string | null;
+  role: UserRole | null;
   grade: string | null;
   group: string | null;
-  role: UserRole | null;
   phone: string | null;
   isAccepted: boolean;
   isRejected: boolean;
@@ -31,9 +32,9 @@ interface UserData {
   createdAt?: Date;
 }
 
-export interface AccountData extends UserData {
-  email: string;
-}
+// export interface AccountData extends UserData {
+//   email: string;
+// }
 
 /** Member */
 export interface MemberData {

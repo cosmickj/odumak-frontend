@@ -12,11 +12,9 @@
 import AdminUserDataTable from './AdminUserDataTable.vue';
 
 import { onMounted, ref } from 'vue';
-import { useAccountStore } from '@/store/account';
 import { useUserStore } from '@/store/user';
 import type { UserData } from '@/types';
 
-const accountStore = useAccountStore();
 const userStore = useUserStore();
 
 const loading = ref(true);
@@ -24,13 +22,13 @@ const users = ref<UserData[]>([]);
 const usersSelection = ref<UserData[]>([]);
 
 const fetchUsers = async () => {
-  if (!accountStore.accountData) {
+  if (!userStore.userData) {
     return;
   }
 
   users.value = await userStore.fetchMultipleByChurchAndDepartment({
-    church: accountStore.accountData.church!,
-    department: accountStore.accountData.department!,
+    church: userStore.userData.church!,
+    department: userStore.userData.department!,
   });
 };
 

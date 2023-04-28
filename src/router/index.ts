@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+import { useUserStore } from '@/store/user';
 import { auth } from '@/firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
-import { useUserStore } from '@/store/user';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -151,6 +151,7 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   const currentUser = await getCurrentUser();
+
   const needAuth = to.matched.some((record) => record.meta.requiresAuth);
   const needAdmin = to.matched.some((record) => record.meta.requiresAdmin);
   const needAccept = to.matched.some((record) => record.meta.requiresAccept);

@@ -7,18 +7,17 @@ import { useUserStore } from '@/store/user';
 import { auth } from '@/firebase/config';
 import {
   createUserWithEmailAndPassword,
-  deleteUser,
   signInWithEmailAndPassword,
   signOut,
   updateProfile,
 } from 'firebase/auth';
 
-import type { AccountData, AuthData, UserData } from '@/types';
+import type { UserData } from '@/types';
 import type { AccountLoginParams, AccountSignupParams } from '@/types/store';
 
 interface AccountStoreState {
   isAuthReady: boolean;
-  accountData: AccountData | null;
+  accountData: any;
 }
 
 export const useAccountStore = defineStore('account', {
@@ -85,27 +84,24 @@ export const useAccountStore = defineStore('account', {
      * 탈퇴 하기
      */
     async delete() {
-      try {
-        const { currentUser } = auth;
-
-        if (currentUser) {
-          await deleteUser(currentUser);
-
-          const userStore = useUserStore();
-          await userStore.deleteSingle({
-            uid: currentUser.uid,
-          });
-        }
-
-        this.accountData = null;
-      } catch (error) {
-        throw Error((error as Error).message);
-      }
+      // try {
+      //   const { currentUser } = auth;
+      //   if (currentUser) {
+      //     await deleteUser(currentUser);
+      //     const userStore = useUserStore();
+      //     await userStore.deleteSingle({
+      //       uid: currentUser.uid,
+      //     });
+      //   }
+      //   this.accountData = null;
+      // } catch (error) {
+      //   throw Error((error as Error).message);
+      // }
     },
     /**
      * 계정 정보와 유저 정보를 합치기
      */
-    composeAccountData(authData: AuthData, userData: UserData) {
+    composeAccountData(authData: any, userData: UserData) {
       this.accountData = {
         ...userData,
         email: authData.email || '이메일이 존재하지 않습니다.',
