@@ -7,20 +7,14 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAccountStore } from '@/store/account';
 import { useUserStore } from '@/store/user';
-import { getCustomToken, getKakaoToken } from '@/api/oauth';
-import { SHA1 } from 'crypto-js';
-import {
-  signInWithCustomToken,
-  updateEmail,
-  updateProfile,
-} from 'firebase/auth';
+import { getKakaoToken, getCustomToken } from '@/api/oauth';
 import { auth } from '@/firebase/config';
+import { signInWithCustomToken } from 'firebase/auth';
 import { UserData } from '@/types';
+import { SHA1 } from 'crypto-js';
 
 const router = useRouter();
-const accountStore = useAccountStore();
 const userStore = useUserStore();
 
 onMounted(async () => {
@@ -28,41 +22,26 @@ onMounted(async () => {
     const code = router.currentRoute.value.query.code as string;
     const { data } = await getKakaoToken(code);
 
-    const token = data.access_token;
+    const kakaoToken = data.access_token;
 
-    await window.Kakao.Auth.setAccessToken(token);
+    await window.Kakao.Auth.setAccessToken(kakaoToken);
 
     const statusInfo = await window.Kakao.Auth.getStatusInfo();
-
     const uid = SHA1(statusInfo.user.id).toString();
+
     const { data: customToken } = await getCustomToken(uid);
-    const { user: account } = await signInWithCustomToken(auth, customToken);
+    await signInWithCustomToken(auth, customToken);
 
     if (!auth.currentUser) {
       return;
     }
-    if (!account.displayName) {
-      await updateProfile(auth.currentUser, {
-        displayName: statusInfo.user.kakao_account.profile.nickname,
-      });
-    }
-    if (!account.photoURL) {
-      await updateProfile(auth.currentUser, {
-        photoURL: statusInfo.user.kakao_account.profile.thumbnail_image_url,
-      });
-    }
-    if (!account.email) {
-      await updateEmail(auth.currentUser, statusInfo.user.kakao_account.email);
-    }
 
-    const user = await userStore.fetchSingle({
-      uid,
-    });
-
+    const user = await userStore.fetchSingle({ uid });
     if (user === null) {
       const newUser: UserData = {
         uid,
-        provider: 'naver' as const,
+        email: statusInfo.user.kakao_account.email,
+        provider: 'kakao' as const,
         profileImage: statusInfo.user.kakao_account.profile.thumbnail_image_url,
         name: statusInfo.user.kakao_account.profile.nickname,
         birth: null,
@@ -76,12 +55,11 @@ onMounted(async () => {
         isRejected: false,
         rejectedReason: '',
       };
+
       await userStore.createSingle(newUser);
-      accountStore.composeAccountData(account, newUser);
-    } else {
-      accountStore.composeAccountData(account, user);
     }
 
+    await userStore.fetchSingle({ uid });
     router.push({ name: 'HomeView' });
   } catch (error) {
     console.log(error);
