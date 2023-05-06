@@ -1,17 +1,19 @@
 <template>
-  <section class="flex flex-col px-5 py-8">
+  <section class="flex flex-col px-5 py-8 justify-between">
     <div class="text-lg text-center">
-      <h1 class="mb-3 text-2xl font-bold">오두막</h1>
-      <p class="mb-8">아이들과 가까워지는 곳</p>
+      <h1 class="text-2xl font-bold">오두막</h1>
+      <p>아이들과 가까워지는 곳</p>
     </div>
 
-    <div class="flex-1 flex flex-col gap-2 justify-end">
+    <Image :src="bgLogin" />
+
+    <div class="flex flex-col gap-2 justify-end">
       <div
         class="flex gap-2 p-2 rounded bg-[#fee500] items-center justify-center cursor-pointer select-none"
         @click="loginWithKakao"
       >
         <Image id="kakao-login-btn" :src="loginKakao" image-class="w-8" />
-        <span class="leading-8 text-lg">카카오톡으로 시작하기</span>
+        <p class="leading-8 text-lg">카카오톡으로 시작하기</p>
       </div>
 
       <div
@@ -117,8 +119,10 @@ import { useCookies } from '@vueuse/integrations/useCookies';
 // import { useVuelidate } from '@vuelidate/core';
 // import { required } from '@vuelidate/validators';
 
+import bgLogin from '@/assets/images/bg-login.png';
+import logoTransparent from '@/assets/images/logo-transparent.png';
 import loginKakao from '@/assets/images/login-kakao.png';
-import loginNaver from '@/assets/images/naver-login-icon.png';
+import loginNaver from '@/assets/images/login-naver.png';
 
 const cookies = useCookies(['odmk_has_account']);
 
