@@ -71,9 +71,9 @@
 </template>
 
 <script setup lang="ts">
-import CheckerHeader from './components/CheckerHeader.vue';
-import CheckerStudents from './components/CheckerStudents.vue';
-import CheckerTeachers from './components/CheckerTeachers.vue';
+import CheckerHeader from './_partials/CheckerHeader.vue';
+import CheckerStudents from './_partials/CheckerStudents.vue';
+import CheckerTeachers from './_partials/CheckerTeachers.vue';
 
 import { computed, ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
