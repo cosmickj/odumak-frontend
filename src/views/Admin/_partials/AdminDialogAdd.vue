@@ -53,7 +53,7 @@
         </div>
       </div>
 
-      <!-- <div class="flex flex-col gap-x-5 mx-6 mb-2">
+      <div v-if="job === 'teachers'" class="flex flex-col gap-x-5 mx-6 mb-2">
         <label for="role" class="mb-1">담임 여부</label>
         <SelectButton
           unselectable
@@ -64,7 +64,7 @@
           optionValue="value"
           placeholder="담당 학년"
         />
-      </div> -->
+      </div>
 
       <div class="flex gap-x-5 mx-6 mb-2">
         <div class="flex-1">
@@ -167,14 +167,14 @@
 
 <script setup lang="ts">
 import TheDialog from '@/components/TheDialog.vue';
+import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { GRADE_OPTIONS, GROUP_OPTIONS, TEACHER_ROLE } from '@/constants/common';
-import type { SelectedMember } from '../Student/AdminStudent.vue';
-import { computed } from 'vue';
+import type { MemberData } from '@/types';
 
 const props = defineProps<{
   isDialogVisible: boolean;
-  members: SelectedMember[];
+  members: MemberData[];
   errors: any;
 }>();
 
@@ -217,5 +217,5 @@ const toggleBirth = (index: number) => {
 
 const { path } = useRoute();
 
-const target = computed(() => path.split('/').pop());
+const job = computed(() => path.split('/').pop());
 </script>
