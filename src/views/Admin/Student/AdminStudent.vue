@@ -44,10 +44,6 @@ import { useToast } from 'primevue/usetoast';
 import type { DataTableCellEditCompleteEvent } from 'primevue/datatable';
 import type { MemberData } from '@/types';
 
-export interface SelectedMember extends MemberData {
-  birthLater: true;
-}
-
 const userStore = useUserStore();
 const accountData = computed(() => userStore.userData!);
 
@@ -71,7 +67,7 @@ const getStudents = async () => {
   }
 };
 
-const initSelectedStudent: SelectedMember = {
+const initSelectedStudent: MemberData = {
   name: '',
   birth: null,
   birthLater: true,
@@ -79,6 +75,7 @@ const initSelectedStudent: SelectedMember = {
   church: '',
   department: '',
   job: 'student',
+  role: null,
   grade: '',
   group: '',
   phone: '',
@@ -87,11 +84,11 @@ const initSelectedStudent: SelectedMember = {
   remark: '',
 };
 
-const selectedStudents = reactive({ body: [] as SelectedMember[] });
+const selectedStudents = reactive({ body: [] as MemberData[] });
 
-const createNewStudent = (obj: SelectedMember) => Object.assign({}, obj);
+const createNewStudent = (obj: MemberData) => Object.assign({}, obj);
 
-const addSelectedStudents = (payload: SelectedMember[]) => {
+const addSelectedStudents = (payload: MemberData[]) => {
   selectedStudents.body = payload.map((d) => createNewStudent(d));
 };
 
@@ -102,7 +99,7 @@ const openDialogToAddStudent = () => {
   addNewStudent();
 };
 
-const newStudents = reactive({ body: [] as SelectedMember[] });
+const newStudents = reactive({ body: [] as MemberData[] });
 
 const addNewStudent = () => {
   newStudents.body.push(createNewStudent(initSelectedStudent));
