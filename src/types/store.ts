@@ -1,96 +1,79 @@
-import { UserData } from './index';
+import { MemberData, UserData } from './index';
 
-/** account.ts */
-export interface AccountSignupParams {
-  email: string;
-  password: string;
+/*---------- attendace.ts ----------*/
+export interface AddAttendanceParams {
   name: string;
-}
-
-export interface AccountLoginParams {
-  email: string;
-  password: string;
-}
-
-/** attendace.ts */
-export interface StudentsAttendance {
-  date: Date;
-  grade: string;
-  group: string;
-  teacher: string;
-  studentsAttendance: Student[];
-}
-
-export interface TeachersAttendance {
-  date: Date;
-  teachersAttendance: Teacher[];
-}
-
-export interface AttendaceAddAttendancesParams
-  extends Omit<AttendaceAddAttendanceParams, 'attendance'> {
-  attendances: DataSource[];
-  checksum: string;
-}
-
-export interface AttendaceAddAttendanceParams {
-  attendance: DataSource;
   church: string;
   department: string;
   grade: string;
   group: string;
+  job: 'student' | 'teacher';
+  attendance: {
+    date: Date;
+    status: 'online' | 'offline' | 'absence';
+  };
+  createdBy: string;
+  createdAt?: Date;
 }
 
-export interface AttendaceRemoveAttendanceParams
-  extends AttendaceAddAttendanceParams {}
+export interface FetchAttendancesParams {
+  grade?: string;
+  group?: string;
+  church: string;
+  department: string;
+  job: 'student' | 'teacher';
+  attendanceDate: Date;
+}
 
-/** member.ts */
-interface MemberCreateMultipleParams
-  extends Pick<AccountData, 'church' | 'department'> {
+export interface ModifyAttendanceParams {
+  uid: string;
+  attendance: {
+    status: 'online' | 'offline' | 'absence';
+  };
+}
+
+/*---------- member.ts ----------*/
+export interface CreateMultipleParams
+  extends Pick<MemberData, 'church' | 'department'> {
   members: MemberData[];
 }
 
-export interface MemberFetchAllParmas
-  extends Pick<AccountData, 'church' | 'department'> {
-  job: 'student' | 'teacher';
-}
+export interface FetchAllParmas
+  extends Pick<MemberData, 'church' | 'department' | 'job'> {}
 
-export interface MemberFetchByGradeGroupParams
-  extends Pick<AccountData, 'church' | 'department'> {
-  grade: string;
-  group: string;
-  job: 'student' | 'teacher';
-}
+export interface FetchByGradeGroupParams
+  extends Pick<
+    MemberData,
+    'church' | 'department' | 'grade' | 'group' | 'job'
+  > {}
 
-interface MemberModifySingleParams {
+export interface ModifySingleParams {
   uid: string;
   field: string;
   value: string;
 }
 
-interface MemberRemoveMultipleParams {
+export interface RemoveMultipleParams {
   uids: (string | undefined)[];
 }
 
-/** user.ts */
-export interface UserCreateSingleParams extends Omit<UserData, 'createdAt'> {
-  uid: string;
-  provider: 'naver' | 'kakao' | 'email';
-}
+/*---------- user.ts ----------*/
+export interface CreateSingleParams extends Omit<UserData, 'createdAt'> {}
 
-export interface UserFetchSingleParams {
+export interface FetchSingleParams {
   uid: string;
 }
 
-export interface UserFetchMultipleByChurchAndDepartment {
+export interface FetchMultipleByChurchAndDepartment {
   church: string;
   department: string;
 }
 
-export interface UserModifySingle {
+export interface ModifySingle {
   uid: string;
   [key: string]: any;
 }
 
-export interface UserDeleteSingleParams {
+export interface DeleteSingleParams {
   uid: string;
 }

@@ -17,17 +17,17 @@ import {
 
 import type { MemberData } from '@/types';
 import type {
-  MemberCreateMultipleParams,
-  MemberFetchAllParmas,
-  MemberFetchByGradeGroupParams,
-  MemberModifySingleParams,
-  MemberRemoveMultipleParams,
+  CreateMultipleParams,
+  FetchAllParmas,
+  FetchByGradeGroupParams,
+  ModifySingleParams,
+  RemoveMultipleParams,
 } from '@/types/store';
 
 export const useMemberStore = defineStore('member', {
   state: () => ({}),
   actions: {
-    createMultiple(params: MemberCreateMultipleParams) {
+    createMultiple(params: CreateMultipleParams) {
       const { church, department, members } = params;
 
       members.forEach(async (member) => {
@@ -41,7 +41,7 @@ export const useMemberStore = defineStore('member', {
       });
     },
 
-    async fetchAll(params: MemberFetchAllParmas) {
+    async fetchAll(params: FetchAllParmas) {
       const { church, department, job } = params;
 
       const q = query(
@@ -71,7 +71,7 @@ export const useMemberStore = defineStore('member', {
       return arraySort(members, ['grade', 'group', 'name']);
     },
 
-    async fetchByGradeGroup(params: MemberFetchByGradeGroupParams) {
+    async fetchByGradeGroup(params: FetchByGradeGroupParams) {
       const { church, department, grade, group, job } = params;
 
       const q = query(
@@ -112,13 +112,13 @@ export const useMemberStore = defineStore('member', {
       return member;
     },
 
-    async modifySingle(params: MemberModifySingleParams) {
+    async modifySingle(params: ModifySingleParams) {
       return await updateDoc(doc(db, 'newMembers', params.uid), {
         [params.field]: params.value,
       });
     },
 
-    removeMultiple(params: MemberRemoveMultipleParams) {
+    removeMultiple(params: RemoveMultipleParams) {
       params.uids.forEach(async (uid) => {
         if (uid) {
           await deleteDoc(doc(db, 'newMembers', uid));

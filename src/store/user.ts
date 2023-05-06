@@ -17,10 +17,10 @@ import { deleteUser, signOut } from 'firebase/auth';
 import { Collection } from '@/enums';
 import type { UserData } from '@/types';
 import type {
-  UserCreateSingleParams,
-  UserFetchSingleParams,
-  UserFetchMultipleByChurchAndDepartment,
-  UserModifySingle,
+  CreateSingleParams,
+  FetchSingleParams,
+  FetchMultipleByChurchAndDepartment,
+  ModifySingle,
 } from '@/types/store';
 
 interface UserStoreState {
@@ -34,7 +34,7 @@ export const useUserStore = defineStore('user', {
     userData: null,
   }),
   actions: {
-    async createSingle(params: UserCreateSingleParams) {
+    async createSingle(params: CreateSingleParams) {
       try {
         const { uid, ...newUser } = params;
 
@@ -47,7 +47,7 @@ export const useUserStore = defineStore('user', {
       }
     },
 
-    async fetchSingle(params: UserFetchSingleParams) {
+    async fetchSingle(params: FetchSingleParams) {
       try {
         const docRef = doc(db, Collection.USERS, params.uid);
         const docSnap = await getDoc(docRef);
@@ -65,7 +65,7 @@ export const useUserStore = defineStore('user', {
      * 관리자 페이지에서 가입자 전체 목록 읽어오기
      */
     async fetchMultipleByChurchAndDepartment(
-      params: UserFetchMultipleByChurchAndDepartment
+      params: FetchMultipleByChurchAndDepartment
     ) {
       const { church, department } = params;
 
@@ -87,7 +87,7 @@ export const useUserStore = defineStore('user', {
     /**
      * 유저 정보 수정 함수 - 속성 1개
      */
-    async modifySingle(params: UserModifySingle) {
+    async modifySingle(params: ModifySingle) {
       const { uid, keyName, keyValue } = params;
       return await updateDoc(doc(db, 'newUsers', uid), {
         [keyName]: keyValue,
