@@ -1,13 +1,13 @@
 <template>
-  <section class="flex flex-col px-5 py-8 justify-between">
+  <section class="flex flex-col px-5 py-8 justify-evenly bg-custom">
     <div class="text-lg text-center">
       <h1 class="text-2xl font-bold">오두막</h1>
       <p>아이들과 가까워지는 곳</p>
     </div>
 
-    <Image :src="bgLogin" />
+    <Image :src="logoTransparent" />
 
-    <div class="flex flex-col gap-2 justify-end">
+    <div class="flex flex-col gap-2">
       <div
         class="flex gap-2 p-2 rounded bg-[#fee500] items-center justify-center cursor-pointer select-none"
         @click="loginWithKakao"
@@ -119,7 +119,6 @@ import { useCookies } from '@vueuse/integrations/useCookies';
 // import { useVuelidate } from '@vuelidate/core';
 // import { required } from '@vuelidate/validators';
 
-import bgLogin from '@/assets/images/bg-login.png';
 import logoTransparent from '@/assets/images/logo-transparent.png';
 import loginKakao from '@/assets/images/login-kakao.png';
 import loginNaver from '@/assets/images/login-naver.png';
@@ -214,3 +213,16 @@ const loginWithNaver = () => {
 //   }
 // };
 </script>
+
+<style scoped>
+.bg-custom {
+  background: linear-gradient(
+    330deg,
+    rgba(248, 250, 252, 1) 0%,
+    rgba(194, 203, 215, 1) 25%,
+    rgba(148, 163, 184, 1) 50%,
+    rgba(208, 215, 225, 1) 75%,
+    rgba(248, 250, 252, 1) 100%
+  );
+}
+</style>
