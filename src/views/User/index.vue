@@ -39,15 +39,15 @@
         <span>{{ userStore.userData?.name }}</span>
       </div>
 
-      <div class="flex px-5 py-2 items-center justify-between">
+      <!-- <div class="flex px-5 py-2 items-center justify-between">
         <span>생년월일</span>
         <span>{{ userStore.userData?.birth || '없음' }}</span>
-      </div>
+      </div> -->
 
-      <div class="flex px-5 py-2 items-center justify-between">
+      <!-- <div class="flex px-5 py-2 items-center justify-between">
         <span>휴대폰 번호</span>
         <span>{{ userStore.userData?.phone || '없음' }}</span>
-      </div>
+      </div> -->
 
       <div class="flex px-5 py-2 items-center justify-between">
         <span>이메일</span>
@@ -128,12 +128,9 @@
     </div>
 
     <div class="mt-3 mb-6 bg-slate-100">
-      <div
-        class="flex px-5 py-2 items-center justify-between cursor-pointer"
-        @click="deleteUser"
-      >
+      <div class="flex px-5 py-2 items-center justify-between">
         <span>탈퇴하기</span>
-        <i class="pi pi-angle-right"></i>
+        <i class="pi pi-angle-right cursor-pointer" @click="deleteUser"></i>
       </div>
     </div>
 

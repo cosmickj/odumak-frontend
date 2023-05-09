@@ -73,6 +73,7 @@ export const useAttendanceStore = defineStore('attendance', {
             grade: member.grade,
             group: member.group,
             job: member.job,
+            role: member.role,
             attendance: memberAttendance?.attendance || attendance,
           };
         });
