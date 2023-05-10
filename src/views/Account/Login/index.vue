@@ -28,7 +28,6 @@
     <!-- <div class="flex flex-col">
       <form class="flex flex-col gap-3" @submit.prevent="loginWithEmail">
         <InputText
-          autofocus
           v-model="v$.email.$model"
           id="email"
           class="w-full"
@@ -102,7 +101,6 @@
             class="p-button-info"
             label="좋아요"
             icon="pi pi-check"
-            autofocus
             @click="setDialog"
           />
         </RouterLink>
