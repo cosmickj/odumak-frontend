@@ -158,7 +158,7 @@
   </DataView>
 
   <div v-else>
-    <Chart type="doughnut" :data="chartData" />
+    <Chart class="max-w-[300px] mx-auto" type="doughnut" :data="chartData" />
 
     <p v-if="chartData" class="mt-4 flex gap-2 items-baseline justify-center">
       <span class="text-sm">미입력:</span>
