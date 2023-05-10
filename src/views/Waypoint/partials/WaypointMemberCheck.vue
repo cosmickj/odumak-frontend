@@ -149,9 +149,7 @@ const complete = async () => {
           ele.classList.remove('wrong');
         });
       }, 900);
-    }
-    //
-    else {
+    } else {
       alert('인증되었습니다! 감사합니다!');
 
       await userStore.modifyMultiple({

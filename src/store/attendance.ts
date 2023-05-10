@@ -50,7 +50,9 @@ export const useAttendanceStore = defineStore('attendance', {
       );
       const qSnapshot = await getDocs(q);
 
-      const attendanceData = qSnapshot.docs.map((doc) => doc.data());
+      const attendanceData = qSnapshot.docs.map((doc) => {
+        return { ...doc.data(), uid: doc.id } as any;
+      });
 
       const attendances: AttendanceData[] = members
         .filter((member) => member.registeredAt <= params.attendanceDate)

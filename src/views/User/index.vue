@@ -149,7 +149,6 @@
 
       <template #footer>
         <Button
-          autofocus
           class="text-xs"
           icon="pi pi-check"
           label="추가 정보 입력하기"

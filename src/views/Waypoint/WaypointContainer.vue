@@ -27,12 +27,12 @@ const userStore = useUserStore();
 
 const items = ref([
   {
-    label: '이름',
-    to: { name: 'NameCheck' },
-  },
-  {
     label: '소속',
     to: { name: 'GroupCheck' },
+  },
+  {
+    label: '이름',
+    to: { name: 'NameCheck' },
   },
   {
     label: '담임 여부',

@@ -27,7 +27,7 @@ onMounted(async () => {
     await window.Kakao.Auth.setAccessToken(kakaoToken);
 
     const statusInfo = await window.Kakao.Auth.getStatusInfo();
-    const uid = SHA1(statusInfo.user.id).toString();
+    const uid = SHA1(`${statusInfo.user.id}`).toString();
 
     const { data: customToken } = await getCustomToken(uid);
     await signInWithCustomToken(auth, customToken);
@@ -40,25 +40,22 @@ onMounted(async () => {
     if (user === null) {
       const newUser: UserData = {
         uid,
-        email: statusInfo.user.kakao_account.email,
+        email: statusInfo.user.kakao_account.email || '',
         provider: 'kakao' as const,
-        profileImage: statusInfo.user.kakao_account.profile.thumbnail_image_url,
-        name: statusInfo.user.kakao_account.profile.nickname,
-        birth: null,
+        profileImage:
+          statusInfo.user.kakao_account.profile.thumbnail_image_url || '',
+        name: statusInfo.user.kakao_account.profile.nickname || '',
         church: null,
         department: null,
         grade: null,
         group: null,
-        phone: '',
         role: null,
         isAccepted: false,
         isRejected: false,
         rejectedReason: '',
       };
-
       await userStore.createSingle(newUser);
     }
-
     await userStore.fetchSingle({ uid });
     router.push({ name: 'HomeView' });
   } catch (error) {

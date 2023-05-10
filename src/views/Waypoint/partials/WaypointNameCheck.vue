@@ -12,13 +12,7 @@
     </div>
 
     <div class="flex justify-between">
-      <Button
-        text
-        severity="secondary"
-        label="홈으로"
-        @click="router.push({ name: 'HomeView' })"
-      />
-
+      <Button text severity="secondary" label="이전으로" @click="prevPage" />
       <Button severity="warning" label="다음으로" @click="nextPage" />
     </div>
   </div>
@@ -40,6 +34,10 @@ const props = defineProps<{
 
 const emit = defineEmits(['prevPage', 'nextPage']);
 
+if (!props.formState.church || !props.formState.department) {
+  router.push({ name: 'GroupCheck' });
+}
+
 const formState = reactive(Object.assign({}, props.formState));
 
 const rules = computed(() => ({
@@ -47,6 +45,10 @@ const rules = computed(() => ({
 }));
 
 const v$ = useVuelidate(rules, formState);
+
+const prevPage = () => {
+  emit('prevPage', { index: 1 });
+};
 
 const nextPage = async () => {
   const isFormCorrect = await v$.value.$validate();
@@ -65,7 +67,7 @@ const nextPage = async () => {
       `${formState.name} 선생님은 현재 ${formState.department} ${formState.church}에 등록되어 있지 않아 승인이 불가능합니다. 관리자에게 문의해주시기 바랍니다.`
     );
   } else {
-    emit('nextPage', { index: 0, formState });
+    emit('nextPage', { index: 1, formState });
   }
 };
 </script>

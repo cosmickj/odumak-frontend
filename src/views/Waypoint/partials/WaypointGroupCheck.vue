@@ -27,7 +27,13 @@
     </div>
 
     <div class="flex justify-between">
-      <Button text severity="secondary" label="이전으로" @click="prevPage" />
+      <Button
+        text
+        severity="secondary"
+        label="홈으로"
+        @click="router.push({ name: 'HomeView' })"
+      />
+
       <Button severity="warning" label="다음으로" @click="nextPage" />
     </div>
   </div>
@@ -35,6 +41,7 @@
 
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
+import { useRouter } from 'vue-router';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import { CHURCH_OPTIONS, DEPARTMENT_OPTIONS } from '@/constants/common';
@@ -44,6 +51,8 @@ const emit = defineEmits(['prevPage', 'nextPage']);
 const props = defineProps<{
   formState: any;
 }>();
+
+const router = useRouter();
 
 const formState = reactive(Object.assign({}, props.formState));
 
@@ -59,11 +68,7 @@ const nextPage = async () => {
   if (!isFormCorrect) {
     return;
   }
-  emit('nextPage', { index: 1, formState });
-};
-
-const prevPage = () => {
-  emit('prevPage', { index: 1 });
+  emit('nextPage', { index: 0, formState });
 };
 </script>
 
