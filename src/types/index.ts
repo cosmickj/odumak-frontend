@@ -47,7 +47,7 @@ export interface MemberData {
 export interface AttendanceData
   extends Pick<
     MemberData,
-    'name' | 'church' | 'department' | 'job' | 'grade' | 'group'
+    'name' | 'church' | 'department' | 'job' | 'grade' | 'group' | 'role'
   > {
   uid: string;
   attendance: {
