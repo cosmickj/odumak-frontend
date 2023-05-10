@@ -79,12 +79,21 @@
     <template #list="slotProps">
       <Card>
         <template #content>
-          <div class="flex items-center justify-between">
-            <Avatar icon="pi pi-user" size="large" shape="circle" />
-            <div class="text-center">
+          <div class="flex gap-2 items-center justify-between">
+            <p class="font-bold">
+              {{ slotProps.data.name }}
+            </p>
+
+            <div
+              v-if="slotProps.data.grade && slotProps.data.group"
+              class="flex-1 text-sm text-center"
+            >
+              <p>
+                {{ formatRole(slotProps.data.role) }}
+              </p>
               <p>{{ slotProps.data.grade }} - {{ slotProps.data.group }}</p>
-              <p class="font-bold">{{ slotProps.data.name }}</p>
             </div>
+
             <div class="flex gap-2">
               <Avatar
                 label="현"
@@ -110,10 +119,24 @@
     <template #grid="slotProps">
       <Card class="col-span-1">
         <template #content>
-          <div class="flex flex-col gap-2 items-center justify-center">
+          <div class="flex flex-col gap-2 items-center justify-between">
             <Avatar icon="pi pi-user" size="large" shape="circle" />
-            <p>{{ slotProps.data.grade }} - {{ slotProps.data.group }}</p>
             <p class="font-bold">{{ slotProps.data.name }}</p>
+
+            <div
+              v-if="slotProps.data.grade && slotProps.data.group"
+              class="flex-1 text-sm text-center flex gap-2"
+            >
+              <span>
+                {{ formatRole(slotProps.data.role) }}
+              </span>
+              <span>
+                {{ slotProps.data.grade }} - {{ slotProps.data.group }}
+              </span>
+            </div>
+
+            <div v-else class="min-h-[20px]"></div>
+
             <div class="flex mt-2">
               <Avatar
                 label="현"
@@ -150,6 +173,7 @@ import { computed, ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/store/user';
 import { useAttendanceStore } from '@/store/attendance';
+import { formatRole } from '@/utils/useFormat';
 import { GRADE_OPTIONS, GROUP_OPTIONS } from '@/constants/common';
 
 const router = useRouter();

@@ -18,7 +18,7 @@ const formatGender = (value: Gender) => {
 
 const formatRole = (value: UserRole) => {
   if (value === 'admin') return '관리자';
-  else if (value === 'common') return '일반교사';
+  else if (value === 'common') return '해당없음';
   else if (value === 'main') return '담임';
   else if (value === 'sub') return '부담임';
   else return '';
