@@ -85,12 +85,11 @@
 
       <template #footer>
         <Button
-          autofocus
           class="text-xs"
           icon="pi pi-check"
           label="추가 정보 입력하기"
           severity="success"
-          @click="waypointPage"
+          @click="router.push({ name: 'GroupCheck' })"
         />
       </template>
     </Dialog>
@@ -115,10 +114,6 @@ onBeforeRouteLeave((to, from, next) => {
     next();
   }
 });
-
-const waypointPage = () => {
-  router.push({ name: 'GroupCheck' });
-};
 </script>
 
 <style scoped>

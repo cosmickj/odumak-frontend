@@ -95,7 +95,7 @@ export const useMemberStore = defineStore('member', {
     async fetchByName(params: {
       church: string;
       department: string;
-      name?: string;
+      name: string;
     }) {
       const { church, department, name } = params;
 

@@ -53,8 +53,11 @@ export const useUserStore = defineStore('user', {
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-          return (this.userData = docSnap.data() as UserData);
-          // return docSnap.data() as UserData;
+          this.userData = {
+            ...(docSnap.data() as UserData),
+            uid: params.uid,
+          };
+          return this.userData;
         }
         return null;
       } catch (error) {

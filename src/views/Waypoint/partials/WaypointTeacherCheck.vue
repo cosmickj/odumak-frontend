@@ -58,7 +58,11 @@ const props = defineProps<{
   formState: any;
 }>();
 
-if (!props.formState.church || !props.formState.department) {
+if (
+  !props.formState.church ||
+  !props.formState.department ||
+  !props.formState.name
+) {
   router.push({ name: 'GroupCheck' });
 }
 
