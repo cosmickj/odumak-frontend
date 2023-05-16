@@ -20,11 +20,14 @@
         <CheckerTeachers
           v-if="userData.role === 'admin'"
           :attendances="attendances"
+          :attendance-date="attendanceDate"
         />
+
         <CheckerStudents
           v-else-if="userData.role === 'main' || userData.role === 'sub'"
           :attendances-template="attendances"
         />
+
         <Dialog
           v-else
           modal
