@@ -15,23 +15,25 @@ import {
 import { deleteUser, signOut } from 'firebase/auth';
 
 import { Collection } from '@/enums';
-import type { UserData } from '@/types';
 import type {
   CreateSingleParams,
   FetchSingleParams,
   FetchMultipleByChurchAndDepartment,
   ModifySingle,
 } from '@/types/store';
+import type { UserData } from '@/types';
 
 interface UserStoreState {
-  isAuthReady: boolean;
   userData: UserData | null;
+  isAuthReady: boolean;
+  isVisible: boolean;
 }
 
 export const useUserStore = defineStore('user', {
   state: (): UserStoreState => ({
-    isAuthReady: false,
     userData: null,
+    isAuthReady: false,
+    isVisible: false,
   }),
   actions: {
     async createSingle(params: CreateSingleParams) {
