@@ -83,6 +83,64 @@ export const useAttendanceStore = defineStore('attendance', {
       this.attendancesRecord.daily = attendances;
     },
 
+    async fetchAttendancesByGradeGroup(
+      params: Required<FetchAttendancesParams>
+    ) {
+      this.attendancesRecord.daily = [];
+
+      const memberStore = useMemberStore();
+      const members = await memberStore.fetchByGradeGroup({
+        church: params.church,
+        department: params.department,
+        grade: params.grade,
+        group: params.group,
+        job: params.job,
+      });
+
+      const q = query(
+        attendancesColl,
+        where('church', '==', params.church),
+        where('department', '==', params.department),
+        where('job', '==', params.job),
+        where('attendance.date', '==', params.attendanceDate),
+        where('grade', '==', params.grade),
+        where('group', '==', params.group)
+      );
+      const qSnapshot = await getDocs(q);
+
+      const attendanceData = qSnapshot.docs.map((doc) => {
+        return { ...doc.data(), uid: doc.id } as any;
+      });
+
+      const attendances: AttendanceData[] = members
+        .filter((member) => member.registeredAt <= params.attendanceDate)
+        .map((member) => {
+          const memberAttendance = attendanceData.find((attendance) => {
+            return (
+              attendance.name === member.name &&
+              attendance.church === member.church &&
+              attendance.department === member.department &&
+              attendance.job === member.job
+            );
+          });
+          const attendance = { status: '', date: null };
+
+          return {
+            uid: memberAttendance?.uid || '',
+            name: member.name,
+            church: member.church,
+            department: member.department,
+            grade: member.grade,
+            group: member.group,
+            job: member.job,
+            role: member.role,
+            attendance: memberAttendance?.attendance || attendance,
+          };
+        });
+
+      this.attendancesRecord.daily = attendances;
+    },
+
     async modifyAttendance(params: ModifyAttendanceParams) {
       return await updateDoc(doc(db, 'attendances', params.uid), {
         'attendance.status': params.attendance.status,

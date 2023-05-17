@@ -5,10 +5,14 @@
     :key="i"
   >
     <div class="flex items-center justify-between">
-      <span>{{ attendance.name }}</span>
+      <p class="flex gap-2">
+        <span>{{ attendance.name }}</span>
+        <span>{{ attendance.grade }}학년 {{ attendance.group }}반</span>
+        <span>{{ formatRole(attendance.role) }}</span>
+      </p>
 
       <Button
-        v-if="attendance.role !== 'common'"
+        v-if="attendance.role === 'main'"
         icon="pi pi-chevron-down"
         class="p-button-rounded p-button-text p-button-secondary p-button-sm"
         @click="getSubAttendances(attendance)"
@@ -41,8 +45,8 @@
     <template #footer>
       <Button
         label="저장"
-        severity="warning"
         size="small"
+        severity="warning"
         @click="visible = false"
       />
     </template>
@@ -53,6 +57,7 @@
 import CheckerStudents from './CheckerStudents.vue';
 import { ref } from 'vue';
 import { useAttendanceStore } from '@/store/attendance';
+import { formatRole } from '@/utils/useFormat';
 import type { AttendanceData } from '@/types';
 
 const props = defineProps<{
@@ -70,11 +75,13 @@ const getSubAttendances = async (attd: AttendanceData) => {
   try {
     isLoading.value = true;
 
-    await attendanceStore.fetchAttendances({
+    await attendanceStore.fetchAttendancesByGradeGroup({
+      attendanceDate: props.attendanceDate,
       church: attd.church!,
       department: attd.department!,
+      grade: attd.grade,
+      group: attd.group,
       job: 'student',
-      attendanceDate: props.attendanceDate,
     });
 
     subAttendances.value = attendanceStore.attendancesRecord.daily;
@@ -91,6 +98,9 @@ const getSubAttendances = async (attd: AttendanceData) => {
 <style>
 .p-dialog-custom .p-dialog-content {
   padding: unset;
+}
+.p-dialog-custom .p-dialog-footer {
+  padding: 16px;
 }
 @media (max-width: 320px) {
   .p-dialog-custom .p-dialog-content {
