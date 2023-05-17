@@ -133,36 +133,12 @@
         <i class="pi pi-angle-right cursor-pointer" @click="deleteUser"></i>
       </div>
     </div>
-
-    <Dialog
-      modal
-      v-model:visible="isVisible"
-      class="w-1/2"
-      position="bottom"
-      header="승인이 필요합니다"
-      :breakpoints="{ '640px': '90vw' }"
-    >
-      <div class="break-keep">
-        <span class="font-semibold"> 추가정보(교회, 당담부서, 학급 등) </span>
-        를 입력해주세요.
-      </div>
-
-      <template #footer>
-        <Button
-          class="text-xs"
-          icon="pi pi-check"
-          label="추가 정보 입력하기"
-          severity="success"
-          @click="waypointPage"
-        />
-      </template>
-    </Dialog>
   </section>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import { onBeforeRouteLeave, useRouter } from 'vue-router';
+import { computed } from 'vue';
+import { useRouter } from 'vue-router';
 import { useUserStore } from '@/store/user';
 
 import youngeunElementLogo from '@/assets/images/youngeun-element-logo.png';
@@ -236,22 +212,5 @@ const deleteUser = async () => {
   } catch (error) {
     alert('다시 로그인 후 시도해주세요.');
   }
-};
-
-const isVisible = ref(false);
-
-onBeforeRouteLeave((to, from, next) => {
-  if (
-    (to.name as string).includes('UserEdit') &&
-    !userStore.userData?.isAccepted
-  ) {
-    isVisible.value = true;
-  } else {
-    next();
-  }
-});
-
-const waypointPage = () => {
-  router.push({ name: 'GroupCheck' });
 };
 </script>

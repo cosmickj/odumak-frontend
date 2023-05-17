@@ -69,51 +69,14 @@
         route-name="AttendanceTrackerTotal"
       />
     </div>
-
-    <Dialog
-      modal
-      v-model:visible="isVisible"
-      class="w-1/2"
-      position="bottom"
-      header="승인이 필요합니다"
-      :breakpoints="{ '640px': '90vw' }"
-    >
-      <div class="break-keep">
-        <span class="font-semibold"> 추가정보(교회, 당담부서, 학급 등) </span>
-        를 입력해주세요.
-      </div>
-
-      <template #footer>
-        <Button
-          class="text-xs"
-          icon="pi pi-check"
-          label="추가 정보 입력하기"
-          severity="success"
-          @click="router.push({ name: 'GroupCheck' })"
-        />
-      </template>
-    </Dialog>
   </section>
 </template>
 
 <script setup lang="ts">
 import HomeMenu from './components/HomeMenu.vue';
-import { ref } from 'vue';
-import { onBeforeRouteLeave, useRouter } from 'vue-router';
 import { useUserStore } from '@/store/user';
 
-const router = useRouter();
 const { userData } = useUserStore();
-
-const isVisible = ref(false);
-
-onBeforeRouteLeave((to, from, next) => {
-  if ((to.name as string).includes('Attendance') && !userData?.isAccepted) {
-    isVisible.value = true;
-  } else {
-    next();
-  }
-});
 </script>
 
 <style scoped>

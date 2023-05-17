@@ -15,23 +15,25 @@ import {
 import { deleteUser, signOut } from 'firebase/auth';
 
 import { Collection } from '@/enums';
-import type { UserData } from '@/types';
 import type {
   CreateSingleParams,
   FetchSingleParams,
   FetchMultipleByChurchAndDepartment,
   ModifySingle,
 } from '@/types/store';
+import type { UserData } from '@/types';
 
 interface UserStoreState {
-  isAuthReady: boolean;
   userData: UserData | null;
+  isAuthReady: boolean;
+  isVisible: boolean;
 }
 
 export const useUserStore = defineStore('user', {
   state: (): UserStoreState => ({
-    isAuthReady: false,
     userData: null,
+    isAuthReady: false,
+    isVisible: false,
   }),
   actions: {
     async createSingle(params: CreateSingleParams) {
@@ -92,7 +94,7 @@ export const useUserStore = defineStore('user', {
      */
     async modifySingle(params: ModifySingle) {
       const { uid, keyName, keyValue } = params;
-      return await updateDoc(doc(db, 'newUsers', uid), {
+      return await updateDoc(doc(db, 'users', uid), {
         [keyName]: keyValue,
       });
     },
@@ -101,7 +103,7 @@ export const useUserStore = defineStore('user', {
      */
     async modifyMultiple(payload: any) {
       const { uid, ...params } = payload;
-      return await updateDoc(doc(db, 'newUsers', uid), {
+      return await updateDoc(doc(db, 'users', uid), {
         ...params,
       });
     },

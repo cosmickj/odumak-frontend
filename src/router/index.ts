@@ -169,7 +169,9 @@ router.beforeEach(async (to, from, next) => {
       return next({ name: 'HomeView' });
     }
     if (needAccept && !userData?.isAccepted) {
-      alert('승인 받은 유저만 접근할 수 있습니다.');
+      userStore.$patch({
+        isVisible: true,
+      });
       return next({ name: 'HomeView' });
     }
     if (needAdmin && userData?.role !== 'admin') {

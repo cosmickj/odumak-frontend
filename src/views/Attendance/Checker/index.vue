@@ -2,63 +2,40 @@
   <main class="overflow-auto flex flex-col h-full p-5">
     <CheckerHeader @submit="onSubmit" />
 
-    <template v-if="userData.isAccepted">
-      <Calendar
-        touchUI
-        v-model="attendanceDate"
-        class="my-5"
-        input-class="text-center"
-        placeholder="날짜를 선택해주세요"
-        :max-date="maxDate"
-        :disabledDays="[1, 2, 3, 4, 5, 6]"
-        @date-select="getAttendances"
+    <Calendar
+      touchUI
+      v-model="attendanceDate"
+      class="my-5"
+      input-class="text-center"
+      placeholder="날짜를 선택해주세요"
+      :max-date="maxDate"
+      :disabledDays="[1, 2, 3, 4, 5, 6]"
+      @date-select="getAttendances"
+    />
+
+    <ProgressSpinner v-if="isLoading" />
+
+    <section v-else>
+      <CheckerTeachers
+        v-if="userData.role === 'admin'"
+        :attendances="attendances"
+        :attendance-date="attendanceDate"
       />
 
-      <ProgressSpinner v-if="isLoading" />
+      <CheckerStudents
+        v-else-if="userData.role === 'main' || userData.role === 'sub'"
+        :attendances-template="attendances"
+      />
 
-      <section v-else>
-        <CheckerTeachers
-          v-if="userData.role === 'admin'"
-          :attendances="attendances"
-          :attendance-date="attendanceDate"
-        />
-
-        <CheckerStudents
-          v-else-if="userData.role === 'main' || userData.role === 'sub'"
-          :attendances-template="attendances"
-        />
-
-        <Dialog
-          v-else
-          modal
-          header="담임이 아닙니다"
-          v-model:visible="visible"
-          :breakpoints="{ '450px': '85vw' }"
-          @hide="navigateHome"
-        >
-          <p>출석 체크는 담임, 부담임 선생님만 이용할 수 있습니다.</p>
-
-          <template #footer>
-            <Button
-              label="알겠습니다"
-              class="p-button-info"
-              icon="pi pi-check"
-              @click="navigateHome"
-            />
-          </template>
-        </Dialog>
-      </section>
-    </template>
-
-    <template v-else>
       <Dialog
+        v-else
         modal
-        header="승인이 필요합니다"
+        header="담임이 아닙니다"
         v-model:visible="visible"
         :breakpoints="{ '450px': '85vw' }"
         @hide="navigateHome"
       >
-        <p>서기 선생님의 승인 이전에는 출석 체크를 할 수 없습니다.</p>
+        <p>출석 체크는 담임, 부담임 선생님만 이용할 수 있습니다.</p>
 
         <template #footer>
           <Button
@@ -69,7 +46,7 @@
           />
         </template>
       </Dialog>
-    </template>
+    </section>
   </main>
 </template>
 
@@ -122,12 +99,24 @@ const getAttendances = async () => {
       return;
     }
 
-    await attendanceStore.fetchAttendances({
-      church: userData.value.church!,
-      department: userData.value.department!,
-      job: requestJob.value,
-      attendanceDate: attendanceDate.value,
-    });
+    // 입력하는 사람이 관리자인가 교사인가
+    if (requestJob.value === 'teacher') {
+      await attendanceStore.fetchAttendances({
+        church: userData.value.church!,
+        department: userData.value.department!,
+        job: requestJob.value,
+        attendanceDate: attendanceDate.value,
+      });
+    } else if (requestJob.value === 'student') {
+      await attendanceStore.fetchAttendancesByGradeGroup({
+        attendanceDate: attendanceDate.value,
+        church: userData.value.church!,
+        department: userData.value.department!,
+        grade: userData.value.grade!,
+        group: userData.value.group!,
+        job: requestJob.value,
+      });
+    }
 
     attendances.value = attendanceStore.attendancesRecord.daily;
   } catch (error) {
@@ -137,9 +126,7 @@ const getAttendances = async () => {
   }
 };
 
-onMounted(async () => {
-  await getAttendances();
-});
+onMounted(async () => await getAttendances());
 
 const onSubmit = () => {
   try {
