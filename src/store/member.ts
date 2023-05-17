@@ -37,7 +37,7 @@ export const useMemberStore = defineStore('member', {
           department,
           createdAt: serverTimestamp(),
         };
-        return await addDoc(collection(db, 'newMembers'), param);
+        return await addDoc(collection(db, 'members'), param);
       });
     },
 
@@ -113,7 +113,7 @@ export const useMemberStore = defineStore('member', {
     },
 
     async modifySingle(params: ModifySingleParams) {
-      return await updateDoc(doc(db, 'newMembers', params.uid), {
+      return await updateDoc(doc(db, 'members', params.uid), {
         [params.field]: params.value,
       });
     },
@@ -121,7 +121,7 @@ export const useMemberStore = defineStore('member', {
     removeMultiple(params: RemoveMultipleParams) {
       params.uids.forEach(async (uid) => {
         if (uid) {
-          await deleteDoc(doc(db, 'newMembers', uid));
+          await deleteDoc(doc(db, 'members', uid));
         }
       });
     },

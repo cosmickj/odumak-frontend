@@ -94,7 +94,7 @@ export const useUserStore = defineStore('user', {
      */
     async modifySingle(params: ModifySingle) {
       const { uid, keyName, keyValue } = params;
-      return await updateDoc(doc(db, 'newUsers', uid), {
+      return await updateDoc(doc(db, 'users', uid), {
         [keyName]: keyValue,
       });
     },
@@ -103,7 +103,7 @@ export const useUserStore = defineStore('user', {
      */
     async modifyMultiple(payload: any) {
       const { uid, ...params } = payload;
-      return await updateDoc(doc(db, 'newUsers', uid), {
+      return await updateDoc(doc(db, 'users', uid), {
         ...params,
       });
     },

@@ -84,7 +84,7 @@ export const useAttendanceStore = defineStore('attendance', {
     },
 
     async modifyAttendance(params: ModifyAttendanceParams) {
-      return await updateDoc(doc(db, 'newAttendances', params.uid), {
+      return await updateDoc(doc(db, 'attendances', params.uid), {
         'attendance.status': params.attendance.status,
       });
     },
