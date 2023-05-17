@@ -4,7 +4,7 @@ import { Timestamp } from 'firebase/firestore';
 export type Gender = 'male' | 'female';
 
 /** Account */
-export type UserRole = 'admin' | 'main' | 'sub' | 'common';
+export type UserRole = 'admin' | 'main' | 'sub' | 'common' | null;
 
 export interface UserData {
   uid: string;

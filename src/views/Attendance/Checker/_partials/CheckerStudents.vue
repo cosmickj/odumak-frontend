@@ -1,7 +1,7 @@
 <template>
   <div
     v-for="(member, i) in attendancesTemplate"
-    class="flex mt-[-1px] p-2 border border-slate-300 items-center justify-around"
+    class="flex mt-[-1px] p-2 border border-slate-300 items-center justify-around checker-students-cont"
     :key="i"
   >
     <span>{{ member.name }}</span>
@@ -26,3 +26,14 @@ defineProps<{
   attendancesTemplate: AttendanceData[] | undefined;
 }>();
 </script>
+
+<style scoped>
+@media (max-width: 320px) {
+  .checker-students-cont {
+    font-size: 12px;
+  }
+  :deep(.p-component) {
+    font-size: 12px;
+  }
+}
+</style>
