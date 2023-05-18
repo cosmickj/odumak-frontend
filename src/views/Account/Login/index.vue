@@ -1,13 +1,13 @@
 <template>
-  <section class="flex flex-col px-5 py-8 justify-evenly bg-custom">
-    <div class="text-lg text-center">
-      <h1 class="text-2xl font-bold">오두막</h1>
-      <p>아이들과 가까워지는 곳</p>
+  <section class="flex flex-col px-5 py-8 bg-custom justify-between">
+    <div class="text-lg text-center text-[#f5e1da]">
+      <h1 class="text-3xl font-bold">오두막</h1>
+      <h3>아이들과 가까워지는 곳</h3>
     </div>
 
     <Image :src="logoTransparent" />
 
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-3">
       <div
         class="flex gap-2 p-2 rounded bg-[#fee500] items-center justify-center cursor-pointer select-none"
         @click="loginWithKakao"
@@ -215,12 +215,13 @@ const loginWithNaver = () => {
 <style scoped>
 .bg-custom {
   background: linear-gradient(
-    330deg,
-    rgba(248, 250, 252, 1) 0%,
-    rgba(194, 203, 215, 1) 25%,
-    rgba(148, 163, 184, 1) 50%,
-    rgba(208, 215, 225, 1) 75%,
-    rgba(248, 250, 252, 1) 100%
+    300deg,
+    #94a3b8 15%,
+    #8c93ae 25%,
+    #8882a2 45%,
+    #867193 65%,
+    #855f80 90%,
+    #834d6a 100%
   );
 }
 </style>
