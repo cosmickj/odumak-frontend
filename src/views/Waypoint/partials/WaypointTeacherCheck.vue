@@ -5,11 +5,11 @@
         <label for="role" class="mb-1">담임 여부</label>
         <SelectButton
           unselectable
-          class="flex break-keep"
-          :options="TEACHER_ROLE"
+          v-model="formState.role"
+          class="flex"
           optionLabel="label"
           optionValue="value"
-          v-model="formState.role"
+          :options="TEACHER_ROLE"
         />
       </div>
 
@@ -106,5 +106,10 @@ const nextPage = async () => {
 <style scoped>
 :deep(.p-selectbutton .p-button.p-component) {
   flex: 1;
+}
+@media (max-width: 320px) {
+  :deep(.p-selectbutton .p-button.p-component) {
+    font-size: 12px;
+  }
 }
 </style>

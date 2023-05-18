@@ -2,41 +2,48 @@
   <div class="flex-1 flex flex-col justify-between">
     <div>
       <div class="text-lg">
-        <p v-if="formState.role !== 'common'">
+        <p v-if="formState.role === 'common'">
+          아래 이름 중
+          <span class="text-orange-400">
+            {{ formState.church }} {{ formState.department }}
+          </span>
+          공동체를 모두 선택 후 제출하기를 눌러주세요. (최대 3명)
+        </p>
+
+        <p v-else>
+          아래 이름 중
           <span class="text-orange-400">
             {{ formState.church }} {{ formState.department }}
             {{ formState.grade }}학년 {{ formState.group }}반
           </span>
-          <span>
-            담당 확인을 위해 아래 이름 중 담당 학생을 모두 선택 후 제출하기를
-            눌러주세요
-          </span>
-        </p>
-
-        <p v-else>
-          <span class="text-orange-400">
-            {{ formState.church }} {{ formState.department }}
-          </span>
-          <span>
-            소속 확인을 위해 아래 이름 중 같은 소속 선생님을 모두 선택 후
-            제출하기를 눌러주세요
-          </span>
+          어린이를 모두 선택 후 제출하기를 눌러주세요. (최대 3명)
         </p>
       </div>
 
       <div class="grid grid-cols-3 gap-3 py-4">
-        <div
-          v-for="(candidate, i) in candidates"
-          ref="toggleButtonRefs"
-          :key="i"
-        >
-          <ToggleButton
-            class="flex aspect-square bg-white rounded-md text-xs xs:text-base items-center justify-center shadow"
-            v-model="candidate.checked"
-            :on-label="candidate.name"
-            :off-label="candidate.name"
+        <template v-if="!candidates.length">
+          <Skeleton
+            v-for="i in 9"
+            class="aspect-square"
+            style="height: unset"
+            :key="i"
           />
-        </div>
+        </template>
+
+        <template v-else>
+          <div
+            v-for="(candidate, i) in candidates"
+            ref="toggleButtonRefs"
+            :key="i"
+          >
+            <ToggleButton
+              class="flex aspect-square bg-white rounded-md text-xs xs:text-base items-center justify-center shadow"
+              v-model="candidate.checked"
+              :on-label="candidate.name"
+              :off-label="candidate.name"
+            />
+          </div>
+        </template>
       </div>
     </div>
 
@@ -48,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { onActivated, ref } from 'vue';
+import { onActivated, onDeactivated, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { getCurrentUser } from '@/router';
 import { useUserStore } from '@/store/user';
@@ -73,11 +80,45 @@ const emit = defineEmits(['prevPage']);
 
 const members = ref<MemberData[]>([]);
 
+class Candidate {
+  constructor(
+    public name: string,
+    public checked: boolean,
+    public answer: boolean
+  ) {}
+}
+
+const candidates = ref<Candidate[]>([]);
+
+const getCandidates = (members: MemberData[]) => {
+  const candidates = [];
+
+  for (let i = 0; i < 9; i++) {
+    if (!members.length || i > 2) {
+      const fakeName = faker.name.lastName() + faker.name.firstName();
+      candidates.push(new Candidate(fakeName, false, false));
+    } else {
+      const index = Math.floor(Math.random() * members.length);
+      const member = members.splice(index, 1);
+      candidates.push(new Candidate(member[0].name, false, true));
+    }
+  }
+  return candidates;
+};
+
+const shuffle = (array: Candidate[]) => {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+};
+
 onActivated(async () => {
   try {
-    const { church, department, grade, group } = props.formState;
+    const { church, department, grade, group, role } = props.formState;
 
-    if (props.formState.role === 'common') {
+    if (role === 'common') {
       members.value = await memberStore.fetchAll({
         church,
         department,
@@ -99,38 +140,9 @@ onActivated(async () => {
   }
 });
 
-class Candidate {
-  constructor(
-    public name: string,
-    public checked: boolean,
-    public answer: boolean
-  ) {}
-}
-
-const candidates = ref<Candidate[]>([]);
-
-const getCandidates = (students: any[]) => {
-  const candidates = [];
-
-  for (let i = 0; i < 9; i++) {
-    if (!students.length || i > 2) {
-      const fakeName = faker.name.lastName() + faker.name.firstName();
-      candidates.push(new Candidate(fakeName, false, false));
-    } else {
-      const student = students.pop();
-      candidates.push(new Candidate(student.name, false, true));
-    }
-  }
-  return candidates;
-};
-
-const shuffle = (array: Candidate[]) => {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-};
+onDeactivated(() => {
+  candidates.value = [];
+});
 
 const toggleButtonRefs = ref<HTMLDivElement[]>([]);
 

@@ -39,7 +39,7 @@ const items = ref([
     to: { name: 'TeacherCheck' },
   },
   {
-    label: '퀴즈',
+    label: '공동체',
     to: { name: 'MemberCheck' },
   },
 ]);

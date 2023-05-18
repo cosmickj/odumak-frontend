@@ -59,16 +59,17 @@ import InputNumber from 'primevue/inputnumber';
 import InputSwitch from 'primevue/inputswitch';
 import InputText from 'primevue/inputtext';
 import MultiSelect from 'primevue/multiselect';
+import OverlayPanel from 'primevue/overlaypanel';
 import Password from 'primevue/password';
 import ProgressSpinner from 'primevue/progressspinner';
 import RadioButton from 'primevue/radiobutton';
 import SelectButton from 'primevue/selectbutton';
+import Skeleton from 'primevue/skeleton';
+import Steps from 'primevue/steps';
 import Toast from 'primevue/toast';
+import ToggleButton from 'primevue/togglebutton';
 import Toolbar from 'primevue/toolbar';
 import Tree from 'primevue/tree';
-import OverlayPanel from 'primevue/overlaypanel';
-import Steps from 'primevue/steps';
-import ToggleButton from 'primevue/togglebutton';
 
 app
   .component('Avatar', Avatar)
@@ -88,15 +89,16 @@ app
   .component('InputSwitch', InputSwitch)
   .component('InputText', InputText)
   .component('MultiSelect', MultiSelect)
+  .component('OverlayPanel', OverlayPanel)
   .component('Password', Password)
   .component('ProgressSpinner', ProgressSpinner)
   .component('RadioButton', RadioButton)
   .component('SelectButton', SelectButton)
-  .component('Toast', Toast)
-  .component('Toolbar', Toolbar)
-  .component('Tree', Tree)
+  .component('Skeleton', Skeleton)
   .component('Steps', Steps)
+  .component('Toast', Toast)
   .component('ToggleButton', ToggleButton)
-  .component('OverlayPanel', OverlayPanel);
+  .component('Toolbar', Toolbar)
+  .component('Tree', Tree);
 
 app.mount('#app');

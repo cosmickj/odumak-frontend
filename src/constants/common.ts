@@ -1,8 +1,14 @@
 import type { Option } from '@/types';
 
-const CHURCH_OPTIONS: Option[] = [{ label: '영은교회', value: '영은교회' }];
+const CHURCH_OPTIONS: Option[] = [
+  //
+  { label: '영은교회', value: '영은교회' },
+];
 
-const DEPARTMENT_OPTIONS: Option[] = [{ label: '초등부', value: '초등부' }];
+const DEPARTMENT_OPTIONS: Option[] = [
+  //
+  { label: '초등부', value: '초등부' },
+];
 
 const GRADE_OPTIONS: Option[] = [
   { label: '3학년', value: '3' },
@@ -18,9 +24,6 @@ const GROUP_OPTIONS: Option[] = [
   { label: '5반', value: '5' },
   { label: '6반', value: '6' },
   { label: '7반', value: '7' },
-  { label: '8반', value: '8' },
-  { label: '9반', value: '9' },
-  { label: '10반', value: '10' },
 ];
 
 const GENDER: Option[] = [

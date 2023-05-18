@@ -1,14 +1,16 @@
 <template>
   <div class="flex-1 flex flex-col justify-between">
-    <div class="flex flex-col">
-      <label for="name" class="mb-1">이름을 정확히 입력해주세요</label>
+    <div class="flex flex-col gap-2">
+      <label for="name">이름을 정확히 입력해주세요</label>
       <InputText
         v-model="formState.name"
         id="name"
         class="w-full"
         :class="{ 'p-invalid': v$.name.$error }"
       />
-      <small class="mt-1">오타가 있을 경우 승인이 제한 될 수 있습니다</small>
+      <small class="text-red-500">
+        오타가 있을 경우 승인이 제한 될 수 있습니다.
+      </small>
     </div>
 
     <div class="flex justify-between">
@@ -64,7 +66,7 @@ const nextPage = async () => {
 
   if (!member.length) {
     alert(
-      `${formState.name} 선생님은 현재 ${formState.department} ${formState.church}에 등록되어 있지 않아 승인이 불가능합니다. 관리자에게 문의해주시기 바랍니다.`
+      `${formState.name} 선생님은 현재 ${formState.church} ${formState.department}에 등록되어 있지 않아 승인이 불가능합니다. 관리자에게 문의해주시기 바랍니다.`
     );
   } else {
     emit('nextPage', { index: 1, formState });
