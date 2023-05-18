@@ -4,7 +4,7 @@
       <div class="flex flex-col">
         <label for="church" class="mb-1">교회 이름</label>
         <Dropdown
-          v-model="formState.church"
+          v-model="church"
           :class="{ 'p-invalid': v$.church.$error }"
           :options="CHURCH_OPTIONS"
           optionLabel="label"
@@ -16,7 +16,7 @@
       <div class="flex flex-col">
         <label for="department" class="mb-1">봉사 부서</label>
         <Dropdown
-          v-model="formState.department"
+          v-model="department"
           :class="{ 'p-invalid': v$.department.$error }"
           :options="DEPARTMENT_OPTIONS"
           optionLabel="label"
@@ -40,36 +40,31 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed } from 'vue';
 import { useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import { useWaypointStore } from '@/store/waypoint';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import { CHURCH_OPTIONS, DEPARTMENT_OPTIONS } from '@/constants/common';
 
 const emit = defineEmits(['prevPage', 'nextPage']);
 
-const props = defineProps<{
-  formState: any;
-}>();
-
 const router = useRouter();
-
-const formState = reactive(Object.assign({}, props.formState));
+const { church, department } = storeToRefs(useWaypointStore());
 
 const rules = computed(() => ({
   church: { required },
   department: { required },
 }));
 
-const v$ = useVuelidate(rules, formState);
+const v$ = useVuelidate(rules, { church, department });
 
 const nextPage = async () => {
   const isFormCorrect = await v$.value.$validate();
   if (!isFormCorrect) {
     return;
   }
-  emit('nextPage', { index: 0, formState });
+  emit('nextPage', { index: 0 });
 };
 </script>
-
-<style scoped></style>

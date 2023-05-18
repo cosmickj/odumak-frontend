@@ -2,41 +2,45 @@
   <div class="flex-1 flex flex-col justify-between">
     <div>
       <div class="text-lg">
-        <p v-if="formState.role !== 'common'">
-          <span class="text-orange-400">
-            {{ formState.church }} {{ formState.department }}
-            {{ formState.grade }}학년 {{ formState.group }}반
-          </span>
-          <span>
-            담당 확인을 위해 아래 이름 중 담당 학생을 모두 선택 후 제출하기를
-            눌러주세요
-          </span>
+        <p v-if="role === 'common'">
+          아래 이름 중
+          <span class="text-orange-400"> {{ church }} {{ department }} </span>
+          공동체를 모두 선택 후 제출하기를 눌러주세요. (최대 3명)
         </p>
 
         <p v-else>
+          아래 이름 중
           <span class="text-orange-400">
-            {{ formState.church }} {{ formState.department }}
+            {{ church }} {{ department }} {{ grade }}학년 {{ group }}반
           </span>
-          <span>
-            소속 확인을 위해 아래 이름 중 같은 소속 선생님을 모두 선택 후
-            제출하기를 눌러주세요
-          </span>
+          어린이를 모두 선택 후 제출하기를 눌러주세요. (최대 3명)
         </p>
       </div>
 
       <div class="grid grid-cols-3 gap-3 py-4">
-        <div
-          v-for="(candidate, i) in candidates"
-          ref="toggleButtonRefs"
-          :key="i"
-        >
-          <ToggleButton
-            class="flex aspect-square bg-white rounded-md text-xs xs:text-base items-center justify-center shadow"
-            v-model="candidate.checked"
-            :on-label="candidate.name"
-            :off-label="candidate.name"
+        <template v-if="!candidates.length">
+          <Skeleton
+            v-for="i in 9"
+            class="aspect-square"
+            style="height: unset"
+            :key="i"
           />
-        </div>
+        </template>
+
+        <template v-else>
+          <div
+            v-for="(candidate, i) in candidates"
+            ref="toggleButtonRefs"
+            :key="i"
+          >
+            <ToggleButton
+              class="flex aspect-square bg-white rounded-md text-xs xs:text-base items-center justify-center shadow"
+              v-model="candidate.checked"
+              :on-label="candidate.name"
+              :off-label="candidate.name"
+            />
+          </div>
+        </template>
       </div>
     </div>
 
@@ -48,11 +52,13 @@
 </template>
 
 <script setup lang="ts">
-import { onActivated, ref } from 'vue';
+import { onActivated, onDeactivated, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { getCurrentUser } from '@/router';
+import { storeToRefs } from 'pinia';
 import { useUserStore } from '@/store/user';
 import { useMemberStore } from '@/store/member';
+import { useWaypointStore } from '@/store/waypoint';
 import { faker } from '@faker-js/faker/locale/ko';
 import type { MemberData } from '@/types';
 import type { User } from 'firebase/auth';
@@ -60,44 +66,23 @@ import type { User } from 'firebase/auth';
 const router = useRouter();
 const userStore = useUserStore();
 const memberStore = useMemberStore();
+const {
+  //
+  church,
+  department,
+  grade,
+  group,
+  name,
+  role,
+} = storeToRefs(useWaypointStore());
 
-const props = defineProps<{
-  formState: any;
-}>();
-
-if (!props.formState.church || !props.formState.department) {
+if (!church.value || !department.value) {
   router.push({ name: 'GroupCheck' });
 }
 
 const emit = defineEmits(['prevPage']);
 
 const members = ref<MemberData[]>([]);
-
-onActivated(async () => {
-  try {
-    const { church, department, grade, group } = props.formState;
-
-    if (props.formState.role === 'common') {
-      members.value = await memberStore.fetchAll({
-        church,
-        department,
-        job: 'teacher',
-      });
-    } else {
-      members.value = await memberStore.fetchByGradeGroup({
-        church,
-        department,
-        grade,
-        group,
-        job: 'student',
-      });
-    }
-
-    candidates.value = shuffle(getCandidates(members.value));
-  } catch (error) {
-    console.log(error);
-  }
-});
 
 class Candidate {
   constructor(
@@ -109,16 +94,17 @@ class Candidate {
 
 const candidates = ref<Candidate[]>([]);
 
-const getCandidates = (students: any[]) => {
+const getCandidates = (members: MemberData[]) => {
   const candidates = [];
 
   for (let i = 0; i < 9; i++) {
-    if (!students.length || i > 2) {
+    if (!members.length || i > 2) {
       const fakeName = faker.name.lastName() + faker.name.firstName();
       candidates.push(new Candidate(fakeName, false, false));
     } else {
-      const student = students.pop();
-      candidates.push(new Candidate(student.name, false, true));
+      const index = Math.floor(Math.random() * members.length);
+      const member = members.splice(index, 1);
+      candidates.push(new Candidate(member[0].name, false, true));
     }
   }
   return candidates;
@@ -131,6 +117,34 @@ const shuffle = (array: Candidate[]) => {
   }
   return array;
 };
+
+onActivated(async () => {
+  try {
+    if (role.value === 'common') {
+      members.value = await memberStore.fetchAll({
+        church: church.value,
+        department: department.value,
+        job: 'teacher',
+      });
+    } else {
+      members.value = await memberStore.fetchByGradeGroup({
+        church: church.value,
+        department: department.value,
+        grade: grade.value,
+        group: group.value,
+        job: 'student',
+      });
+    }
+
+    candidates.value = shuffle(getCandidates(members.value));
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+onDeactivated(() => {
+  candidates.value = [];
+});
 
 const toggleButtonRefs = ref<HTMLDivElement[]>([]);
 
@@ -155,7 +169,12 @@ const complete = async () => {
       await userStore.modifyMultiple({
         uid: userStore.userData?.uid,
         isAccepted: true,
-        ...props.formState,
+        church: church.value,
+        department: department.value,
+        grade: grade.value,
+        group: group.value,
+        name: name.value,
+        role: role.value,
       });
 
       const currentUser = (await getCurrentUser()) as User;

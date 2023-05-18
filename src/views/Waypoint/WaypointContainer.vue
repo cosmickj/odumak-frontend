@@ -1,14 +1,13 @@
 <template>
   <section class="flex flex-col px-5 py-8">
     <div class="mb-8">
-      <Steps :model="items" aria-label="Form Steps" />
+      <Steps :model="steps" aria-label="Form Steps" />
     </div>
 
     <RouterView
       v-slot="{ Component }"
-      :formState="formState"
-      @prevPage="prevPage"
-      @nextPage="nextPage"
+      @prevPage="onPrevPage"
+      @nextPage="onNextPage"
     >
       <KeepAlive>
         <Component :is="Component" />
@@ -18,14 +17,16 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/store/user';
+import { useWaypointStore } from '@/store/waypoint';
 
 const router = useRouter();
 const userStore = useUserStore();
+const waypointStore = useWaypointStore();
 
-const items = ref([
+const steps = ref([
   {
     label: '소속',
     to: { name: 'GroupCheck' },
@@ -39,21 +40,12 @@ const items = ref([
     to: { name: 'TeacherCheck' },
   },
   {
-    label: '퀴즈',
+    label: '공동체',
     to: { name: 'MemberCheck' },
   },
 ]);
 
-interface FormState {
-  name: string;
-  church: string;
-  department: string;
-  role: string;
-  grade: string;
-  group: string;
-}
-
-const formState = reactive<FormState>({
+waypointStore.$patch({
   name: userStore.userData?.name || '',
   church: userStore.userData?.church || '',
   department: userStore.userData?.department || '',
@@ -62,17 +54,12 @@ const formState = reactive<FormState>({
   group: userStore.userData?.group || '',
 });
 
-const prevPage = (payload: { index: number }) => {
-  router.push({ name: items.value[payload.index - 1].to.name });
+const onPrevPage = ({ index }: { index: number }) => {
+  router.push({ name: steps.value[index - 1].to.name });
 };
 
-const nextPage = (payload: { index: number; formState: FormState }) => {
-  for (const key in payload.formState) {
-    const _key = key as keyof FormState;
-    formState[_key] = payload.formState[_key];
-  }
-
-  router.push({ name: items.value[payload.index + 1].to.name });
+const onNextPage = ({ index }: { index: number }) => {
+  router.push({ name: steps.value[index + 1].to.name });
 };
 </script>
 

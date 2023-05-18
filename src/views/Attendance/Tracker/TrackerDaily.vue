@@ -158,13 +158,39 @@
   </DataView>
 
   <div v-else>
-    <Chart class="max-w-[300px] mx-auto" type="doughnut" :data="chartData" />
+    <Chart
+      v-if="chartData && totalCount !== emptyCount"
+      class="max-w-[300px] mx-auto"
+      type="doughnut"
+      :data="chartData"
+    />
 
-    <p v-if="chartData" class="mt-4 flex gap-2 items-baseline justify-center">
-      <span class="text-sm">미입력:</span>
-      <span class="text-xl text-gray-600 font-bold">{{ emptyCount }}</span>
-      <span class="text-sm">/ {{ totalCount }}명</span>
-    </p>
+    <div
+      v-else-if="chartData && totalCount === emptyCount"
+      class="flex max-w-[300px] aspect-square mx-auto items-center justify-center"
+    >
+      <p class="text-xl">입력된 출석이 없습니다.</p>
+    </div>
+
+    <div v-if="chartData" class="flex mt-2 items-baseline justify-evenly">
+      <p class="text-gray-500">
+        학생:
+        <span class="text-xl">{{ totalCount }}</span>
+        <span class="text-xs">명</span>
+      </p>
+
+      <p class="text-bold">
+        입력:
+        <span class="text-xl">{{ totalCount - emptyCount }}</span>
+        <span class="text-xs">명</span>
+      </p>
+
+      <p class="text-bold">
+        미입력:
+        <span class="text-xl">{{ emptyCount }}</span>
+        <span class="text-xs">명</span>
+      </p>
+    </div>
   </div>
 </template>
 
@@ -210,9 +236,10 @@ const getAttendancesRecord = async () => {
       job: job.value,
       attendanceDate: attendanceDate.value,
     });
-    attendanceData.value = attendanceStore.attendancesRecord.daily;
   } catch (error) {
     console.log(error);
+  } finally {
+    return attendanceStore.attendancesRecord.daily;
   }
 };
 
@@ -259,10 +286,7 @@ const setChartData = () => {
         : 'empty';
       const currCount = total[status] ?? 0;
 
-      return {
-        ...total,
-        [status]: currCount + 1,
-      };
+      return { ...total, [status]: currCount + 1 };
     },
     { offline: 0, online: 0, absence: 0, empty: 0 }
   );
@@ -273,7 +297,7 @@ const setChartData = () => {
   totalCount.value = filteredAttendanceData.value.length;
 
   return {
-    labels: Object.keys(data),
+    labels: ['현장', '온라인', '결석'],
     datasets: [
       {
         data: Object.values(data),
@@ -293,7 +317,7 @@ const setChartData = () => {
 };
 
 onMounted(async () => {
-  await getAttendancesRecord();
+  attendanceData.value = await getAttendancesRecord();
   chartData.value = setChartData();
 });
 
@@ -305,7 +329,7 @@ watch(
 );
 
 const onAttendanceDateSelect = async () => {
-  await getAttendancesRecord();
+  attendanceData.value = await getAttendancesRecord();
   chartData.value = setChartData();
 };
 

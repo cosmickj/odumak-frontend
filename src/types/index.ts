@@ -63,11 +63,3 @@ export interface Option {
   label: string;
   value: string;
 }
-
-export interface DataTableColumn {
-  field: string;
-  header: string;
-  // sortable: boolean;
-  minWidth?: string;
-  format: undefined | Function;
-}
