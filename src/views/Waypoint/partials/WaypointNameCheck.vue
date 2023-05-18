@@ -3,7 +3,7 @@
     <div class="flex flex-col gap-2">
       <label for="name">이름을 정확히 입력해주세요</label>
       <InputText
-        v-model="formState.name"
+        v-model="name"
         id="name"
         class="w-full"
         :class="{ 'p-invalid': v$.name.$error }"
@@ -21,32 +21,29 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed } from 'vue';
 import { useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
 import { useMemberStore } from '@/store/member';
+import { useWaypointStore } from '@/store/waypoint';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 
-const router = useRouter();
-const memberStore = useMemberStore();
-
-const props = defineProps<{
-  formState: any;
-}>();
-
 const emit = defineEmits(['prevPage', 'nextPage']);
 
-if (!props.formState.church || !props.formState.department) {
+const router = useRouter();
+const memberStore = useMemberStore();
+const { church, department, name } = storeToRefs(useWaypointStore());
+
+if (!church.value || !department.value) {
   router.push({ name: 'GroupCheck' });
 }
-
-const formState = reactive(Object.assign({}, props.formState));
 
 const rules = computed(() => ({
   name: { required },
 }));
 
-const v$ = useVuelidate(rules, formState);
+const v$ = useVuelidate(rules, { name });
 
 const prevPage = () => {
   emit('prevPage', { index: 1 });
@@ -59,17 +56,17 @@ const nextPage = async () => {
   }
 
   const member = await memberStore.fetchByName({
-    church: formState.church,
-    department: formState.department,
-    name: formState.name,
+    church: church.value,
+    department: department.value,
+    name: name.value,
   });
 
   if (!member.length) {
     alert(
-      `${formState.name} 선생님은 현재 ${formState.church} ${formState.department}에 등록되어 있지 않아 승인이 불가능합니다. 관리자에게 문의해주시기 바랍니다.`
+      `${name} 선생님은 현재 ${church} ${department}에 등록되어 있지 않아 승인이 불가능합니다. 관리자에게 문의해주시기 바랍니다.`
     );
   } else {
-    emit('nextPage', { index: 1, formState });
+    emit('nextPage', { index: 1 });
   }
 };
 </script>

@@ -2,19 +2,16 @@
   <div class="flex-1 flex flex-col justify-between">
     <div>
       <div class="text-lg">
-        <p v-if="formState.role === 'common'">
+        <p v-if="role === 'common'">
           아래 이름 중
-          <span class="text-orange-400">
-            {{ formState.church }} {{ formState.department }}
-          </span>
+          <span class="text-orange-400"> {{ church }} {{ department }} </span>
           공동체를 모두 선택 후 제출하기를 눌러주세요. (최대 3명)
         </p>
 
         <p v-else>
           아래 이름 중
           <span class="text-orange-400">
-            {{ formState.church }} {{ formState.department }}
-            {{ formState.grade }}학년 {{ formState.group }}반
+            {{ church }} {{ department }} {{ grade }}학년 {{ group }}반
           </span>
           어린이를 모두 선택 후 제출하기를 눌러주세요. (최대 3명)
         </p>
@@ -58,8 +55,10 @@
 import { onActivated, onDeactivated, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { getCurrentUser } from '@/router';
+import { storeToRefs } from 'pinia';
 import { useUserStore } from '@/store/user';
 import { useMemberStore } from '@/store/member';
+import { useWaypointStore } from '@/store/waypoint';
 import { faker } from '@faker-js/faker/locale/ko';
 import type { MemberData } from '@/types';
 import type { User } from 'firebase/auth';
@@ -67,12 +66,17 @@ import type { User } from 'firebase/auth';
 const router = useRouter();
 const userStore = useUserStore();
 const memberStore = useMemberStore();
+const {
+  //
+  church,
+  department,
+  grade,
+  group,
+  name,
+  role,
+} = storeToRefs(useWaypointStore());
 
-const props = defineProps<{
-  formState: any;
-}>();
-
-if (!props.formState.church || !props.formState.department) {
+if (!church.value || !department.value) {
   router.push({ name: 'GroupCheck' });
 }
 
@@ -116,20 +120,18 @@ const shuffle = (array: Candidate[]) => {
 
 onActivated(async () => {
   try {
-    const { church, department, grade, group, role } = props.formState;
-
-    if (role === 'common') {
+    if (role.value === 'common') {
       members.value = await memberStore.fetchAll({
-        church,
-        department,
+        church: church.value,
+        department: department.value,
         job: 'teacher',
       });
     } else {
       members.value = await memberStore.fetchByGradeGroup({
-        church,
-        department,
-        grade,
-        group,
+        church: church.value,
+        department: department.value,
+        grade: grade.value,
+        group: group.value,
         job: 'student',
       });
     }
@@ -167,7 +169,12 @@ const complete = async () => {
       await userStore.modifyMultiple({
         uid: userStore.userData?.uid,
         isAccepted: true,
-        ...props.formState,
+        church: church.value,
+        department: department.value,
+        grade: grade.value,
+        group: group.value,
+        name: name.value,
+        role: role.value,
       });
 
       const currentUser = (await getCurrentUser()) as User;

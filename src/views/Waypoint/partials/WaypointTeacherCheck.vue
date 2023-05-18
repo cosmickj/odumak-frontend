@@ -5,7 +5,7 @@
         <label for="role" class="mb-1">담임 여부</label>
         <SelectButton
           unselectable
-          v-model="formState.role"
+          v-model="role"
           class="flex"
           optionLabel="label"
           optionValue="value"
@@ -13,10 +13,10 @@
         />
       </div>
 
-      <div v-if="formState.role !== 'common'" class="flex flex-col">
+      <div v-if="role !== 'common'" class="flex flex-col">
         <label for="grade" class="mb-1">담당 학년</label>
         <Dropdown
-          v-model="formState.grade"
+          v-model="grade"
           :class="{ 'p-invalid': v$.grade.$error }"
           :options="GRADE_OPTIONS"
           optionLabel="label"
@@ -25,10 +25,10 @@
         />
       </div>
 
-      <div v-if="formState.role !== 'common'" class="flex flex-col">
+      <div v-if="role !== 'common'" class="flex flex-col">
         <label for="group" class="mb-1">담당 학급</label>
         <Dropdown
-          v-model="formState.group"
+          v-model="group"
           :class="{ 'p-invalid': v$.group.$error }"
           :options="GROUP_OPTIONS"
           optionLabel="label"
@@ -46,48 +46,51 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import { computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { useMemberStore } from '@/store/member';
 import useVuelidate from '@vuelidate/core';
 import { required, requiredIf } from '@vuelidate/validators';
 import { GRADE_OPTIONS, GROUP_OPTIONS, TEACHER_ROLE } from '@/constants/common';
-
-const router = useRouter();
-
-const props = defineProps<{
-  formState: any;
-}>();
-
-if (
-  !props.formState.church ||
-  !props.formState.department ||
-  !props.formState.name
-) {
-  router.push({ name: 'GroupCheck' });
-}
+import { storeToRefs } from 'pinia';
+import { useWaypointStore } from '@/store/waypoint';
 
 const emit = defineEmits(['prevPage', 'nextPage']);
 
-const formState = reactive(Object.assign({}, props.formState));
+const router = useRouter();
+const memberStore = useMemberStore();
+const {
+  //
+  church,
+  department,
+  grade,
+  group,
+  name,
+  role,
+} = storeToRefs(useWaypointStore());
 
-watch(formState, (newValue) => {
-  if (newValue.role === 'common') {
-    formState.grade = '';
-    formState.group = '';
+if (!church.value || !department.value || !name.value) {
+  router.push({ name: 'GroupCheck' });
+}
+
+watch(role, (newValue) => {
+  if (newValue === 'common') {
+    grade.value = '';
+    group.value = '';
   }
 });
 
 const rules = computed(() => ({
   role: { required },
   grade: {
-    requiredIf: requiredIf(formState.role !== 'common'),
+    requiredIf: requiredIf(role.value !== 'common'),
   },
   group: {
-    requiredIf: requiredIf(formState.role !== 'common'),
+    requiredIf: requiredIf(role.value !== 'common'),
   },
 }));
 
-const v$ = useVuelidate(rules, formState);
+const v$ = useVuelidate(rules, { role, grade, group });
 
 const prevPage = () => {
   emit('prevPage', { index: 2 });
@@ -99,7 +102,26 @@ const nextPage = async () => {
     return;
   }
 
-  emit('nextPage', { index: 2, formState });
+  const [member] = await memberStore.fetchByName({
+    church: church.value,
+    department: department.value,
+    name: name.value,
+  });
+
+  if (!member) {
+    return alert('잘못된 접근입니다.');
+  }
+
+  if (
+    member.grade !== grade.value ||
+    member.group !== group.value ||
+    member.role !== role.value
+  ) {
+    const message = `현재 ${church.value} ${department.value}에 등록되어 있는 정보와 입력하신 정보가 일치하지 않아 승인이 불가능합니다. 관리자에게 문의해주시기 바랍니다.`;
+    return alert(message);
+  }
+
+  emit('nextPage', { index: 2 });
 };
 </script>
 
