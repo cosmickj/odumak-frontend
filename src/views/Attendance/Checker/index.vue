@@ -1,5 +1,5 @@
 <template>
-  <main class="overflow-auto flex flex-col h-full p-5">
+  <main class="overflow-auto flex flex-col h-full p-4">
     <CheckerHeader @submit="onSubmit" />
 
     <Calendar
