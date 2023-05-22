@@ -24,6 +24,8 @@ export interface UserData {
 }
 
 /** Member */
+export type MemberJob = 'student' | 'teacher';
+
 export interface MemberData {
   uid?: string;
   name: string;
@@ -32,7 +34,7 @@ export interface MemberData {
   gender: Gender;
   church: string;
   department: string;
-  job: 'student' | 'teacher';
+  job: MemberJob;
   role: UserRole | null;
   grade: string;
   group: string;

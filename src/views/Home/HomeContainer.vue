@@ -1,5 +1,5 @@
 <template>
-  <section class="px-5 py-8">
+  <section class="px-4 py-8">
     <header class="mb-4 text-xl">
       <p>안녕하세요!</p>
       <div class="flex items-center justify-between">
@@ -26,12 +26,12 @@
     <div class="grid grid-cols-2 gap-3">
       <RouterLink
         v-if="userData?.role === 'admin'"
-        :to="{ name: 'AdminStudent' }"
         class="col-span-2 bg-purple-300 text-purple-700 rounded-lg"
+        :to="{ name: 'AdminStudent' }"
       >
-        <div class="relative w-full h-full py-6 text-center">
+        <div class="relative w-full h-full px-4 py-6 text-lg">
           <p><span class="font-bold">관리자 페이지</span> 이동하기</p>
-          <span class="absolute bottom-4 right-4">
+          <span class="absolute bottom-6 right-4">
             <i class="pi pi-angle-right"></i>
           </span>
         </div>
@@ -54,7 +54,7 @@
       />
 
       <HomeMenu
-        class="bg-red-300 text-red-700"
+        class="bg-orange-300 text-orange-700"
         job="student"
         type="total"
         icon="pi pi-users"

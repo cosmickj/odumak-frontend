@@ -1,17 +1,13 @@
 <template>
-  <RouterLink
-    class="aspect-square rounded-lg"
-    :to="{ name: routeName, params: { job } }"
-  >
-    <div class="relative h-full p-3 text-base">
-      <p>
-        <span>{{ who }}</span>
-        <span class="font-bold">{{ what }}</span>
+  <RouterLink class="rounded-lg" :to="{ name: routeName, params: { job } }">
+    <div class="relative px-4 py-6">
+      <p class="text-sm">출석현황</p>
+      <p class="text-xl">
+        <span class="font-bold">{{ who }}</span>
+        <span class="ml-1">{{ what }}</span>
       </p>
 
-      <p>출석현황</p>
-
-      <span class="absolute bottom-4 right-4">
+      <span class="absolute top-6 right-4">
         <i class="pi pi-angle-right"></i>
       </span>
     </div>
@@ -20,10 +16,11 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { MemberJob } from '@/types';
 
 const props = defineProps<{
   icon: string;
-  job: 'student' | 'teacher';
+  job: MemberJob;
   type: 'daily' | 'total';
   routeName: string;
 }>();
