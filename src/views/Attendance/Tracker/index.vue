@@ -1,5 +1,5 @@
 <template>
-  <div class="overflow-auto flex flex-col h-full p-5">
+  <div class="overflow-auto flex flex-col h-full p-4">
     <RouterView />
   </div>
 </template>

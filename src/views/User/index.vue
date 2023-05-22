@@ -22,7 +22,7 @@
     </header>
 
     <div class="bg-slate-100">
-      <div class="flex flex-col gap-2 px-5 py-3 items-center text-xs">
+      <div class="flex flex-col gap-2 px-4 py-3 items-center text-xs">
         <Avatar
           :image="userStore.userData?.profileImage || youngeunElementLogo"
           size="xlarge"
@@ -33,28 +33,28 @@
         <span v-else class="text-red-600">승인 대기</span>
       </div>
 
-      <div class="flex px-5 py-2 items-center justify-between">
+      <div class="flex px-4 py-2 items-center justify-between">
         <span class="mr-3">이름</span>
 
         <span>{{ userStore.userData?.name }}</span>
       </div>
 
-      <!-- <div class="flex px-5 py-2 items-center justify-between">
+      <!-- <div class="flex px-4 py-2 items-center justify-between">
         <span>생년월일</span>
         <span>{{ userStore.userData?.birth || '없음' }}</span>
       </div> -->
 
-      <!-- <div class="flex px-5 py-2 items-center justify-between">
+      <!-- <div class="flex px-4 py-2 items-center justify-between">
         <span>휴대폰 번호</span>
         <span>{{ userStore.userData?.phone || '없음' }}</span>
       </div> -->
 
-      <div class="flex px-5 py-2 items-center justify-between">
+      <div class="flex px-4 py-2 items-center justify-between">
         <span>이메일</span>
         <span>{{ userStore.userData?.email }}</span>
       </div>
 
-      <div class="flex px-5 py-2 items-center justify-between">
+      <div class="flex px-4 py-2 items-center justify-between">
         <span>가입 방식</span>
         <span
           v-if="userStore.userData?.provider === 'naver'"
@@ -73,43 +73,43 @@
     </div>
 
     <div class="mt-3 bg-slate-100">
-      <div class="flex px-5 py-2 font-semibold items-center justify-between">
+      <div class="flex px-4 py-2 font-semibold items-center justify-between">
         <span>소속 정보</span>
       </div>
 
-      <div class="flex px-5 py-2 items-center justify-between">
+      <div class="flex px-4 py-2 items-center justify-between">
         <span>교회 이름</span>
         <span :class="{ 'text-gray-400': isNan(church) }">
           {{ church }}
         </span>
       </div>
 
-      <div class="flex px-5 py-2 items-center justify-between">
+      <div class="flex px-4 py-2 items-center justify-between">
         <span>봉사 부서</span>
         <span :class="{ 'text-gray-400': isNan(department) }">
           {{ department }}
         </span>
       </div>
 
-      <div class="px-5 py-2">
+      <div class="px-4 py-2">
         <p class="h-[1px] bg-slate-200"></p>
       </div>
 
-      <div class="flex px-5 py-2 items-center justify-between">
+      <div class="flex px-4 py-2 items-center justify-between">
         <span>담임 여부</span>
         <span :class="{ 'text-gray-400': isNan(role) }">
           {{ role }}
         </span>
       </div>
 
-      <div class="flex px-5 py-2 items-center justify-between">
+      <div class="flex px-4 py-2 items-center justify-between">
         <span>담당 학년</span>
         <span :class="{ 'text-gray-400': isNan(grade) }">
           {{ grade }}
         </span>
       </div>
 
-      <div class="flex px-5 py-2 items-center justify-between">
+      <div class="flex px-4 py-2 items-center justify-between">
         <span>담당 학급</span>
         <span :class="{ 'text-gray-400': isNan(group) }">
           {{ group }}
@@ -119,7 +119,7 @@
 
     <div class="mt-3 bg-slate-100 text-red-500">
       <div
-        class="flex px-5 py-2 items-center justify-between cursor-pointer"
+        class="flex px-4 py-2 items-center justify-between cursor-pointer"
         @click="logoutUser"
       >
         <span>로그아웃</span>
@@ -128,7 +128,7 @@
     </div>
 
     <div class="mt-3 mb-6 bg-slate-100">
-      <div class="flex px-5 py-2 items-center justify-between">
+      <div class="flex px-4 py-2 items-center justify-between">
         <span>탈퇴하기</span>
         <i class="pi pi-angle-right cursor-pointer" @click="deleteUser"></i>
       </div>
