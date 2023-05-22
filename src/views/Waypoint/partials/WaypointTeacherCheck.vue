@@ -13,8 +13,23 @@
         />
       </div>
 
-      <div v-if="role !== 'common'" class="flex flex-col">
-        <label for="grade" class="mb-1">담당 학년</label>
+      <div v-if="role !== 'common'">
+        <p class="mb-1">새친구 학급이신가요?</p>
+
+        <div
+          class="flex gap-4 p-2 bg-white border border-[#ced4da] rounded-[3px] items-center"
+        >
+          <InputSwitch v-model="isNewFriendClassTeacher" />
+          <p v-if="isNewFriendClassTeacher" class="text-[#2196f3]">맞아요</p>
+          <p v-else class="text-[#ced4da]">아니요</p>
+        </div>
+      </div>
+
+      <div
+        v-if="role !== 'common' && !isNewFriendClassTeacher"
+        class="flex flex-col"
+      >
+        <p class="mb-1">담당 학년</p>
         <Dropdown
           v-model="grade"
           :class="{ 'p-invalid': v$.grade.$error }"
@@ -25,8 +40,11 @@
         />
       </div>
 
-      <div v-if="role !== 'common'" class="flex flex-col">
-        <label for="group" class="mb-1">담당 학급</label>
+      <div
+        v-if="role !== 'common' && !isNewFriendClassTeacher"
+        class="flex flex-col"
+      >
+        <p class="mb-1">담당 학급</p>
         <Dropdown
           v-model="group"
           :class="{ 'p-invalid': v$.group.$error }"
@@ -46,7 +64,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useMemberStore } from '@/store/member';
 import useVuelidate from '@vuelidate/core';
@@ -75,6 +93,18 @@ if (!church.value || !department.value || !name.value) {
 
 watch(role, (newValue) => {
   if (newValue === 'common') {
+    grade.value = '';
+    group.value = '';
+  }
+});
+
+const isNewFriendClassTeacher = ref(false);
+
+watch(isNewFriendClassTeacher, (newValue) => {
+  if (newValue) {
+    grade.value = '0';
+    group.value = '0';
+  } else {
     grade.value = '';
     group.value = '';
   }
