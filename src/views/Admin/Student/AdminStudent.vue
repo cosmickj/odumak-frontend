@@ -16,7 +16,7 @@
     }"
     @add="openDialogToAddStudent"
     @edit="editSelectedStudent"
-    @delete="toggleIsDialogDeleteVisible"
+    @delete="isDialogDeleteVisible = true"
     @select="addSelectedStudents"
   />
 
@@ -98,9 +98,9 @@ const initSelectedStudent: MemberData = {
   remark: '',
 };
 
-const selectedStudents = reactive({ body: [] as MemberData[] });
-
 const createNewStudent = (obj: MemberData) => Object.assign({}, obj);
+
+const selectedStudents = reactive<{ body: MemberData[] }>({ body: [] });
 
 const addSelectedStudents = (payload: MemberData[]) => {
   selectedStudents.body = payload.map((d) => createNewStudent(d));
@@ -113,7 +113,7 @@ const openDialogToAddStudent = () => {
   addNewStudent();
 };
 
-const newStudents = reactive({ body: [] as MemberData[] });
+const newStudents = reactive<{ body: MemberData[] }>({ body: [] });
 
 const addNewStudent = () => {
   newStudents.body.push(createNewStudent(initSelectedStudent));

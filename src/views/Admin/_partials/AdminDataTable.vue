@@ -1,9 +1,9 @@
 <template>
   <AdminDataTableHeader
     :selection="selectionRef"
-    @export="exportDataTable"
     @add="handleAdd"
     @delete="handleDelete"
+    @export="exportDataTable"
   />
 
   <DataTable
@@ -193,7 +193,7 @@ import type { MemberData } from '@/types';
 const props = defineProps<{
   isLoading: boolean;
   dataSource: MemberData[];
-  selection?: any[];
+  selection: MemberData[];
   columnState: {
     [field: string]: boolean;
   };
