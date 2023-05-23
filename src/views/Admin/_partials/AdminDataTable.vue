@@ -28,13 +28,23 @@
 
     <Column selectionMode="multiple" :exportable="false" />
 
-    <Column header="이름" field="name" style="min-width: 6rem">
+    <Column
+      v-if="columnState['name']"
+      field="name"
+      header="이름"
+      style="min-width: 6rem"
+    >
       <template #editor="{ data, field }">
         <InputText v-model="data[field]" class="w-full" />
       </template>
     </Column>
 
-    <Column header="생일" field="birth" style="min-width: 10rem">
+    <Column
+      v-if="columnState['birth']"
+      field="birth"
+      header="생일"
+      style="min-width: 10rem"
+    >
       <template #body="slotProps">
         <span>
           {{ formatDate(slotProps.data.birth) }}
@@ -46,7 +56,12 @@
       </template>
     </Column>
 
-    <Column header="성별" field="gender" style="min-width: 8rem">
+    <Column
+      v-if="columnState['gender']"
+      field="gender"
+      header="성별"
+      style="min-width: 8rem"
+    >
       <template #body="slotProps">
         <span>
           {{ formatGender(slotProps.data.gender) }}
@@ -66,11 +81,17 @@
       </template>
     </Column>
 
-    <Column header="학년" field="grade" style="min-width: 8rem">
+    <Column
+      v-if="columnState['grade']"
+      header="학년"
+      field="grade"
+      style="min-width: 8rem"
+    >
       <template #editor="{ data, field }">
         <Dropdown
           v-model="data[field]"
           :options="[
+            { label: '새친구', value: '0' },
             { label: '3학년', value: '3' },
             { label: '4학년', value: '4' },
           ]"
@@ -80,7 +101,12 @@
       </template>
     </Column>
 
-    <Column header="학급" field="group" style="min-width: 8rem">
+    <Column
+      v-if="columnState['group']"
+      header="학급"
+      field="group"
+      style="min-width: 8rem"
+    >
       <template #editor="{ data, field }">
         <Dropdown
           v-model="data[field]"
@@ -100,19 +126,34 @@
       </template>
     </Column>
 
-    <Column header="연락처" field="phone" style="min-width: 6rem">
+    <Column
+      v-if="columnState['phone']"
+      header="연락처"
+      field="phone"
+      style="min-width: 6rem"
+    >
       <template #editor="{ data, field }">
         <InputText v-model="data[field]" class="w-full" />
       </template>
     </Column>
 
-    <Column header="주소" field="address" style="min-width: 15rem">
+    <Column
+      v-if="columnState['address']"
+      header="주소"
+      field="address"
+      style="min-width: 15rem"
+    >
       <template #editor="{ data, field }">
         <InputText v-model="data[field]" class="w-full" />
       </template>
     </Column>
 
-    <Column header="등록일" field="registeredAt" style="min-width: 10rem">
+    <Column
+      v-if="columnState['registeredAt']"
+      header="등록일"
+      field="registeredAt"
+      style="min-width: 10rem"
+    >
       <template #body="slotProps">
         <span>
           {{ formatDate(slotProps.data.registeredAt) }}
@@ -124,7 +165,12 @@
       </template>
     </Column>
 
-    <Column header="비고" field="remark" style="min-width: 15rem">
+    <Column
+      v-if="columnState['remark']"
+      header="비고"
+      field="remark"
+      style="min-width: 15rem"
+    >
       <template #editor="{ data, field }">
         <InputText v-model="data[field]" class="w-full" />
       </template>
@@ -143,13 +189,14 @@ import { formatDate, formatGender } from '@/utils/useFormat';
 import type DataTable from 'primevue/datatable';
 import type { DataTableCellEditCompleteEvent } from 'primevue/datatable/DataTable';
 import type { MemberData } from '@/types';
-import type { SelectedMember } from '../Student/AdminStudent.vue';
 
 const props = defineProps<{
   isLoading: boolean;
   dataSource: MemberData[];
-  selection?: SelectedMember[];
-  // selectedColumns: any;
+  selection?: any[];
+  columnState: {
+    [field: string]: boolean;
+  };
 }>();
 
 const emit = defineEmits(['add', 'edit', 'delete', 'select']);
@@ -164,8 +211,6 @@ const exportDataTable = () => {
   if (dataTableRef.value) dataTableRef.value.exportCSV();
 };
 
-// 상위 컴포넌트에서 받아온 props에 twoway-binding을 하기 위해서는 한 번 더 감싸줘야한다
-// TODO: 더 깔끔한 방법이 있을지 고민해보자
 const selectionRef = ref(props.selection);
 
 watch(

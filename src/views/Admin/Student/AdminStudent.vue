@@ -3,6 +3,17 @@
     :is-loading="isLoading"
     :data-source="students"
     :selection="selectedStudents.body"
+    :column-state="{
+      name: true,
+      birth: true,
+      gender: true,
+      grade: true,
+      group: true,
+      phone: true,
+      address: true,
+      registeredAt: true,
+      remark: true,
+    }"
     @add="openDialogToAddStudent"
     @edit="editSelectedStudent"
     @delete="toggleIsDialogDeleteVisible"
@@ -29,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import AdminDataTable from '@/views/Admin/_partials/AdminDataTable.vue';
+import AdminDataTable from '../_partials/AdminDataTable.vue';
 import AdminDialogAdd from '../_partials/AdminDialogAdd.vue';
 import AdminDialogDelete from '../_partials/AdminDialogDelete.vue';
 
@@ -45,8 +56,6 @@ import type { DataTableCellEditCompleteEvent } from 'primevue/datatable';
 import type { MemberData } from '@/types';
 
 const userStore = useUserStore();
-const accountData = computed(() => userStore.userData!);
-
 const memberStore = useMemberStore();
 
 const isLoading = ref(false);
@@ -55,11 +64,16 @@ const students = ref<MemberData[]>([]);
 const getStudents = async () => {
   try {
     isLoading.value = true;
-    students.value = await memberStore.fetchAll({
-      church: accountData.value.church,
-      department: accountData.value.department,
-      job: 'student',
-    });
+
+    const { church, department } = userStore.userData || {};
+
+    if (church && department) {
+      students.value = await memberStore.fetchAll({
+        church,
+        department,
+        job: 'student',
+      });
+    }
   } catch (error) {
     console.log(error);
   } finally {
@@ -139,11 +153,15 @@ const resetNewStudents = () => {
 
 const createNewStudents = () => {
   try {
-    memberStore.createMultiple({
-      church: accountData.value.church,
-      department: accountData.value.department,
-      members: newStudents.body,
-    });
+    const { church, department } = userStore.userData || {};
+
+    if (church && department) {
+      memberStore.createMultiple({
+        church,
+        department,
+        members: newStudents.body,
+      });
+    }
   } catch (error) {
     console.log(error);
   }
