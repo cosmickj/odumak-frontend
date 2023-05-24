@@ -19,7 +19,6 @@ import { computed } from 'vue';
 import { MemberJob } from '@/types';
 
 const props = defineProps<{
-  icon: string;
   job: MemberJob;
   type: 'daily' | 'total';
   routeName: string;
