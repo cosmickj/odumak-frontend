@@ -68,11 +68,15 @@
     </div>
 
     <Button
+      v-if="
+        userStore.userData?.grade === '0' && userStore.userData?.group === '0'
+      "
+      raised
       rounded
-      class="absolute bottom-4 right-4 shadow-md shadow-slate-400"
+      class="absolute bottom-4 right-4"
       severity="info"
-      label="새친구 등록하기"
       icon="pi pi-user-plus"
+      label="새친구 등록하기"
       @click="visible = true"
     />
 

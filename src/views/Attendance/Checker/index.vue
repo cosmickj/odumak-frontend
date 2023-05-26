@@ -92,13 +92,12 @@ const getAttendances = async () => {
       return;
     }
 
-    // 입력하는 사람이 관리자인가 교사인가
     if (requestJob.value === 'teacher') {
       await attendanceStore.fetchAttendances({
+        attendanceDate: attendanceDate.value,
         church: userData.value.church!,
         department: userData.value.department!,
         job: requestJob.value,
-        attendanceDate: attendanceDate.value,
       });
     } else if (requestJob.value === 'student') {
       await attendanceStore.fetchAttendancesByGradeGroup({

@@ -74,16 +74,19 @@ export const useMemberStore = defineStore('member', {
     async fetchByGradeGroup(params: FetchByGradeGroupParams) {
       const { church, department, grade, group, job } = params;
 
+      const whereGrade = grade !== '0' ? [where('grade', '==', grade)] : [];
+
       const q = query(
         membersColl,
         where('church', '==', church),
         where('department', '==', department),
-        where('grade', '==', grade),
+        ...whereGrade,
         where('group', '==', group),
         where('job', '==', job)
       );
       const qSnapshot = await getDocs(q);
 
+      // TODO: MemberData를 class로 만들어서 인스턴스를 만들어보자
       const members = qSnapshot.docs.map((doc) => ({
         uid: doc.id,
         ...doc.data(),
