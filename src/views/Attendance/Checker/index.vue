@@ -24,7 +24,7 @@
 
       <CheckerStudents
         v-else-if="userData.role === 'main' || userData.role === 'sub'"
-        :attendances-template="attendances"
+        :attendances="attendances"
       />
 
       <Dialog
@@ -59,19 +59,12 @@ import { computed, ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/store/user';
 import { useAttendanceStore } from '@/store/attendance';
+import { getPreviousSunday } from '@/utils/useCalendar';
 import type { AttendanceData } from '@/types';
 
 const router = useRouter();
 const userStore = useUserStore();
 const attendanceStore = useAttendanceStore();
-
-// https://bobbyhadz.com/blog/javascript-get-previous-sunday
-const getPreviousSunday = (date = new Date()) => {
-  const _date = new Date();
-  _date.setDate(date.getDate() - date.getDay());
-  _date.setHours(0, 0, 0, 0);
-  return _date;
-};
 
 const maxDate = getPreviousSunday();
 const attendanceDate = ref<Date>(getPreviousSunday());

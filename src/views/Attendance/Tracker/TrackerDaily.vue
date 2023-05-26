@@ -199,6 +199,7 @@ import { computed, ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/store/user';
 import { useAttendanceStore } from '@/store/attendance';
+import { getPreviousSunday } from '@/utils/useCalendar';
 import { formatRole } from '@/utils/useFormat';
 import { GRADE_OPTIONS, GROUP_OPTIONS } from '@/constants/common';
 
@@ -212,14 +213,6 @@ const job = computed(() => {
 
 const JobMap = { student: '학생', teacher: '교사' };
 const headerText = computed(() => JobMap[job.value]);
-
-// https://bobbyhadz.com/blog/javascript-get-previous-sunday
-const getPreviousSunday = (date = new Date()) => {
-  const _date = new Date();
-  _date.setDate(date.getDate() - date.getDay());
-  _date.setHours(0, 0, 0, 0);
-  return _date;
-};
 
 const maxDate = getPreviousSunday();
 const attendanceDate = ref<Date>(getPreviousSunday());

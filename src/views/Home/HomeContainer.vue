@@ -188,6 +188,8 @@
                   class="w-full"
                   v-model="student.registeredAt"
                   date-format="yy년 mm월 dd일"
+                  :max-date="maxDate"
+                  :disabled-days="[1, 2, 3, 4, 5, 6]"
                 />
               </div>
             </div>
@@ -219,19 +221,26 @@
                 />
               </div>
             </div>
-            <div class="flex gap-2 mt-4 justify-center">
+            <div class="flex gap-2 mt-6 justify-center">
               <Button
                 outlined
                 size="small"
                 severity="help"
-                label="복사하기"
+                label="복사"
                 @click="copyNewStudent(idx)"
               />
               <Button
                 outlined
                 size="small"
+                severity="success"
+                label="추가"
+                @click="addNewStudent"
+              />
+              <Button
+                outlined
+                size="small"
                 severity="danger"
-                label="삭제하기"
+                label="삭제"
                 :disabled="newStudents.body.length === 1"
                 @click="deleteNewStudent(idx)"
               />
@@ -243,12 +252,7 @@
       <template #footer>
         <div class="flex flex-wrap gap-2 justify-end">
           <Button
-            size="small"
-            severity="success"
-            label="인원 추가"
-            @click="addNewStudent"
-          />
-          <Button
+            raised
             size="small"
             severity="warning"
             label="제출하기"
@@ -268,6 +272,7 @@ import { useMemberStore } from '@/store/member';
 import { useUserStore } from '@/store/user';
 import { useVuelidate } from '@vuelidate/core';
 import { required, helpers } from '@vuelidate/validators';
+import { getPreviousSunday } from '@/utils/useCalendar';
 import { GRADE_OPTIONS, GROUP_OPTIONS } from '@/constants/common';
 import type { NewStudent } from '@/types';
 
@@ -277,7 +282,6 @@ const userStore = useUserStore();
 const visible = ref(false);
 
 const id = ref(1);
-
 const initSelectedStudent: NewStudent = {
   id: 0,
   name: '',
@@ -292,7 +296,7 @@ const initSelectedStudent: NewStudent = {
   group: '',
   phone: '',
   address: '',
-  registeredAt: new Date(),
+  registeredAt: getPreviousSunday(),
   remark: '',
 };
 
@@ -343,7 +347,7 @@ const $v = useVuelidate(rules, newStudents);
 const $errors = computed(() => $v.value.$errors[0]?.$response?.$errors);
 
 const confirmClose = () => {
-  if (confirm('작업한 내용이 모두 사라집니다. 정말 닫으시겠습니까?')) {
+  if (confirm('작성한 내용이 모두 사라집니다. 정말 닫으시겠습니까?')) {
     newStudents.body = [{ ...initSelectedStudent }];
     $v.value.$reset();
     return;
@@ -360,20 +364,16 @@ const submitNewStudents = async () => {
 
     const { church, department } = userStore.userData || {};
 
-    // TODO: newStudents.body에서 id값을 삭제해주고 넣어야한다.
     if (church && department) {
-      memberStore.createMultiple({
-        church,
-        department,
-        members: newStudents.body,
-      });
+      const members = newStudents.body.map(({ id, ...params }) => params);
+      memberStore.createMultiple({ church, department, members });
     }
 
-    // createNewStudents();
-    // resetNewStudents();
-    // await getStudents();
-
     alert('추가되었습니다.');
+
+    newStudents.body = [{ ...initSelectedStudent }];
+    $v.value.$reset();
+    visible.value = false;
   } catch (error) {
     alert(error);
   }
@@ -400,6 +400,8 @@ const toggleBirth = (index: number) => {
   //   member.birth = date;
   // }
 };
+
+const maxDate = getPreviousSunday();
 </script>
 
 <style scoped>
@@ -409,7 +411,7 @@ const toggleBirth = (index: number) => {
 
 .list-enter-active,
 .list-leave-active {
-  transition: all 0.5s ease-out;
+  transition: all 0.5s;
 }
 .list-enter-from,
 .list-leave-to {
