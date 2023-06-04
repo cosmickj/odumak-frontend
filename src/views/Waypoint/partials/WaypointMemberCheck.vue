@@ -46,7 +46,12 @@
 
     <div class="flex justify-between">
       <Button text severity="secondary" label="이전으로" @click="prevPage" />
-      <Button severity="success" label="제출하기" @click="complete" />
+      <Button
+        :disabled="candidates.length === 0"
+        severity="success"
+        label="제출하기"
+        @click="complete"
+      />
     </div>
   </div>
 </template>
@@ -150,6 +155,10 @@ const toggleButtonRefs = ref<HTMLDivElement[]>([]);
 
 const complete = async () => {
   try {
+    if (candidates.value.length === 0) {
+      return;
+    }
+
     const isCorrect = candidates.value.every((candidate) => {
       return candidate.checked === candidate.answer;
     });
