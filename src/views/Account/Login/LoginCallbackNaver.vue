@@ -81,7 +81,6 @@ onMounted(async () => {
         role: null,
         grade: null,
         group: null,
-        phone: '',
         isAccepted: false,
         isRejected: false,
         rejectedReason: '',
