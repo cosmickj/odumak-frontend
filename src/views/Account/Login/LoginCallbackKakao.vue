@@ -45,6 +45,7 @@ onMounted(async () => {
         profileImage:
           statusInfo.user.kakao_account.profile.thumbnail_image_url || '',
         name: statusInfo.user.kakao_account.profile.nickname || '',
+        birth: null,
         church: null,
         department: null,
         grade: null,

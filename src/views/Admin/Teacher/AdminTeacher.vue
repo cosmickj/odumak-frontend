@@ -3,6 +3,14 @@
     :is-loading="isLoading"
     :data-source="members"
     :selection="selectedMembers.body"
+    :column-state="{
+      name: true,
+      gender: true,
+      grade: true,
+      group: true,
+      registeredAt: true,
+      remark: true,
+    }"
     @add="openDialogToAddTeacher"
     @edit="editSelectedMember"
     @delete="toggleIsDialogDeleteVisible"
@@ -29,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import AdminDataTable from '@/views/Admin/_partials/AdminDataTable.vue';
+import AdminDataTable from '../_partials/AdminDataTable.vue';
 import AdminDialogAdd from '../_partials/AdminDialogAdd.vue';
 import AdminDialogDelete from '../_partials/AdminDialogDelete.vue';
 
@@ -45,8 +53,6 @@ import type { DataTableCellEditCompleteEvent } from 'primevue/datatable';
 import type { MemberData } from '@/types';
 
 const userStore = useUserStore();
-const userData = computed(() => userStore.userData!);
-
 const memberStore = useMemberStore();
 
 const isLoading = ref(false);
@@ -55,11 +61,16 @@ const members = ref<MemberData[]>([]);
 const getMembers = async () => {
   try {
     isLoading.value = true;
-    members.value = await memberStore.fetchAll({
-      church: userData.value.church,
-      department: userData.value.department,
-      job: 'teacher',
-    });
+
+    const { church, department } = userStore.userData || {};
+
+    if (church && department) {
+      members.value = await memberStore.fetchAll({
+        church,
+        department,
+        job: 'teacher',
+      });
+    }
   } catch (error) {
     console.log(error);
   } finally {
@@ -127,23 +138,27 @@ const rules = {
   },
 };
 
-const _v = useVuelidate(rules, selectedMembers);
+const $v = useVuelidate(rules, selectedMembers);
 
-const errors = computed(() => _v.value.$errors[0]?.$response?.$errors);
+const errors = computed(() => $v.value.$errors[0]?.$response?.$errors);
 
 const resetNewMembers = () => {
   isDialogAddVisible.value = false;
   newMembers.body = [];
-  _v.value.$reset();
+  $v.value.$reset();
 };
 
 const createNewMembers = () => {
   try {
-    memberStore.createMultiple({
-      church: userData.value.church,
-      department: userData.value.department,
-      members: newMembers.body,
-    });
+    const { church, department } = userStore.userData || {};
+
+    if (church && department) {
+      memberStore.createMultiple({
+        church,
+        department,
+        members: newMembers.body,
+      });
+    }
   } catch (error) {
     console.log(error);
   }
@@ -151,7 +166,7 @@ const createNewMembers = () => {
 
 const submitNewMembers = async () => {
   try {
-    const isFormCorrect = await _v.value.body.$validate();
+    const isFormCorrect = await $v.value.body.$validate();
     if (!isFormCorrect) return;
 
     createNewMembers();

@@ -1,6 +1,6 @@
 <template>
   <div
-    v-for="(member, i) in attendancesTemplate"
+    v-for="(member, i) in attendances"
     class="flex mt-[-1px] p-2 border border-slate-300 items-center justify-around checker-students-cont"
     :key="i"
   >
@@ -23,7 +23,7 @@
 import type { AttendanceData } from '@/types';
 
 defineProps<{
-  attendancesTemplate: AttendanceData[] | undefined;
+  attendances: AttendanceData[];
 }>();
 </script>
 

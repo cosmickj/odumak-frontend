@@ -40,7 +40,7 @@
     :style="{ width: '360px' }"
     :breakpoints="{ '641px': '95vw' }"
   >
-    <CheckerStudents :attendances-template="subAttendances" />
+    <CheckerStudents :attendances="subAttendances" />
 
     <template #footer>
       <Button

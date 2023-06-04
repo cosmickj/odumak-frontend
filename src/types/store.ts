@@ -17,12 +17,12 @@ export interface AddAttendanceParams {
 }
 
 export interface FetchAttendancesParams {
-  grade?: string;
-  group?: string;
+  attendanceDate: Date;
   church: string;
   department: string;
+  grade?: string;
+  group?: string;
   job: 'student' | 'teacher';
-  attendanceDate: Date;
 }
 
 export interface ModifyAttendanceParams {

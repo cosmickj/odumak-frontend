@@ -87,24 +87,27 @@ export const useAttendanceStore = defineStore('attendance', {
       params: Required<FetchAttendancesParams>
     ) {
       this.attendancesRecord.daily = [];
+      const { attendanceDate, church, department, grade, group, job } = params;
 
       const memberStore = useMemberStore();
       const members = await memberStore.fetchByGradeGroup({
-        church: params.church,
-        department: params.department,
-        grade: params.grade,
-        group: params.group,
-        job: params.job,
+        church,
+        department,
+        grade,
+        group,
+        job,
       });
+
+      const whereGrade = grade !== '0' ? [where('grade', '==', grade)] : [];
 
       const q = query(
         attendancesColl,
-        where('church', '==', params.church),
-        where('department', '==', params.department),
-        where('job', '==', params.job),
-        where('attendance.date', '==', params.attendanceDate),
-        where('grade', '==', params.grade),
-        where('group', '==', params.group)
+        where('attendance.date', '==', attendanceDate),
+        where('church', '==', church),
+        where('department', '==', department),
+        ...whereGrade,
+        where('group', '==', group),
+        where('job', '==', job)
       );
       const qSnapshot = await getDocs(q);
 
@@ -113,7 +116,7 @@ export const useAttendanceStore = defineStore('attendance', {
       });
 
       const attendances: AttendanceData[] = members
-        .filter((member) => member.registeredAt <= params.attendanceDate)
+        .filter((member) => member.registeredAt <= attendanceDate)
         .map((member) => {
           const memberAttendance = attendanceData.find((attendance) => {
             return (
