@@ -9,6 +9,7 @@ export type UserRole = 'admin' | 'main' | 'sub' | 'common' | null;
 export interface UserData {
   uid: string;
   name: string;
+  birth: Date | null;
   email: string;
   provider: 'naver' | 'kakao';
   profileImage: string | null;
