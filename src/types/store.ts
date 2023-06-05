@@ -47,10 +47,15 @@ export interface FetchByGradeGroupParams
     'church' | 'department' | 'grade' | 'group' | 'job'
   > {}
 
+// export interface ModifySingleParams {
+//   uid: string;
+//   field: string;
+//   value: string;
+// }
+
 export interface ModifySingleParams {
   uid: string;
-  field: string;
-  value: string;
+  [key: string]: string;
 }
 
 export interface RemoveMultipleParams {

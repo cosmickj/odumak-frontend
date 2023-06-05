@@ -115,10 +115,15 @@ export const useMemberStore = defineStore('member', {
       return member;
     },
 
+    // async modifySingle(params: ModifySingleParams) {
+    //   return await updateDoc(doc(db, 'members', params.uid), {
+    //     [params.field]: params.value,
+    //   });
+    // },
+
     async modifySingle(params: ModifySingleParams) {
-      return await updateDoc(doc(db, 'members', params.uid), {
-        [params.field]: params.value,
-      });
+      const { uid, ...data } = params;
+      return await updateDoc(doc(db, 'members', uid), { ...data });
     },
 
     removeMultiple(params: RemoveMultipleParams) {

@@ -39,8 +39,8 @@ export interface MemberData {
   role: UserRole | null;
   grade: string;
   group: string;
-  phone: string; // TODO: 민감 정보 암호화 처리
-  address: string; // TODO: 민감 정보 암호화 처리
+  // phone: string;
+  // address: string;
   registeredAt: Date;
   remark: string;
   createdAt?: Date;

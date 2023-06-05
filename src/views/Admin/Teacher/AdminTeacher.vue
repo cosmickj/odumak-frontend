@@ -3,14 +3,6 @@
     :is-loading="isLoading"
     :data-source="members"
     :selection="selectedMembers.body"
-    :column-state="{
-      name: true,
-      gender: true,
-      grade: true,
-      group: true,
-      registeredAt: true,
-      remark: true,
-    }"
     @add="openDialogToAddTeacher"
     @edit="editSelectedMember"
     @delete="toggleIsDialogDeleteVisible"
@@ -49,7 +41,7 @@ import { useVuelidate } from '@vuelidate/core';
 import { required, helpers } from '@vuelidate/validators';
 
 import { useToast } from 'primevue/usetoast';
-import type { DataTableCellEditCompleteEvent } from 'primevue/datatable';
+import type { DataTableRowEditSaveEvent } from 'primevue/datatable';
 import type { MemberData } from '@/types';
 
 const userStore = useUserStore();
@@ -89,8 +81,6 @@ const initSelectedMember: MemberData = {
   role: 'common',
   grade: '',
   group: '',
-  phone: '',
-  address: '',
   registeredAt: new Date(),
   remark: '',
 };
@@ -179,22 +169,19 @@ const submitNewMembers = async () => {
 
 const toast = useToast();
 
-const editSelectedMember = async (payload: DataTableCellEditCompleteEvent) => {
+const editSelectedMember = async (payload: DataTableRowEditSaveEvent) => {
   try {
-    const { data, newData, field, newValue } = payload;
+    const { data, newData } = payload;
 
     if (JSON.stringify(data) !== JSON.stringify(newData)) {
-      await memberStore.modifySingle({
-        uid: data.uid,
-        field: field,
-        value: newValue,
-      });
+      const { uid, ...params } = newData;
+      await memberStore.modifySingle({ uid, ...params });
 
       await getMembers();
 
       toast.add({
         severity: 'success',
-        summary: `${data.name}`,
+        summary: `${params.name}`,
         detail: '수정되었습니다',
         life: 2000,
       });

@@ -1,4 +1,4 @@
-import { Gender, UserRole } from '@/types';
+import { Gender, MemberData, UserRole } from '@/types';
 
 const formatDate = (date: Date | null) => {
   if (date) {
@@ -7,21 +7,35 @@ const formatDate = (date: Date | null) => {
     const _date = date.getDate();
     return `${_year}년 ${_month}월 ${_date}일`;
   }
-  return '입력 필요';
+  return '-';
 };
 
-const formatGender = (value: Gender) => {
-  if (value === 'male') return '남자';
-  else if (value === 'female') return '여자';
-  else return '';
+const GenderMap = { male: '남자', female: '여자' };
+const formatGender = (gender: Gender) => GenderMap[gender];
+
+const RoleMap = {
+  admin: '관리자',
+  main: '담임',
+  sub: '부담임',
+  common: '해당없음',
+};
+const formatRole = (role: UserRole) => (role ? RoleMap[role] : '-');
+
+const formatClass = ({ grade, group, job, role }: MemberData) => {
+  if (job === 'student') {
+    return `${grade}학년 ${group !== '0' ? group + '반' : '새친구'}`;
+  }
+  if (job === 'teacher') {
+    if (role === 'common') {
+      return '비담임교사';
+    } else {
+      return (
+        `${grade !== '0' ? grade + '학년 ' : ''}` +
+        `${group !== '0' ? group + '반' : '새친구 학급'}`
+      );
+    }
+  }
+  return;
 };
 
-const formatRole = (value: UserRole) => {
-  if (value === 'admin') return '관리자';
-  else if (value === 'common') return '해당없음';
-  else if (value === 'main') return '담임';
-  else if (value === 'sub') return '부담임';
-  else return '';
-};
-
-export { formatDate, formatGender, formatRole };
+export { formatDate, formatGender, formatRole, formatClass };

@@ -66,6 +66,7 @@ import RadioButton from 'primevue/radiobutton';
 import SelectButton from 'primevue/selectbutton';
 import Skeleton from 'primevue/skeleton';
 import Steps from 'primevue/steps';
+import Tag from 'primevue/tag';
 import Toast from 'primevue/toast';
 import ToggleButton from 'primevue/togglebutton';
 import Toolbar from 'primevue/toolbar';
@@ -96,6 +97,7 @@ app
   .component('SelectButton', SelectButton)
   .component('Skeleton', Skeleton)
   .component('Steps', Steps)
+  .component('Tag', Tag)
   .component('Toast', Toast)
   .component('ToggleButton', ToggleButton)
   .component('Toolbar', Toolbar)

@@ -3,17 +3,6 @@
     :is-loading="isLoading"
     :data-source="students"
     :selection="selectedStudents.body"
-    :column-state="{
-      name: true,
-      birth: true,
-      gender: true,
-      grade: true,
-      group: true,
-      phone: true,
-      address: true,
-      registeredAt: true,
-      remark: true,
-    }"
     @add="openDialogToAddStudent"
     @edit="editSelectedStudent"
     @delete="isDialogDeleteVisible = true"
@@ -81,6 +70,8 @@ const getStudents = async () => {
   }
 };
 
+onMounted(async () => await getStudents());
+
 const initSelectedStudent: MemberData = {
   name: '',
   birth: null,
@@ -92,8 +83,6 @@ const initSelectedStudent: MemberData = {
   role: null,
   grade: '',
   group: '',
-  phone: '',
-  address: '',
   registeredAt: new Date(),
   remark: '',
 };
@@ -226,6 +215,4 @@ const deleteStudentList = async () => {
     console.log(error);
   }
 };
-
-onMounted(async () => await getStudents());
 </script>

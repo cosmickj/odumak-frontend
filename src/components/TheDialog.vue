@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="isDialogVisible"
-    class="fixed inset-0 flex flex-col bg-gray-100 text-black"
+    class="z-10 fixed inset-0 flex flex-col bg-gray-100 text-black"
   >
     <div class="flex px-8 pt-8 justify-between">
       <slot name="header"></slot>
