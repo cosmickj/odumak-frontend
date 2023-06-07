@@ -39,6 +39,7 @@ export interface MemberData {
   role: UserRole | null;
   grade: string;
   group: string;
+  isNewFriendClass: boolean;
   // phone: string;
   // address: string;
   registeredAt: Date;

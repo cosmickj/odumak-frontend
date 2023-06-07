@@ -65,7 +65,6 @@
         <template #body="slotProps">
           <Button
             text
-            size="small"
             severity="info"
             icon="pi pi-pencil"
             class="w-6 aspect-square"
@@ -77,133 +76,215 @@
 
     <Dialog
       modal
-      v-model:visible="editVisible"
+      class="w-[40vw] max-w-[480px]"
       header="수정하기"
-      position="right"
+      position="bottomright"
+      v-model:visible="editingVisible"
       :closable="false"
       :draggable="false"
-      :style="{ width: '40vw' }"
-      :breakpoints="{ '960px': '75vw', '641px': '100vw' }"
+      :breakpoints="{ '640px': '90vw' }"
     >
-      <div class="flex flex-col gap-2">
-        <div class="flex gap-6 items-center">
-          <InputText class="flex-1 w-full" v-model="editMember.name" />
+      <section class="flex flex-col">
+        <div class="flex items-start">
+          <div class="flex-1">
+            <p class="font-bold text-lg">기본 정보</p>
+          </div>
 
-          <div class="flex-1 flex items-center">
-            <RadioButton
-              v-model="editMember.gender"
-              input-id="male"
-              name="gender"
-              value="male"
-            />
-            <label for="male">남자</label>
+          <div class="flex-2">
+            <p class="mb-2 font-bold">이름</p>
+            <InputText class="w-full" v-model="editingMember.name" />
 
-            <RadioButton
-              class="ml-2"
-              v-model="editMember.gender"
-              input-id="female"
-              name="gender"
-              value="female"
+            <div class="flex gap-8 my-2">
+              <p class="font-bold">성별</p>
+              <div class="flex items-center">
+                <RadioButton
+                  v-model="editingMember.gender"
+                  input-id="male"
+                  name="gender"
+                  value="male"
+                />
+                <label class="ml-2 cursor-pointer" for="male">남자</label>
+
+                <RadioButton
+                  class="ml-2"
+                  v-model="editingMember.gender"
+                  input-id="female"
+                  name="gender"
+                  value="female"
+                />
+                <label class="ml-2 cursor-pointer" for="female">여자</label>
+              </div>
+            </div>
+
+            <div class="flex gap-8">
+              <p class="font-bold mb-2">생년월일</p>
+            </div>
+
+            <Calendar
+              id="birth"
+              class="w-full"
+              touch-u-i
+              showButtonBar
+              v-model="editingMember.birth"
+              :disabled="editingMember.birthLater"
+              placeholder="생년월일을 선택해주세요"
             />
-            <label for="female">여자</label>
+
+            <div class="flex mt-1 items-center">
+              <Checkbox
+                binary
+                input-id="birthLater"
+                v-model="editingMember.birthLater"
+              />
+              <label class="ml-2 cursor-pointer select-none" for="birthLater">
+                나중에 입력할게요
+              </label>
+            </div>
           </div>
         </div>
 
-        <div>
-          <label for="role" class="mb-1">담임 여부</label>
-          <SelectButton
-            unselectable
-            class="flex"
-            v-model="editMember.role"
-            :options="TEACHER_ROLE"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="담당 학년"
-          />
-        </div>
+        <hr class="h-1 my-3 border-0 bg-slate-200" />
 
-        <div>
-          <p>학년반</p>
-          <div class="flex gap-6">
-            <Dropdown
-              class="flex-1"
-              v-model="editMember.grade"
-              :options="[
-                { label: '새친구', value: '0' },
-                { label: '3학년', value: '3' },
-                { label: '4학년', value: '4' },
-              ]"
+        <div v-if="editingMember.job === 'teacher'" class="flex items-start">
+          <div class="flex-1">
+            <p class="font-bold text-lg">담임 정보</p>
+          </div>
+
+          <div class="flex-2">
+            <SelectButton
+              unselectable
+              class="flex [&>*]:flex-1"
+              v-model="editingMember.role"
+              :options="TEACHER_ROLE"
               optionLabel="label"
               optionValue="value"
+              placeholder="담당 학년"
             />
 
-            <Dropdown
-              class="flex-1"
-              v-model="editMember.group"
-              :options="[
-                { label: '새친구', value: '0' },
-                { label: '1반', value: '1' },
-                { label: '2반', value: '2' },
-                { label: '3반', value: '3' },
-                { label: '4반', value: '4' },
-                { label: '5반', value: '5' },
-                { label: '6반', value: '6' },
-                { label: '7반', value: '7' },
-              ]"
-              optionLabel="label"
-              optionValue="value"
-            />
+            <Transition>
+              <div
+                v-if="editingMember.role !== 'common'"
+                class="flex my-2 items-center justify-between"
+              >
+                <p>새친구 학급이신가요?</p>
+
+                <div class="flex gap-2 items-center">
+                  <p :class="switchState(editingMember.isNewFriendClass)">
+                    {{ editingMember.isNewFriendClass ? '네' : '아니요' }}
+                  </p>
+                  <InputSwitch v-model="editingMember.isNewFriendClass" />
+                </div>
+              </div>
+            </Transition>
+
+            <Transition>
+              <div v-if="editingMember.role !== 'common'" class="flex gap-4">
+                <Dropdown
+                  class="flex-1"
+                  v-model="editingMember.grade"
+                  :disabled="editingMember.isNewFriendClass"
+                  :options="GRADE_OPTIONS"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="학년 선택"
+                />
+
+                <Dropdown
+                  class="flex-1"
+                  v-model="editingMember.group"
+                  :disabled="editingMember.isNewFriendClass"
+                  :options="GROUP_OPTIONS"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="학급 선택"
+                />
+              </div>
+            </Transition>
           </div>
         </div>
 
-        <div>
-          <div class="flex items-center">
-            <label class="mr-auto" for="birth">생년월일</label>
-
-            <InputSwitch id="birthLater" v-model="editMember.birthLater" />
-            <label class="ml-2" for="birthLater">나중에 입력</label>
+        <div v-else class="flex items-start">
+          <div class="flex-1">
+            <p class="font-bold text-lg">학급 정보</p>
           </div>
 
-          <Calendar
-            id="birth"
-            class="w-full"
-            touch-u-i
-            showButtonBar
-            v-model="editMember.birth"
-            :disabled="editMember.birthLater"
-            placeholder="생년월일을 입력해주세요"
-          />
+          <div class="flex-2">
+            <div class="flex mb-2 items-center justify-between">
+              <p>새친구인가요?</p>
+
+              <div class="flex gap-2 items-center">
+                <p :class="switchState(editingMember.isNewFriendClass)">
+                  {{ editingMember.isNewFriendClass ? '네' : '아니요' }}
+                </p>
+                <InputSwitch v-model="editingMember.isNewFriendClass" />
+              </div>
+            </div>
+
+            <div class="flex gap-4">
+              <Dropdown
+                class="flex-1"
+                v-model="editingMember.grade"
+                :options="GRADE_OPTIONS"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="학년 선택"
+              />
+
+              <Dropdown
+                class="flex-1"
+                v-model="editingMember.group"
+                :disabled="editingMember.isNewFriendClass"
+                :options="GROUP_OPTIONS"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="학급 선택"
+              />
+            </div>
+          </div>
         </div>
 
-        <div>
-          <label for="registeredAt">등록일</label>
-          <Calendar
-            id="registeredAt"
-            class="w-full"
-            touch-u-i
-            showButtonBar
-            v-model="editMember.registeredAt"
-          />
-        </div>
+        <hr class="h-1 my-3 border-0 bg-slate-200" />
 
-        <div>
-          <label for="remark">비고</label>
-          <InputText id="remark" class="w-full" v-model="editMember.remark" />
+        <div class="flex items-start">
+          <div class="flex-1">
+            <p class="font-bold text-lg">추가 정보</p>
+          </div>
+
+          <div class="flex-2">
+            <label class="inline-block mb-2 font-bold" for="registeredAt">
+              교육부 첫 출석일
+            </label>
+            <Calendar
+              id="registeredAt"
+              class="w-full"
+              touch-u-i
+              showButtonBar
+              v-model="editingMember.registeredAt"
+            />
+
+            <label class="inline-block my-2 font-bold" for="remark">비고</label>
+            <InputText
+              id="remark"
+              class="w-full"
+              v-model="editingMember.remark"
+            />
+          </div>
         </div>
-      </div>
+      </section>
 
       <template #footer>
         <Button
           text
           label="취소하기"
           icon="pi pi-times"
-          @click="editVisible = false"
+          @click="editingVisible = false"
         />
         <Button
-          label="제출하기"
+          label="수정하기"
           severity="warning"
           icon="pi pi-check"
-          @click="editVisible = false"
+          :disabled="disabled"
+          @click="handleEdit"
         />
       </template>
     </Dialog>
@@ -215,13 +296,14 @@
 <script setup lang="ts">
 import AdminDataTableHeader from '@/views/Admin/_partials/AdminDataTableHeader.vue';
 
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { formatDate, formatGender, formatClass } from '@/utils/useFormat';
-import { TEACHER_ROLE } from '@/constants/common';
+import { GRADE_OPTIONS, GROUP_OPTIONS, TEACHER_ROLE } from '@/constants/common';
 import type { MemberData } from '@/types';
 
+import { useVuelidate } from '@vuelidate/core';
+import { required, helpers } from '@vuelidate/validators';
 import type DataTable from 'primevue/datatable';
-import type { DataTableRowEditSaveEvent } from 'primevue/datatable/DataTable';
 
 const props = defineProps<{
   isLoading: boolean;
@@ -236,6 +318,12 @@ const emit = defineEmits(['add', 'edit', 'delete', 'select']);
 
 const handleAdd = () => emit('add');
 const handleDelete = () => emit('delete');
+const handleEdit = async () => {
+  // const isFormCorrect = await $v.value.$validate();
+  // if (!isFormCorrect) return;
+
+  emit('edit', editingMember.value);
+};
 const handleSelect = () => emit('select', selectionRef.value);
 
 const dataTableRef = ref<DataTable | null>(null);
@@ -257,7 +345,7 @@ onMounted(() => {
     const headers = document.querySelectorAll('.p-rowgroup-header td');
 
     Array.from(headers).forEach((rowHeader) => {
-      rowHeader.setAttribute('colspan', '9');
+      rowHeader.setAttribute('colspan', '8');
     });
   }, 300);
 });
@@ -266,13 +354,32 @@ const groupRowsBy = ({ grade, group }: MemberData) => {
   return `${grade} ${group}`;
 };
 
-const editVisible = ref(false);
-const editMember = ref<Partial<MemberData>>({});
+const editingVisible = ref(false);
+const editingMember = ref<Partial<MemberData>>({});
+const editingMemberClone = ref<Partial<MemberData>>({});
+
+const switchState = (flag?: boolean) =>
+  flag ? 'text-[#2196f3]' : 'text-[#ced4da]';
 
 const showEditDialog = (data: MemberData) => {
-  editVisible.value = true;
-  editMember.value = { ...data };
+  editingVisible.value = true;
+
+  editingMember.value = { ...data };
+  editingMemberClone.value = { ...data };
 };
+
+const disabled = computed(() => {
+  return (
+    JSON.stringify(editingMember.value) ===
+    JSON.stringify(editingMemberClone.value)
+  );
+});
+
+// const rules = computed(() => ({
+//   name: { required },
+// }));
+
+// const $v = useVuelidate(rules, editingMember);
 </script>
 
 <style scoped>
@@ -286,5 +393,14 @@ const showEditDialog = (data: MemberData) => {
 }
 :deep(tr.p-rowgroup-header > td) {
   padding: 8px 16px !important;
+}
+
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.3s ease;
+}
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
 }
 </style>

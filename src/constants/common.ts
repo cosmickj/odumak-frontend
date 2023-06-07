@@ -6,8 +6,9 @@ const CHURCH_OPTIONS: Option[] = [
 ];
 
 const DEPARTMENT_OPTIONS: Option[] = [
-  //
+  { label: '유년부', value: '유년부' },
   { label: '초등부', value: '초등부' },
+  { label: '소년부', value: '소년부' },
 ];
 
 const GRADE_OPTIONS: Option[] = [
@@ -16,7 +17,6 @@ const GRADE_OPTIONS: Option[] = [
 ];
 
 const GROUP_OPTIONS: Option[] = [
-  { label: '새친구', value: '0' },
   { label: '1반', value: '1' },
   { label: '2반', value: '2' },
   { label: '3반', value: '3' },

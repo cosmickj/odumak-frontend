@@ -52,6 +52,7 @@ import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import DataView from 'primevue/dataview';
 import Dialog from 'primevue/dialog';
+import Divider from 'primevue/divider';
 import Dropdown from 'primevue/dropdown';
 import FileUpload from 'primevue/fileupload';
 import Image from 'primevue/image';
@@ -83,6 +84,7 @@ app
   .component('DataTable', DataTable)
   .component('DataView', DataView)
   .component('Dialog', Dialog)
+  .component('Divider', Divider)
   .component('Dropdown', Dropdown)
   .component('FileUpload', FileUpload)
   .component('Image', Image)

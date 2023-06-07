@@ -4,7 +4,7 @@
     :data-source="students"
     :selection="selectedStudents.body"
     @add="openDialogToAddStudent"
-    @edit="editSelectedStudent"
+    @edit="editStudent"
     @delete="isDialogDeleteVisible = true"
     @select="addSelectedStudents"
   />
@@ -41,7 +41,6 @@ import { useVuelidate } from '@vuelidate/core';
 import { required, helpers } from '@vuelidate/validators';
 
 import { useToast } from 'primevue/usetoast';
-import type { DataTableCellEditCompleteEvent } from 'primevue/datatable';
 import type { MemberData } from '@/types';
 
 const userStore = useUserStore();
@@ -83,6 +82,7 @@ const initSelectedStudent: MemberData = {
   role: null,
   grade: '',
   group: '',
+  isNewFriendClass: false,
   registeredAt: new Date(),
   remark: '',
 };
@@ -173,26 +173,19 @@ const submitNewStudents = async () => {
 
 const toast = useToast();
 
-const editSelectedStudent = async (payload: DataTableCellEditCompleteEvent) => {
+const editStudent = async (payload: Required<MemberData>) => {
   try {
-    const { data, newData, field, newValue } = payload;
+    const { uid, ...params } = payload;
 
-    if (JSON.stringify(data) !== JSON.stringify(newData)) {
-      await memberStore.modifySingle({
-        uid: data.uid,
-        field: field,
-        value: newValue,
-      });
+    await memberStore.modifySingle({ uid, ...params });
+    await getStudents();
 
-      await getStudents();
-
-      toast.add({
-        severity: 'success',
-        summary: `${data.name}`,
-        detail: '수정되었습니다',
-        life: 2000,
-      });
-    }
+    toast.add({
+      severity: 'success',
+      summary: `${params.name}`,
+      detail: '수정되었습니다',
+      life: 1000,
+    });
   } catch (error) {
     console.log(error);
   }

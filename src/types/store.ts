@@ -55,7 +55,7 @@ export interface FetchByGradeGroupParams
 
 export interface ModifySingleParams {
   uid: string;
-  [key: string]: string;
+  [key: string]: any;
 }
 
 export interface RemoveMultipleParams {

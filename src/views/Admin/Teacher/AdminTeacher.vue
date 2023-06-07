@@ -4,7 +4,7 @@
     :data-source="members"
     :selection="selectedMembers.body"
     @add="openDialogToAddTeacher"
-    @edit="editSelectedMember"
+    @edit="editMember"
     @delete="toggleIsDialogDeleteVisible"
     @select="addSelectedMembers"
   />
@@ -36,13 +36,11 @@ import AdminDialogDelete from '../_partials/AdminDialogDelete.vue';
 import { computed, onMounted, reactive, ref } from 'vue';
 import { useUserStore } from '@/store/user';
 import { useMemberStore } from '@/store/member';
+import type { MemberData } from '@/types';
 
 import { useVuelidate } from '@vuelidate/core';
 import { required, helpers } from '@vuelidate/validators';
-
 import { useToast } from 'primevue/usetoast';
-import type { DataTableRowEditSaveEvent } from 'primevue/datatable';
-import type { MemberData } from '@/types';
 
 const userStore = useUserStore();
 const memberStore = useMemberStore();
@@ -81,6 +79,7 @@ const initSelectedMember: MemberData = {
   role: 'common',
   grade: '',
   group: '',
+  isNewFriendClass: false,
   registeredAt: new Date(),
   remark: '',
 };
@@ -169,23 +168,19 @@ const submitNewMembers = async () => {
 
 const toast = useToast();
 
-const editSelectedMember = async (payload: DataTableRowEditSaveEvent) => {
+const editMember = async (payload: Required<MemberData>) => {
   try {
-    const { data, newData } = payload;
+    const { uid, ...params } = payload;
 
-    if (JSON.stringify(data) !== JSON.stringify(newData)) {
-      const { uid, ...params } = newData;
-      await memberStore.modifySingle({ uid, ...params });
+    await memberStore.modifySingle({ uid, ...params });
+    await getMembers();
 
-      await getMembers();
-
-      toast.add({
-        severity: 'success',
-        summary: `${params.name}`,
-        detail: '수정되었습니다',
-        life: 2000,
-      });
-    }
+    toast.add({
+      severity: 'success',
+      summary: `${params.name}`,
+      detail: '수정되었습니다',
+      life: 1000,
+    });
   } catch (error) {
     console.log(error);
   }
