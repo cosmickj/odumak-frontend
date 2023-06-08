@@ -3,6 +3,7 @@
     :is-loading="isLoading"
     :data-source="members"
     :selection="selectedMembers.body"
+    :column-state="{ role: true }"
     @add="openDialogToAddTeacher"
     @edit="editMember"
     @delete="toggleIsDialogDeleteVisible"

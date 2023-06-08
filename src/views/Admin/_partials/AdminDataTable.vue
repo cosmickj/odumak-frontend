@@ -32,11 +32,7 @@
 
       <Column selectionMode="multiple" :exportable="false" />
 
-      <Column field="name" header="이름" style="min-width: 8rem" />
-
-      <Column field="grade" header="학년" style="min-width: 4.2rem" />
-
-      <Column field="group" header="학급" style="min-width: 4.2rem" />
+      <Column field="name" header="이름" style="min-width: 6rem" />
 
       <Column field="gender" header="성별" style="min-width: 4.2rem">
         <template #body="{ data: { gender } }">
@@ -46,6 +42,24 @@
           />
         </template>
       </Column>
+
+      <Column
+        v-if="columnState?.role"
+        field="role"
+        header="직무"
+        style="min-width: 6rem"
+      >
+        <template #body="{ data: { role } }">
+          <Tag
+            :value="formatRole(role)"
+            :style="`background: ${formatRoleColor(role)}`"
+          />
+        </template>
+      </Column>
+
+      <Column field="grade" header="학년" style="min-width: 4.2rem" />
+
+      <Column field="group" header="학급" style="min-width: 4.2rem" />
 
       <Column field="birth" header="생일" style="min-width: 9rem">
         <template #body="slotProps">
@@ -153,7 +167,7 @@
           <div class="flex-2">
             <SelectButton
               unselectable
-              class="flex [&>*]:flex-1"
+              class="flex"
               v-model="editingMember.role"
               :options="TEACHER_ROLE"
               optionLabel="label"
@@ -297,7 +311,13 @@
 import AdminDataTableHeader from '@/views/Admin/_partials/AdminDataTableHeader.vue';
 
 import { computed, onMounted, ref, watch } from 'vue';
-import { formatDate, formatGender, formatClass } from '@/utils/useFormat';
+import {
+  formatDate,
+  formatGender,
+  formatClass,
+  formatRole,
+  formatRoleColor,
+} from '@/utils/useFormat';
 import { GRADE_OPTIONS, GROUP_OPTIONS, TEACHER_ROLE } from '@/constants/common';
 import type { MemberData } from '@/types';
 
@@ -345,7 +365,7 @@ onMounted(() => {
     const headers = document.querySelectorAll('.p-rowgroup-header td');
 
     Array.from(headers).forEach((rowHeader) => {
-      rowHeader.setAttribute('colspan', '8');
+      rowHeader.setAttribute('colspan', '100');
     });
   }, 300);
 });
