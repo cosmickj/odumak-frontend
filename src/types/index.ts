@@ -3,21 +3,52 @@ import { Timestamp } from 'firebase/firestore';
 /** Common */
 export type Gender = 'male' | 'female';
 
-/** Account */
-export type UserRole = 'admin' | 'main' | 'sub' | 'common' | null;
+export type Job = 'student' | 'teacher';
 
+export type Status = 'offline' | 'online' | 'absence';
+
+export type System = 'admin' | 'user';
+export type Teacher = 'head' | 'assistant' | 'common';
+export type Executive =
+  | 'director' // 부장
+  | 'deputyDirector' // 차장
+  | 'generalAffairs' // 총무
+  | 'accountant' // 회계
+  | 'secretary'; // 서기
+export type Officer =
+  | 'pastor' // 목사
+  | 'evangelist' // 전도사
+  | 'missionary' // 선교사
+  | 'elder' // 장로
+  | 'seniorDeaconess' // 권사
+  | 'ordainedDeacon' // 안수 집사
+  | 'deacon' // 남자 집사
+  | 'deaconess' // 여자 집사
+  | 'deputyDeacon' // 남자 서리집사
+  | 'deputyDeaconess' // 여자 서리집사
+  | 'layman'; // 평신도
+export interface Role {
+  system: System;
+  teacher: Teacher;
+  executive?: Executive;
+  officer?: Officer;
+  [key: string]: string | undefined;
+  // 참고: https://jcwebs.net/english/?uid=1&mod=document
+}
+
+/** Account */
 export interface UserData {
   uid: string;
   name: string;
   birth: Date | null;
   email: string;
   provider: 'naver' | 'kakao';
-  profileImage: string | null;
-  church: string | null;
-  department: string | null;
-  role: UserRole | null;
-  grade: string | null;
-  group: string | null;
+  profileImage: string;
+  church: string;
+  department: string;
+  grade: string;
+  group: string;
+  role: Role;
   isAccepted: boolean;
   isRejected: boolean;
   rejectedReason: string;
@@ -25,8 +56,6 @@ export interface UserData {
 }
 
 /** Member */
-export type MemberJob = 'student' | 'teacher';
-
 export interface MemberData {
   uid?: string;
   name: string;
@@ -35,13 +64,11 @@ export interface MemberData {
   gender: Gender;
   church: string;
   department: string;
-  job: MemberJob;
-  role: UserRole | null;
+  job: Job;
   grade: string;
   group: string;
+  role: Role;
   isNewFriendClass: boolean;
-  // phone: string;
-  // address: string;
   registeredAt: Date;
   remark: string;
   createdAt?: Date;
@@ -54,10 +81,7 @@ export interface AttendanceData
     'name' | 'church' | 'department' | 'job' | 'grade' | 'group' | 'role'
   > {
   uid: string;
-  attendance: {
-    date: Date | Timestamp;
-    status: 'offline' | 'online' | 'absence';
-  };
+  attendance: { date: Date | Timestamp; status: Status };
   createdAt?: Date;
   createdBy?: string;
 }

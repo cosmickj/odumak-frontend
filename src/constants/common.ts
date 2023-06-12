@@ -32,8 +32,8 @@ const GENDER: Option[] = [
 ];
 
 const TEACHER_ROLE: Option[] = [
-  { label: '담임', value: 'main' },
-  { label: '부담임', value: 'sub' },
+  { label: '담임', value: 'head' },
+  { label: '부담임', value: 'assistant' },
   { label: '해당 없음', value: 'common' },
 ];
 

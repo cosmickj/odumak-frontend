@@ -79,7 +79,7 @@ const initSelectedStudent: MemberData = {
   church: '',
   department: '',
   job: 'student',
-  role: null,
+  role: { system: 'user', teacher: 'common' },
   grade: '',
   group: '',
   isNewFriendClass: false,

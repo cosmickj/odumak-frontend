@@ -2,7 +2,7 @@
   <div class="flex-1 flex flex-col justify-between">
     <div>
       <div class="text-lg">
-        <p v-if="role === 'common'">
+        <p v-if="role.teacher === 'common'">
           아래 이름 중
           <span class="text-orange-400"> {{ church }} {{ department }} </span>
           공동체를 모두 선택 후 제출하기를 눌러주세요. (최대 3명)
@@ -125,7 +125,7 @@ const shuffle = (array: Candidate[]) => {
 
 onActivated(async () => {
   try {
-    if (role.value === 'common') {
+    if (role.value.teacher === 'common') {
       members.value = await memberStore.fetchAll({
         church: church.value,
         department: department.value,

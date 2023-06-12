@@ -17,13 +17,16 @@
 
     <section v-else>
       <CheckerTeachers
-        v-if="userData.role === 'admin'"
+        v-if="userData.role.system === 'admin'"
         :attendances="attendances"
         :attendance-date="attendanceDate"
       />
 
       <CheckerStudents
-        v-else-if="userData.role === 'main' || userData.role === 'sub'"
+        v-else-if="
+          userData.role.teacher === 'head' ||
+          userData.role.teacher === 'assistant'
+        "
         :attendances="attendances"
       />
 
@@ -78,8 +81,8 @@ const userData = computed(() => userStore.userData!);
 
 const RequestJobMap = {
   admin: 'teacher' as const,
-  main: 'student' as const,
-  sub: 'student' as const,
+  head: 'student' as const,
+  assistant: 'student' as const,
   common: null,
 };
 const requestJob = computed(() => RequestJobMap[userData.value.role!]);

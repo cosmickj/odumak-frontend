@@ -177,7 +177,7 @@
 
             <Transition>
               <div
-                v-if="editingMember.role !== 'common'"
+                v-if="editingMember.role.teacher !== 'common'"
                 class="flex my-2 items-center justify-between"
               >
                 <p>새친구 학급이신가요?</p>
@@ -192,7 +192,10 @@
             </Transition>
 
             <Transition>
-              <div v-if="editingMember.role !== 'common'" class="flex gap-4">
+              <div
+                v-if="editingMember.role.teacher !== 'common'"
+                class="flex gap-4"
+              >
                 <Dropdown
                   class="flex-1"
                   v-model="editingMember.grade"

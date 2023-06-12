@@ -77,7 +77,7 @@ const initSelectedMember: MemberData = {
   church: '',
   department: '',
   job: 'teacher',
-  role: 'common',
+  role: { system: 'user', teacher: 'common' },
   grade: '',
   group: '',
   isNewFriendClass: false,

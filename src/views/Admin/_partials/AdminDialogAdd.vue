@@ -57,7 +57,7 @@
         <label for="role" class="mb-1">담임 여부</label>
         <SelectButton
           unselectable
-          v-model="member.role"
+          v-model="member.role.teacher"
           class="flex"
           :options="TEACHER_ROLE"
           optionLabel="label"

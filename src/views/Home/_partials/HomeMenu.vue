@@ -16,10 +16,10 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { MemberJob } from '@/types';
+import { Job } from '@/types';
 
 const props = defineProps<{
-  job: MemberJob;
+  job: Job;
   type: 'daily' | 'total';
   routeName: string;
 }>();

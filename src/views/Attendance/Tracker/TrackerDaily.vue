@@ -89,7 +89,7 @@
               class="flex-1 text-sm text-center"
             >
               <p>
-                {{ formatRole(slotProps.data.role) }}
+                {{ formatRole(slotProps.data.role.teacher) }}
               </p>
               <p>{{ slotProps.data.grade }} - {{ slotProps.data.group }}</p>
             </div>
@@ -128,7 +128,7 @@
               class="flex-1 text-sm text-center flex gap-2"
             >
               <span>
-                {{ formatRole(slotProps.data.role) }}
+                {{ formatRole(slotProps.data) }}
               </span>
               <span>
                 {{ slotProps.data.grade }} - {{ slotProps.data.group }}

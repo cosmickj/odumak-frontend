@@ -5,7 +5,7 @@
         <label for="role" class="mb-1">담임 여부</label>
         <SelectButton
           unselectable
-          v-model="role"
+          v-model="role.teacher"
           class="flex"
           optionLabel="label"
           optionValue="value"
@@ -13,7 +13,7 @@
         />
       </div>
 
-      <div v-if="role !== 'common'">
+      <div v-if="role.teacher !== 'common'">
         <p class="mb-1">새친구 학급이신가요?</p>
 
         <div
@@ -26,7 +26,7 @@
       </div>
 
       <div
-        v-if="role !== 'common' && !isNewFriendClassTeacher"
+        v-if="role.teacher !== 'common' && !isNewFriendClassTeacher"
         class="flex flex-col"
       >
         <p class="mb-1">담당 학년</p>
@@ -41,7 +41,7 @@
       </div>
 
       <div
-        v-if="role !== 'common' && !isNewFriendClassTeacher"
+        v-if="role.teacher !== 'common' && !isNewFriendClassTeacher"
         class="flex flex-col"
       >
         <p class="mb-1">담당 학급</p>
@@ -92,7 +92,7 @@ if (!church.value || !department.value || !name.value) {
 }
 
 watch(role, (newValue) => {
-  if (newValue === 'common') {
+  if (newValue.teacher === 'common') {
     grade.value = '';
     group.value = '';
   }
@@ -113,10 +113,10 @@ watch(isNewFriendClassTeacher, (newValue) => {
 const rules = computed(() => ({
   role: { required },
   grade: {
-    requiredIf: requiredIf(role.value !== 'common'),
+    requiredIf: requiredIf(role.value.teacher !== 'common'),
   },
   group: {
-    requiredIf: requiredIf(role.value !== 'common'),
+    requiredIf: requiredIf(role.value.teacher !== 'common'),
   },
 }));
 

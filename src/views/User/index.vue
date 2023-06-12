@@ -160,13 +160,13 @@ const department = computed(() => {
 
 const role = computed(() => {
   const _role = userStore.userData?.role;
-  if (_role === 'admin') {
+  if (_role?.system === 'admin') {
     return '관리자';
-  } else if (_role === 'main') {
+  } else if (_role?.teacher === 'head') {
     return '담임';
-  } else if (_role === 'sub') {
+  } else if (_role?.teacher === 'assistant') {
     return '부담임';
-  } else if (_role === 'common') {
+  } else if (_role?.teacher === 'common') {
     return '일반';
   } else {
     return '없음';

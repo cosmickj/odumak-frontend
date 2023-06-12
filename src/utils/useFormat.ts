@@ -1,11 +1,11 @@
-import { Gender, MemberData, UserRole } from '@/types';
+import { Gender, MemberData, Role } from '@/types';
 
 const formatClass = ({ grade, group, job, role }: MemberData) => {
   if (job === 'student') {
     return `${grade}학년 ${group !== '0' ? group + '반' : '새친구'}`;
   }
   if (job === 'teacher') {
-    if (role === 'common') {
+    if (role.teacher === 'common') {
       return '비담임교사';
     } else {
       return (
@@ -33,19 +33,19 @@ const formatGender = (gender: Gender) => GenderMap[gender];
 
 const RoleMap = {
   admin: '관리자',
-  main: '담임',
-  sub: '부담임',
+  head: '담임',
+  assistant: '부담임',
   common: '일반',
 };
-const formatRole = (role: UserRole) => (role ? RoleMap[role] : '-');
+const formatRole = (role: Role) => (role ? RoleMap[role.teacher] : '-');
 
 const RoleColorMap = {
   admin: '#6A2C70',
-  main: '#7D5A50',
-  sub: '#B4846C',
+  head: '#7D5A50',
+  assistant: '#B4846C',
   common: '#B7C4CF',
 };
-const formatRoleColor = (role: UserRole) =>
-  role ? RoleColorMap[role] : '#000';
+const formatRoleColor = (role: Role) =>
+  role ? RoleColorMap[role.teacher] : '#000';
 
 export { formatClass, formatDate, formatGender, formatRole, formatRoleColor };
