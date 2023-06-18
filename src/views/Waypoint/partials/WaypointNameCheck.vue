@@ -63,7 +63,7 @@ const nextPage = async () => {
 
   if (!member.length) {
     alert(
-      `${name} 선생님은 현재 ${church} ${department}에 등록되어 있지 않아 승인이 불가능합니다. 관리자에게 문의해주시기 바랍니다.`
+      `${name.value} 선생님은 현재 ${church.value} ${department.value}에 등록되어 있지 않아 승인이 불가능합니다. 관리자에게 문의해주시기 바랍니다.`
     );
   } else {
     emit('nextPage', { index: 1 });

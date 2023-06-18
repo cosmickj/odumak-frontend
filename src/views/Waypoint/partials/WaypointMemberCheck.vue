@@ -34,7 +34,7 @@
             :key="i"
           >
             <ToggleButton
-              class="flex aspect-square bg-white rounded-md text-xs xs:text-base items-center justify-center shadow"
+              class="flex aspect-square rounded-md text-xs xs:text-base items-center justify-center shadow"
               v-model="candidate.checked"
               :on-label="candidate.name"
               :off-label="candidate.name"
@@ -171,7 +171,7 @@ const complete = async () => {
         toggleButtonRefs.value.forEach((ele) => {
           ele.classList.remove('wrong');
         });
-      }, 900);
+      }, 800);
     } else {
       alert('인증되었습니다! 감사합니다!');
 
@@ -183,7 +183,7 @@ const complete = async () => {
         grade: grade.value,
         group: group.value,
         name: name.value,
-        role: role.value,
+        role: { ...role.value },
       });
 
       const currentUser = (await getCurrentUser()) as User;
@@ -200,6 +200,7 @@ const complete = async () => {
           };
         }
       }
+
       router.push({ name: 'HomeView' });
     }
   } catch (error) {

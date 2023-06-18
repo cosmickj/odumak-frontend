@@ -36,14 +36,17 @@ export interface Role {
   // 참고: https://jcwebs.net/english/?uid=1&mod=document
 }
 
-/** Account */
-export interface UserData {
-  uid: string;
-  name: string;
-  birth: Date | null;
+/** User */
+export interface OAuthData {
   email: string;
   provider: 'naver' | 'kakao';
   profileImage: string;
+}
+
+export interface UserData extends OAuthData {
+  uid: string;
+  name: string;
+  birth: Date | null;
   church: string;
   department: string;
   grade: string;
@@ -56,22 +59,13 @@ export interface UserData {
 }
 
 /** Member */
-export interface MemberData {
-  uid?: string;
-  name: string;
-  birth: Date | null;
+export interface MemberData extends Omit<UserData, keyof OAuthData> {
   birthLater: boolean;
   gender: Gender;
-  church: string;
-  department: string;
-  job: Job;
-  grade: string;
-  group: string;
-  role: Role;
   isNewFriendClass: boolean;
+  job: Job;
   registeredAt: Date;
   remark: string;
-  createdAt?: Date;
 }
 
 /** Attendance */
