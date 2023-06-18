@@ -3,16 +3,9 @@
     :is-loading="isLoading"
     :data-source="members"
     :selection="selectedMembers.body"
-    :column-state="{
-      name: true,
-      gender: true,
-      grade: true,
-      group: true,
-      registeredAt: true,
-      remark: true,
-    }"
+    :column-state="{ role: true }"
     @add="openDialogToAddTeacher"
-    @edit="editSelectedMember"
+    @edit="editMember"
     @delete="toggleIsDialogDeleteVisible"
     @select="addSelectedMembers"
   />
@@ -44,13 +37,11 @@ import AdminDialogDelete from '../_partials/AdminDialogDelete.vue';
 import { computed, onMounted, reactive, ref } from 'vue';
 import { useUserStore } from '@/store/user';
 import { useMemberStore } from '@/store/member';
+import type { MemberData } from '@/types';
 
 import { useVuelidate } from '@vuelidate/core';
 import { required, helpers } from '@vuelidate/validators';
-
 import { useToast } from 'primevue/usetoast';
-import type { DataTableCellEditCompleteEvent } from 'primevue/datatable';
-import type { MemberData } from '@/types';
 
 const userStore = useUserStore();
 const memberStore = useMemberStore();
@@ -86,11 +77,10 @@ const initSelectedMember: MemberData = {
   church: '',
   department: '',
   job: 'teacher',
-  role: 'common',
+  role: { system: 'user', teacher: 'common' },
   grade: '',
   group: '',
-  phone: '',
-  address: '',
+  isNewFriendClass: false,
   registeredAt: new Date(),
   remark: '',
 };
@@ -179,26 +169,19 @@ const submitNewMembers = async () => {
 
 const toast = useToast();
 
-const editSelectedMember = async (payload: DataTableCellEditCompleteEvent) => {
+const editMember = async (payload: Required<MemberData>) => {
   try {
-    const { data, newData, field, newValue } = payload;
+    const { uid, ...params } = payload;
 
-    if (JSON.stringify(data) !== JSON.stringify(newData)) {
-      await memberStore.modifySingle({
-        uid: data.uid,
-        field: field,
-        value: newValue,
-      });
+    await memberStore.modifySingle({ uid, ...params });
+    await getMembers();
 
-      await getMembers();
-
-      toast.add({
-        severity: 'success',
-        summary: `${data.name}`,
-        detail: '수정되었습니다',
-        life: 2000,
-      });
-    }
+    toast.add({
+      severity: 'success',
+      summary: `${params.name}`,
+      detail: '수정되었습니다',
+      life: 1000,
+    });
   } catch (error) {
     console.log(error);
   }

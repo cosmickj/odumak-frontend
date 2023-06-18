@@ -57,7 +57,7 @@
         <label for="role" class="mb-1">담임 여부</label>
         <SelectButton
           unselectable
-          v-model="member.role"
+          v-model="member.role.teacher"
           class="flex"
           :options="TEACHER_ROLE"
           optionLabel="label"
@@ -130,18 +130,18 @@
         </div>
       </div>
 
-      <div class="flex gap-x-5 mx-6 mb-2">
+      <!-- <div class="flex gap-x-5 mx-6 mb-2">
         <div class="flex-1">
           <p>주소</p>
           <InputText v-model="member.address" class="w-full" />
         </div>
-      </div>
+      </div> -->
 
       <div class="flex gap-x-5 mx-6 mb-2">
-        <div class="flex-1">
+        <!-- <div class="flex-1">
           <p>연락처</p>
           <InputText v-model="member.phone" class="w-full" />
-        </div>
+        </div> -->
 
         <div class="flex-1">
           <p>비고</p>

@@ -2,7 +2,7 @@
   <div class="flex-1 flex flex-col justify-between">
     <div>
       <div class="text-lg">
-        <p v-if="role === 'common'">
+        <p v-if="role.teacher === 'common'">
           아래 이름 중
           <span class="text-orange-400"> {{ church }} {{ department }} </span>
           공동체를 모두 선택 후 제출하기를 눌러주세요. (최대 3명)
@@ -34,7 +34,7 @@
             :key="i"
           >
             <ToggleButton
-              class="flex aspect-square bg-white rounded-md text-xs xs:text-base items-center justify-center shadow"
+              class="flex aspect-square rounded-md text-xs xs:text-base items-center justify-center shadow"
               v-model="candidate.checked"
               :on-label="candidate.name"
               :off-label="candidate.name"
@@ -125,7 +125,7 @@ const shuffle = (array: Candidate[]) => {
 
 onActivated(async () => {
   try {
-    if (role.value === 'common') {
+    if (role.value.teacher === 'common') {
       members.value = await memberStore.fetchAll({
         church: church.value,
         department: department.value,
@@ -171,7 +171,7 @@ const complete = async () => {
         toggleButtonRefs.value.forEach((ele) => {
           ele.classList.remove('wrong');
         });
-      }, 900);
+      }, 800);
     } else {
       alert('인증되었습니다! 감사합니다!');
 
@@ -183,7 +183,7 @@ const complete = async () => {
         grade: grade.value,
         group: group.value,
         name: name.value,
-        role: role.value,
+        role: { ...role.value },
       });
 
       const currentUser = (await getCurrentUser()) as User;
@@ -200,6 +200,7 @@ const complete = async () => {
           };
         }
       }
+
       router.push({ name: 'HomeView' });
     }
   } catch (error) {

@@ -5,7 +5,7 @@
         <label for="role" class="mb-1">담임 여부</label>
         <SelectButton
           unselectable
-          v-model="role"
+          v-model="role.teacher"
           class="flex"
           optionLabel="label"
           optionValue="value"
@@ -13,7 +13,7 @@
         />
       </div>
 
-      <div v-if="role !== 'common'">
+      <div v-if="role.teacher !== 'common'">
         <p class="mb-1">새친구 학급이신가요?</p>
 
         <div
@@ -26,7 +26,7 @@
       </div>
 
       <div
-        v-if="role !== 'common' && !isNewFriendClassTeacher"
+        v-if="role.teacher !== 'common' && !isNewFriendClassTeacher"
         class="flex flex-col"
       >
         <p class="mb-1">담당 학년</p>
@@ -41,7 +41,7 @@
       </div>
 
       <div
-        v-if="role !== 'common' && !isNewFriendClassTeacher"
+        v-if="role.teacher !== 'common' && !isNewFriendClassTeacher"
         class="flex flex-col"
       >
         <p class="mb-1">담당 학급</p>
@@ -91,12 +91,16 @@ if (!church.value || !department.value || !name.value) {
   router.push({ name: 'GroupCheck' });
 }
 
-watch(role, (newValue) => {
-  if (newValue === 'common') {
-    grade.value = '';
-    group.value = '';
-  }
-});
+watch(
+  role,
+  (newValue) => {
+    if (newValue.teacher === 'common') {
+      grade.value = '';
+      group.value = '';
+    }
+  },
+  { deep: true }
+);
 
 const isNewFriendClassTeacher = ref(false);
 
@@ -113,10 +117,10 @@ watch(isNewFriendClassTeacher, (newValue) => {
 const rules = computed(() => ({
   role: { required },
   grade: {
-    requiredIf: requiredIf(role.value !== 'common'),
+    requiredIf: requiredIf(role.value.teacher !== 'common'),
   },
   group: {
-    requiredIf: requiredIf(role.value !== 'common'),
+    requiredIf: requiredIf(role.value.teacher !== 'common'),
   },
 }));
 
@@ -145,7 +149,7 @@ const nextPage = async () => {
   if (
     member.grade !== grade.value ||
     member.group !== group.value ||
-    member.role !== role.value
+    member.role.teacher !== role.value.teacher
   ) {
     const message = `현재 ${church.value} ${department.value}에 등록되어 있는 정보와 입력하신 정보가 일치하지 않아 승인이 불가능합니다. 관리자에게 문의해주시기 바랍니다.`;
     return alert(message);

@@ -7,8 +7,8 @@ const departmentOptions = [
   { name: '테스트', value: '테스트' },
 ];
 const roleOptions = [
-  { name: '담임', value: 'main' },
-  { name: '부담임', value: 'sub' },
+  { name: '담임', value: 'head' },
+  { name: '부담임', value: 'assistant' },
   { name: '해당 없음', value: 'common' },
 ];
 const gradeOptions = [

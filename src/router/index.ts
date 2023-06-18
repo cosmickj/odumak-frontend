@@ -174,7 +174,7 @@ router.beforeEach(async (to, from, next) => {
       });
       return next({ name: 'HomeView' });
     }
-    if (needAdmin && userData?.role !== 'admin') {
+    if (needAdmin && userData?.role.system !== 'admin') {
       return next({ name: 'HomeView' });
     }
   }

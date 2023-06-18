@@ -53,7 +53,7 @@
       />
 
       <RouterLink
-        v-if="userStore.userData?.role === 'admin'"
+        v-if="userStore.userData?.role.system === 'admin'"
         class="bg-purple-300 text-purple-700 rounded-lg"
         :to="{ name: 'AdminStudent' }"
       >
@@ -198,7 +198,7 @@
               </div>
             </div>
 
-            <div class="flex gap-x-5 mb-2">
+            <!-- <div class="flex gap-x-5 mb-2">
               <div class="flex-1">
                 <InputText
                   v-model="student.address"
@@ -206,16 +206,16 @@
                   placeholder="주소"
                 />
               </div>
-            </div>
+            </div> -->
 
             <div class="flex gap-x-5 mb-2">
-              <div class="flex-1">
+              <!-- <div class="flex-1">
                 <InputText
                   v-model="student.phone"
                   class="w-full"
                   placeholder="연락처"
                 />
-              </div>
+              </div> -->
 
               <div class="flex-1">
                 <InputText
@@ -295,11 +295,10 @@ const initSelectedStudent: NewStudent = {
   church: '',
   department: '',
   job: 'student',
-  role: null,
+  isNewFriendClass: false,
   grade: '',
   group: '',
-  phone: '',
-  address: '',
+  role: { system: 'user', teacher: 'common' },
   registeredAt: getPreviousSunday(),
   remark: '',
 };

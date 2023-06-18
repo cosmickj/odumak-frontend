@@ -90,17 +90,16 @@
           />
 
           <SelectButton
-            v-model="role"
+            v-model="role.teacher"
             class="grid grid-cols-3"
             :unselectable="false"
             :options="roleOptions"
             optionLabel="name"
             optionValue="value"
-            placeholder="담당 학년"
           />
 
           <Transition>
-            <div v-if="role === 'main' || role === 'sub'">
+            <div v-if="role.teacher === 'head' || role.teacher === 'assistant'">
               <div class="grid grid-cols-3 gap-2">
                 <Dropdown
                   v-model="grade"
@@ -162,7 +161,7 @@ import {
   groupOptions,
   roleOptions,
 } from './data';
-import type { UserRole } from '@/types';
+import type { Role } from '@/types';
 
 const router = useRouter();
 
@@ -178,15 +177,24 @@ const church = ref('영은교회');
 const department = ref('초등부');
 const grade = ref('na');
 const group = ref('na');
-const role = ref<UserRole>('common');
+const role = ref<Role>({
+  system: 'user',
+  teacher: 'common',
+});
 
 const isNewGroup = ref(false);
 
 watch(role, (newVal, oldVal) => {
-  if (newVal === 'common' && (oldVal === 'main' || oldVal === 'sub')) {
+  if (
+    newVal.teacher === 'common' &&
+    (oldVal.teacher === 'head' || oldVal.teacher === 'assistant')
+  ) {
     grade.value = 'na';
     group.value = 'na';
-  } else if ((newVal === 'main' || newVal === 'sub') && oldVal === 'common') {
+  } else if (
+    oldVal.teacher === 'common' &&
+    (newVal.teacher === 'head' || newVal.teacher === 'assistant')
+  ) {
     grade.value = '3';
     group.value = '1';
     isNewGroup.value = false;

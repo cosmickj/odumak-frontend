@@ -49,7 +49,7 @@ waypointStore.$patch({
   name: userStore.userData?.name || '',
   church: userStore.userData?.church || '',
   department: userStore.userData?.department || '',
-  role: userStore.userData?.role || 'common',
+  role: userStore.userData?.role || { system: 'user', teacher: 'common' },
   grade: userStore.userData?.grade || '',
   group: userStore.userData?.group || '',
 });

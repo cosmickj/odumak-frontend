@@ -6,176 +6,314 @@
     @export="exportDataTable"
   />
 
-  <DataTable
-    ref="dataTableRef"
-    row-hover
-    resizable-columns
-    column-resize-mode="fit"
-    responsive-layout="scroll"
-    edit-mode="cell"
-    paginator
-    :rows="10"
-    :rows-per-page-options="[5, 10, 15, 20]"
-    :value="dataSource"
-    :loading="isLoading"
-    v-model:selection="selectionRef"
-    @update:selection="handleSelect"
-    @cell-edit-complete="handleEdit"
-  >
-    <template #empty>
-      <p>등록된 인원이 없습니다.</p>
-    </template>
-
-    <Column selectionMode="multiple" :exportable="false" />
-
-    <Column
-      v-if="columnState['name']"
-      field="name"
-      header="이름"
-      style="min-width: 6rem"
+  <div class="bg-[#dadde2]">
+    <DataTable
+      ref="dataTableRef"
+      row-group-mode="subheader"
+      :group-rows-by="groupRowsBy"
+      row-hover
+      scrollable
+      scroll-height="calc(100vh - 95px)"
+      :value="dataSource"
+      :loading="isLoading"
+      v-model:selection="selectionRef"
+      @update:selection="handleSelect"
     >
-      <template #editor="{ data, field }">
-        <InputText v-model="data[field]" class="w-full" />
+      <template #empty>
+        <p>등록된 인원이 없습니다.</p>
       </template>
-    </Column>
 
-    <Column
-      v-if="columnState['birth']"
-      field="birth"
-      header="생일"
-      style="min-width: 10rem"
+      <template #groupheader="slotProps">
+        <div>
+          <i class="pi pi-users"></i>
+          <span class="ml-4">{{ formatClass(slotProps.data) }}</span>
+        </div>
+      </template>
+
+      <Column selectionMode="multiple" :exportable="false" />
+
+      <Column field="name" header="이름" style="min-width: 6rem" />
+
+      <Column field="gender" header="성별" style="min-width: 4.2rem">
+        <template #body="{ data: { gender } }">
+          <Tag
+            :value="formatGender(gender)"
+            :severity="gender === 'male' ? 'primary' : 'danger'"
+          />
+        </template>
+      </Column>
+
+      <Column
+        v-if="columnState?.role"
+        field="role"
+        header="직무"
+        style="min-width: 6rem"
+      >
+        <template #body="{ data: { role } }">
+          <Tag
+            :value="formatRole(role)"
+            :style="`background: ${formatRoleColor(role)}`"
+          />
+        </template>
+      </Column>
+
+      <Column field="grade" header="학년" style="min-width: 4.2rem" />
+
+      <Column field="group" header="학급" style="min-width: 4.2rem" />
+
+      <Column field="birth" header="생일" style="min-width: 9rem">
+        <template #body="slotProps">
+          <span>{{ formatDate(slotProps.data.birth) }}</span>
+        </template>
+      </Column>
+
+      <Column header="등록일" field="registeredAt" style="min-width: 9rem">
+        <template #body="slotProps">
+          <span>{{ formatDate(slotProps.data.registeredAt) }}</span>
+        </template>
+      </Column>
+
+      <Column header="비고" field="remark" style="min-width: 8rem" />
+
+      <Column>
+        <template #body="slotProps">
+          <Button
+            text
+            severity="info"
+            icon="pi pi-pencil"
+            class="w-6 aspect-square"
+            @click="showEditDialog(slotProps.data)"
+          />
+        </template>
+      </Column>
+    </DataTable>
+
+    <Dialog
+      modal
+      class="w-[40vw] max-w-[480px]"
+      header="수정하기"
+      position="bottomright"
+      v-model:visible="editingVisible"
+      :closable="false"
+      :draggable="false"
+      :breakpoints="{ '640px': '90vw' }"
     >
-      <template #body="slotProps">
-        <span>
-          {{ formatDate(slotProps.data.birth) }}
-        </span>
-      </template>
+      <section class="flex flex-col">
+        <div class="flex items-start">
+          <div class="flex-1">
+            <p class="font-bold text-lg">기본 정보</p>
+          </div>
 
-      <template #editor="{ data, field }">
-        <Calendar showButtonBar v-model="data[field]" class="w-full" />
-      </template>
-    </Column>
+          <div class="flex-2">
+            <p class="mb-2 font-bold">이름</p>
+            <InputText
+              v-model="editingMember.name"
+              class="w-full"
+              :class="{ 'p-invalid': $v.name.$error }"
+            />
 
-    <Column
-      v-if="columnState['gender']"
-      field="gender"
-      header="성별"
-      style="min-width: 8rem"
-    >
-      <template #body="slotProps">
-        <span>
-          {{ formatGender(slotProps.data.gender) }}
-        </span>
-      </template>
+            <div class="flex gap-8 my-2">
+              <p class="font-bold">성별</p>
+              <div class="flex items-center">
+                <RadioButton
+                  v-model="editingMember.gender"
+                  input-id="male"
+                  name="gender"
+                  value="male"
+                />
+                <label class="ml-2 cursor-pointer" for="male">남자</label>
 
-      <template #editor="{ data, field }">
-        <Dropdown
-          v-model="data[field]"
-          :options="[
-            { label: '남자', value: 'male' },
-            { label: '여자', value: 'female' },
-          ]"
-          optionLabel="label"
-          optionValue="value"
+                <RadioButton
+                  class="ml-2"
+                  v-model="editingMember.gender"
+                  input-id="female"
+                  name="gender"
+                  value="female"
+                />
+                <label class="ml-2 cursor-pointer" for="female">여자</label>
+              </div>
+            </div>
+
+            <div class="flex gap-8">
+              <p class="font-bold mb-2">생년월일</p>
+            </div>
+
+            <Calendar
+              touch-u-i
+              showButtonBar
+              v-model="editingMember.birth"
+              id="birth"
+              class="w-full"
+              :class="{ 'p-invalid': $v.birth.$error }"
+              placeholder="생년월일을 선택해주세요"
+              :disabled="editingMember.birthLater"
+            />
+
+            <div class="flex mt-1 items-center">
+              <Checkbox
+                binary
+                input-id="birthLater"
+                v-model="editingMember.birthLater"
+              />
+              <label class="ml-2 cursor-pointer select-none" for="birthLater">
+                나중에 입력할게요
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <hr class="h-1 my-3 border-0 bg-slate-200" />
+
+        <div v-if="editingMember.job === 'teacher'" class="flex items-start">
+          <div class="flex-1">
+            <p class="font-bold text-lg">담임 정보</p>
+          </div>
+
+          <div class="flex-2">
+            <SelectButton
+              unselectable
+              class="flex"
+              optionLabel="label"
+              optionValue="value"
+              :options="TEACHER_ROLE"
+              v-model="editingMember.role!.teacher"
+            />
+
+            <Transition>
+              <div
+                v-if="editingMember.role!.teacher !== 'common'"
+                class="flex my-2 items-center justify-between"
+              >
+                <p>새친구 학급이신가요?</p>
+
+                <div class="flex gap-2 items-center">
+                  <p :class="switchState(editingMember.isNewFriendClass)">
+                    {{ editingMember.isNewFriendClass ? '네' : '아니요' }}
+                  </p>
+                  <InputSwitch v-model="editingMember.isNewFriendClass" />
+                </div>
+              </div>
+            </Transition>
+
+            <Transition>
+              <div
+                v-if="editingMember.role!.teacher !== 'common'"
+                class="flex gap-4"
+              >
+                <Dropdown
+                  class="flex-1"
+                  :class="{ 'p-invalid': $v.grade.$error }"
+                  v-model="editingMember.grade"
+                  placeholder="학년 선택"
+                  optionLabel="label"
+                  optionValue="value"
+                  :options="GRADE_OPTIONS"
+                  :disabled="editingMember.isNewFriendClass"
+                />
+
+                <Dropdown
+                  class="flex-1"
+                  :class="{ 'p-invalid': $v.group.$error }"
+                  v-model="editingMember.group"
+                  placeholder="학급 선택"
+                  optionLabel="label"
+                  optionValue="value"
+                  :options="GROUP_OPTIONS"
+                  :disabled="editingMember.isNewFriendClass"
+                />
+              </div>
+            </Transition>
+          </div>
+        </div>
+
+        <div v-else class="flex items-start">
+          <div class="flex-1">
+            <p class="font-bold text-lg">학급 정보</p>
+          </div>
+
+          <div class="flex-2">
+            <div class="flex mb-2 items-center justify-between">
+              <p>새친구인가요?</p>
+
+              <div class="flex gap-2 items-center">
+                <p :class="switchState(editingMember.isNewFriendClass)">
+                  {{ editingMember.isNewFriendClass ? '네' : '아니요' }}
+                </p>
+                <InputSwitch v-model="editingMember.isNewFriendClass" />
+              </div>
+            </div>
+
+            <div class="flex gap-4">
+              <Dropdown
+                class="flex-1"
+                :class="{ 'p-invalid': $v.grade.$error }"
+                v-model="editingMember.grade"
+                placeholder="학년 선택"
+                optionLabel="label"
+                optionValue="value"
+                :options="GRADE_OPTIONS"
+              />
+
+              <Dropdown
+                class="flex-1"
+                :class="{ 'p-invalid': $v.group.$error }"
+                v-model="editingMember.group"
+                placeholder="학급 선택"
+                optionLabel="label"
+                optionValue="value"
+                :options="GROUP_OPTIONS"
+                :disabled="editingMember.isNewFriendClass"
+              />
+            </div>
+          </div>
+        </div>
+
+        <hr class="h-1 my-3 border-0 bg-slate-200" />
+
+        <div class="flex items-start">
+          <div class="flex-1">
+            <p class="font-bold text-lg">추가 정보</p>
+          </div>
+
+          <div class="flex-2">
+            <label class="inline-block mb-2 font-bold" for="registeredAt">
+              교육부 첫 출석일
+            </label>
+            <Calendar
+              id="registeredAt"
+              class="w-full"
+              touch-u-i
+              showButtonBar
+              v-model="editingMember.registeredAt"
+            />
+
+            <label class="inline-block my-2 font-bold" for="remark">비고</label>
+            <InputText
+              id="remark"
+              class="w-full"
+              v-model="editingMember.remark"
+            />
+          </div>
+        </div>
+      </section>
+
+      <template #footer>
+        <Button
+          text
+          label="취소하기"
+          icon="pi pi-times"
+          @click="editingVisible = false"
+        />
+        <Button
+          label="수정하기"
+          severity="warning"
+          icon="pi pi-check"
+          :disabled="isEditButtonClickable"
+          @click="handleEdit"
         />
       </template>
-    </Column>
-
-    <Column
-      v-if="columnState['grade']"
-      header="학년"
-      field="grade"
-      style="min-width: 8rem"
-    >
-      <template #editor="{ data, field }">
-        <Dropdown
-          v-model="data[field]"
-          :options="[
-            { label: '새친구', value: '0' },
-            { label: '3학년', value: '3' },
-            { label: '4학년', value: '4' },
-          ]"
-          optionLabel="label"
-          optionValue="value"
-        />
-      </template>
-    </Column>
-
-    <Column
-      v-if="columnState['group']"
-      header="학급"
-      field="group"
-      style="min-width: 8rem"
-    >
-      <template #editor="{ data, field }">
-        <Dropdown
-          v-model="data[field]"
-          :options="[
-            { label: '새친구', value: '0' },
-            { label: '1반', value: '1' },
-            { label: '2반', value: '2' },
-            { label: '3반', value: '3' },
-            { label: '4반', value: '4' },
-            { label: '5반', value: '5' },
-            { label: '6반', value: '6' },
-            { label: '7반', value: '7' },
-          ]"
-          optionLabel="label"
-          optionValue="value"
-        />
-      </template>
-    </Column>
-
-    <Column
-      v-if="columnState['phone']"
-      header="연락처"
-      field="phone"
-      style="min-width: 6rem"
-    >
-      <template #editor="{ data, field }">
-        <InputText v-model="data[field]" class="w-full" />
-      </template>
-    </Column>
-
-    <Column
-      v-if="columnState['address']"
-      header="주소"
-      field="address"
-      style="min-width: 15rem"
-    >
-      <template #editor="{ data, field }">
-        <InputText v-model="data[field]" class="w-full" />
-      </template>
-    </Column>
-
-    <Column
-      v-if="columnState['registeredAt']"
-      header="등록일"
-      field="registeredAt"
-      style="min-width: 10rem"
-    >
-      <template #body="slotProps">
-        <span>
-          {{ formatDate(slotProps.data.registeredAt) }}
-        </span>
-      </template>
-
-      <template #editor="{ data, field }">
-        <Calendar showButtonBar v-model="data[field]" class="w-full" />
-      </template>
-    </Column>
-
-    <Column
-      v-if="columnState['remark']"
-      header="비고"
-      field="remark"
-      style="min-width: 15rem"
-    >
-      <template #editor="{ data, field }">
-        <InputText v-model="data[field]" class="w-full" />
-      </template>
-    </Column>
-  </DataTable>
+    </Dialog>
+  </div>
 
   <Toast />
 </template>
@@ -183,18 +321,26 @@
 <script setup lang="ts">
 import AdminDataTableHeader from '@/views/Admin/_partials/AdminDataTableHeader.vue';
 
-import { ref, watch } from 'vue';
-import { formatDate, formatGender } from '@/utils/useFormat';
-
-import type DataTable from 'primevue/datatable';
-import type { DataTableCellEditCompleteEvent } from 'primevue/datatable/DataTable';
+import { computed, onMounted, ref, toRaw, watch } from 'vue';
+import {
+  formatDate,
+  formatGender,
+  formatClass,
+  formatRole,
+  formatRoleColor,
+} from '@/utils/useFormat';
+import { GRADE_OPTIONS, GROUP_OPTIONS, TEACHER_ROLE } from '@/constants/common';
 import type { MemberData } from '@/types';
+
+import { useVuelidate } from '@vuelidate/core';
+import { required, requiredIf } from '@vuelidate/validators';
+import type DataTable from 'primevue/datatable';
 
 const props = defineProps<{
   isLoading: boolean;
   dataSource: MemberData[];
   selection: MemberData[];
-  columnState: {
+  columnState?: {
     [field: string]: boolean;
   };
 }>();
@@ -202,11 +348,20 @@ const props = defineProps<{
 const emit = defineEmits(['add', 'edit', 'delete', 'select']);
 
 const handleAdd = () => emit('add');
-const handleEdit = (ev: DataTableCellEditCompleteEvent) => emit('edit', ev);
 const handleDelete = () => emit('delete');
+const handleEdit = async () => {
+  const isFormCorrect = await $v.value.$validate();
+  if (!isFormCorrect) {
+    return;
+  }
+
+  editingVisible.value = false;
+  emit('edit', editingMember.value);
+};
 const handleSelect = () => emit('select', selectionRef.value);
 
 const dataTableRef = ref<DataTable | null>(null);
+
 const exportDataTable = () => {
   if (dataTableRef.value) dataTableRef.value.exportCSV();
 };
@@ -218,11 +373,111 @@ watch(
   (newValue) => (selectionRef.value = newValue),
   { deep: true }
 );
+
+onMounted(() => {
+  setTimeout(() => {
+    const headers = document.querySelectorAll('.p-rowgroup-header td');
+
+    Array.from(headers).forEach((rowHeader) => {
+      rowHeader.setAttribute('colspan', '100');
+    });
+  }, 300);
+});
+
+const groupRowsBy = ({ grade, group }: MemberData) => {
+  return `${grade} ${group}`;
+};
+
+const editingVisible = ref(false);
+const editingMember = ref<Partial<MemberData>>({});
+const editingMemberClone = ref<Partial<MemberData>>({});
+
+const switchState = (flag?: boolean) => {
+  return flag ? 'text-[#2196f3]' : 'text-[#ced4da]';
+};
+
+const showEditDialog = (data: MemberData) => {
+  editingVisible.value = true;
+
+  editingMember.value = structuredClone(toRaw(data));
+  editingMemberClone.value = structuredClone(toRaw(data));
+};
+
+watch(
+  () => editingMember.value.role?.teacher,
+  (newValue) => {
+    if (newValue === 'common') {
+      editingMember.value.grade = '';
+      editingMember.value.group = '';
+      editingMember.value.isNewFriendClass = false;
+    }
+  }
+);
+
+watch(
+  () => editingMember.value.isNewFriendClass,
+  (newValue) => {
+    if (newValue === true) {
+      editingMember.value.grade = '0';
+      editingMember.value.group = '0';
+    } else {
+      editingMember.value.grade = '';
+      editingMember.value.group = '';
+    }
+  }
+);
+
+watch(
+  () => editingMember.value.birthLater,
+  (newValue) => {
+    if (newValue === true) {
+      editingMember.value.birth = null;
+    }
+  }
+);
+
+const isEditButtonClickable = computed(() => {
+  const member = editingMember.value;
+  const clone = editingMemberClone.value;
+
+  return JSON.stringify(member) === JSON.stringify(clone);
+});
+
+const rules = computed(() => ({
+  name: { required },
+  birth: {
+    requiredIf: requiredIf(editingMember.value.birthLater === false),
+  },
+  grade: {
+    requiredIf: requiredIf(editingMember.value.role?.teacher !== 'common'),
+  },
+  group: {
+    requiredIf: requiredIf(editingMember.value.role?.teacher !== 'common'),
+  },
+}));
+
+// @ts-ignore
+const $v = useVuelidate(rules, editingMember);
 </script>
 
 <style scoped>
 :deep(td.p-editable-column.p-cell-editing) {
   padding-top: 0;
   padding-bottom: 0;
+}
+:deep(tr.p-rowgroup-header) {
+  position: unset !important;
+  background: #dadde2;
+}
+:deep(tr.p-rowgroup-header > td) {
+  padding: 8px 16px !important;
+}
+
+.v-enter-active {
+  transition: opacity 0.3s ease;
+}
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
 }
 </style>

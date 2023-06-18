@@ -12,7 +12,7 @@
       </p>
 
       <Button
-        v-if="attendance.role === 'main'"
+        v-if="attendance.role.teacher === 'head'"
         icon="pi pi-chevron-down"
         class="p-button-rounded p-button-text p-button-secondary p-button-sm"
         @click="getSubAttendances(attendance)"
