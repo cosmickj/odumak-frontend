@@ -106,7 +106,11 @@
 
           <div class="flex-2">
             <p class="mb-2 font-bold">이름</p>
-            <InputText class="w-full" v-model="editingMember.name" />
+            <InputText
+              v-model="editingMember.name"
+              class="w-full"
+              :class="{ 'p-invalid': $v.name.$error }"
+            />
 
             <div class="flex gap-8 my-2">
               <p class="font-bold">성별</p>
@@ -135,13 +139,14 @@
             </div>
 
             <Calendar
-              id="birth"
-              class="w-full"
               touch-u-i
               showButtonBar
               v-model="editingMember.birth"
-              :disabled="editingMember.birthLater"
+              id="birth"
+              class="w-full"
+              :class="{ 'p-invalid': $v.birth.$error }"
               placeholder="생년월일을 선택해주세요"
+              :disabled="editingMember.birthLater"
             />
 
             <div class="flex mt-1 items-center">
@@ -168,16 +173,15 @@
             <SelectButton
               unselectable
               class="flex"
-              v-model="editingMember.role"
-              :options="TEACHER_ROLE"
               optionLabel="label"
               optionValue="value"
-              placeholder="담당 학년"
+              :options="TEACHER_ROLE"
+              v-model="editingMember.role!.teacher"
             />
 
             <Transition>
               <div
-                v-if="editingMember.role.teacher !== 'common'"
+                v-if="editingMember.role!.teacher !== 'common'"
                 class="flex my-2 items-center justify-between"
               >
                 <p>새친구 학급이신가요?</p>
@@ -193,27 +197,29 @@
 
             <Transition>
               <div
-                v-if="editingMember.role.teacher !== 'common'"
+                v-if="editingMember.role!.teacher !== 'common'"
                 class="flex gap-4"
               >
                 <Dropdown
                   class="flex-1"
+                  :class="{ 'p-invalid': $v.grade.$error }"
                   v-model="editingMember.grade"
-                  :disabled="editingMember.isNewFriendClass"
-                  :options="GRADE_OPTIONS"
+                  placeholder="학년 선택"
                   optionLabel="label"
                   optionValue="value"
-                  placeholder="학년 선택"
+                  :options="GRADE_OPTIONS"
+                  :disabled="editingMember.isNewFriendClass"
                 />
 
                 <Dropdown
                   class="flex-1"
+                  :class="{ 'p-invalid': $v.group.$error }"
                   v-model="editingMember.group"
-                  :disabled="editingMember.isNewFriendClass"
-                  :options="GROUP_OPTIONS"
+                  placeholder="학급 선택"
                   optionLabel="label"
                   optionValue="value"
-                  placeholder="학급 선택"
+                  :options="GROUP_OPTIONS"
+                  :disabled="editingMember.isNewFriendClass"
                 />
               </div>
             </Transition>
@@ -240,21 +246,23 @@
             <div class="flex gap-4">
               <Dropdown
                 class="flex-1"
+                :class="{ 'p-invalid': $v.grade.$error }"
                 v-model="editingMember.grade"
-                :options="GRADE_OPTIONS"
+                placeholder="학년 선택"
                 optionLabel="label"
                 optionValue="value"
-                placeholder="학년 선택"
+                :options="GRADE_OPTIONS"
               />
 
               <Dropdown
                 class="flex-1"
+                :class="{ 'p-invalid': $v.group.$error }"
                 v-model="editingMember.group"
-                :disabled="editingMember.isNewFriendClass"
-                :options="GROUP_OPTIONS"
+                placeholder="학급 선택"
                 optionLabel="label"
                 optionValue="value"
-                placeholder="학급 선택"
+                :options="GROUP_OPTIONS"
+                :disabled="editingMember.isNewFriendClass"
               />
             </div>
           </div>
@@ -300,7 +308,7 @@
           label="수정하기"
           severity="warning"
           icon="pi pi-check"
-          :disabled="disabled"
+          :disabled="isEditButtonClickable"
           @click="handleEdit"
         />
       </template>
@@ -313,7 +321,7 @@
 <script setup lang="ts">
 import AdminDataTableHeader from '@/views/Admin/_partials/AdminDataTableHeader.vue';
 
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, toRaw, watch } from 'vue';
 import {
   formatDate,
   formatGender,
@@ -325,7 +333,7 @@ import { GRADE_OPTIONS, GROUP_OPTIONS, TEACHER_ROLE } from '@/constants/common';
 import type { MemberData } from '@/types';
 
 import { useVuelidate } from '@vuelidate/core';
-import { required, helpers } from '@vuelidate/validators';
+import { required, requiredIf } from '@vuelidate/validators';
 import type DataTable from 'primevue/datatable';
 
 const props = defineProps<{
@@ -342,9 +350,12 @@ const emit = defineEmits(['add', 'edit', 'delete', 'select']);
 const handleAdd = () => emit('add');
 const handleDelete = () => emit('delete');
 const handleEdit = async () => {
-  // const isFormCorrect = await $v.value.$validate();
-  // if (!isFormCorrect) return;
+  const isFormCorrect = await $v.value.$validate();
+  if (!isFormCorrect) {
+    return;
+  }
 
+  editingVisible.value = false;
   emit('edit', editingMember.value);
 };
 const handleSelect = () => emit('select', selectionRef.value);
@@ -381,28 +392,72 @@ const editingVisible = ref(false);
 const editingMember = ref<Partial<MemberData>>({});
 const editingMemberClone = ref<Partial<MemberData>>({});
 
-const switchState = (flag?: boolean) =>
-  flag ? 'text-[#2196f3]' : 'text-[#ced4da]';
+const switchState = (flag?: boolean) => {
+  return flag ? 'text-[#2196f3]' : 'text-[#ced4da]';
+};
 
 const showEditDialog = (data: MemberData) => {
   editingVisible.value = true;
 
-  editingMember.value = { ...data };
-  editingMemberClone.value = { ...data };
+  editingMember.value = structuredClone(toRaw(data));
+  editingMemberClone.value = structuredClone(toRaw(data));
 };
 
-const disabled = computed(() => {
-  return (
-    JSON.stringify(editingMember.value) ===
-    JSON.stringify(editingMemberClone.value)
-  );
+watch(
+  () => editingMember.value.role?.teacher,
+  (newValue) => {
+    if (newValue === 'common') {
+      editingMember.value.grade = '';
+      editingMember.value.group = '';
+      editingMember.value.isNewFriendClass = false;
+    }
+  }
+);
+
+watch(
+  () => editingMember.value.isNewFriendClass,
+  (newValue) => {
+    if (newValue === true) {
+      editingMember.value.grade = '0';
+      editingMember.value.group = '0';
+    } else {
+      editingMember.value.grade = '';
+      editingMember.value.group = '';
+    }
+  }
+);
+
+watch(
+  () => editingMember.value.birthLater,
+  (newValue) => {
+    if (newValue === true) {
+      editingMember.value.birth = null;
+    }
+  }
+);
+
+const isEditButtonClickable = computed(() => {
+  const member = editingMember.value;
+  const clone = editingMemberClone.value;
+
+  return JSON.stringify(member) === JSON.stringify(clone);
 });
 
-// const rules = computed(() => ({
-//   name: { required },
-// }));
+const rules = computed(() => ({
+  name: { required },
+  birth: {
+    requiredIf: requiredIf(editingMember.value.birthLater === false),
+  },
+  grade: {
+    requiredIf: requiredIf(editingMember.value.role?.teacher !== 'common'),
+  },
+  group: {
+    requiredIf: requiredIf(editingMember.value.role?.teacher !== 'common'),
+  },
+}));
 
-// const $v = useVuelidate(rules, editingMember);
+// @ts-ignore
+const $v = useVuelidate(rules, editingMember);
 </script>
 
 <style scoped>
@@ -418,8 +473,7 @@ const disabled = computed(() => {
   padding: 8px 16px !important;
 }
 
-.v-enter-active,
-.v-leave-active {
+.v-enter-active {
   transition: opacity 0.3s ease;
 }
 .v-enter-from,
