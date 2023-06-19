@@ -1,6 +1,6 @@
 <template>
   <AdminDataTable
-    :is-loading="isLoading"
+    :loading="isLoading"
     :data-source="students"
     :selection="selectedStudents.body"
     @add="openDialogToAddStudent"

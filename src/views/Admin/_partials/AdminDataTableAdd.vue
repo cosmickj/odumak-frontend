@@ -1,5 +1,5 @@
 <template>
-  <TheDialog :visible="isDialogVisible" @close="handleClose">
+  <TheDialog :visible="visible" @close="handleClose">
     <template #header>
       <div class="flex gap-x-4 items-center">
         <Button
@@ -17,9 +17,9 @@
 
     <section class="grid grid-cols-3 gap-4">
       <div
-        v-for="(member, idx) in members"
+        v-for="(member, i) in members"
         class="p-4 rounded bg-stone-500 text-white"
-        :key="idx"
+        :key="i"
       >
         <div class="flex items-start">
           <div class="flex-1">
@@ -28,7 +28,11 @@
 
           <div class="flex-2">
             <p class="mb-2 font-bold">이름</p>
-            <InputText v-model="member.name" class="w-full" />
+            <InputText
+              v-model="member.name"
+              class="w-full"
+              :class="{ 'p-invalid': isInvalid(i, 'name') }"
+            />
 
             <div class="flex gap-8 my-2">
               <p class="font-bold">성별</p>
@@ -116,6 +120,7 @@
               <div v-if="member.role!.teacher !== 'common'" class="flex gap-4">
                 <Dropdown
                   class="flex-1"
+                  :class="{ 'p-invalid': isInvalid(i, 'grade') }"
                   v-model="member.grade"
                   placeholder="학년 선택"
                   optionLabel="label"
@@ -126,6 +131,7 @@
 
                 <Dropdown
                   class="flex-1"
+                  :class="{ 'p-invalid': isInvalid(i, 'group') }"
                   v-model="member.group"
                   placeholder="학급 선택"
                   optionLabel="label"
@@ -205,12 +211,12 @@
         <Button
           label="삭제하기"
           class="p-button-danger p-button-sm"
-          @click="handleDelete(idx)"
+          @click="handleDelete(i)"
         />
         <Button
           label="복사하기"
           class="p-button-help p-button-sm"
-          @click="handleCopy(idx)"
+          @click="handleCopy(i)"
         />
       </div>
     </section>
@@ -225,49 +231,62 @@ import { GRADE_OPTIONS, GROUP_OPTIONS, TEACHER_ROLE } from '@/constants/common';
 import type { MemberData } from '@/types';
 
 const props = defineProps<{
-  isDialogVisible: boolean;
+  v: any;
+  visible: boolean;
   members: MemberData[];
-  errors: any;
 }>();
 
 const emit = defineEmits(['add', 'copy', 'delete', 'submit', 'close']);
+
+const handleAdd = () => emit('add');
+
+const handleCopy = (i: number) => emit('copy', i);
+
+const handleDelete = (i: number) => emit('delete', i);
 
 const handleClose = (payload: boolean) => {
   if (confirm('작업한 내용이 모두 사라집니다. 정말 닫으시겠습니까?')) {
     emit('close', payload);
   }
 };
-const handleAdd = () => emit('add');
-const handleCopy = (index: number) => emit('copy', index);
-const handleDelete = (index: number) => emit('delete', index);
-const handleSubmit = () => emit('submit');
 
-const isInvalid = (index: number, key: string) => {
-  if (props.errors && props.errors[index][key].length > 0) {
+const handleSubmit = async () => {
+  const isFormCorrect = await props.v.$validate();
+  if (!isFormCorrect) {
+    return;
+  }
+
+  emit('submit');
+  emit('close');
+};
+
+const isInvalid = (i: number, key: string) => {
+  const errors = props.v.$errors[0]?.$response?.$errors;
+
+  if (errors && errors[i][key].length > 0) {
     return true;
   }
   return false;
 };
 
-const toggleBirth = (index: number) => {
-  const member = props.members[index];
+// const toggleBirth = (i: number) => {
+//   const member = props.members[i];
 
-  if (member.birthLater) {
-    member.birth = null;
-  } else {
-    const date = new Date();
-    const grade = member.grade ? ~~member.grade + 6 : 9;
-    const year = date.getFullYear() - grade;
+//   if (member.birthLater) {
+//     member.birth = null;
+//   } else {
+//     const date = new Date();
+//     const grade = member.grade ? ~~member.grade + 6 : 9;
+//     const year = date.getFullYear() - grade;
 
-    date.setFullYear(year);
-    date.setMonth(0);
-    date.setDate(1);
+//     date.setFullYear(year);
+//     date.setMonth(0);
+//     date.setDate(1);
 
-    member.birth = date;
-  }
-};
+//     member.birth = date;
+//   }
+// };
 
-const { path } = useRoute();
-
-const job = computed(() => path.split('/').pop());
+// const { path } = useRoute();
+// const job = computed(() => path.split('/').pop());
 </script>

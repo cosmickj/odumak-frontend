@@ -1,9 +1,9 @@
 <template>
   <div
-    v-if="isDialogVisible"
+    v-if="visible"
     class="z-10 fixed inset-0 flex flex-col bg-gray-100 text-black"
   >
-    <div class="flex px-8 pt-8 justify-between">
+    <div class="flex px-4 pt-4 justify-between">
       <slot name="header"></slot>
 
       <Button
@@ -13,18 +13,16 @@
       />
     </div>
 
-    <div class="overflow-auto flex-1 flex flex-wrap gap-4 p-8 items-start">
+    <div class="overflow-auto flex-1 gap-4 p-4 items-start">
       <slot></slot>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{
-  isDialogVisible: boolean;
-}>();
+const props = defineProps<{ visible: boolean }>();
 
 const emit = defineEmits(['close']);
 
-const handleClose = () => emit('close', !props.isDialogVisible);
+const handleClose = () => emit('close', !props.visible);
 </script>
