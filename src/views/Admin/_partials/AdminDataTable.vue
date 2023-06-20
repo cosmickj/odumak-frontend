@@ -1,23 +1,49 @@
 <template>
   <AdminDataTableHeader
-    :selection="selectionRef"
-    @add="handleAdd"
-    @delete="handleDelete"
+    :selection="selectedMembers"
+    @add="addingVisible = true"
+    @delete="deletingVisible = true"
     @export="exportDataTable"
+  />
+
+  <AdminDataTableAdd
+    :v="vAdd"
+    :visible="addingVisible"
+    :members="addingMembers.body"
+    @add="addOneMember"
+    @copy="copyOneMember"
+    @delete="deleteOneMember"
+    @close="resetAllMembers"
+    @submit="handleAdd"
+  />
+
+  <AdminDataTableEdit
+    :v="vEdit"
+    :visible="editingVisible"
+    :member="editingMember"
+    :clone="editingMemberClone"
+    @close="resetEditingState"
+    @edit="handleEdit"
+  />
+
+  <AdminDataTableDelete
+    :visible="deletingVisible"
+    :members="selectedMembers"
+    @cancel="deletingVisible = false"
+    @confirm="handleDelete"
   />
 
   <div class="bg-[#dadde2]">
     <DataTable
       ref="dataTableRef"
+      v-model:selection="selectedMembers"
       row-group-mode="subheader"
       :group-rows-by="groupRowsBy"
       row-hover
       scrollable
       scroll-height="calc(100vh - 95px)"
+      :loading="loading"
       :value="dataSource"
-      :loading="isLoading"
-      v-model:selection="selectionRef"
-      @update:selection="handleSelect"
     >
       <template #empty>
         <p>등록된 인원이 없습니다.</p>
@@ -87,241 +113,20 @@
         </template>
       </Column>
     </DataTable>
-
-    <Dialog
-      modal
-      class="w-[40vw] max-w-[480px]"
-      header="수정하기"
-      position="bottomright"
-      v-model:visible="editingVisible"
-      :closable="false"
-      :draggable="false"
-      :breakpoints="{ '640px': '90vw' }"
-    >
-      <section class="flex flex-col">
-        <div class="flex items-start">
-          <div class="flex-1">
-            <p class="font-bold text-lg">기본 정보</p>
-          </div>
-
-          <div class="flex-2">
-            <p class="mb-2 font-bold">이름</p>
-            <InputText
-              v-model="editingMember.name"
-              class="w-full"
-              :class="{ 'p-invalid': $v.name.$error }"
-            />
-
-            <div class="flex gap-8 my-2">
-              <p class="font-bold">성별</p>
-              <div class="flex items-center">
-                <RadioButton
-                  v-model="editingMember.gender"
-                  input-id="male"
-                  name="gender"
-                  value="male"
-                />
-                <label class="ml-2 cursor-pointer" for="male">남자</label>
-
-                <RadioButton
-                  class="ml-2"
-                  v-model="editingMember.gender"
-                  input-id="female"
-                  name="gender"
-                  value="female"
-                />
-                <label class="ml-2 cursor-pointer" for="female">여자</label>
-              </div>
-            </div>
-
-            <div class="flex gap-8">
-              <p class="font-bold mb-2">생년월일</p>
-            </div>
-
-            <Calendar
-              touch-u-i
-              showButtonBar
-              v-model="editingMember.birth"
-              id="birth"
-              class="w-full"
-              :class="{ 'p-invalid': $v.birth.$error }"
-              placeholder="생년월일을 선택해주세요"
-              :disabled="editingMember.birthLater"
-            />
-
-            <div class="flex mt-1 items-center">
-              <Checkbox
-                binary
-                input-id="birthLater"
-                v-model="editingMember.birthLater"
-              />
-              <label class="ml-2 cursor-pointer select-none" for="birthLater">
-                나중에 입력할게요
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <hr class="h-1 my-3 border-0 bg-slate-200" />
-
-        <div v-if="editingMember.job === 'teacher'" class="flex items-start">
-          <div class="flex-1">
-            <p class="font-bold text-lg">담임 정보</p>
-          </div>
-
-          <div class="flex-2">
-            <SelectButton
-              unselectable
-              class="flex"
-              optionLabel="label"
-              optionValue="value"
-              :options="TEACHER_ROLE"
-              v-model="editingMember.role!.teacher"
-            />
-
-            <Transition>
-              <div
-                v-if="editingMember.role!.teacher !== 'common'"
-                class="flex my-2 items-center justify-between"
-              >
-                <p>새친구 학급이신가요?</p>
-
-                <div class="flex gap-2 items-center">
-                  <p :class="switchState(editingMember.isNewFriendClass)">
-                    {{ editingMember.isNewFriendClass ? '네' : '아니요' }}
-                  </p>
-                  <InputSwitch v-model="editingMember.isNewFriendClass" />
-                </div>
-              </div>
-            </Transition>
-
-            <Transition>
-              <div
-                v-if="editingMember.role!.teacher !== 'common'"
-                class="flex gap-4"
-              >
-                <Dropdown
-                  class="flex-1"
-                  :class="{ 'p-invalid': $v.grade.$error }"
-                  v-model="editingMember.grade"
-                  placeholder="학년 선택"
-                  optionLabel="label"
-                  optionValue="value"
-                  :options="GRADE_OPTIONS"
-                  :disabled="editingMember.isNewFriendClass"
-                />
-
-                <Dropdown
-                  class="flex-1"
-                  :class="{ 'p-invalid': $v.group.$error }"
-                  v-model="editingMember.group"
-                  placeholder="학급 선택"
-                  optionLabel="label"
-                  optionValue="value"
-                  :options="GROUP_OPTIONS"
-                  :disabled="editingMember.isNewFriendClass"
-                />
-              </div>
-            </Transition>
-          </div>
-        </div>
-
-        <div v-else class="flex items-start">
-          <div class="flex-1">
-            <p class="font-bold text-lg">학급 정보</p>
-          </div>
-
-          <div class="flex-2">
-            <div class="flex mb-2 items-center justify-between">
-              <p>새친구인가요?</p>
-
-              <div class="flex gap-2 items-center">
-                <p :class="switchState(editingMember.isNewFriendClass)">
-                  {{ editingMember.isNewFriendClass ? '네' : '아니요' }}
-                </p>
-                <InputSwitch v-model="editingMember.isNewFriendClass" />
-              </div>
-            </div>
-
-            <div class="flex gap-4">
-              <Dropdown
-                class="flex-1"
-                :class="{ 'p-invalid': $v.grade.$error }"
-                v-model="editingMember.grade"
-                placeholder="학년 선택"
-                optionLabel="label"
-                optionValue="value"
-                :options="GRADE_OPTIONS"
-              />
-
-              <Dropdown
-                class="flex-1"
-                :class="{ 'p-invalid': $v.group.$error }"
-                v-model="editingMember.group"
-                placeholder="학급 선택"
-                optionLabel="label"
-                optionValue="value"
-                :options="GROUP_OPTIONS"
-                :disabled="editingMember.isNewFriendClass"
-              />
-            </div>
-          </div>
-        </div>
-
-        <hr class="h-1 my-3 border-0 bg-slate-200" />
-
-        <div class="flex items-start">
-          <div class="flex-1">
-            <p class="font-bold text-lg">추가 정보</p>
-          </div>
-
-          <div class="flex-2">
-            <label class="inline-block mb-2 font-bold" for="registeredAt">
-              교육부 첫 출석일
-            </label>
-            <Calendar
-              id="registeredAt"
-              class="w-full"
-              touch-u-i
-              showButtonBar
-              v-model="editingMember.registeredAt"
-            />
-
-            <label class="inline-block my-2 font-bold" for="remark">비고</label>
-            <InputText
-              id="remark"
-              class="w-full"
-              v-model="editingMember.remark"
-            />
-          </div>
-        </div>
-      </section>
-
-      <template #footer>
-        <Button
-          text
-          label="취소하기"
-          icon="pi pi-times"
-          @click="editingVisible = false"
-        />
-        <Button
-          label="수정하기"
-          severity="warning"
-          icon="pi pi-check"
-          :disabled="isEditButtonClickable"
-          @click="handleEdit"
-        />
-      </template>
-    </Dialog>
   </div>
 
   <Toast />
 </template>
 
 <script setup lang="ts">
-import AdminDataTableHeader from '@/views/Admin/_partials/AdminDataTableHeader.vue';
+import AdminDataTableHeader from './AdminDataTableHeader.vue';
+import AdminDataTableAdd from './AdminDataTableAdd.vue';
+import AdminDataTableDelete from './AdminDataTableDelete.vue';
+import AdminDataTableEdit from './AdminDataTableEdit.vue';
 
 import { computed, onMounted, ref, toRaw, watch } from 'vue';
+import { useVuelidate } from '@vuelidate/core';
+import { helpers, required, requiredIf } from '@vuelidate/validators';
 import {
   formatDate,
   formatGender,
@@ -329,50 +134,19 @@ import {
   formatRole,
   formatRoleColor,
 } from '@/utils/useFormat';
-import { GRADE_OPTIONS, GROUP_OPTIONS, TEACHER_ROLE } from '@/constants/common';
 import type { MemberData } from '@/types';
-
-import { useVuelidate } from '@vuelidate/core';
-import { required, requiredIf } from '@vuelidate/validators';
 import type DataTable from 'primevue/datatable';
 
+const emit = defineEmits(['add', 'edit', 'delete']);
+
 const props = defineProps<{
-  isLoading: boolean;
+  loading: boolean;
   dataSource: MemberData[];
-  selection: MemberData[];
+  dataTarget: MemberData['job'];
   columnState?: {
     [field: string]: boolean;
   };
 }>();
-
-const emit = defineEmits(['add', 'edit', 'delete', 'select']);
-
-const handleAdd = () => emit('add');
-const handleDelete = () => emit('delete');
-const handleEdit = async () => {
-  const isFormCorrect = await $v.value.$validate();
-  if (!isFormCorrect) {
-    return;
-  }
-
-  editingVisible.value = false;
-  emit('edit', editingMember.value);
-};
-const handleSelect = () => emit('select', selectionRef.value);
-
-const dataTableRef = ref<DataTable | null>(null);
-
-const exportDataTable = () => {
-  if (dataTableRef.value) dataTableRef.value.exportCSV();
-};
-
-const selectionRef = ref(props.selection);
-
-watch(
-  () => props.selection,
-  (newValue) => (selectionRef.value = newValue),
-  { deep: true }
-);
 
 onMounted(() => {
   setTimeout(() => {
@@ -384,17 +158,160 @@ onMounted(() => {
   }, 300);
 });
 
+const dataTableRef = ref<DataTable | null>(null);
+
+const exportDataTable = () => {
+  if (dataTableRef.value) dataTableRef.value.exportCSV();
+};
+
 const groupRowsBy = ({ grade, group }: MemberData) => {
   return `${grade} ${group}`;
 };
 
+const selectedMembers = ref<MemberData[]>([]);
+
+/*---------- ADD ----------*/
+const MemberRoleMap = {
+  student: {},
+  teacher: { teacher: 'common' as const },
+};
+
+const addingMemberTemp: MemberData = {
+  name: '',
+  birth: null,
+  birthLater: true,
+  gender: 'male',
+  church: '',
+  department: '',
+  job: props.dataTarget,
+  role: MemberRoleMap[props.dataTarget],
+  grade: '',
+  group: '',
+  isNewFriendClass: false,
+  registeredAt: new Date(),
+  remark: '',
+};
+const addingMembers = ref({ body: [structuredClone(addingMemberTemp)] });
+const addingVisible = ref(false);
+
+const addOneMember = () => {
+  addingMembers.value.body.push(structuredClone(addingMemberTemp));
+};
+
+const copyOneMember = (i: number) => {
+  addingMembers.value.body.push(
+    structuredClone(toRaw(addingMembers.value.body[i]))
+  );
+};
+
+const deleteOneMember = (i: number) => {
+  if (addingMembers.value.body.length > 1) {
+    addingMembers.value.body.splice(i, 1);
+  } else {
+    alert('더 이상 삭제할 수 없습니다.');
+  }
+};
+
+const resetAllMembers = () => {
+  vAdd.value.$reset();
+  addingVisible.value = false;
+
+  addingMembers.value.body = [];
+  addingMembers.value.body.push(structuredClone(addingMemberTemp));
+};
+
+const handleAddingTeacherChange = (newValue: MemberData) => {
+  if (newValue.isNewFriendClass) {
+    newValue.grade = '0';
+    newValue.group = '0';
+  } else if (newValue.grade === '0' && newValue.group === '0') {
+    newValue.grade = '';
+    newValue.group = '';
+  }
+
+  if (newValue.role.teacher === 'common') {
+    newValue.grade = '';
+    newValue.group = '';
+    newValue.isNewFriendClass = false;
+  }
+};
+
+const handleAddingStudentChange = (newValue: MemberData) => {
+  if (newValue.isNewFriendClass) {
+    newValue.group = '0';
+  } else if (newValue.group === '0') {
+    newValue.group = '';
+  }
+};
+
+watch(
+  addingMembers,
+  (newValue) => {
+    newValue.body.forEach((member) => {
+      if (member.job === 'teacher') {
+        handleAddingTeacherChange(member);
+      } else if (member.job === 'student') {
+        handleAddingStudentChange(member);
+      }
+
+      if (member.birthLater) {
+        member.birth = null;
+      }
+    });
+  },
+  { deep: true }
+);
+
+const addStudentRules = {
+  body: {
+    $each: helpers.forEach({
+      name: { required },
+      grade: { required },
+      group: {
+        // @ts-ignore
+        requiredIf: requiredIf((_, data: MemberData) => {
+          return !data.isNewFriendClass;
+        }),
+      },
+    }),
+  },
+};
+
+const addTeacherRules = {
+  body: {
+    $each: helpers.forEach({
+      name: { required },
+      grade: {
+        // @ts-ignore
+        requiredIf: requiredIf((_, data: MemberData) => {
+          return data.role.teacher !== 'common';
+        }),
+      },
+      group: {
+        // @ts-ignore
+        requiredIf: requiredIf((_, data: MemberData) => {
+          return data.role.teacher !== 'common';
+        }),
+      },
+    }),
+  },
+};
+
+const AddRulesMap = {
+  student: addStudentRules,
+  teacher: addTeacherRules,
+};
+
+const vAdd = useVuelidate(AddRulesMap[props.dataTarget], addingMembers);
+
+const handleAdd = () => {
+  emit('add', addingMembers.value.body);
+};
+
+/*---------- EDIT ----------*/
 const editingVisible = ref(false);
 const editingMember = ref<Partial<MemberData>>({});
 const editingMemberClone = ref<Partial<MemberData>>({});
-
-const switchState = (flag?: boolean) => {
-  return flag ? 'text-[#2196f3]' : 'text-[#ced4da]';
-};
 
 const showEditDialog = (data: MemberData) => {
   editingVisible.value = true;
@@ -403,47 +320,55 @@ const showEditDialog = (data: MemberData) => {
   editingMemberClone.value = structuredClone(toRaw(data));
 };
 
-watch(
-  () => editingMember.value.role?.teacher,
-  (newValue) => {
-    if (newValue === 'common') {
-      editingMember.value.grade = '';
-      editingMember.value.group = '';
-      editingMember.value.isNewFriendClass = false;
-    }
+const resetEditingState = () => {
+  vEdit.value.$reset();
+  editingVisible.value = false;
+
+  editingMember.value = {};
+  editingMemberClone.value = {};
+};
+
+const handleEditingTeacherChange = (newValue: Partial<MemberData>) => {
+  if (newValue.isNewFriendClass) {
+    newValue.grade = '0';
+    newValue.group = '0';
+  } else if (newValue.grade === '0' && newValue.group === '0') {
+    newValue.grade = '';
+    newValue.group = '';
   }
+
+  if (newValue.role?.teacher === 'common') {
+    newValue.grade = '';
+    newValue.group = '';
+    newValue.isNewFriendClass = false;
+  }
+};
+
+const handleEditingStudentChange = (newValue: Partial<MemberData>) => {
+  if (newValue.isNewFriendClass) {
+    newValue.group = '0';
+  } else if (newValue.group === '0') {
+    newValue.group = '';
+  }
+};
+
+watch(
+  editingMember,
+  (newValue) => {
+    if (newValue.job === 'teacher') {
+      handleEditingTeacherChange(newValue);
+    } else if (newValue.job === 'student') {
+      handleEditingStudentChange(newValue);
+    }
+
+    if (newValue.birthLater) {
+      newValue.birth = null;
+    }
+  },
+  { deep: true }
 );
 
-watch(
-  () => editingMember.value.isNewFriendClass,
-  (newValue) => {
-    if (newValue === true) {
-      editingMember.value.grade = '0';
-      editingMember.value.group = '0';
-    } else {
-      editingMember.value.grade = '';
-      editingMember.value.group = '';
-    }
-  }
-);
-
-watch(
-  () => editingMember.value.birthLater,
-  (newValue) => {
-    if (newValue === true) {
-      editingMember.value.birth = null;
-    }
-  }
-);
-
-const isEditButtonClickable = computed(() => {
-  const member = editingMember.value;
-  const clone = editingMemberClone.value;
-
-  return JSON.stringify(member) === JSON.stringify(clone);
-});
-
-const rules = computed(() => ({
+const editRules = computed(() => ({
   name: { required },
   birth: {
     requiredIf: requiredIf(editingMember.value.birthLater === false),
@@ -457,7 +382,20 @@ const rules = computed(() => ({
 }));
 
 // @ts-ignore
-const $v = useVuelidate(rules, editingMember);
+const vEdit = useVuelidate(editRules, editingMember);
+
+const handleEdit = () => {
+  emit('edit', editingMember.value);
+  editingVisible.value = false;
+};
+
+/*---------- DELETE ----------*/
+const deletingVisible = ref(false);
+
+const handleDelete = () => {
+  emit('delete', selectedMembers.value);
+  deletingVisible.value = false;
+};
 </script>
 
 <style scoped>

@@ -126,12 +126,12 @@ export const useMemberStore = defineStore('member', {
       return await updateDoc(doc(db, 'members', uid), { ...data });
     },
 
-    removeMultiple(params: RemoveMultipleParams) {
-      params.uids.forEach(async (uid) => {
-        if (uid) {
-          await deleteDoc(doc(db, 'members', uid));
-        }
-      });
+    async removeMultiple(params: RemoveMultipleParams) {
+      return await Promise.all(
+        params.uids.map(async (uid) => {
+          if (uid) await deleteDoc(doc(db, 'members', uid));
+        })
+      );
     },
   },
 });

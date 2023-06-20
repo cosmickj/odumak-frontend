@@ -24,7 +24,7 @@
     <div class="bg-slate-100">
       <div class="flex flex-col gap-2 px-4 py-3 items-center text-xs">
         <Avatar
-          :image="userStore.userData?.profileImage || youngeunElementLogo"
+          :image="userStore.userData?.profileImage || odumakLogo"
           size="xlarge"
           shape="circle"
         />
@@ -141,7 +141,7 @@ import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/store/user';
 
-import youngeunElementLogo from '@/assets/images/youngeun-element-logo.png';
+import odumakLogo from '@/assets/images/logo-transparent.png';
 
 const router = useRouter();
 const userStore = useUserStore();

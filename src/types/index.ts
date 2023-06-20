@@ -33,8 +33,8 @@ export type Officer =
   | 'layman'; // 평신도
 
 export interface Role {
-  system: System;
-  teacher: Teacher;
+  system?: System;
+  teacher?: Teacher;
   executive?: Executive;
   officer?: Officer;
   [key: string]: string | undefined;

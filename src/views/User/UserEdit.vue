@@ -81,7 +81,7 @@
         />
       </div>
 
-      <div v-if="formState.role !== 'common'" class="flex flex-col px-5 py-2">
+      <!-- <div v-if="formState.role !== 'common'" class="flex flex-col px-5 py-2">
         <label for="grade" class="mb-1">담당 학년</label>
         <Dropdown
           v-model="formState.grade"
@@ -91,9 +91,9 @@
           optionValue="value"
           placeholder="담당 학년"
         />
-      </div>
+      </div> -->
 
-      <div v-if="formState.role !== 'common'" class="flex flex-col px-5 py-2">
+      <!-- <div v-if="formState.role !== 'common'" class="flex flex-col px-5 py-2">
         <label for="group" class="mb-1">담당 학급</label>
         <Dropdown
           v-model="formState.group"
@@ -103,7 +103,7 @@
           optionValue="value"
           placeholder="담당 학급"
         />
-      </div>
+      </div> -->
     </div>
 
     <div class="sticky bottom-0 mt-10 px-5 pb-4 bg-slate-200">
@@ -148,15 +148,15 @@ watch(
   { deep: true }
 );
 
-watch(
-  () => formState.role,
-  (newValue) => {
-    if (newValue === 'common') {
-      formState.grade = '';
-      formState.group = '';
-    }
-  }
-);
+// watch(
+//   () => formState.role,
+//   (newValue) => {
+//     if (newValue === 'common') {
+//       formState.grade = '';
+//       formState.group = '';
+//     }
+//   }
+// );
 
 const rules = computed(() => ({
   name: {
@@ -164,12 +164,12 @@ const rules = computed(() => ({
   },
   church: { required },
   department: { required },
-  grade: {
-    requiredIf: requiredIf(formState.role !== 'common'),
-  },
-  group: {
-    requiredIf: requiredIf(formState.role !== 'common'),
-  },
+  // grade: {
+  //   requiredIf: requiredIf(formState.role !== 'common'),
+  // },
+  // group: {
+  //   requiredIf: requiredIf(formState.role !== 'common'),
+  // },
 }));
 
 // @ts-ignore

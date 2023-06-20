@@ -85,7 +85,7 @@ const RequestJobMap = {
   assistant: 'student' as const,
   common: null,
 };
-const requestJob = computed(() => RequestJobMap[userData.value.role!]);
+const requestJob = computed(() => RequestJobMap[userData.value.role.teacher!]);
 
 const getAttendances = async () => {
   try {
@@ -95,23 +95,24 @@ const getAttendances = async () => {
       return;
     }
 
-    if (requestJob.value === 'teacher') {
-      await attendanceStore.fetchAttendances({
-        attendanceDate: attendanceDate.value,
-        church: userData.value.church!,
-        department: userData.value.department!,
-        job: requestJob.value,
-      });
-    } else if (requestJob.value === 'student') {
-      await attendanceStore.fetchAttendancesByGradeGroup({
-        attendanceDate: attendanceDate.value,
-        church: userData.value.church!,
-        department: userData.value.department!,
-        grade: userData.value.grade!,
-        group: userData.value.group!,
-        job: requestJob.value,
-      });
-    }
+    // CONTINUE: role에 따른 출석 입력 데이터 변경처리
+    // if (requestJob.value === 'teacher') {
+    //   await attendanceStore.fetchAttendances({
+    //     attendanceDate: attendanceDate.value,
+    //     church: userData.value.church!,
+    //     department: userData.value.department!,
+    //     job: requestJob.value,
+    //   });
+    // } else if (requestJob.value === 'student') {
+    await attendanceStore.fetchAttendancesByGradeGroup({
+      attendanceDate: attendanceDate.value,
+      church: userData.value.church!,
+      department: userData.value.department!,
+      grade: userData.value.grade!,
+      group: userData.value.group!,
+      job: requestJob.value,
+    });
+    // }
 
     attendances.value = attendanceStore.attendancesRecord.daily;
   } catch (error) {
