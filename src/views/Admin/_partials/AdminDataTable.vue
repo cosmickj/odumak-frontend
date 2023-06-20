@@ -22,7 +22,7 @@
     :visible="editingVisible"
     :member="editingMember"
     :clone="editingMemberClone"
-    @close="editingVisible = false"
+    @close="resetEditingState"
     @edit="handleEdit"
   />
 
@@ -208,18 +208,59 @@ const deleteOneMember = (i: number) => {
 };
 
 const resetAllMembers = () => {
+  vAdd.value.$reset();
   addingVisible.value = false;
 
   addingMembers.value.body = [];
   addingMembers.value.body.push(structuredClone(addingMemberTemp));
 };
 
+watch(
+  addingMembers,
+  (newValue) => {
+    newValue.body.forEach((member) => {
+      if (member.isNewFriendClass) {
+        member.grade = '0';
+        member.group = '0';
+      } else if (
+        !member.isNewFriendClass &&
+        member.grade === '0' &&
+        member.group === '0'
+      ) {
+        member.grade = '';
+        member.group = '';
+      }
+
+      if (member.role.teacher === 'common') {
+        member.grade = '';
+        member.group = '';
+        member.isNewFriendClass = false;
+      }
+
+      if (member.birthLater === true) {
+        member.birth = null;
+      }
+    });
+  },
+  { deep: true }
+);
+
 const addRules = {
   body: {
     $each: helpers.forEach({
       name: { required },
-      grade: { required },
-      group: { required },
+      grade: {
+        // @ts-ignore
+        requiredIf: requiredIf((_, data: MemberData) => {
+          return data.role.teacher !== 'common';
+        }),
+      },
+      group: {
+        // @ts-ignore
+        requiredIf: requiredIf((_, data: MemberData) => {
+          return data.role.teacher !== 'common';
+        }),
+      },
     }),
   },
 };
@@ -242,37 +283,40 @@ const showEditDialog = (data: MemberData) => {
   editingMemberClone.value = structuredClone(toRaw(data));
 };
 
-watch(
-  () => editingMember.value.role?.teacher,
-  (newValue) => {
-    if (newValue === 'common') {
-      editingMember.value.grade = '';
-      editingMember.value.group = '';
-      editingMember.value.isNewFriendClass = false;
-    }
-  }
-);
+const resetEditingState = () => {
+  vEdit.value.$reset();
+  editingVisible.value = false;
+
+  editingMember.value = {};
+  editingMemberClone.value = {};
+};
 
 watch(
-  () => editingMember.value.isNewFriendClass,
+  editingMember,
   (newValue) => {
-    if (newValue === true) {
-      editingMember.value.grade = '0';
-      editingMember.value.group = '0';
-    } else {
-      editingMember.value.grade = '';
-      editingMember.value.group = '';
+    if (newValue.isNewFriendClass) {
+      newValue.grade = '0';
+      newValue.group = '0';
+    } else if (
+      !newValue.isNewFriendClass &&
+      newValue.grade === '0' &&
+      newValue.group === '0'
+    ) {
+      newValue.grade = '';
+      newValue.group = '';
     }
-  }
-);
 
-watch(
-  () => editingMember.value.birthLater,
-  (newValue) => {
-    if (newValue === true) {
-      editingMember.value.birth = null;
+    if (newValue.role?.teacher === 'common') {
+      newValue.grade = '';
+      newValue.group = '';
+      newValue.isNewFriendClass = false;
     }
-  }
+
+    if (newValue.birthLater === true) {
+      newValue.birth = null;
+    }
+  },
+  { deep: true }
 );
 
 const editRules = computed(() => ({
