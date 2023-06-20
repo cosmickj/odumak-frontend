@@ -37,7 +37,8 @@ const RoleMap = {
   assistant: '부담임',
   common: '일반',
 };
-const formatRole = (role: Role) => (role ? RoleMap[role.teacher] : '-');
+const formatRole = (role: Role) =>
+  role ? RoleMap[role.teacher ?? 'common'] : '-';
 
 const RoleColorMap = {
   admin: '#6A2C70',
@@ -46,6 +47,6 @@ const RoleColorMap = {
   common: '#B7C4CF',
 };
 const formatRoleColor = (role: Role) =>
-  role ? RoleColorMap[role.teacher] : '#000';
+  role ? RoleColorMap[role.teacher ?? 'common'] : '#000';
 
 export { formatClass, formatDate, formatGender, formatRole, formatRoleColor };
