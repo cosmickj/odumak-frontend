@@ -164,6 +164,7 @@
             <div class="flex gap-4">
               <Dropdown
                 class="flex-1"
+                :class="{ 'p-invalid': isInvalid(i, 'grade') }"
                 v-model="member.grade"
                 placeholder="학년 선택"
                 optionLabel="label"
@@ -173,6 +174,7 @@
 
               <Dropdown
                 class="flex-1"
+                :class="{ 'p-invalid': isInvalid(i, 'group') }"
                 v-model="member.group"
                 placeholder="학급 선택"
                 optionLabel="label"
@@ -225,8 +227,7 @@
 
 <script setup lang="ts">
 import TheDialog from '@/components/TheDialog.vue';
-import { computed } from 'vue';
-import { useRoute } from 'vue-router';
+
 import { GRADE_OPTIONS, GROUP_OPTIONS, TEACHER_ROLE } from '@/constants/common';
 import type { MemberData } from '@/types';
 
@@ -286,7 +287,4 @@ const isInvalid = (i: number, key: string) => {
 //     member.birth = date;
 //   }
 // };
-
-// const { path } = useRoute();
-// const job = computed(() => path.split('/').pop());
 </script>

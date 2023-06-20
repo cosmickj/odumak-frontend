@@ -139,9 +139,10 @@ import type DataTable from 'primevue/datatable';
 
 const emit = defineEmits(['add', 'edit', 'delete']);
 
-defineProps<{
+const props = defineProps<{
   loading: boolean;
   dataSource: MemberData[];
+  dataTarget: MemberData['job'];
   columnState?: {
     [field: string]: boolean;
   };
@@ -170,7 +171,10 @@ const groupRowsBy = ({ grade, group }: MemberData) => {
 const selectedMembers = ref<MemberData[]>([]);
 
 /*---------- ADD ----------*/
-const addingVisible = ref(false);
+const MemberRoleMap = {
+  student: {},
+  teacher: { teacher: 'common' as const },
+};
 
 const addingMemberTemp: MemberData = {
   name: '',
@@ -179,8 +183,8 @@ const addingMemberTemp: MemberData = {
   gender: 'male',
   church: '',
   department: '',
-  job: 'teacher',
-  role: { system: 'user', teacher: 'common' },
+  job: props.dataTarget,
+  role: MemberRoleMap[props.dataTarget],
   grade: '',
   group: '',
   isNewFriendClass: false,
@@ -188,6 +192,7 @@ const addingMemberTemp: MemberData = {
   remark: '',
 };
 const addingMembers = ref({ body: [structuredClone(addingMemberTemp)] });
+const addingVisible = ref(false);
 
 const addOneMember = () => {
   addingMembers.value.body.push(structuredClone(addingMemberTemp));
@@ -215,29 +220,41 @@ const resetAllMembers = () => {
   addingMembers.value.body.push(structuredClone(addingMemberTemp));
 };
 
+const handleAddingTeacherChange = (newValue: MemberData) => {
+  if (newValue.isNewFriendClass) {
+    newValue.grade = '0';
+    newValue.group = '0';
+  } else if (newValue.grade === '0' && newValue.group === '0') {
+    newValue.grade = '';
+    newValue.group = '';
+  }
+
+  if (newValue.role.teacher === 'common') {
+    newValue.grade = '';
+    newValue.group = '';
+    newValue.isNewFriendClass = false;
+  }
+};
+
+const handleAddingStudentChange = (newValue: MemberData) => {
+  if (newValue.isNewFriendClass) {
+    newValue.group = '0';
+  } else if (newValue.group === '0') {
+    newValue.group = '';
+  }
+};
+
 watch(
   addingMembers,
   (newValue) => {
     newValue.body.forEach((member) => {
-      if (member.isNewFriendClass) {
-        member.grade = '0';
-        member.group = '0';
-      } else if (
-        !member.isNewFriendClass &&
-        member.grade === '0' &&
-        member.group === '0'
-      ) {
-        member.grade = '';
-        member.group = '';
+      if (member.job === 'teacher') {
+        handleAddingTeacherChange(member);
+      } else if (member.job === 'student') {
+        handleAddingStudentChange(member);
       }
 
-      if (member.role.teacher === 'common') {
-        member.grade = '';
-        member.group = '';
-        member.isNewFriendClass = false;
-      }
-
-      if (member.birthLater === true) {
+      if (member.birthLater) {
         member.birth = null;
       }
     });
@@ -245,7 +262,22 @@ watch(
   { deep: true }
 );
 
-const addRules = {
+const addStudentRules = {
+  body: {
+    $each: helpers.forEach({
+      name: { required },
+      grade: { required },
+      group: {
+        // @ts-ignore
+        requiredIf: requiredIf((_, data: MemberData) => {
+          return !data.isNewFriendClass;
+        }),
+      },
+    }),
+  },
+};
+
+const addTeacherRules = {
   body: {
     $each: helpers.forEach({
       name: { required },
@@ -265,7 +297,12 @@ const addRules = {
   },
 };
 
-const vAdd = useVuelidate(addRules, addingMembers);
+const AddRulesMap = {
+  student: addStudentRules,
+  teacher: addTeacherRules,
+};
+
+const vAdd = useVuelidate(AddRulesMap[props.dataTarget], addingMembers);
 
 const handleAdd = () => {
   emit('add', addingMembers.value.body);
@@ -291,28 +328,40 @@ const resetEditingState = () => {
   editingMemberClone.value = {};
 };
 
+const handleEditingTeacherChange = (newValue: Partial<MemberData>) => {
+  if (newValue.isNewFriendClass) {
+    newValue.grade = '0';
+    newValue.group = '0';
+  } else if (newValue.grade === '0' && newValue.group === '0') {
+    newValue.grade = '';
+    newValue.group = '';
+  }
+
+  if (newValue.role?.teacher === 'common') {
+    newValue.grade = '';
+    newValue.group = '';
+    newValue.isNewFriendClass = false;
+  }
+};
+
+const handleEditingStudentChange = (newValue: Partial<MemberData>) => {
+  if (newValue.isNewFriendClass) {
+    newValue.group = '0';
+  } else if (newValue.group === '0') {
+    newValue.group = '';
+  }
+};
+
 watch(
   editingMember,
   (newValue) => {
-    if (newValue.isNewFriendClass) {
-      newValue.grade = '0';
-      newValue.group = '0';
-    } else if (
-      !newValue.isNewFriendClass &&
-      newValue.grade === '0' &&
-      newValue.group === '0'
-    ) {
-      newValue.grade = '';
-      newValue.group = '';
+    if (newValue.job === 'teacher') {
+      handleEditingTeacherChange(newValue);
+    } else if (newValue.job === 'student') {
+      handleEditingStudentChange(newValue);
     }
 
-    if (newValue.role?.teacher === 'common') {
-      newValue.grade = '';
-      newValue.group = '';
-      newValue.isNewFriendClass = false;
-    }
-
-    if (newValue.birthLater === true) {
+    if (newValue.birthLater) {
       newValue.birth = null;
     }
   },

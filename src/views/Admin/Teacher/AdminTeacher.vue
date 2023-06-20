@@ -2,6 +2,7 @@
   <AdminDataTable
     :loading="isLoading"
     :data-source="members"
+    :data-target="'teacher'"
     :column-state="{ role: true }"
     @add="addMembers"
     @edit="editMember"
@@ -17,9 +18,6 @@ import { useUserStore } from '@/store/user';
 import { useMemberStore } from '@/store/member';
 import { useToast } from 'primevue/usetoast';
 import type { MemberData } from '@/types';
-
-// import { useVuelidate } from '@vuelidate/core';
-// import { required, helpers } from '@vuelidate/validators';
 
 const userStore = useUserStore();
 const memberStore = useMemberStore();
@@ -48,94 +46,6 @@ const fetchMembers = async () => {
 };
 
 onMounted(async () => await fetchMembers());
-
-// const initSelectedMember: MemberData = {
-//   name: '',
-//   birth: null,
-//   birthLater: true,
-//   gender: 'male',
-//   church: '',
-//   department: '',
-//   job: 'teacher',
-//   role: { system: 'user', teacher: 'common' },
-//   grade: '',
-//   group: '',
-//   isNewFriendClass: false,
-//   registeredAt: new Date(),
-//   remark: '',
-// };
-
-// const selectedMembers = reactive({ body: [] as MemberData[] });
-
-// const createNewMember = (obj: MemberData) => Object.assign({}, obj);
-
-// const addSelectedMembers = (payload: MemberData[]) => {
-//   selectedMembers.body = payload.map((d) => createNewMember(d));
-// };
-
-// const isDialogAddVisible = ref(false);
-
-// const openDialogToAddTeacher = () => {
-//   isDialogAddVisible.value = true;
-//   addNewMember();
-// };
-
-// const newMembers = reactive({ body: [] as MemberData[] });
-
-// const addNewMember = () => {
-//   newMembers.body.push(createNewMember(initSelectedMember));
-// };
-
-// const copyNewMember = (index: number) => {
-//   newMembers.body.push(createNewMember(newMembers.body[index]));
-// };
-
-// const deleteNewMember = (index: number) => {
-//   if (newMembers.body.length > 1) {
-//     newMembers.body.splice(index, 1);
-//   } else {
-//     alert('더 이상 삭제할 수 없습니다.');
-//   }
-// };
-
-// const rules = {
-//   body: {
-//     $each: helpers.forEach({
-//       name: { required },
-//       grade: { required },
-//       group: { required },
-//     }),
-//   },
-// };
-
-// const $v = useVuelidate(rules, selectedMembers);
-
-// const errors = computed(() => $v.value.$errors[0]?.$response?.$errors);
-
-// const resetNewMembers = () => {
-//   isDialogAddVisible.value = false;
-//   newMembers.body = [];
-//   $v.value.$reset();
-// };
-
-// const submitNewMembers = async () => {
-//   try {
-//     const isFormCorrect = await $v.value.body.$validate();
-//     if (!isFormCorrect) return;
-
-//     addMembers();
-//     resetNewMembers();
-//     await getMembers();
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
-
-// const isDialogDeleteVisible = ref(false);
-
-// const toggleIsDialogDeleteVisible = () => {
-//   isDialogDeleteVisible.value = !isDialogDeleteVisible.value;
-// };
 
 const toast = useToast();
 
