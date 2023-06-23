@@ -97,24 +97,27 @@
 
       <div class="flex px-4 py-2 items-center justify-between">
         <span>담임 여부</span>
-        <span :class="{ 'text-gray-400': isNan(role) }">
-          {{ role }}
-        </span>
+        <Tag
+          :value="formatTeacher(userData?.role.teacher)"
+          :style="`background: ${formatTeacherColor(userData?.role.teacher)}`"
+        />
       </div>
 
-      <div class="flex px-4 py-2 items-center justify-between">
-        <span>담당 학년</span>
-        <span :class="{ 'text-gray-400': isNan(grade) }">
-          {{ grade }}
-        </span>
-      </div>
+      <template v-if="userData?.role.teacher !== 'common'">
+        <div class="flex px-4 py-2 items-center justify-between">
+          <span>담당 학년</span>
+          <span :class="{ 'text-gray-400': isNan(grade) }">
+            {{ grade }}
+          </span>
+        </div>
 
-      <div class="flex px-4 py-2 items-center justify-between">
-        <span>담당 학급</span>
-        <span :class="{ 'text-gray-400': isNan(group) }">
-          {{ group }}
-        </span>
-      </div>
+        <div class="flex px-4 py-2 items-center justify-between">
+          <span>담당 학급</span>
+          <span :class="{ 'text-gray-400': isNan(group) }">
+            {{ group }}
+          </span>
+        </div>
+      </template>
     </div>
 
     <div class="mt-3 bg-slate-100 text-red-500">
@@ -140,56 +143,34 @@
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/store/user';
+import { formatTeacher, formatTeacherColor } from '@/utils/useFormat';
+import { NAN_TEXT } from '@/constants/common';
 
 import odumakLogo from '@/assets/images/logo-transparent.png';
 
 const router = useRouter();
 const userStore = useUserStore();
 
+const userData = computed(() => userStore.userData);
+
 const church = computed(() => {
-  const _church = userStore.userData?.church;
-  if (_church) return _church;
-  else return '없음';
+  return userData.value?.church ? userData.value?.church : NAN_TEXT;
 });
 
 const department = computed(() => {
-  const _department = userStore.userData?.department;
-  if (_department) return _department;
-  else return '없음';
-});
-
-const role = computed(() => {
-  const _role = userStore.userData?.role;
-  if (_role?.system === 'admin') {
-    return '관리자';
-  } else if (_role?.teacher === 'head') {
-    return '담임';
-  } else if (_role?.teacher === 'assistant') {
-    return '부담임';
-  } else if (_role?.teacher === 'common') {
-    return '일반';
-  } else {
-    return '없음';
-  }
+  return userData.value?.department ? userData.value?.department : NAN_TEXT;
 });
 
 const grade = computed(() => {
-  const _grade = userStore.userData?.grade;
-
-  if (_grade === 'na') return '없음';
-  else if (_grade) return _grade + '학년';
+  return userData.value?.grade ? userData.value?.grade + '학년' : NAN_TEXT;
 });
 
 const group = computed(() => {
-  const _group = userStore.userData?.group;
-
-  if (_group === 'na') return '없음';
-  else if (_group) return _group + '학급';
+  return userData.value?.group ? userData.value?.group + '학급' : NAN_TEXT;
 });
 
-const isNan = (str: string | undefined) => {
-  if (str === '없음') return true;
-  else return false;
+const isNan = (txt: string | undefined) => {
+  return txt === NAN_TEXT ? true : false;
 };
 
 const logoutUser = async () => {

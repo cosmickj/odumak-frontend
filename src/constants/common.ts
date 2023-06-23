@@ -48,6 +48,8 @@ const TEACHER_ROLE: Option[] = [
   { label: '해당 없음', value: 'common' },
 ];
 
+const NAN_TEXT = '없음';
+
 // const getBirthYear = () => {
 //   const currentYear = new Date().getFullYear();
 //   const minYear = currentYear - 100;
@@ -93,4 +95,5 @@ export {
   GROUP_OPTIONS,
   GROUP_WITH_NEW_CLASS_OPTIONS,
   TEACHER_ROLE,
+  NAN_TEXT,
 };
