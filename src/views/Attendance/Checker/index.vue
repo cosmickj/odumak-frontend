@@ -4,18 +4,23 @@
 
     <Calendar
       touchUI
-      v-model="attendanceDate"
-      class="my-5"
+      class="my-4"
       input-class="text-center"
       placeholder="날짜를 선택해주세요"
+      v-model="attendanceDate"
       :max-date="maxDate"
       :disabledDays="[1, 2, 3, 4, 5, 6]"
       @date-select="getAttendances"
     />
 
+    <div v-if="!isLoading" class="flex gap-2 mb-2 text-lg">
+      <span>{{ formatClassName(userData.grade, userData.group) }}</span>
+      <span>(총 {{ attendances.length }}명)</span>
+    </div>
+
     <ProgressSpinner v-if="isLoading" />
 
-    <section v-else>
+    <template v-else>
       <CheckerTeachers
         v-if="userData.role.system === 'admin'"
         :attendances="attendances"
@@ -49,7 +54,7 @@
           />
         </template>
       </Dialog>
-    </section>
+    </template>
   </main>
 </template>
 
@@ -63,6 +68,7 @@ import { useRouter } from 'vue-router';
 import { useUserStore } from '@/store/user';
 import { useAttendanceStore } from '@/store/attendance';
 import { getPreviousSunday } from '@/utils/useCalendar';
+import { formatClassName } from '@/utils/useFormat';
 import type { AttendanceData } from '@/types';
 
 const router = useRouter();

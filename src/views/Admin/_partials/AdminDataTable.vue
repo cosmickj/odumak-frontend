@@ -49,10 +49,10 @@
         <p>등록된 인원이 없습니다.</p>
       </template>
 
-      <template #groupheader="slotProps">
+      <template #groupheader="{ data }">
         <div>
           <i class="pi pi-users"></i>
-          <span class="ml-4">{{ formatClass(slotProps.data) }}</span>
+          <span class="ml-4">{{ formatGroupHeader(data) }}</span>
         </div>
       </template>
 
@@ -130,7 +130,7 @@ import { helpers, required, requiredIf } from '@vuelidate/validators';
 import {
   formatDate,
   formatGender,
-  formatClass,
+  formatGroupHeader,
   formatTeacher,
   formatTeacherColor,
 } from '@/utils/useFormat';

@@ -1,6 +1,30 @@
 import { Gender, MemberData, Role } from '@/types';
 
-const formatClass = ({ grade, group, job, role }: MemberData) => {
+const formatClassName = (grade: string, group: string) => {
+  if (grade === '0' || group === '0') {
+    return '새친구 학급';
+  }
+  return `${grade}학년 ${group}반`;
+};
+
+const formatDate = (date: Date | null) => {
+  if (date) {
+    const yyyy = date.getFullYear();
+    const mm = date.getMonth() + 1;
+    const dd = date.getDate();
+
+    return `${yyyy}.${mm}.${dd}`; // return `${yyyy}년 ${mm}월 ${dd}일`;
+  }
+  return '-';
+};
+
+const GenderMap = {
+  male: '남',
+  female: '여',
+};
+const formatGender = (g: Gender) => GenderMap[g];
+
+const formatGroupHeader = ({ grade, group, job, role }: MemberData) => {
   if (job === 'student') {
     return `${grade}학년 ${group !== '0' ? group + '반' : '새친구'}`;
   }
@@ -16,20 +40,6 @@ const formatClass = ({ grade, group, job, role }: MemberData) => {
   }
   return;
 };
-
-const formatDate = (date: Date | null) => {
-  if (date) {
-    const yyyy = date.getFullYear();
-    const mm = date.getMonth() + 1;
-    const dd = date.getDate();
-
-    return `${yyyy}.${mm}.${dd}`; // return `${yyyy}년 ${mm}월 ${dd}일`;
-  }
-  return '-';
-};
-
-const GenderMap = { male: '남', female: '여' };
-const formatGender = (gender: Gender) => GenderMap[gender];
 
 const TeacherMap = {
   admin: '관리자',
@@ -49,9 +59,10 @@ const formatTeacherColor = (t: Role['teacher']) =>
   t ? TeacherColorMap[t] : '';
 
 export {
-  formatClass,
+  formatClassName,
   formatDate,
   formatGender,
+  formatGroupHeader,
   formatTeacher,
   formatTeacherColor,
 };
