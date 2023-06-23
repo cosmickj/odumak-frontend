@@ -77,8 +77,8 @@
       >
         <template #body="{ data: { role } }">
           <Tag
-            :value="formatRole(role)"
-            :style="`background: ${formatRoleColor(role)}`"
+            :value="formatTeacher(role.teacher)"
+            :style="`background: ${formatTeacherColor(role.teacher)}`"
           />
         </template>
       </Column>
@@ -131,8 +131,8 @@ import {
   formatDate,
   formatGender,
   formatClass,
-  formatRole,
-  formatRoleColor,
+  formatTeacher,
+  formatTeacherColor,
 } from '@/utils/useFormat';
 import type { MemberData } from '@/types';
 import type DataTable from 'primevue/datatable';

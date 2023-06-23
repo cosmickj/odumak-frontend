@@ -31,22 +31,27 @@ const formatDate = (date: Date | null) => {
 const GenderMap = { male: '남', female: '여' };
 const formatGender = (gender: Gender) => GenderMap[gender];
 
-const RoleMap = {
+const TeacherMap = {
   admin: '관리자',
   head: '담임',
   assistant: '부담임',
-  common: '일반',
+  common: '비담임',
 };
-const formatRole = (role: Role) =>
-  role ? RoleMap[role.teacher ?? 'common'] : '-';
+const formatTeacher = (t: Role['teacher']) => (t ? TeacherMap[t] : '');
 
-const RoleColorMap = {
+const TeacherColorMap = {
   admin: '#6A2C70',
   head: '#7D5A50',
   assistant: '#B4846C',
   common: '#B7C4CF',
 };
-const formatRoleColor = (role: Role) =>
-  role ? RoleColorMap[role.teacher ?? 'common'] : '#000';
+const formatTeacherColor = (t: Role['teacher']) =>
+  t ? TeacherColorMap[t] : '';
 
-export { formatClass, formatDate, formatGender, formatRole, formatRoleColor };
+export {
+  formatClass,
+  formatDate,
+  formatGender,
+  formatTeacher,
+  formatTeacherColor,
+};

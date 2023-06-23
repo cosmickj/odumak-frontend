@@ -8,7 +8,7 @@
       <p class="flex gap-2">
         <span>{{ attendance.name }}</span>
         <span>{{ attendance.grade }}학년 {{ attendance.group }}반</span>
-        <span>{{ formatRole(attendance.role) }}</span>
+        <span>{{ formatTeacher(attendance.role.teacher) }}</span>
       </p>
 
       <Button
@@ -57,7 +57,7 @@
 import CheckerStudents from './CheckerStudents.vue';
 import { ref } from 'vue';
 import { useAttendanceStore } from '@/store/attendance';
-import { formatRole } from '@/utils/useFormat';
+import { formatTeacher } from '@/utils/useFormat';
 import type { AttendanceData } from '@/types';
 
 const props = defineProps<{
