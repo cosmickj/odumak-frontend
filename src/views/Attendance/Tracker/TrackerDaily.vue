@@ -55,7 +55,7 @@
       class="w-full"
       show-clear
       v-model="filterGroup"
-      :options="GROUP_OPTIONS"
+      :options="GROUP_WITH_NEW_CLASS_OPTIONS"
       optionLabel="label"
       optionValue="value"
       placeholder="학급"
@@ -76,39 +76,36 @@
       <div>해당되는 내용이 없습니다</div>
     </template>
 
-    <template #list="slotProps">
+    <template #list="{ data }">
       <Card>
         <template #content>
           <div class="flex gap-2 items-center justify-between">
-            <p class="font-bold">
-              {{ slotProps.data.name }}
-            </p>
-
-            <div
-              v-if="slotProps.data.grade && slotProps.data.group"
-              class="flex-1 text-sm text-center"
-            >
-              <p>
-                {{ formatRole(slotProps.data.role.teacher) }}
-              </p>
-              <p>{{ slotProps.data.grade }} - {{ slotProps.data.group }}</p>
+            <div class="text-center">
+              <p class="font-bold">{{ data.name }}</p>
+              <Tag
+                v-if="data.role.teacher"
+                :value="formatTeacher(data.role.teacher)"
+                :style="`background: ${formatTeacherColor(data.role.teacher)}`"
+              />
             </div>
+
+            <p>{{ data.grade }} - {{ data.group }}</p>
 
             <div class="flex gap-2">
               <Avatar
                 label="현"
                 shape="circle"
-                :class="statusOffline(slotProps.data.attendance.status)"
+                :class="statusOffline(data.attendance.status)"
               />
               <Avatar
                 label="온"
                 shape="circle"
-                :class="statusOnline(slotProps.data.attendance.status)"
+                :class="statusOnline(data.attendance.status)"
               />
               <Avatar
                 label="결"
                 shape="circle"
-                :class="statusAbsence(slotProps.data.attendance.status)"
+                :class="statusAbsence(data.attendance.status)"
               />
             </div>
           </div>
@@ -116,39 +113,35 @@
       </Card>
     </template>
 
-    <template #grid="slotProps">
+    <template #grid="{ data }">
       <Card class="col-span-1">
         <template #content>
           <div class="flex flex-col gap-2 items-center justify-between">
             <Avatar icon="pi pi-user" size="large" shape="circle" />
-            <p class="font-bold">{{ slotProps.data.name }}</p>
+            <p class="font-bold">{{ data.name }}</p>
 
-            <div
-              v-if="slotProps.data.grade && slotProps.data.group"
-              class="flex-1 text-sm text-center flex gap-2"
-            >
-              <span>
-                {{ formatRole(slotProps.data) }}
-              </span>
-              <span>
-                {{ slotProps.data.grade }} - {{ slotProps.data.group }}
-              </span>
-            </div>
+            <Tag
+              v-if="data.role.teacher"
+              :value="formatTeacher(data.role.teacher)"
+              :style="`background: ${formatTeacherColor(data.role.teacher)}`"
+            />
 
-            <div v-else class="min-h-[20px]"></div>
+            <!-- <div class="flex-1 flex gap-2 text-sm items-center"> -->
+            <span> {{ data.grade }} - {{ data.group }} </span>
+            <!-- </div> -->
 
             <div class="flex mt-2">
               <Avatar
                 label="현"
-                :class="statusOffline(slotProps.data.attendance.status)"
+                :class="statusOffline(data.attendance.status)"
               />
               <Avatar
                 label="온"
-                :class="statusOnline(slotProps.data.attendance.status)"
+                :class="statusOnline(data.attendance.status)"
               />
               <Avatar
                 label="결"
-                :class="statusAbsence(slotProps.data.attendance.status)"
+                :class="statusAbsence(data.attendance.status)"
               />
             </div>
           </div>
@@ -174,14 +167,8 @@
 
     <div v-if="chartData" class="flex mt-2 items-baseline justify-evenly">
       <p class="text-gray-500">
-        학생:
+        총:
         <span class="text-xl">{{ totalCount }}</span>
-        <span class="text-xs">명</span>
-      </p>
-
-      <p class="text-bold">
-        입력:
-        <span class="text-xl">{{ totalCount - emptyCount }}</span>
         <span class="text-xs">명</span>
       </p>
 
@@ -189,6 +176,12 @@
         미입력:
         <span class="text-xl">{{ emptyCount }}</span>
         <span class="text-xs">명</span>
+      </p>
+
+      <p class="text-green-700 text-bold text-lg">
+        입력:
+        <span class="text-2xl">{{ totalCount - emptyCount }}</span>
+        <span class="text-sm">명</span>
       </p>
     </div>
   </div>
@@ -200,8 +193,11 @@ import { useRouter } from 'vue-router';
 import { useUserStore } from '@/store/user';
 import { useAttendanceStore } from '@/store/attendance';
 import { getPreviousSunday } from '@/utils/useCalendar';
-import { formatRole } from '@/utils/useFormat';
-import { GRADE_OPTIONS, GROUP_OPTIONS } from '@/constants/common';
+import { formatTeacher, formatTeacherColor } from '@/utils/useFormat';
+import {
+  GRADE_OPTIONS,
+  GROUP_WITH_NEW_CLASS_OPTIONS,
+} from '@/constants/common';
 
 const router = useRouter();
 const userStore = useUserStore();
