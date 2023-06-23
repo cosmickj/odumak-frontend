@@ -67,7 +67,7 @@
       </RouterLink>
     </div>
 
-    <Button
+    <!-- <Button
       v-if="
         userStore.userData?.grade === '0' && userStore.userData?.group === '0'
       "
@@ -78,7 +78,7 @@
       icon="pi pi-user-plus"
       label="새친구 등록하기"
       @click="visible = true"
-    />
+    /> -->
 
     <Dialog
       modal
