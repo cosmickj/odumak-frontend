@@ -4,18 +4,23 @@
 
     <Calendar
       touchUI
-      v-model="attendanceDate"
-      class="my-5"
+      class="my-4"
       input-class="text-center"
       placeholder="날짜를 선택해주세요"
+      v-model="attendanceDate"
       :max-date="maxDate"
       :disabledDays="[1, 2, 3, 4, 5, 6]"
       @date-select="getAttendances"
     />
 
+    <div v-if="!isLoading" class="flex gap-2 mb-2 text-lg">
+      <span>{{ formatClassName(userData.grade, userData.group) }}</span>
+      <span>(총 {{ attendances.length }}명)</span>
+    </div>
+
     <ProgressSpinner v-if="isLoading" />
 
-    <section v-else>
+    <template v-else>
       <CheckerTeachers
         v-if="userData.role.system === 'admin'"
         :attendances="attendances"
@@ -49,7 +54,7 @@
           />
         </template>
       </Dialog>
-    </section>
+    </template>
   </main>
 </template>
 
@@ -63,6 +68,7 @@ import { useRouter } from 'vue-router';
 import { useUserStore } from '@/store/user';
 import { useAttendanceStore } from '@/store/attendance';
 import { getPreviousSunday } from '@/utils/useCalendar';
+import { formatClassName } from '@/utils/useFormat';
 import type { AttendanceData } from '@/types';
 
 const router = useRouter();
@@ -126,29 +132,28 @@ onMounted(async () => await getAttendances());
 
 const onSubmit = () => {
   try {
-    attendances.value.forEach(async (attendance) => {
-      if (attendance.uid) {
-        await attendanceStore.modifyAttendance({
-          uid: attendance.uid,
-          attendance: {
-            status: attendance.attendance.status,
-          },
-        });
-      } else {
-        await attendanceStore.addAttendance({
-          name: attendance.name,
-          church: attendance.church,
-          department: attendance.department,
-          grade: attendance.grade,
-          group: attendance.group,
-          job: attendance.job,
-          attendance: {
-            date: attendanceDate.value,
-            status: attendance.attendance.status,
-          },
-          createdBy: userData.value.name,
+    attendances.value.forEach(async (attd) => {
+      if (attd.uid) {
+        return await attendanceStore.modifyAttendance({
+          uid: attd.uid,
+          attendance: { status: attd.attendance.status },
         });
       }
+
+      return await attendanceStore.addAttendance({
+        memberUid: attd.memberUid,
+        name: attd.name,
+        church: attd.church,
+        department: attd.department,
+        grade: attd.grade,
+        group: attd.group,
+        job: attd.job,
+        attendance: {
+          date: attendanceDate.value,
+          status: attd.attendance.status,
+        },
+        createdBy: userData.value.name,
+      });
     });
 
     alert('저장되었습니다!');

@@ -49,10 +49,10 @@
         <p>등록된 인원이 없습니다.</p>
       </template>
 
-      <template #groupheader="slotProps">
+      <template #groupheader="{ data }">
         <div>
           <i class="pi pi-users"></i>
-          <span class="ml-4">{{ formatClass(slotProps.data) }}</span>
+          <span class="ml-4">{{ formatGroupHeader(data) }}</span>
         </div>
       </template>
 
@@ -77,8 +77,8 @@
       >
         <template #body="{ data: { role } }">
           <Tag
-            :value="formatRole(role)"
-            :style="`background: ${formatRoleColor(role)}`"
+            :value="formatTeacher(role.teacher)"
+            :style="`background: ${formatTeacherColor(role.teacher)}`"
           />
         </template>
       </Column>
@@ -130,9 +130,9 @@ import { helpers, required, requiredIf } from '@vuelidate/validators';
 import {
   formatDate,
   formatGender,
-  formatClass,
-  formatRole,
-  formatRoleColor,
+  formatGroupHeader,
+  formatTeacher,
+  formatTeacherColor,
 } from '@/utils/useFormat';
 import type { MemberData } from '@/types';
 import type DataTable from 'primevue/datatable';

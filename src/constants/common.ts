@@ -26,6 +26,17 @@ const GROUP_OPTIONS: Option[] = [
   { label: '7반', value: '7' },
 ];
 
+const GROUP_WITH_NEW_CLASS_OPTIONS: Option[] = [
+  { label: '새친구', value: '0' },
+  { label: '1반', value: '1' },
+  { label: '2반', value: '2' },
+  { label: '3반', value: '3' },
+  { label: '4반', value: '4' },
+  { label: '5반', value: '5' },
+  { label: '6반', value: '6' },
+  { label: '7반', value: '7' },
+];
+
 const GENDER: Option[] = [
   { label: '남자', value: 'male' },
   { label: '여자', value: 'female' },
@@ -36,6 +47,8 @@ const TEACHER_ROLE: Option[] = [
   { label: '부담임', value: 'assistant' },
   { label: '해당 없음', value: 'common' },
 ];
+
+const NAN_TEXT = '없음';
 
 // const getBirthYear = () => {
 //   const currentYear = new Date().getFullYear();
@@ -80,5 +93,7 @@ export {
   GENDER,
   GRADE_OPTIONS,
   GROUP_OPTIONS,
+  GROUP_WITH_NEW_CLASS_OPTIONS,
   TEACHER_ROLE,
+  NAN_TEXT,
 };

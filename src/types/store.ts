@@ -1,17 +1,15 @@
-import { MemberData, UserData } from './index';
+import { Job, MemberData, Status, UserData } from './index';
 
 /*---------- attendace.ts ----------*/
 export interface AddAttendanceParams {
+  memberUid: string;
   name: string;
   church: string;
   department: string;
   grade: string;
   group: string;
-  job: 'student' | 'teacher';
-  attendance: {
-    date: Date;
-    status: 'online' | 'offline' | 'absence';
-  };
+  job: Job;
+  attendance: { date: Date; status: Status };
   createdBy: string;
   createdAt?: Date;
 }
@@ -22,14 +20,12 @@ export interface FetchAttendancesParams {
   department: string;
   grade?: string;
   group?: string;
-  job: 'student' | 'teacher';
+  job: Job;
 }
 
 export interface ModifyAttendanceParams {
   uid: string;
-  attendance: {
-    status: 'online' | 'offline' | 'absence';
-  };
+  attendance: { status: Status };
 }
 
 /*---------- member.ts ----------*/
