@@ -4,17 +4,23 @@
     class="mt-[-1px] p-2 border border-slate-300 items-center justify-between"
     :key="i"
   >
-    <div class="flex items-center justify-between">
+    <div class="flex min-h-[40px] items-center justify-between">
       <p class="flex gap-2">
+        <Tag
+          :value="formatTeacher(attendance.role.teacher)"
+          :style="`background: ${formatTeacherColor(attendance.role.teacher)}`"
+        />
         <span>{{ attendance.name }}</span>
-        <span>{{ attendance.grade }}학년 {{ attendance.group }}반</span>
-        <span>{{ formatTeacher(attendance.role.teacher) }}</span>
+        <span v-if="attendance.role.teacher !== 'common'">
+          {{ formatClassName(attendance.grade, attendance.group) }}
+        </span>
       </p>
 
       <Button
         v-if="attendance.role.teacher === 'head'"
-        icon="pi pi-chevron-down"
-        class="p-button-rounded p-button-text p-button-secondary p-button-sm"
+        rounded
+        severity="secondary"
+        icon="pi pi-plus"
         @click="getSubAttendances(attendance)"
       />
     </div>
@@ -43,12 +49,7 @@
     <CheckerStudents :attendances="subAttendances" />
 
     <template #footer>
-      <Button
-        label="저장"
-        size="small"
-        severity="warning"
-        @click="visible = false"
-      />
+      <Button text label="닫기" size="small" @click="visible = false" />
     </template>
   </Dialog>
 </template>
@@ -57,7 +58,11 @@
 import CheckerStudents from './CheckerStudents.vue';
 import { ref } from 'vue';
 import { useAttendanceStore } from '@/store/attendance';
-import { formatTeacher } from '@/utils/useFormat';
+import {
+  formatClassName,
+  formatTeacher,
+  formatTeacherColor,
+} from '@/utils/useFormat';
 import type { AttendanceData } from '@/types';
 
 const props = defineProps<{

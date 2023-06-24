@@ -53,7 +53,9 @@ export const useAttendanceStore = defineStore('attendance', {
       });
 
       const attendances: AttendanceData[] = members
-        .filter((mem) => mem.registeredAt <= params.attendanceDate)
+        .filter((mem) => {
+          return mem.registeredAt <= params.attendanceDate && !mem.role.officer;
+        })
         .map((mem) => {
           const registeredAttendance = registeredAttendances.find((attd) => {
             return (
@@ -63,7 +65,7 @@ export const useAttendanceStore = defineStore('attendance', {
               attd.department === mem.department
             );
           });
-          const attendanceTemp = { status: '', date: null };
+          const attendanceTemp = { status: null, date: null };
 
           return {
             uid: registeredAttendance?.uid || '',
@@ -125,7 +127,7 @@ export const useAttendanceStore = defineStore('attendance', {
               mem.department == attd.department
             );
           });
-          const attendanceTemp = { status: '', date: null };
+          const attendanceTemp = { status: null, date: null };
 
           return {
             uid: registeredAttendance?.uid || '',
