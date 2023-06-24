@@ -77,12 +77,10 @@ export interface MemberData extends BaseData {
 }
 
 /** Attendance */
-export interface AttendanceData
-  extends Pick<
-    MemberData,
-    'name' | 'church' | 'department' | 'job' | 'grade' | 'group' | 'role'
-  > {
+export interface AttendanceData extends Omit<BaseData, 'birth' | 'createdAt'> {
   uid: string;
+  memberUid: string;
+  job: Job;
   attendance: { date: Date | Timestamp; status: Status };
   createdAt?: Date;
   createdBy?: string;

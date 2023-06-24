@@ -64,7 +64,7 @@
 
   <DataView
     v-if="layout !== 'chart'"
-    data-key="uid"
+    data-key="memberUid"
     paginator
     paginator-template="PrevPageLink PageLinks NextPageLink RowsPerPageDropdown"
     :rows="6"
@@ -126,9 +126,7 @@
               :style="`background: ${formatTeacherColor(data.role.teacher)}`"
             />
 
-            <!-- <div class="flex-1 flex gap-2 text-sm items-center"> -->
             <span> {{ data.grade }} - {{ data.group }} </span>
-            <!-- </div> -->
 
             <div class="flex mt-2">
               <Avatar

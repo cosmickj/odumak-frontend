@@ -132,29 +132,28 @@ onMounted(async () => await getAttendances());
 
 const onSubmit = () => {
   try {
-    attendances.value.forEach(async (attendance) => {
-      if (attendance.uid) {
-        await attendanceStore.modifyAttendance({
-          uid: attendance.uid,
-          attendance: {
-            status: attendance.attendance.status,
-          },
-        });
-      } else {
-        await attendanceStore.addAttendance({
-          name: attendance.name,
-          church: attendance.church,
-          department: attendance.department,
-          grade: attendance.grade,
-          group: attendance.group,
-          job: attendance.job,
-          attendance: {
-            date: attendanceDate.value,
-            status: attendance.attendance.status,
-          },
-          createdBy: userData.value.name,
+    attendances.value.forEach(async (attd) => {
+      if (attd.uid) {
+        return await attendanceStore.modifyAttendance({
+          uid: attd.uid,
+          attendance: { status: attd.attendance.status },
         });
       }
+
+      return await attendanceStore.addAttendance({
+        memberUid: attd.memberUid,
+        name: attd.name,
+        church: attd.church,
+        department: attd.department,
+        grade: attd.grade,
+        group: attd.group,
+        job: attd.job,
+        attendance: {
+          date: attendanceDate.value,
+          status: attd.attendance.status,
+        },
+        createdBy: userData.value.name,
+      });
     });
 
     alert('저장되었습니다!');
