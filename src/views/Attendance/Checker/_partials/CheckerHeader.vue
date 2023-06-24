@@ -1,10 +1,7 @@
 <template>
   <header class="relative flex items-center justify-between">
     <RouterLink :to="{ name: 'HomeView' }">
-      <Button
-        icon="pi pi-angle-left"
-        class="p-button-text p-button-secondary"
-      />
+      <Button text severity="secondary" icon="pi pi-angle-left" />
     </RouterLink>
 
     <span
@@ -14,14 +11,20 @@
     </span>
 
     <Button
-      class="p-button-warning p-button-sm"
       label="저장"
+      size="small"
+      severity="warning"
+      :disabled="!isChanged"
       @click="handleSubmit"
     />
   </header>
 </template>
 
 <script setup lang="ts">
+defineProps<{
+  isChanged: boolean;
+}>();
+
 const emit = defineEmits(['submit']);
 
 const handleSubmit = () => emit('submit');

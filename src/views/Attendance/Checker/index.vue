@@ -1,6 +1,6 @@
 <template>
   <main class="overflow-auto flex flex-col h-full p-4">
-    <CheckerHeader @submit="onSubmit" />
+    <CheckerHeader :is-changed="isChanged" @submit="onSubmit" />
 
     <Calendar
       touchUI
@@ -13,8 +13,12 @@
       @date-select="getAttendances"
     />
 
-    <div v-if="!isLoading" class="flex gap-2 mb-2 text-lg">
-      <span>{{ formatClassName(userData.grade, userData.group) }}</span>
+    <div class="flex gap-2 mb-2 text-lg">
+      <span v-if="userData.role.system === 'user'">
+        {{ formatClassName(userData.grade, userData.group) }}
+      </span>
+      <span v-else> {{ userData.church }} {{ userData.department }} 교사 </span>
+
       <span>(총 {{ attendances.length }}명)</span>
     </div>
 
@@ -63,7 +67,7 @@ import CheckerHeader from './_partials/CheckerHeader.vue';
 import CheckerStudents from './_partials/CheckerStudents.vue';
 import CheckerTeachers from './_partials/CheckerTeachers.vue';
 
-import { computed, ref, onMounted } from 'vue';
+import { computed, ref, onMounted, toRaw } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/store/user';
 import { useAttendanceStore } from '@/store/attendance';
@@ -80,55 +84,53 @@ const attendanceDate = ref<Date>(getPreviousSunday());
 
 const isLoading = ref(false);
 const attendances = ref<AttendanceData[]>([]);
+const attendancesClone = ref<AttendanceData[]>([]);
+
+const isChanged = computed(() => {
+  const attd = attendances.value;
+  const clone = attendancesClone.value;
+
+  return JSON.stringify(attd) !== JSON.stringify(clone);
+});
 
 const visible = ref(true);
-
 const userData = computed(() => userStore.userData!);
-
-const RequestJobMap = {
-  admin: 'teacher' as const,
-  head: 'student' as const,
-  assistant: 'student' as const,
-  common: null,
-};
-const requestJob = computed(() => RequestJobMap[userData.value.role.teacher!]);
 
 const getAttendances = async () => {
   try {
     isLoading.value = true;
 
-    if (!requestJob.value) {
-      return;
+    const { system } = userData.value.role;
+    if (system === 'admin') {
+      await attendanceStore.fetchAttendances({
+        attendanceDate: attendanceDate.value,
+        church: userData.value.church,
+        department: userData.value.department,
+        job: 'teacher',
+      });
+    } else if (system === 'user') {
+      await attendanceStore.fetchAttendancesByGradeGroup({
+        attendanceDate: attendanceDate.value,
+        church: userData.value.church,
+        department: userData.value.department,
+        grade: userData.value.grade,
+        group: userData.value.group,
+        job: 'student',
+      });
     }
-
-    // CONTINUE: role에 따른 출석 입력 데이터 변경처리
-    // if (requestJob.value === 'teacher') {
-    //   await attendanceStore.fetchAttendances({
-    //     attendanceDate: attendanceDate.value,
-    //     church: userData.value.church!,
-    //     department: userData.value.department!,
-    //     job: requestJob.value,
-    //   });
-    // } else if (requestJob.value === 'student') {
-    await attendanceStore.fetchAttendancesByGradeGroup({
-      attendanceDate: attendanceDate.value,
-      church: userData.value.church!,
-      department: userData.value.department!,
-      grade: userData.value.grade!,
-      group: userData.value.group!,
-      job: requestJob.value,
-    });
-    // }
-
-    attendances.value = attendanceStore.attendancesRecord.daily;
   } catch (error) {
     console.log(error);
   } finally {
     isLoading.value = false;
+
+    return attendanceStore.attendancesRecord.daily;
   }
 };
 
-onMounted(async () => await getAttendances());
+onMounted(async () => {
+  attendances.value = await getAttendances();
+  attendancesClone.value = structuredClone(toRaw(attendances.value));
+});
 
 const onSubmit = () => {
   try {
@@ -156,7 +158,12 @@ const onSubmit = () => {
       });
     });
 
-    alert('저장되었습니다!');
+    if (confirm('저장되었습니다! 확인하러 가시겠습니까?')) {
+      router.push({
+        name: 'AttendanceTrackerDaily',
+        params: { job: attendances.value[0].job },
+      });
+    }
   } catch (error) {
     console.log(error);
   }
