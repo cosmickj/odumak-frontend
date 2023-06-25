@@ -1,6 +1,6 @@
 <template>
   <main class="overflow-auto flex flex-col h-full p-4">
-    <CheckerHeader :is-changed="isChanged" @submit="onSubmit" />
+    <CheckerHeader :is-changed="isChanged" @submit="saveAttendances" />
 
     <Calendar
       touchUI
@@ -14,10 +14,18 @@
     />
 
     <div class="flex gap-2 mb-2 text-lg">
-      <span v-if="userData.role.system === 'user'">
+      <span
+        v-if="
+          userData.role.system === 'admin' ||
+          userData.role.executive === 'secretary'
+        "
+      >
+        {{ userData.church }} {{ userData.department }} 교사
+      </span>
+
+      <span v-else-if="userData.role.system === 'user'">
         {{ formatClassName(userData.grade, userData.group) }}
       </span>
-      <span v-else> {{ userData.church }} {{ userData.department }} 교사 </span>
 
       <span>(총 {{ attendances.length }}명)</span>
     </div>
@@ -26,7 +34,10 @@
 
     <template v-else>
       <CheckerTeachers
-        v-if="userData.role.system === 'admin'"
+        v-if="
+          userData.role.system === 'admin' ||
+          userData.role.executive === 'secretary'
+        "
         :attendances="attendances"
         :attendance-date="attendanceDate"
       />
@@ -100,8 +111,8 @@ const getAttendances = async () => {
   try {
     isLoading.value = true;
 
-    const { system } = userData.value.role;
-    if (system === 'admin') {
+    const { system, executive } = userData.value.role;
+    if (system === 'admin' || executive === 'secretary') {
       await attendanceStore.fetchAttendances({
         attendanceDate: attendanceDate.value,
         church: userData.value.church,
@@ -130,7 +141,7 @@ const getAttendances = async () => {
 
 onMounted(async () => await getAttendances());
 
-const onSubmit = () => {
+const saveAttendances = () => {
   try {
     attendances.value.forEach(async (attd) => {
       if (attd.uid) {
@@ -150,7 +161,7 @@ const onSubmit = () => {
         job: attd.job,
         attendance: {
           date: attendanceDate.value,
-          status: attd.attendance.status,
+          status: attd.attendance.status ? attd.attendance.status : 'absence',
         },
         createdBy: userData.value.name,
       });
