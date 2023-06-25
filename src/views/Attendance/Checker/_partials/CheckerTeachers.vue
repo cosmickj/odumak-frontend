@@ -50,14 +50,23 @@
 
     <template #footer>
       <Button text label="닫기" size="small" @click="visible = false" />
+      <Button
+        severity="warning"
+        label="저장"
+        size="small"
+        :disabled="!changed"
+        @click="saveSubAttendances"
+      />
     </template>
   </Dialog>
 </template>
 
 <script setup lang="ts">
 import CheckerStudents from './CheckerStudents.vue';
-import { ref } from 'vue';
+import { computed, ref, toRaw } from 'vue';
 import { useAttendanceStore } from '@/store/attendance';
+import { useUserStore } from '@/store/user';
+import { useToast } from 'primevue/usetoast';
 import {
   formatClassName,
   formatTeacher,
@@ -71,10 +80,21 @@ const props = defineProps<{
 }>();
 
 const attendanceStore = useAttendanceStore();
+const userStore = useUserStore();
+
+const toast = useToast();
 
 const visible = ref(false);
 const isLoading = ref(false);
 const subAttendances = ref<AttendanceData[]>([]);
+const subAttendancesClone = ref<AttendanceData[]>([]);
+
+const changed = computed(() => {
+  const attd = subAttendances.value;
+  const clone = subAttendancesClone.value;
+
+  return JSON.stringify(attd) !== JSON.stringify(clone);
+});
 
 const getSubAttendances = async (attd: AttendanceData) => {
   try {
@@ -90,12 +110,55 @@ const getSubAttendances = async (attd: AttendanceData) => {
     });
 
     subAttendances.value = attendanceStore.attendancesRecord.daily;
+    subAttendancesClone.value = structuredClone(toRaw(subAttendances.value));
 
     visible.value = true;
   } catch (error) {
     console.log(error);
   } finally {
     isLoading.value = false;
+  }
+};
+
+const saveSubAttendances = () => {
+  try {
+    const userData = userStore.userData;
+    if (!userData) {
+      return;
+    }
+
+    subAttendances.value.forEach(async (attd) => {
+      if (attd.uid) {
+        return await attendanceStore.modifyAttendance({
+          uid: attd.uid,
+          attendance: { status: attd.attendance.status },
+        });
+      }
+      return await attendanceStore.addAttendance({
+        memberUid: attd.memberUid,
+        name: attd.name,
+        church: attd.church,
+        department: attd.department,
+        grade: attd.grade,
+        group: attd.group,
+        job: attd.job,
+        attendance: {
+          date: props.attendanceDate,
+          status: attd.attendance.status ? attd.attendance.status : 'absence',
+        },
+        createdBy: userData.name,
+      });
+    });
+
+    toast.add({
+      severity: 'success',
+      detail: '추가되었습니다',
+      life: 1000,
+    });
+
+    visible.value = false;
+  } catch (error) {
+    console.log(error);
   }
 };
 </script>
