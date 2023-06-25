@@ -19,7 +19,7 @@
     :breakpoints="{ '640px': '90vw' }"
   >
     <div class="break-keep">
-      <span class="font-semibold"> 추가정보(교회, 당담부서, 학급 등) </span>
+      <span class="font-semibold">추가정보(교회, 담당부서, 학급 등)</span>
       를 입력해주세요.
     </div>
 
