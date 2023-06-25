@@ -118,19 +118,17 @@ const getAttendances = async () => {
         job: 'student',
       });
     }
+
+    attendances.value = attendanceStore.attendancesRecord.daily;
+    attendancesClone.value = structuredClone(toRaw(attendances.value));
   } catch (error) {
     console.log(error);
   } finally {
     isLoading.value = false;
-
-    return attendanceStore.attendancesRecord.daily;
   }
 };
 
-onMounted(async () => {
-  attendances.value = await getAttendances();
-  attendancesClone.value = structuredClone(toRaw(attendances.value));
-});
+onMounted(async () => await getAttendances());
 
 const onSubmit = () => {
   try {
