@@ -15,6 +15,7 @@ import {
   where,
 } from 'firebase/firestore';
 
+import { COLLECTION } from '@/constants/common';
 import type { MemberData } from '@/types';
 import type {
   CreateMultipleParams,
@@ -37,7 +38,7 @@ export const useMemberStore = defineStore('member', {
           department,
           createdAt: serverTimestamp(),
         };
-        return await addDoc(collection(db, 'members'), param);
+        return await addDoc(collection(db, COLLECTION.MEMBERS), param);
       });
     },
 
@@ -116,20 +117,20 @@ export const useMemberStore = defineStore('member', {
     },
 
     // async modifySingle(params: ModifySingleParams) {
-    //   return await updateDoc(doc(db, 'members', params.uid), {
+    //   return await updateDoc(doc(db, COLLECTION.MEMBERS, params.uid), {
     //     [params.field]: params.value,
     //   });
     // },
 
     async modifySingle(params: ModifySingleParams) {
       const { uid, ...data } = params;
-      return await updateDoc(doc(db, 'members', uid), { ...data });
+      return await updateDoc(doc(db, COLLECTION.MEMBERS, uid), { ...data });
     },
 
     async removeMultiple(params: RemoveMultipleParams) {
       return await Promise.all(
         params.uids.map(async (uid) => {
-          if (uid) await deleteDoc(doc(db, 'members', uid));
+          if (uid) await deleteDoc(doc(db, COLLECTION.MEMBERS, uid));
         })
       );
     },

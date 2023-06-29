@@ -14,7 +14,7 @@ import {
 } from 'firebase/firestore';
 import { deleteUser, signOut } from 'firebase/auth';
 
-import { Collection } from '@/enums';
+import { COLLECTION } from '@/constants/common';
 import type {
   CreateSingleParams,
   FetchSingleParams,
@@ -40,7 +40,7 @@ export const useUserStore = defineStore('user', {
       try {
         const { uid, ...newUser } = params;
 
-        await setDoc(doc(db, Collection.USERS, uid), {
+        await setDoc(doc(db, COLLECTION.USERS, uid), {
           ...newUser,
           createdAt: serverTimestamp(),
         });
@@ -51,7 +51,7 @@ export const useUserStore = defineStore('user', {
 
     async fetchSingle(params: FetchSingleParams) {
       try {
-        const docRef = doc(db, Collection.USERS, params.uid);
+        const docRef = doc(db, COLLECTION.USERS, params.uid);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
@@ -94,7 +94,7 @@ export const useUserStore = defineStore('user', {
      */
     async modifySingle(params: ModifySingle) {
       const { uid, keyName, keyValue } = params;
-      return await updateDoc(doc(db, 'users', uid), {
+      return await updateDoc(doc(db, COLLECTION.USERS, uid), {
         [keyName]: keyValue,
       });
     },
@@ -103,7 +103,7 @@ export const useUserStore = defineStore('user', {
      */
     async modifyMultiple(payload: any) {
       const { uid, ...params } = payload;
-      return await updateDoc(doc(db, 'users', uid), {
+      return await updateDoc(doc(db, COLLECTION.USERS, uid), {
         ...params,
       });
     },
@@ -114,7 +114,7 @@ export const useUserStore = defineStore('user', {
 
         if (currentUser) {
           await deleteUser(currentUser);
-          await deleteDoc(doc(db, Collection.USERS, currentUser.uid));
+          await deleteDoc(doc(db, COLLECTION.USERS, currentUser.uid));
         }
       } catch (error) {
         throw Error((error as Error).message);

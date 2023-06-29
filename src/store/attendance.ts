@@ -8,9 +8,11 @@ import {
   updateDoc,
   where,
 } from 'firebase/firestore';
+
 import { defineStore } from 'pinia';
 import { useMemberStore } from './member';
-import type { AttendanceData, MemberData } from '@/types';
+import { COLLECTION } from '@/constants/common';
+import type { AttendanceData } from '@/types';
 import type {
   AddAttendanceParams,
   FetchAttendancesParams,
@@ -148,7 +150,7 @@ export const useAttendanceStore = defineStore('attendance', {
     },
 
     async modifyAttendance(params: ModifyAttendanceParams) {
-      return await updateDoc(doc(db, 'attendances', params.uid), {
+      return await updateDoc(doc(db, COLLECTION.ATTENDANCES, params.uid), {
         'attendance.status': params.attendance.status,
       });
     },

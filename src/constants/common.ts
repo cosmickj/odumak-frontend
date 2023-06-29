@@ -1,5 +1,11 @@
 import type { Option } from '@/types';
 
+const COLLECTION = {
+  ATTENDANCES: import.meta.env.VITE_FIREBASE_COLL_ATTENDANCES,
+  MEMBERS: import.meta.env.VITE_FIREBASE_COLL_MEMBERS,
+  USERS: import.meta.env.VITE_FIREBASE_COLL_USERS,
+};
+
 const CHURCH_OPTIONS: Option[] = [
   //
   { label: '영은교회', value: '영은교회' },
@@ -88,6 +94,7 @@ export {
   // BIRTH_YEAR,
   // BIRTH_MONTH,
   // BIRTH_DATE,
+  COLLECTION,
   CHURCH_OPTIONS,
   DEPARTMENT_OPTIONS,
   GENDER,
