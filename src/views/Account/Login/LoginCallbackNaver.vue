@@ -11,7 +11,6 @@ import { useUserStore } from '@/store/user';
 import { getNaverOAuth, getCustomToken } from '@/api/oauth';
 import { auth } from '@/firebase/config';
 import { signInWithCustomToken } from '@firebase/auth';
-import { UserData } from '@/types';
 
 interface NaverOAuth {
   message: string;
@@ -57,27 +56,23 @@ onMounted(async () => {
 
     const user = await userStore.fetchSingle({ uid });
     if (user === null) {
-      const newUser: UserData = {
+      const newUser = {
         uid,
+        name,
         email,
         provider: 'naver' as const,
         profileImage: profile_image,
-        name,
-        birth: null,
         church: '',
         department: '',
-        grade: '',
-        group: '',
-        role: { system: 'user', teacher: 'common' },
         isAccepted: false,
         isRejected: false,
         rejectedReason: '',
       };
       await userStore.createSingle(newUser);
     }
-
     await userStore.fetchSingle({ uid });
-    router.push({ name: 'HomeView' });
+
+    router.replace({ name: 'HomeView' });
   } catch (error) {
     throw Error((error as Error).message);
   }

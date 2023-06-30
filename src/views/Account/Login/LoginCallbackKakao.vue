@@ -11,7 +11,6 @@ import { useUserStore } from '@/store/user';
 import { getKakaoToken, getCustomToken } from '@/api/oauth';
 import { auth } from '@/firebase/config';
 import { signInWithCustomToken } from 'firebase/auth';
-import { UserData } from '@/types';
 import { SHA1 } from 'crypto-js';
 
 const router = useRouter();
@@ -38,19 +37,15 @@ onMounted(async () => {
 
     const user = await userStore.fetchSingle({ uid });
     if (user === null) {
-      const newUser: UserData = {
+      const newUser = {
         uid,
+        name: statusInfo.user.kakao_account.profile.nickname || '',
         email: statusInfo.user.kakao_account.email || '',
         provider: 'kakao' as const,
         profileImage:
           statusInfo.user.kakao_account.profile.thumbnail_image_url || '',
-        name: statusInfo.user.kakao_account.profile.nickname || '',
-        birth: null,
         church: '',
         department: '',
-        grade: '',
-        group: '',
-        role: { system: 'user', teacher: 'common' },
         isAccepted: false,
         isRejected: false,
         rejectedReason: '',
@@ -58,11 +53,10 @@ onMounted(async () => {
       await userStore.createSingle(newUser);
     }
     await userStore.fetchSingle({ uid });
-    router.push({ name: 'HomeView' });
+
+    router.replace({ name: 'HomeView' });
   } catch (error) {
     console.log(error);
   }
 });
 </script>
-
-<style scoped></style>

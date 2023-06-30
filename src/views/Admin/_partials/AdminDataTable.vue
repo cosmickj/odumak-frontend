@@ -171,9 +171,9 @@ const groupRowsBy = ({ grade, group }: MemberData) => {
 const selectedMembers = ref<MemberData[]>([]);
 
 /*---------- ADD ----------*/
-const MemberRoleMap = {
+const MemberRoleMap: { student: {}; teacher: MemberData['role'] } = {
   student: {},
-  teacher: { teacher: 'common' as const },
+  teacher: { system: 'user', teacher: 'common' },
 };
 
 const addingMemberTemp: MemberData = {

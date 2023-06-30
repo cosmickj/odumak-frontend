@@ -14,17 +14,19 @@ import {
 } from 'firebase/firestore';
 import { deleteUser, signOut } from 'firebase/auth';
 
+import { useMemberStore } from './member';
+import { userConverter } from '@/utils/useConverter';
 import { COLLECTION } from '@/constants/common';
+import type { Member, User } from '@/models';
 import type {
   CreateSingleParams,
   FetchSingleParams,
   FetchMultipleByChurchAndDepartment,
   ModifySingle,
 } from '@/types/store';
-import type { UserData } from '@/types';
 
 interface UserStoreState {
-  userData: UserData | null;
+  userData: User | null;
   isAuthReady: boolean;
   isVisible: boolean;
 }
@@ -49,19 +51,31 @@ export const useUserStore = defineStore('user', {
       }
     },
 
-    async fetchSingle(params: FetchSingleParams) {
+    async fetchSingle({ uid }: FetchSingleParams) {
       try {
-        const docRef = doc(db, COLLECTION.USERS, params.uid);
-        const docSnap = await getDoc(docRef);
+        const ref = doc(db, COLLECTION.USERS, uid).withConverter(userConverter);
+        const docSnap = await getDoc(ref);
 
-        if (docSnap.exists()) {
-          this.userData = {
-            ...(docSnap.data() as UserData),
-            uid: params.uid,
-          };
-          return this.userData;
+        if (!docSnap.exists()) {
+          return null;
         }
-        return null;
+
+        let user = docSnap.data();
+
+        if (!user.isAccepted) {
+          user = mergeUserWithDefaultMemberData(user);
+        } else {
+          const memberStore = useMemberStore();
+          const [member] = await memberStore.fetchByName({
+            name: user.name,
+            church: user.church,
+            department: user.department,
+          });
+          user = mergeUserWithMemberData(user, member);
+        }
+
+        this.userData = setUserUID(user, uid);
+        return this.userData;
       } catch (error) {
         throw Error((error as Error).message);
       }
@@ -87,7 +101,7 @@ export const useUserStore = defineStore('user', {
         ...doc.data(),
       }));
 
-      return result as unknown as UserData[];
+      return result as unknown as User[];
     },
     /**
      * 유저 정보 수정 함수 - 속성 1개
@@ -131,3 +145,23 @@ export const useUserStore = defineStore('user', {
     },
   },
 });
+
+const mergeUserWithDefaultMemberData = (user: User): User => ({
+  ...user,
+  birth: null,
+  birthLater: true,
+  grade: '',
+  group: '',
+  isNewFriendClass: false,
+  remark: '',
+  job: 'teacher',
+  role: { system: 'user', teacher: 'common' },
+});
+
+const mergeUserWithMemberData = (user: User, member: Member): User => {
+  return { ...user, ...member };
+};
+
+const setUserUID = (user: User, uid: string) => {
+  return { ...user, uid };
+};

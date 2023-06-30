@@ -1,4 +1,4 @@
-import { Job, MemberData, Status, UserData } from './index';
+import { BaseData, Job, MemberData, Status, UserData } from './index';
 
 /*---------- attendace.ts ----------*/
 export interface AddAttendanceParams {
@@ -59,7 +59,12 @@ export interface RemoveMultipleParams {
 }
 
 /*---------- user.ts ----------*/
-export interface CreateSingleParams extends Omit<UserData, 'createdAt'> {}
+export interface CreateSingleParams extends Omit<UserData, keyof MemberData> {
+  uid: string;
+  name: string;
+  church: string;
+  department: string;
+}
 
 export interface FetchSingleParams {
   uid: string;

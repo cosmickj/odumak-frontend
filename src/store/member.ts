@@ -15,8 +15,8 @@ import {
   where,
 } from 'firebase/firestore';
 
+import { memberConverter } from '@/utils/useConverter';
 import { COLLECTION } from '@/constants/common';
-import type { MemberData } from '@/types';
 import type {
   CreateMultipleParams,
   FetchAllParmas,
@@ -47,16 +47,16 @@ export const useMemberStore = defineStore('member', {
 
       const q = query(
         membersColl,
+        where('job', '==', job),
         where('church', '==', church),
-        where('department', '==', department),
-        where('job', '==', job)
+        where('department', '==', department)
       );
       const qSnapshot = await getDocs(q);
 
       const members = qSnapshot.docs.map((doc) => ({
+        ...memberConverter.fromFirestore(doc),
         uid: doc.id,
-        ...doc.data(),
-      })) as MemberData[];
+      }));
 
       members.forEach((member) => {
         if (member.birth) {
@@ -87,33 +87,32 @@ export const useMemberStore = defineStore('member', {
       );
       const qSnapshot = await getDocs(q);
 
-      // TODO: MemberData를 class로 만들어서 인스턴스를 만들어보자
       const members = qSnapshot.docs.map((doc) => ({
+        ...memberConverter.fromFirestore(doc),
         uid: doc.id,
-        ...doc.data(),
-      })) as MemberData[];
+      }));
 
       return arraySort(members, ['grade', 'group', 'name']);
     },
 
     async fetchByName(params: {
+      name: string;
       church: string;
       department: string;
-      name: string;
     }) {
       const { church, department, name } = params;
 
       const q = query(
         membersColl,
+        where('name', '==', name),
         where('church', '==', church),
-        where('department', '==', department),
-        where('name', '==', name)
+        where('department', '==', department)
       );
       const qSnapshot = await getDocs(q);
 
-      const member = qSnapshot.docs.map((doc) => doc.data());
-
-      return member;
+      return qSnapshot.docs.map((doc) => {
+        return memberConverter.fromFirestore(doc);
+      });
     },
 
     // async modifySingle(params: ModifySingleParams) {

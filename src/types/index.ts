@@ -1,6 +1,5 @@
 import { Timestamp } from 'firebase/firestore';
 
-/** Common */
 export type Gender = 'male' | 'female';
 
 export type Job = 'student' | 'teacher';
@@ -40,53 +39,49 @@ export interface Role {
   [key: string]: string | undefined;
 }
 
-interface BaseData {
-  name: string;
-  birth: Date | null;
-  church: string;
-  department: string;
-  grade: string;
-  group: string;
-  role: Role;
-  createdAt?: Date;
-}
-
-/** User */
 export interface OAuthData {
   email: string;
   provider: 'naver' | 'kakao';
   profileImage: string;
 }
 
-export interface UserData extends BaseData, OAuthData {
+export interface BaseData {
+  name: string;
+  church: string;
+  department: string;
+  job: Job;
+  grade: string;
+  group: string;
+}
+
+export interface MemberData extends BaseData {
+  uid?: string;
+  role: Role;
+  gender: Gender;
+  birth: Date | null;
+  birthLater: boolean;
+  isNewFriendClass: boolean;
+  remark: string;
+  registeredAt: Date | null;
+  createdAt?: Date;
+}
+
+export interface UserData extends MemberData, OAuthData {
   uid: string;
   isAccepted: boolean;
   isRejected: boolean;
   rejectedReason: string;
+  createdAt?: Date;
 }
 
-/** Member */
-export interface MemberData extends BaseData {
-  uid?: string;
-  birthLater: boolean;
-  gender: Gender;
-  isNewFriendClass: boolean;
-  job: Job;
-  registeredAt: Date;
-  remark: string;
-}
-
-/** Attendance */
-export interface AttendanceData extends Omit<BaseData, 'birth' | 'createdAt'> {
+export interface AttendanceData extends BaseData {
   uid: string;
   memberUid: string;
-  job: Job;
   attendance: { date: Date | Timestamp; status: Status };
   createdAt?: Date;
   createdBy?: string;
 }
 
-/** Etc */
 export interface Option {
   label: string;
   value: string;

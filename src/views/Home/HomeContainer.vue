@@ -198,25 +198,7 @@
               </div>
             </div>
 
-            <!-- <div class="flex gap-x-5 mb-2">
-              <div class="flex-1">
-                <InputText
-                  v-model="student.address"
-                  class="w-full"
-                  placeholder="주소"
-                />
-              </div>
-            </div> -->
-
             <div class="flex gap-x-5 mb-2">
-              <!-- <div class="flex-1">
-                <InputText
-                  v-model="student.phone"
-                  class="w-full"
-                  placeholder="연락처"
-                />
-              </div> -->
-
               <div class="flex-1">
                 <InputText
                   v-model="student.remark"
