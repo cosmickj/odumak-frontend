@@ -260,7 +260,8 @@ import { useVuelidate } from '@vuelidate/core';
 import { required, helpers } from '@vuelidate/validators';
 import { getPreviousSunday } from '@/utils/useCalendar';
 import { GRADE_OPTIONS, GROUP_OPTIONS } from '@/constants/common';
-import type { NewStudent } from '@/types';
+import { Member } from '@/models';
+// import type { NewStudent } from '@/types';
 
 const memberStore = useMemberStore();
 const userStore = useUserStore();
@@ -268,7 +269,7 @@ const userStore = useUserStore();
 const visible = ref(false);
 
 const id = ref(1);
-const initSelectedStudent: NewStudent = {
+const initSelectedStudent = {
   id: 0,
   name: '',
   birth: null,
@@ -297,7 +298,7 @@ const scroll = () => {
   }, 100);
 };
 
-const newStudents = reactive<{ body: NewStudent[] }>({
+const newStudents = reactive<{ body: any[] }>({
   body: [{ ...initSelectedStudent, id: id.value }],
 });
 

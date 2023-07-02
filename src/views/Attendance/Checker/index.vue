@@ -84,7 +84,7 @@ import { useUserStore } from '@/store/user';
 import { useAttendanceStore } from '@/store/attendance';
 import { getPreviousSunday } from '@/utils/useCalendar';
 import { formatClassName } from '@/utils/useFormat';
-import type { AttendanceData } from '@/types';
+import type { Attendance } from '@/models';
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -94,8 +94,8 @@ const maxDate = getPreviousSunday();
 const attendanceDate = ref<Date>(getPreviousSunday());
 
 const isLoading = ref(false);
-const attendances = ref<AttendanceData[]>([]);
-const attendancesClone = ref<AttendanceData[]>([]);
+const attendances = ref<Attendance[]>([]);
+const attendancesClone = ref<Attendance[]>([]);
 
 const isChanged = computed(() => {
   const attd = attendances.value;

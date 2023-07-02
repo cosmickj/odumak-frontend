@@ -20,10 +20,10 @@
 </template>
 
 <script setup lang="ts">
-import type { AttendanceData } from '@/types';
+import type { Attendance } from '@/models';
 
 defineProps<{
-  attendances: AttendanceData[];
+  attendances: Attendance[];
 }>();
 </script>
 

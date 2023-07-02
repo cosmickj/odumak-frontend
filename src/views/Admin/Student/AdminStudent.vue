@@ -16,13 +16,13 @@ import { onMounted, ref } from 'vue';
 import { useUserStore } from '@/store/user';
 import { useMemberStore } from '@/store/member';
 import { useToast } from 'primevue/usetoast';
-import type { MemberData } from '@/types';
+import type { Member } from '@/models';
 
 const userStore = useUserStore();
 const memberStore = useMemberStore();
 
 const isLoading = ref(false);
-const members = ref<MemberData[]>([]);
+const members = ref<Member[]>([]);
 
 const fetchStudents = async () => {
   try {
@@ -48,7 +48,7 @@ onMounted(async () => await fetchStudents());
 
 const toast = useToast();
 
-const addStudents = async (members: MemberData[]) => {
+const addStudents = async (members: Member[]) => {
   try {
     const { church, department } = userStore.userData || {};
 
@@ -67,7 +67,7 @@ const addStudents = async (members: MemberData[]) => {
   }
 };
 
-const editStudent = async (payload: Required<MemberData>) => {
+const editStudent = async (payload: Required<Member>) => {
   try {
     const { uid, ...params } = payload;
 
@@ -85,7 +85,7 @@ const editStudent = async (payload: Required<MemberData>) => {
   }
 };
 
-const deleteStudents = async (members: MemberData[]) => {
+const deleteStudents = async (members: Member[]) => {
   try {
     const uids = members.map((member) => member.uid);
 

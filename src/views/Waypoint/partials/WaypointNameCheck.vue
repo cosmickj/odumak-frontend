@@ -1,7 +1,7 @@
 <template>
   <div class="flex-1 flex flex-col justify-between">
     <div class="flex flex-col gap-2">
-      <label for="name">이름을 정확히 입력해주세요</label>
+      <label for="name">{{ church }}에 등록된 이름을 입력해주세요</label>
       <InputText
         v-model="name"
         id="name"
@@ -14,8 +14,24 @@
     </div>
 
     <div class="flex justify-between">
-      <Button text severity="secondary" label="이전으로" @click="prevPage" />
-      <Button severity="warning" label="다음으로" @click="nextPage" />
+      <Button
+        raised
+        rounded
+        outlined
+        severity="secondary"
+        icon="pi pi-chevron-left"
+        label="이전으로"
+        @click="prevPage"
+      />
+
+      <Button
+        raised
+        rounded
+        icon="pi pi-chevron-right"
+        iconPos="right"
+        label="다음으로"
+        @click="nextPage"
+      />
     </div>
   </div>
 </template>
@@ -29,14 +45,14 @@ import { useWaypointStore } from '@/store/waypoint';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 
-const emit = defineEmits(['prevPage', 'nextPage']);
+const emit = defineEmits(['prev', 'next']);
 
 const router = useRouter();
 const memberStore = useMemberStore();
 const { church, department, name } = storeToRefs(useWaypointStore());
 
 if (!church.value || !department.value) {
-  router.push({ name: 'GroupCheck' });
+  router.replace({ name: 'GroupCheck' });
 }
 
 const rules = computed(() => ({
@@ -45,9 +61,9 @@ const rules = computed(() => ({
 
 const v$ = useVuelidate(rules, { name });
 
-const prevPage = () => {
-  emit('prevPage', { index: 1 });
-};
+const index = 1;
+
+const prevPage = () => emit('prev', { index });
 
 const nextPage = async () => {
   const isFormCorrect = await v$.value.$validate();
@@ -62,12 +78,12 @@ const nextPage = async () => {
   });
 
   if (!member.length) {
-    alert(
+    return alert(
       `${name.value} 선생님은 현재 ${church.value} ${department.value}에 등록되어 있지 않아 승인이 불가능합니다. 관리자에게 문의해주시기 바랍니다.`
     );
-  } else {
-    emit('nextPage', { index: 1 });
   }
+
+  emit('next', { index });
 };
 </script>
 

@@ -13,7 +13,7 @@ const formatDate = (date: Date | null) => {
     const mm = date.getMonth() + 1;
     const dd = date.getDate();
 
-    return `${yyyy}.${mm}.${dd}`; // return `${yyyy}년 ${mm}월 ${dd}일`;
+    return `${yyyy}.${mm}.${dd}`;
   }
   return '-';
 };

@@ -57,8 +57,24 @@
     </div>
 
     <div class="flex justify-between">
-      <Button text severity="secondary" label="이전으로" @click="prevPage" />
-      <Button severity="warning" label="다음으로" @click="nextPage" />
+      <Button
+        raised
+        rounded
+        outlined
+        severity="secondary"
+        icon="pi pi-chevron-left"
+        label="이전으로"
+        @click="prevPage"
+      />
+
+      <Button
+        raised
+        rounded
+        icon="pi pi-chevron-right"
+        iconPos="right"
+        label="다음으로"
+        @click="nextPage"
+      />
     </div>
   </div>
 </template>
@@ -73,7 +89,7 @@ import { GRADE_OPTIONS, GROUP_OPTIONS, TEACHER_ROLE } from '@/constants/common';
 import { storeToRefs } from 'pinia';
 import { useWaypointStore } from '@/store/waypoint';
 
-const emit = defineEmits(['prevPage', 'nextPage']);
+const emit = defineEmits(['prev', 'next']);
 
 const router = useRouter();
 const memberStore = useMemberStore();
@@ -126,9 +142,9 @@ const rules = computed(() => ({
 
 const v$ = useVuelidate(rules, { role, grade, group });
 
-const prevPage = () => {
-  emit('prevPage', { index: 2 });
-};
+const index = 2;
+
+const prevPage = () => emit('prev', { index });
 
 const nextPage = async () => {
   const isFormCorrect = await v$.value.$validate();
@@ -155,7 +171,7 @@ const nextPage = async () => {
     return alert(message);
   }
 
-  emit('nextPage', { index: 2 });
+  emit('next', { index });
 };
 </script>
 

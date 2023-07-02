@@ -229,12 +229,12 @@
 import TheDialog from '@/components/TheDialog.vue';
 
 import { GRADE_OPTIONS, GROUP_OPTIONS, TEACHER_ROLE } from '@/constants/common';
-import type { MemberData } from '@/types';
+import type { Member } from '@/models';
 
 const props = defineProps<{
   v: any;
   visible: boolean;
-  members: MemberData[];
+  members: Member[];
 }>();
 
 const emit = defineEmits(['add', 'copy', 'delete', 'submit', 'close']);

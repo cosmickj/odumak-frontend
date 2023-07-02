@@ -14,11 +14,6 @@ const routes: Array<RouteRecordRaw> = [
         name: 'AccountLogin',
         component: () => import('@/views/Account/Login/index.vue'),
       },
-      // {
-      //   path: 'signup',
-      //   name: 'AccountSignup',
-      //   component: () => import('@/views/Account/Signup/index.vue'),
-      // },
     ],
   },
   {
@@ -90,6 +85,13 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: '/waypoint',
         meta: { requiresAuth: true },
+        beforeEnter: () => {
+          const { userData } = useUserStore();
+
+          if (userData?.isAccepted) {
+            return { name: 'HomeView' };
+          }
+        },
         component: () => import('@/views/Waypoint/WaypointContainer.vue'),
         children: [
           {
@@ -162,19 +164,16 @@ router.beforeEach(async (to, from, next) => {
 
   if (currentUser) {
     const userStore = useUserStore();
-    const userData = await userStore.fetchSingle({
-      uid: currentUser.uid,
-    });
+    const user = await userStore.fetchSingle({ uid: currentUser.uid });
+
     if (!needAuth) {
       return next({ name: 'HomeView' });
     }
-    if (needAccept && !userData?.isAccepted) {
-      userStore.$patch({
-        isVisible: true,
-      });
+    if (needAccept && !user?.isAccepted) {
+      userStore.$patch({ isAcceptDialogVisible: true });
       return next({ name: 'HomeView' });
     }
-    if (needAdmin && userData?.role.system !== 'admin') {
+    if (needAdmin && user?.role.system !== 'admin') {
       return next({ name: 'HomeView' });
     }
   }

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 
-import { auth, db, usersColl } from '@/firebase/config';
+import { auth, db } from '@/firebase/config';
 import {
   deleteDoc,
   doc,
@@ -17,25 +17,25 @@ import { deleteUser, signOut } from 'firebase/auth';
 import { useMemberStore } from './member';
 import { userConverter } from '@/utils/useConverter';
 import { COLLECTION } from '@/constants/common';
-import type { Member, User } from '@/models';
+import { Member, User } from '@/models';
+import type { MemberData } from '@/types';
 import type {
   CreateSingleParams,
   FetchSingleParams,
-  FetchMultipleByChurchAndDepartment,
   ModifySingle,
 } from '@/types/store';
 
 interface UserStoreState {
   userData: User | null;
   isAuthReady: boolean;
-  isVisible: boolean;
+  isAcceptDialogVisible: boolean;
 }
 
 export const useUserStore = defineStore('user', {
   state: (): UserStoreState => ({
     userData: null,
     isAuthReady: false,
-    isVisible: false,
+    isAcceptDialogVisible: false,
   }),
   actions: {
     async createSingle(params: CreateSingleParams) {
@@ -62,9 +62,7 @@ export const useUserStore = defineStore('user', {
 
         let user = docSnap.data();
 
-        if (!user.isAccepted) {
-          user = mergeUserWithDefaultMemberData(user);
-        } else {
+        if (user.isAccepted) {
           const memberStore = useMemberStore();
           const [member] = await memberStore.fetchByName({
             name: user.name,
@@ -72,6 +70,23 @@ export const useUserStore = defineStore('user', {
             department: user.department,
           });
           user = mergeUserWithMemberData(user, member);
+        } else {
+          const defaultParams: MemberData = {
+            uid: user.uid,
+            name: user.name,
+            church: user.church,
+            department: user.department,
+            grade: '',
+            group: '',
+            job: 'teacher',
+            role: { system: 'user', teacher: 'common' },
+            gender: 'male',
+            birth: null,
+            birthLater: true,
+            isNewFriendClass: false,
+            remark: '',
+          };
+          user = mergeUserWithMemberData(user, new Member(defaultParams));
         }
 
         this.userData = setUserUID(user, uid);
@@ -80,42 +95,31 @@ export const useUserStore = defineStore('user', {
         throw Error((error as Error).message);
       }
     },
-    /**
-     * 관리자 페이지에서 가입자 전체 목록 읽어오기
-     */
-    async fetchMultipleByChurchAndDepartment(
-      params: FetchMultipleByChurchAndDepartment
-    ) {
-      const { church, department } = params;
 
-      const q = query(
-        usersColl,
-        where('church', '==', church),
-        where('department', '==', department),
-        where('role', '!=', 'admin')
-      );
-      const qSnapshot = await getDocs(q);
+    // async fetchMultipleByChurchAndDepartment(params: FetchMultipleByChurchAndDepartment) {
+    //   const { church, department } = params;
+    //   const q = query(
+    //     usersColl,
+    //     where('church', '==', church),
+    //     where('department', '==', department),
+    //     where('role', '!=', 'admin')
+    //   );
+    //   const qSnapshot = await getDocs(q);
+    //   const result = qSnapshot.docs.map((doc) => ({
+    //     uid: doc.id,
+    //     ...doc.data(),
+    //   }));
+    //   return result as unknown as User[];
+    // },
 
-      const result = qSnapshot.docs.map((doc) => ({
-        uid: doc.id,
-        ...doc.data(),
-      }));
-
-      return result as unknown as User[];
-    },
-    /**
-     * 유저 정보 수정 함수 - 속성 1개
-     */
     async modifySingle(params: ModifySingle) {
       const { uid, keyName, keyValue } = params;
       return await updateDoc(doc(db, COLLECTION.USERS, uid), {
         [keyName]: keyValue,
       });
     },
-    /**
-     * 유저 정보 수정 함수 - 속성 n개
-     */
-    async modifyMultiple(payload: any) {
+
+    async modifyMultiple(payload: ModifySingle) {
       const { uid, ...params } = payload;
       return await updateDoc(doc(db, COLLECTION.USERS, uid), {
         ...params,
@@ -144,18 +148,6 @@ export const useUserStore = defineStore('user', {
       }
     },
   },
-});
-
-const mergeUserWithDefaultMemberData = (user: User): User => ({
-  ...user,
-  birth: null,
-  birthLater: true,
-  grade: '',
-  group: '',
-  isNewFriendClass: false,
-  remark: '',
-  job: 'teacher',
-  role: { system: 'user', teacher: 'common' },
 });
 
 const mergeUserWithMemberData = (user: User, member: Member): User => {

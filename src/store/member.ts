@@ -1,5 +1,4 @@
 import arraySort from 'array-sort';
-
 import { defineStore } from 'pinia';
 import { db, membersColl } from '@/firebase/config';
 import {
@@ -10,17 +9,17 @@ import {
   getDocs,
   query,
   serverTimestamp,
-  Timestamp,
   updateDoc,
   where,
 } from 'firebase/firestore';
-
 import { memberConverter } from '@/utils/useConverter';
 import { COLLECTION } from '@/constants/common';
+
 import type {
   CreateMultipleParams,
   FetchAllParmas,
   FetchByGradeGroupParams,
+  FetchByNameParams,
   ModifySingleParams,
   RemoveMultipleParams,
 } from '@/types/store';
@@ -58,17 +57,6 @@ export const useMemberStore = defineStore('member', {
         uid: doc.id,
       }));
 
-      members.forEach((member) => {
-        if (member.birth) {
-          member.birth = (member.birth as unknown as Timestamp).toDate();
-        }
-        if (member.registeredAt) {
-          member.registeredAt = (
-            member.registeredAt as unknown as Timestamp
-          ).toDate();
-        }
-      });
-
       return arraySort(members, ['grade', 'group', 'name']);
     },
 
@@ -95,11 +83,7 @@ export const useMemberStore = defineStore('member', {
       return arraySort(members, ['grade', 'group', 'name']);
     },
 
-    async fetchByName(params: {
-      name: string;
-      church: string;
-      department: string;
-    }) {
+    async fetchByName(params: FetchByNameParams) {
       const { church, department, name } = params;
 
       const q = query(
@@ -114,12 +98,6 @@ export const useMemberStore = defineStore('member', {
         return memberConverter.fromFirestore(doc);
       });
     },
-
-    // async modifySingle(params: ModifySingleParams) {
-    //   return await updateDoc(doc(db, COLLECTION.MEMBERS, params.uid), {
-    //     [params.field]: params.value,
-    //   });
-    // },
 
     async modifySingle(params: ModifySingleParams) {
       const { uid, ...data } = params;

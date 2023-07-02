@@ -1,10 +1,10 @@
-import { Timestamp } from 'firebase/firestore';
+import type { Timestamp } from 'firebase/firestore';
 
 export type Gender = 'male' | 'female';
 
 export type Job = 'student' | 'teacher';
 
-export type Status = 'offline' | 'online' | 'absence';
+export type Status = 'offline' | 'online' | 'absence' | null;
 
 export type System = 'admin' | 'user';
 
@@ -50,35 +50,36 @@ export interface BaseData {
   church: string;
   department: string;
   job: Job;
+  role: Role;
   grade: string;
   group: string;
 }
 
 export interface MemberData extends BaseData {
-  uid?: string;
-  role: Role;
+  uid: string;
   gender: Gender;
   birth: Date | null;
   birthLater: boolean;
   isNewFriendClass: boolean;
   remark: string;
-  registeredAt: Date | null;
-  createdAt?: Date;
+  registeredAt?: Timestamp;
+  createdAt?: Timestamp;
 }
 
-export interface UserData extends MemberData, OAuthData {
+export interface UserData extends OAuthData, MemberData {
   uid: string;
   isAccepted: boolean;
   isRejected: boolean;
   rejectedReason: string;
-  createdAt?: Date;
+  createdAt: Timestamp;
 }
 
-export interface AttendanceData extends BaseData {
+export interface AttendanceData extends Omit<BaseData, 'role'> {
   uid: string;
   memberUid: string;
-  attendance: { date: Date | Timestamp; status: Status };
-  createdAt?: Date;
+  role?: Role;
+  attendance: { date: Date; status: Status };
+  createdAt?: Timestamp;
   createdBy?: string;
 }
 
@@ -87,6 +88,6 @@ export interface Option {
   value: string;
 }
 
-export interface NewStudent extends MemberData {
-  id: number;
-}
+// export interface NewStudent extends MemberData {
+//   id: number;
+// }

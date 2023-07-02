@@ -11,8 +11,9 @@ import {
 
 import { defineStore } from 'pinia';
 import { useMemberStore } from './member';
+import { Attendance } from '@/models';
 import { COLLECTION } from '@/constants/common';
-import type { AttendanceData } from '@/types';
+import { attendanceConverter } from '@/utils/useConverter';
 import type {
   AddAttendanceParams,
   FetchAttendancesParams,
@@ -22,7 +23,7 @@ import type {
 export const useAttendanceStore = defineStore('attendance', {
   state: () => ({
     attendancesRecord: {
-      daily: [] as AttendanceData[],
+      daily: [] as Attendance[],
     },
   }),
   actions: {
@@ -34,31 +35,32 @@ export const useAttendanceStore = defineStore('attendance', {
     },
 
     async fetchAttendances(params: FetchAttendancesParams) {
+      const { attendanceDate, church, department, job } = params;
+
       const memberStore = useMemberStore();
-      const members = await memberStore.fetchAll({
-        church: params.church,
-        department: params.department,
-        job: params.job,
-      });
+      const members = await memberStore.fetchAll({ job, church, department });
 
       const attendanceQuery = query(
         attendancesColl,
-        where('church', '==', params.church),
-        where('department', '==', params.department),
-        where('job', '==', params.job),
-        where('attendance.date', '==', params.attendanceDate)
+        where('church', '==', church),
+        where('department', '==', department),
+        where('job', '==', job),
+        where('attendance.date', '==', attendanceDate)
       );
       const attendanceSnapshot = await getDocs(attendanceQuery);
 
-      const registeredAttendances = attendanceSnapshot.docs.map((doc) => {
-        return { ...doc.data(), uid: doc.id } as any;
-      });
+      const registeredAttendances = attendanceSnapshot.docs.map((doc) => ({
+        ...attendanceConverter.fromFirestore(doc),
+        uid: doc.id,
+      }));
 
-      const attendances: AttendanceData[] = members
+      const attendances = members
         .filter((mem) => {
-          return mem.registeredAt <= params.attendanceDate && !mem.role.officer;
+          return mem.registeredAt <= attendanceDate && !mem.role.officer;
         })
         .map((mem) => {
+          const attendanceTemp = { date: attendanceDate, status: null };
+
           const registeredAttendance = registeredAttendances.find((attd) => {
             return (
               attd.job === mem.job &&
@@ -67,7 +69,6 @@ export const useAttendanceStore = defineStore('attendance', {
               attd.department === mem.department
             );
           });
-          const attendanceTemp = { status: null, date: null };
 
           return {
             uid: registeredAttendance?.uid || '',
@@ -87,10 +88,8 @@ export const useAttendanceStore = defineStore('attendance', {
       this.attendancesRecord.daily = attendances;
     },
 
-    async fetchAttendancesByGradeGroup(
-      params: Required<FetchAttendancesParams>
-    ) {
-      const { attendanceDate, church, department, grade, group, job } = params;
+    async fetchAttendancesByGradeGroup(p: Required<FetchAttendancesParams>) {
+      const { attendanceDate, church, department, grade, group, job } = p;
 
       const memberStore = useMemberStore();
       const members = await memberStore.fetchByGradeGroup({
@@ -114,13 +113,16 @@ export const useAttendanceStore = defineStore('attendance', {
       );
       const attendanceSnapshot = await getDocs(attendanceQuery);
 
-      const registeredAttendances = attendanceSnapshot.docs.map((doc) => {
-        return { ...doc.data(), uid: doc.id } as any;
-      });
+      const registeredAttendances = attendanceSnapshot.docs.map((doc) => ({
+        ...attendanceConverter.fromFirestore(doc),
+        uid: doc.id,
+      }));
 
-      const attendancesRecord: AttendanceData[] = members
+      const attendances = members
         .filter((mem) => mem.registeredAt <= attendanceDate)
         .map((mem) => {
+          const attendanceTemp = { date: attendanceDate, status: null };
+
           const registeredAttendance = registeredAttendances.find((attd) => {
             return (
               mem.job == attd.job &&
@@ -129,7 +131,6 @@ export const useAttendanceStore = defineStore('attendance', {
               mem.department == attd.department
             );
           });
-          const attendanceTemp = { status: null, date: null };
 
           return {
             uid: registeredAttendance?.uid || '',
@@ -146,7 +147,7 @@ export const useAttendanceStore = defineStore('attendance', {
         });
 
       this.attendancesRecord.daily = [];
-      this.attendancesRecord.daily = attendancesRecord;
+      this.attendancesRecord.daily = attendances;
     },
 
     async modifyAttendance(params: ModifyAttendanceParams) {

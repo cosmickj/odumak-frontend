@@ -1,9 +1,9 @@
 import '@/styles/normalize.css';
 import '@/styles/global.css';
+import '@/index.css'; // Tailwind CSS
 import 'primevue/resources/primevue.min.css';
 import 'primevue/resources/themes/saga-blue/theme.css';
 import 'primeicons/primeicons.css';
-import '@/index.css'; // Tailwind CSS
 
 import router from '@/router';
 import { createPinia } from 'pinia';

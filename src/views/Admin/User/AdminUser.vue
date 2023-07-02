@@ -26,10 +26,10 @@ const fetchUsers = async () => {
     return;
   }
 
-  users.value = await userStore.fetchMultipleByChurchAndDepartment({
-    church: userStore.userData.church!,
-    department: userStore.userData.department!,
-  });
+  // users.value = await userStore.fetchMultipleByChurchAndDepartment({
+  //   church: userStore.userData.church!,
+  //   department: userStore.userData.department!,
+  // });
 };
 
 onMounted(async () => {

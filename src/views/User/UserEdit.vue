@@ -177,15 +177,15 @@ const v$ = useVuelidate(rules, formState);
 
 const submitForm = async () => {
   try {
-    const isFormCorrect = await v$.value.$validate();
-    if (!isFormCorrect) {
-      return;
-    }
-    await userStore.modifyMultiple({
-      uid: userData?.uid,
-      ...formState,
-    });
-    alert('수정되었습니다.');
+    // const isFormCorrect = await v$.value.$validate();
+    // if (!isFormCorrect) {
+    //   return;
+    // }
+    // await userStore.modifyMultiple({
+    //   uid: userData?.uid,
+    //   ...formState,
+    // });
+    // alert('수정되었습니다.');
   } catch (error) {
     throw Error((error as Error).message);
   } finally {
