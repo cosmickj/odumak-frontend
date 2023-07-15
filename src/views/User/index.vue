@@ -177,7 +177,7 @@ const logoutUser = async () => {
   try {
     if (confirm('로그아웃 하시겠습니까?')) {
       await userStore.logout();
-      router.push({ name: 'AccountLogin' });
+      router.push({ name: 'LoginView' });
     }
   } catch (error) {
     console.log(error);
@@ -188,7 +188,7 @@ const deleteUser = async () => {
   try {
     if (confirm('정말로 탈퇴하시겠습니까?')) {
       await userStore.deleteSingle();
-      router.push({ name: 'AccountLogin' });
+      router.push({ name: 'LoginView' });
     }
   } catch (error) {
     alert('다시 로그인 후 시도해주세요.');
