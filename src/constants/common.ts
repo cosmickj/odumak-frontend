@@ -1,9 +1,9 @@
 import type { Option } from '@/types';
 
 const COLLECTION = {
-  ATTENDANCES: import.meta.env.VITE_FIREBASE_COLL_ATTENDANCES,
-  MEMBERS: import.meta.env.VITE_FIREBASE_COLL_MEMBERS,
-  USERS: import.meta.env.VITE_FIREBASE_COLL_USERS,
+  ATTENDANCES: 'attendances',
+  MEMBERS: 'members',
+  USERS: 'users',
 };
 
 const CHURCH_OPTIONS: Option[] = [
