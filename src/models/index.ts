@@ -41,8 +41,10 @@ export class Member implements Omit<MemberData, 'registeredAt' | 'createdAt'> {
     this.remark = data.remark;
     this.registeredAt = !data.registeredAt
       ? new Date()
-      : data.registeredAt.toDate();
-    this.createdAt = !data.createdAt ? new Date() : data.createdAt.toDate();
+      : new Date(data.registeredAt.seconds * 1000);
+    this.createdAt = !data.createdAt
+      ? new Date()
+      : new Date(data.createdAt.seconds * 1000);
   }
 }
 
@@ -91,8 +93,10 @@ export class User implements Omit<UserData, 'registeredAt' | 'createdAt'> {
     this.remark = data.remark;
     this.registeredAt = !data.registeredAt
       ? new Date()
-      : data.registeredAt.toDate();
-    this.createdAt = data.createdAt.toDate();
+      : new Date(data.registeredAt.seconds * 1000);
+    this.createdAt = !data.createdAt
+      ? new Date()
+      : new Date(data.createdAt.seconds * 1000);
   }
 }
 
@@ -122,6 +126,8 @@ export class Attendance implements Omit<AttendanceData, 'createdAt'> {
     this.group = data.group;
     this.job = data.job;
     this.createdBy = data.createdBy;
-    this.createdAt = !data.createdAt ? new Date() : data.createdAt.toDate();
+    this.createdAt = !data.createdAt
+      ? new Date()
+      : new Date(data.createdAt.seconds * 1000);
   }
 }

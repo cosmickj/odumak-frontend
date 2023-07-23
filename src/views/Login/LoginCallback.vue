@@ -12,13 +12,13 @@ import { useCookies } from '@vueuse/integrations/useCookies';
 import { auth } from '@/firebase/config';
 import { signInWithCustomToken } from '@firebase/auth';
 
+const cookies = useCookies(['odumak_key']);
 const router = useRouter();
+
 const userStore = useUserStore();
 
 onMounted(async () => {
   try {
-    const cookies = useCookies(['odumak_key']);
-
     const { uid, token } = cookies.get('odumak_key');
     await signInWithCustomToken(auth, token);
 
@@ -27,6 +27,8 @@ onMounted(async () => {
     router.replace({ name: 'HomeView' });
   } catch (error) {
     throw Error((error as Error).message);
+  } finally {
+    cookies.remove('odumak_key', { path: '/' });
   }
 });
 </script>

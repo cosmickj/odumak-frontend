@@ -87,7 +87,3 @@ export interface Option {
   label: string;
   value: string;
 }
-
-// export interface NewStudent extends MemberData {
-//   id: number;
-// }
