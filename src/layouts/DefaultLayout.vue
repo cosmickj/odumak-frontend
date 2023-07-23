@@ -1,18 +1,27 @@
 <template>
   <main class="h-[100svh] flex items-center justify-center sm:bg-gray-200">
     <div
-      class="w-full sm:w-[360px] h-full sm:max-h-[640px] bg-slate-100 shadow-lg"
+      class="overflow-hidden relative w-full sm:w-[360px] h-full sm:max-h-[640px] bg-slate-100 shadow-lg"
     >
       <div v-if="isAuthReady" class="flex flex-col h-full">
         <RouterView class="overflow-auto flex-1" />
         <RouterView name="GlobalNavbar" />
+      </div>
+
+      <div
+        v-if="envMode === 'development'"
+        class="z-10 opacity-30 absolute inset-0 flex justify-center items-center pointer-events-none"
+      >
+        <p class="px-4 py-2 rounded text-4xl -rotate-[24deg]">
+          &copy; app.odumak.xyz
+        </p>
       </div>
     </div>
   </main>
 
   <Dialog
     modal
-    v-model:visible="isVisible"
+    v-model:visible="isAcceptDialogVisible"
     class="w-1/2"
     position="bottom"
     header="승인이 필요합니다"
@@ -41,10 +50,12 @@ import { storeToRefs } from 'pinia';
 import { useUserStore } from '@/store/user';
 
 const router = useRouter();
-const { isAuthReady, isVisible } = storeToRefs(useUserStore());
+const { isAcceptDialogVisible, isAuthReady } = storeToRefs(useUserStore());
 
 const enterWaypoint = () => {
-  isVisible.value = false;
+  isAcceptDialogVisible.value = false;
   router.push({ name: 'GroupCheck' });
 };
+
+const envMode = import.meta.env.MODE;
 </script>

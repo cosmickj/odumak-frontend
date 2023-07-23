@@ -5,7 +5,7 @@
         <label for="church" class="mb-1">교회 이름</label>
         <Dropdown
           v-model="church"
-          :class="{ 'p-invalid': v$.church.$error }"
+          :class="{ 'p-invalid': $v.church.$error }"
           :options="CHURCH_OPTIONS"
           optionLabel="label"
           optionValue="value"
@@ -17,7 +17,7 @@
         <label for="department" class="mb-1">봉사 부서</label>
         <Dropdown
           v-model="department"
-          :class="{ 'p-invalid': v$.department.$error }"
+          :class="{ 'p-invalid': $v.department.$error }"
           :options="DEPARTMENT_OPTIONS"
           optionLabel="label"
           optionValue="value"
@@ -26,31 +26,39 @@
       </div>
     </div>
 
-    <div class="flex justify-between">
+    <div class="flex gap-2 justify-between">
       <Button
-        text
+        raised
+        rounded
+        outlined
         severity="secondary"
-        label="홈으로"
-        @click="router.push({ name: 'HomeView' })"
+        icon="pi pi-chevron-left"
+        label="이전으로"
+        @click="prevPage"
       />
 
-      <Button severity="warning" label="다음으로" @click="nextPage" />
+      <Button
+        raised
+        rounded
+        icon="pi pi-chevron-right"
+        iconPos="right"
+        label="다음으로"
+        @click="nextPage"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useWaypointStore } from '@/store/waypoint';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import { CHURCH_OPTIONS, DEPARTMENT_OPTIONS } from '@/constants/common';
 
-const emit = defineEmits(['prevPage', 'nextPage']);
+const emit = defineEmits(['prev', 'next']);
 
-const router = useRouter();
 const { church, department } = storeToRefs(useWaypointStore());
 
 const rules = computed(() => ({
@@ -58,13 +66,17 @@ const rules = computed(() => ({
   department: { required },
 }));
 
-const v$ = useVuelidate(rules, { church, department });
+const $v = useVuelidate(rules, { church, department });
+
+const index = 0;
+
+const prevPage = () => emit('prev', { index });
 
 const nextPage = async () => {
-  const isFormCorrect = await v$.value.$validate();
+  const isFormCorrect = await $v.value.$validate();
   if (!isFormCorrect) {
     return;
   }
-  emit('nextPage', { index: 0 });
+  emit('next', { index });
 };
 </script>

@@ -134,15 +134,15 @@ import {
   formatTeacher,
   formatTeacherColor,
 } from '@/utils/useFormat';
-import type { MemberData } from '@/types';
+import type { Member } from '@/models';
 import type DataTable from 'primevue/datatable';
 
 const emit = defineEmits(['add', 'edit', 'delete']);
 
 const props = defineProps<{
   loading: boolean;
-  dataSource: MemberData[];
-  dataTarget: MemberData['job'];
+  dataSource: Member[];
+  dataTarget: Member['job'];
   columnState?: {
     [field: string]: boolean;
   };
@@ -164,19 +164,20 @@ const exportDataTable = () => {
   if (dataTableRef.value) dataTableRef.value.exportCSV();
 };
 
-const groupRowsBy = ({ grade, group }: MemberData) => {
+const groupRowsBy = ({ grade, group }: Member) => {
   return `${grade} ${group}`;
 };
 
-const selectedMembers = ref<MemberData[]>([]);
+const selectedMembers = ref<Member[]>([]);
 
 /*---------- ADD ----------*/
-const MemberRoleMap = {
+const MemberRoleMap: { student: {}; teacher: Member['role'] } = {
   student: {},
-  teacher: { teacher: 'common' as const },
+  teacher: { system: 'user', teacher: 'common' },
 };
 
-const addingMemberTemp: MemberData = {
+// CONTINUE
+const addingMemberTemp: Member = {
   name: '',
   birth: null,
   birthLater: true,
@@ -220,7 +221,7 @@ const resetAllMembers = () => {
   addingMembers.value.body.push(structuredClone(addingMemberTemp));
 };
 
-const handleAddingTeacherChange = (newValue: MemberData) => {
+const handleAddingTeacherChange = (newValue: Member) => {
   if (newValue.isNewFriendClass) {
     newValue.grade = '0';
     newValue.group = '0';
@@ -236,7 +237,7 @@ const handleAddingTeacherChange = (newValue: MemberData) => {
   }
 };
 
-const handleAddingStudentChange = (newValue: MemberData) => {
+const handleAddingStudentChange = (newValue: Member) => {
   if (newValue.isNewFriendClass) {
     newValue.group = '0';
   } else if (newValue.group === '0') {
@@ -269,7 +270,7 @@ const addStudentRules = {
       grade: { required },
       group: {
         // @ts-ignore
-        requiredIf: requiredIf((_, data: MemberData) => {
+        requiredIf: requiredIf((_, data: Member) => {
           return !data.isNewFriendClass;
         }),
       },
@@ -283,13 +284,13 @@ const addTeacherRules = {
       name: { required },
       grade: {
         // @ts-ignore
-        requiredIf: requiredIf((_, data: MemberData) => {
+        requiredIf: requiredIf((_, data: Member) => {
           return data.role.teacher !== 'common';
         }),
       },
       group: {
         // @ts-ignore
-        requiredIf: requiredIf((_, data: MemberData) => {
+        requiredIf: requiredIf((_, data: Member) => {
           return data.role.teacher !== 'common';
         }),
       },
@@ -310,10 +311,10 @@ const handleAdd = () => {
 
 /*---------- EDIT ----------*/
 const editingVisible = ref(false);
-const editingMember = ref<Partial<MemberData>>({});
-const editingMemberClone = ref<Partial<MemberData>>({});
+const editingMember = ref<Partial<Member>>({});
+const editingMemberClone = ref<Partial<Member>>({});
 
-const showEditDialog = (data: MemberData) => {
+const showEditDialog = (data: Member) => {
   editingVisible.value = true;
 
   editingMember.value = structuredClone(toRaw(data));
@@ -328,7 +329,7 @@ const resetEditingState = () => {
   editingMemberClone.value = {};
 };
 
-const handleEditingTeacherChange = (newValue: Partial<MemberData>) => {
+const handleEditingTeacherChange = (newValue: Partial<Member>) => {
   if (newValue.isNewFriendClass) {
     newValue.grade = '0';
     newValue.group = '0';
@@ -344,7 +345,7 @@ const handleEditingTeacherChange = (newValue: Partial<MemberData>) => {
   }
 };
 
-const handleEditingStudentChange = (newValue: Partial<MemberData>) => {
+const handleEditingStudentChange = (newValue: Partial<Member>) => {
   if (newValue.isNewFriendClass) {
     newValue.group = '0';
   } else if (newValue.group === '0') {

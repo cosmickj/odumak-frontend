@@ -217,15 +217,15 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { GRADE_OPTIONS, GROUP_OPTIONS, TEACHER_ROLE } from '@/constants/common';
-import type { MemberData } from '@/types';
+import type { Member } from '@/models';
 
 const emit = defineEmits(['edit', 'close']);
 
 const props = defineProps<{
   v: any;
   visible: boolean;
-  clone: Partial<MemberData>;
-  member: Partial<MemberData>;
+  clone: Partial<Member>;
+  member: Partial<Member>;
 }>();
 
 const visibleRef = computed({

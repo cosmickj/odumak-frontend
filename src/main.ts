@@ -1,23 +1,20 @@
 import '@/styles/normalize.css';
 import '@/styles/global.css';
+import '@/index.css'; // Tailwind CSS
 import 'primevue/resources/primevue.min.css';
 import 'primevue/resources/themes/saga-blue/theme.css';
 import 'primeicons/primeicons.css';
-import '@/index.css'; // Tailwind CSS
 
+import App from '@/App.vue';
 import router from '@/router';
 import { createPinia } from 'pinia';
 import { createApp } from 'vue';
-import App from '@/App.vue';
 
 import PrimeVue from 'primevue/config';
 import ToastService from 'primevue/toastservice';
 
 import { getCurrentUser } from '@/router';
 import { useUserStore } from '@/store/user';
-
-/*----- Setup Kakao -----*/
-window.Kakao.init(import.meta.env.VITE_KAKAO_CLIENT_ID);
 
 const app = createApp(App);
 

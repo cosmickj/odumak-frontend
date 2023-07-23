@@ -29,10 +29,10 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { breakpointsTailwind, useBreakpoints } from '@vueuse/core';
-import type { MemberData } from '@/types';
+import type { Member } from '@/models';
 
 const props = defineProps<{
-  selection: MemberData[];
+  selection: Member[];
 }>();
 
 const emit = defineEmits(['export', 'add', 'delete']);

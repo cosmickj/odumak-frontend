@@ -37,11 +37,11 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { MemberData } from '@/types';
+import type { Member } from '@/models';
 
 const props = defineProps<{
   visible: boolean;
-  members: MemberData[];
+  members: Member[];
 }>();
 
 const emit = defineEmits(['cancel', 'confirm']);

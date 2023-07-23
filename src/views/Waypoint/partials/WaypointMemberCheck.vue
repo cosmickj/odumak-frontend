@@ -45,13 +45,33 @@
     </div>
 
     <div class="flex justify-between">
-      <Button text severity="secondary" label="이전으로" @click="prevPage" />
+      <Button
+        raised
+        rounded
+        outlined
+        severity="secondary"
+        icon="pi pi-chevron-left"
+        label="이전으로"
+        @click="prevPage"
+      />
+
+      <Button
+        raised
+        rounded
+        severity="warning"
+        icon="pi pi-chevron-right"
+        iconPos="right"
+        label="제출하기"
+        @click="complete"
+      />
+
+      <!-- <Button text severity="secondary" label="이전으로" @click="prevPage" />
       <Button
         :disabled="candidates.length === 0"
         severity="success"
         label="제출하기"
         @click="complete"
-      />
+      /> -->
     </div>
   </div>
 </template>
@@ -65,8 +85,7 @@ import { useUserStore } from '@/store/user';
 import { useMemberStore } from '@/store/member';
 import { useWaypointStore } from '@/store/waypoint';
 import { faker } from '@faker-js/faker/locale/ko';
-import type { MemberData } from '@/types';
-import type { User } from 'firebase/auth';
+import type { Member } from '@/models';
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -85,9 +104,9 @@ if (!church.value || !department.value) {
   router.push({ name: 'GroupCheck' });
 }
 
-const emit = defineEmits(['prevPage']);
+const emit = defineEmits(['prev']);
 
-const members = ref<MemberData[]>([]);
+const members = ref<Member[]>([]);
 
 class Candidate {
   constructor(
@@ -99,7 +118,7 @@ class Candidate {
 
 const candidates = ref<Candidate[]>([]);
 
-const getCandidates = (members: MemberData[]) => {
+const getCandidates = (members: Member[]) => {
   const candidates = [];
 
   for (let i = 0; i < 9; i++) {
@@ -151,6 +170,10 @@ onDeactivated(() => {
   candidates.value = [];
 });
 
+const index = 3;
+
+const prevPage = () => emit('prev', { index });
+
 const toggleButtonRefs = ref<HTMLDivElement[]>([]);
 
 const complete = async () => {
@@ -172,44 +195,29 @@ const complete = async () => {
           ele.classList.remove('wrong');
         });
       }, 800);
-    } else {
-      alert('인증되었습니다! 감사합니다!');
-
+    }
+    //
+    else {
+      const uid = userStore.userData?.uid;
+      if (!uid) {
+        alert('잘못된 접근입니다.');
+        return router.push({ name: 'HomeView' });
+      }
       await userStore.modifyMultiple({
-        uid: userStore.userData?.uid,
-        isAccepted: true,
+        uid,
+        name: name.value,
         church: church.value,
         department: department.value,
-        grade: grade.value,
-        group: group.value,
-        name: name.value,
-        role: { ...role.value },
+        isAccepted: true,
       });
+      await userStore.fetchSingle({ uid });
 
-      const currentUser = (await getCurrentUser()) as User;
-      if (currentUser) {
-        const userData = await userStore.fetchSingle({
-          uid: currentUser.uid,
-        });
-        if (userData) {
-          userStore.userData = {
-            ...userData,
-            uid: currentUser.uid,
-            email: currentUser.email!,
-            name: currentUser.displayName!,
-          };
-        }
-      }
-
+      alert('인증되었습니다! 감사합니다!');
       router.push({ name: 'HomeView' });
     }
   } catch (error) {
     console.log(error);
   }
-};
-
-const prevPage = () => {
-  emit('prevPage', { index: 3 });
 };
 </script>
 

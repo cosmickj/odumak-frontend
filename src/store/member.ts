@@ -1,5 +1,4 @@
 import arraySort from 'array-sort';
-
 import { defineStore } from 'pinia';
 import { db, membersColl } from '@/firebase/config';
 import {
@@ -10,16 +9,17 @@ import {
   getDocs,
   query,
   serverTimestamp,
-  Timestamp,
   updateDoc,
   where,
 } from 'firebase/firestore';
+import { memberConverter } from '@/utils/useConverter';
+import { COLLECTION } from '@/constants/common';
 
-import type { MemberData } from '@/types';
 import type {
   CreateMultipleParams,
   FetchAllParmas,
   FetchByGradeGroupParams,
+  FetchByNameParams,
   ModifySingleParams,
   RemoveMultipleParams,
 } from '@/types/store';
@@ -37,7 +37,7 @@ export const useMemberStore = defineStore('member', {
           department,
           createdAt: serverTimestamp(),
         };
-        return await addDoc(collection(db, 'members'), param);
+        return await addDoc(collection(db, COLLECTION.MEMBERS), param);
       });
     },
 
@@ -46,27 +46,16 @@ export const useMemberStore = defineStore('member', {
 
       const q = query(
         membersColl,
+        where('job', '==', job),
         where('church', '==', church),
-        where('department', '==', department),
-        where('job', '==', job)
+        where('department', '==', department)
       );
       const qSnapshot = await getDocs(q);
 
       const members = qSnapshot.docs.map((doc) => ({
+        ...memberConverter.fromFirestore(doc),
         uid: doc.id,
-        ...doc.data(),
-      })) as MemberData[];
-
-      members.forEach((member) => {
-        if (member.birth) {
-          member.birth = (member.birth as unknown as Timestamp).toDate();
-        }
-        if (member.registeredAt) {
-          member.registeredAt = (
-            member.registeredAt as unknown as Timestamp
-          ).toDate();
-        }
-      });
+      }));
 
       return arraySort(members, ['grade', 'group', 'name']);
     },
@@ -86,50 +75,39 @@ export const useMemberStore = defineStore('member', {
       );
       const qSnapshot = await getDocs(q);
 
-      // TODO: MemberData를 class로 만들어서 인스턴스를 만들어보자
       const members = qSnapshot.docs.map((doc) => ({
+        ...memberConverter.fromFirestore(doc),
         uid: doc.id,
-        ...doc.data(),
-      })) as MemberData[];
+      }));
 
       return arraySort(members, ['grade', 'group', 'name']);
     },
 
-    async fetchByName(params: {
-      church: string;
-      department: string;
-      name: string;
-    }) {
+    async fetchByName(params: FetchByNameParams) {
       const { church, department, name } = params;
 
       const q = query(
         membersColl,
+        where('name', '==', name),
         where('church', '==', church),
-        where('department', '==', department),
-        where('name', '==', name)
+        where('department', '==', department)
       );
       const qSnapshot = await getDocs(q);
 
-      const member = qSnapshot.docs.map((doc) => doc.data());
-
-      return member;
+      return qSnapshot.docs.map((doc) => {
+        return memberConverter.fromFirestore(doc);
+      });
     },
-
-    // async modifySingle(params: ModifySingleParams) {
-    //   return await updateDoc(doc(db, 'members', params.uid), {
-    //     [params.field]: params.value,
-    //   });
-    // },
 
     async modifySingle(params: ModifySingleParams) {
       const { uid, ...data } = params;
-      return await updateDoc(doc(db, 'members', uid), { ...data });
+      return await updateDoc(doc(db, COLLECTION.MEMBERS, uid), { ...data });
     },
 
     async removeMultiple(params: RemoveMultipleParams) {
       return await Promise.all(
         params.uids.map(async (uid) => {
-          if (uid) await deleteDoc(doc(db, 'members', uid));
+          if (uid) await deleteDoc(doc(db, COLLECTION.MEMBERS, uid));
         })
       );
     },

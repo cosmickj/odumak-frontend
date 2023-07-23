@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 
-import { auth, db, usersColl } from '@/firebase/config';
+import { auth, db } from '@/firebase/config';
 import {
   deleteDoc,
   doc,
@@ -14,33 +14,35 @@ import {
 } from 'firebase/firestore';
 import { deleteUser, signOut } from 'firebase/auth';
 
-import { Collection } from '@/enums';
+import { useMemberStore } from './member';
+import { userConverter } from '@/utils/useConverter';
+import { COLLECTION } from '@/constants/common';
+import { Member, User } from '@/models';
+import type { MemberData } from '@/types';
 import type {
   CreateSingleParams,
   FetchSingleParams,
-  FetchMultipleByChurchAndDepartment,
   ModifySingle,
 } from '@/types/store';
-import type { UserData } from '@/types';
 
 interface UserStoreState {
-  userData: UserData | null;
+  userData: User | null;
   isAuthReady: boolean;
-  isVisible: boolean;
+  isAcceptDialogVisible: boolean;
 }
 
 export const useUserStore = defineStore('user', {
   state: (): UserStoreState => ({
     userData: null,
     isAuthReady: false,
-    isVisible: false,
+    isAcceptDialogVisible: false,
   }),
   actions: {
     async createSingle(params: CreateSingleParams) {
       try {
         const { uid, ...newUser } = params;
 
-        await setDoc(doc(db, Collection.USERS, uid), {
+        await setDoc(doc(db, COLLECTION.USERS, uid), {
           ...newUser,
           createdAt: serverTimestamp(),
         });
@@ -49,61 +51,77 @@ export const useUserStore = defineStore('user', {
       }
     },
 
-    async fetchSingle(params: FetchSingleParams) {
+    async fetchSingle({ uid }: FetchSingleParams) {
       try {
-        const docRef = doc(db, Collection.USERS, params.uid);
-        const docSnap = await getDoc(docRef);
+        const ref = doc(db, COLLECTION.USERS, uid).withConverter(userConverter);
+        const docSnap = await getDoc(ref);
 
-        if (docSnap.exists()) {
-          this.userData = {
-            ...(docSnap.data() as UserData),
-            uid: params.uid,
-          };
-          return this.userData;
+        if (!docSnap.exists()) {
+          return null;
         }
-        return null;
+
+        let user = docSnap.data();
+
+        if (user.isAccepted) {
+          const memberStore = useMemberStore();
+          const [member] = await memberStore.fetchByName({
+            name: user.name,
+            church: user.church,
+            department: user.department,
+          });
+          user = mergeUserWithMemberData(user, member);
+        } else {
+          const defaultParams: MemberData = {
+            uid: user.uid,
+            name: user.name,
+            church: user.church,
+            department: user.department,
+            grade: '',
+            group: '',
+            job: 'teacher',
+            role: { system: 'user', teacher: 'common' },
+            gender: 'male',
+            birth: null,
+            birthLater: true,
+            isNewFriendClass: false,
+            remark: '',
+          };
+          user = mergeUserWithMemberData(user, new Member(defaultParams));
+        }
+
+        this.userData = setUserUID(user, uid);
+        return this.userData;
       } catch (error) {
         throw Error((error as Error).message);
       }
     },
-    /**
-     * 관리자 페이지에서 가입자 전체 목록 읽어오기
-     */
-    async fetchMultipleByChurchAndDepartment(
-      params: FetchMultipleByChurchAndDepartment
-    ) {
-      const { church, department } = params;
 
-      const q = query(
-        usersColl,
-        where('church', '==', church),
-        where('department', '==', department),
-        where('role', '!=', 'admin')
-      );
-      const qSnapshot = await getDocs(q);
+    // async fetchMultipleByChurchAndDepartment(params: FetchMultipleByChurchAndDepartment) {
+    //   const { church, department } = params;
+    //   const q = query(
+    //     usersColl,
+    //     where('church', '==', church),
+    //     where('department', '==', department),
+    //     where('role', '!=', 'admin')
+    //   );
+    //   const qSnapshot = await getDocs(q);
+    //   const result = qSnapshot.docs.map((doc) => ({
+    //     uid: doc.id,
+    //     ...doc.data(),
+    //   }));
+    //   return result as unknown as User[];
+    // },
 
-      const result = qSnapshot.docs.map((doc) => ({
-        uid: doc.id,
-        ...doc.data(),
-      }));
-
-      return result as unknown as UserData[];
-    },
-    /**
-     * 유저 정보 수정 함수 - 속성 1개
-     */
     async modifySingle(params: ModifySingle) {
       const { uid, keyName, keyValue } = params;
-      return await updateDoc(doc(db, 'users', uid), {
+      return await updateDoc(doc(db, COLLECTION.USERS, uid), {
         [keyName]: keyValue,
       });
     },
-    /**
-     * 유저 정보 수정 함수 - 속성 n개
-     */
-    async modifyMultiple(payload: any) {
+
+    async modifyMultiple(payload: ModifySingle) {
       const { uid, ...params } = payload;
-      return await updateDoc(doc(db, 'users', uid), {
+      return await updateDoc(doc(db, COLLECTION.USERS, uid), {
         ...params,
       });
     },
@@ -114,7 +132,7 @@ export const useUserStore = defineStore('user', {
 
         if (currentUser) {
           await deleteUser(currentUser);
-          await deleteDoc(doc(db, Collection.USERS, currentUser.uid));
+          await deleteDoc(doc(db, COLLECTION.USERS, currentUser.uid));
         }
       } catch (error) {
         throw Error((error as Error).message);
@@ -131,3 +149,11 @@ export const useUserStore = defineStore('user', {
     },
   },
 });
+
+const mergeUserWithMemberData = (user: User, member: Member): User => {
+  return { ...user, ...member };
+};
+
+const setUserUID = (user: User, uid: string) => {
+  return { ...user, uid };
+};

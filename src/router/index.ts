@@ -3,65 +3,47 @@ import { useUserStore } from '@/store/user';
 import { auth } from '@/firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
 
+// prettier-ignore
 const routes: Array<RouteRecordRaw> = [
   {
-    path: '/account',
-    meta: { requiresAuth: false },
-    component: () => import('@/layouts/DefaultLayout.vue'),
-    children: [
-      {
-        path: 'login',
-        name: 'AccountLogin',
-        component: () => import('@/views/Account/Login/index.vue'),
-      },
-      // {
-      //   path: 'signup',
-      //   name: 'AccountSignup',
-      //   component: () => import('@/views/Account/Signup/index.vue'),
-      // },
-    ],
-  },
-  {
-    path: '/callback/naver',
-    name: 'CallbackNaver',
-    component: () => import('@/views/Account/Login/LoginCallbackNaver.vue'),
-  },
-  {
-    path: '/callback/kakao',
-    name: 'CallbackKakao',
-    component: () => import('@/views/Account/Login/LoginCallbackKakao.vue'),
-  },
-  {
     path: '/',
-    meta: { requiresAuth: true },
     component: () => import('@/layouts/DefaultLayout.vue'),
     children: [
       {
         path: '',
         name: 'HomeView',
+        meta: { requiresAuth: true },
         components: {
           default: () => import('@/views/Home/HomeContainer.vue'),
           GlobalNavbar: () => import('@/components/TheNavbar.vue'),
         },
       },
       {
+        path: 'login',
+        name: 'LoginView',
+        meta: { requiresAuth: false },
+        component: () => import('@/views/Login/LoginContainer.vue'),
+      },
+      {
+        path: 'login/callback',
+        meta: { requiresAuth: false },
+        component: () => import('@/views/Login/LoginCallback.vue'),
+      },
+      {
         path: 'user',
         name: 'UserView',
-        components: {
-          default: () => import('@/views/User/index.vue'),
-        },
+        meta: { requiresAuth: true },
+        component: () => import('@/views/User/index.vue'),
       },
       // {
       //   path: 'user/edit',
       //   name: 'UserEditView',
       //   meta: { requiresAccept: true },
-      //   components: {
-      //     default: () => import('@/views/User/UserEdit.vue'),
-      //   },
+      //   component: () => import('@/views/User/UserEdit.vue'),
       // },
       {
         path: 'attendance/tracker',
-        meta: { requiresAccept: true },
+        meta: { requiresAuth: true, requiresAccept: true },
         components: {
           default: () => import('@/views/Attendance/Tracker/index.vue'),
           GlobalNavbar: () => import('@/components/TheNavbar.vue'),
@@ -70,51 +52,52 @@ const routes: Array<RouteRecordRaw> = [
           {
             path: '/:job/daily',
             name: 'AttendanceTrackerDaily',
-            component: () =>
-              import('@/views/Attendance/Tracker/TrackerDaily.vue'),
+            component: () => import('@/views/Attendance/Tracker/TrackerDaily.vue'),
           },
           {
             path: '/:job/total',
             name: 'AttendanceTrackerTotal',
-            component: () =>
-              import('@/views/Attendance/Tracker/TrackerTotal.vue'),
+            component: () => import('@/views/Attendance/Tracker/TrackerTotal.vue'),
           },
         ],
       },
       {
         path: 'attendance/checker',
         name: 'AttendanceChecker',
-        meta: { requiresAccept: true },
+        meta: { requiresAuth: true, requiresAccept: true },
         component: () => import('@/views/Attendance/Checker/index.vue'),
       },
       {
         path: '/waypoint',
         meta: { requiresAuth: true },
+        beforeEnter: () => {
+          const { userData } = useUserStore();
+
+          if (userData?.isAccepted) {
+            return { name: 'HomeView' };
+          }
+        },
         component: () => import('@/views/Waypoint/WaypointContainer.vue'),
         children: [
           {
             path: 'name',
             name: 'NameCheck',
-            component: () =>
-              import('@/views/Waypoint/partials/WaypointNameCheck.vue'),
+            component: () => import('@/views/Waypoint/partials/WaypointNameCheck.vue'),
           },
           {
             path: 'group',
             name: 'GroupCheck',
-            component: () =>
-              import('@/views/Waypoint/partials/WaypointGroupCheck.vue'),
+            component: () => import('@/views/Waypoint/partials/WaypointGroupCheck.vue'),
           },
           {
             path: 'teacher',
             name: 'TeacherCheck',
-            component: () =>
-              import('@/views/Waypoint/partials/WaypointTeacherCheck.vue'),
+            component: () => import('@/views/Waypoint/partials/WaypointTeacherCheck.vue'),
           },
           {
             path: 'member',
             name: 'MemberCheck',
-            component: () =>
-              import('@/views/Waypoint/partials/WaypointMemberCheck.vue'),
+            component: () => import('@/views/Waypoint/partials/WaypointMemberCheck.vue'),
           },
         ],
       },
@@ -157,24 +140,21 @@ router.beforeEach(async (to, from, next) => {
   const needAccept = to.matched.some((record) => record.meta.requiresAccept);
 
   if (!currentUser && needAuth) {
-    return next({ name: 'AccountLogin' });
+    return next({ name: 'LoginView' });
   }
 
   if (currentUser) {
     const userStore = useUserStore();
-    const userData = await userStore.fetchSingle({
-      uid: currentUser.uid,
-    });
+    const user = await userStore.fetchSingle({ uid: currentUser.uid });
+
     if (!needAuth) {
       return next({ name: 'HomeView' });
     }
-    if (needAccept && !userData?.isAccepted) {
-      userStore.$patch({
-        isVisible: true,
-      });
+    if (needAccept && !user?.isAccepted) {
+      userStore.$patch({ isAcceptDialogVisible: true });
       return next({ name: 'HomeView' });
     }
-    if (needAdmin && userData?.role.system !== 'admin') {
+    if (needAdmin && user?.role.system !== 'admin') {
       return next({ name: 'HomeView' });
     }
   }

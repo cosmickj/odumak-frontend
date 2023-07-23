@@ -4,11 +4,7 @@
       <Steps :model="steps" aria-label="Form Steps" />
     </div>
 
-    <RouterView
-      v-slot="{ Component }"
-      @prevPage="onPrevPage"
-      @nextPage="onNextPage"
-    >
+    <RouterView v-slot="{ Component }" @prev="toPrevPage" @next="toNextPage">
       <KeepAlive>
         <Component :is="Component" />
       </KeepAlive>
@@ -46,19 +42,24 @@ const steps = ref([
 ]);
 
 waypointStore.$patch({
-  name: userStore.userData?.name || '',
-  church: userStore.userData?.church || '',
-  department: userStore.userData?.department || '',
-  role: userStore.userData?.role || { system: 'user', teacher: 'common' },
-  grade: userStore.userData?.grade || '',
-  group: userStore.userData?.group || '',
+  // church: '',
+  // department: '',
+  church: '테스트',
+  department: '테스트',
+  name: userStore.userData?.name,
+  role: userStore.userData?.role,
+  grade: userStore.userData?.grade,
+  group: userStore.userData?.group,
 });
 
-const onPrevPage = ({ index }: { index: number }) => {
-  router.push({ name: steps.value[index - 1].to.name });
+const toPrevPage = ({ index }: { index: number }) => {
+  if (index - 1 < 0) {
+    return router.push({ name: 'HomeView' });
+  }
+  return router.push({ name: steps.value[index - 1].to.name });
 };
 
-const onNextPage = ({ index }: { index: number }) => {
+const toNextPage = ({ index }: { index: number }) => {
   router.push({ name: steps.value[index + 1].to.name });
 };
 </script>

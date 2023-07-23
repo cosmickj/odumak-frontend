@@ -7,17 +7,17 @@
     <div class="flex min-h-[40px] items-center justify-between">
       <p class="flex gap-2">
         <Tag
-          :value="formatTeacher(attendance.role.teacher)"
-          :style="`background: ${formatTeacherColor(attendance.role.teacher)}`"
+          :value="formatTeacher(attendance.role?.teacher)"
+          :style="`background: ${formatTeacherColor(attendance.role?.teacher)}`"
         />
         <span>{{ attendance.name }}</span>
-        <span v-if="attendance.role.teacher !== 'common'">
+        <span v-if="attendance.role?.teacher !== 'common'">
           {{ formatClassName(attendance.grade, attendance.group) }}
         </span>
       </p>
 
       <Button
-        v-if="attendance.role.teacher === 'head'"
+        v-if="attendance.role?.teacher === 'head'"
         rounded
         severity="secondary"
         icon="pi pi-plus"
@@ -46,6 +46,10 @@
     :style="{ width: '360px' }"
     :breakpoints="{ '641px': '95vw' }"
   >
+    <div v-if="!subAttendances.length" class="text-center text-base">
+      해당 날짜에 입력할 인원이 없습니다.
+    </div>
+
     <CheckerStudents :attendances="subAttendances" />
 
     <template #footer>
@@ -72,10 +76,10 @@ import {
   formatTeacher,
   formatTeacherColor,
 } from '@/utils/useFormat';
-import type { AttendanceData } from '@/types';
+import type { Attendance } from '@/models';
 
 const props = defineProps<{
-  attendances: AttendanceData[];
+  attendances: Attendance[];
   attendanceDate: Date;
 }>();
 
@@ -86,8 +90,8 @@ const toast = useToast();
 
 const visible = ref(false);
 const isLoading = ref(false);
-const subAttendances = ref<AttendanceData[]>([]);
-const subAttendancesClone = ref<AttendanceData[]>([]);
+const subAttendances = ref<Attendance[]>([]);
+const subAttendancesClone = ref<Attendance[]>([]);
 
 const changed = computed(() => {
   const attd = subAttendances.value;
@@ -96,7 +100,7 @@ const changed = computed(() => {
   return JSON.stringify(attd) !== JSON.stringify(clone);
 });
 
-const getSubAttendances = async (attd: AttendanceData) => {
+const getSubAttendances = async (attd: Attendance) => {
   try {
     isLoading.value = true;
 

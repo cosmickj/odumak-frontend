@@ -1,4 +1,5 @@
-import { Job, MemberData, Status, UserData } from './index';
+import type { Member, User } from '@/models';
+import { Job, Status, MemberData, UserData } from './index';
 
 /*---------- attendace.ts ----------*/
 export interface AddAttendanceParams {
@@ -25,29 +26,35 @@ export interface FetchAttendancesParams {
 
 export interface ModifyAttendanceParams {
   uid: string;
-  attendance: { status: Status };
+  attendance: { status: Status | null };
 }
 
-/*---------- member.ts ----------*/
-export interface CreateMultipleParams
-  extends Pick<MemberData, 'church' | 'department'> {
-  members: MemberData[];
+/*---------- memberStore ----------*/
+export interface CreateMultipleParams {
+  church: string;
+  department: string;
+  members: Member[];
 }
 
-export interface FetchAllParmas
-  extends Pick<MemberData, 'church' | 'department' | 'job'> {}
+export interface FetchAllParmas {
+  church: string;
+  department: string;
+  job: Job;
+}
 
-export interface FetchByGradeGroupParams
-  extends Pick<
-    MemberData,
-    'church' | 'department' | 'grade' | 'group' | 'job'
-  > {}
+export interface FetchByGradeGroupParams {
+  church: string;
+  department: string;
+  grade: string;
+  group: string;
+  job: Job;
+}
 
-// export interface ModifySingleParams {
-//   uid: string;
-//   field: string;
-//   value: string;
-// }
+export interface FetchByNameParams {
+  name: string;
+  church: string;
+  department: string;
+}
 
 export interface ModifySingleParams {
   uid: string;
@@ -58,8 +65,26 @@ export interface RemoveMultipleParams {
   uids: (string | undefined)[];
 }
 
-/*---------- user.ts ----------*/
-export interface CreateSingleParams extends Omit<UserData, 'createdAt'> {}
+/*---------- userStore ----------*/
+// export interface CreateSingleParams extends Omit<UserData, keyof MemberData> {
+//   uid: string;
+//   name: string;
+//   church: string;
+//   department: string;
+// }
+
+export interface CreateSingleParams {
+  uid: string;
+  name: string;
+  email: string;
+  provider: 'naver' | 'kakao';
+  profileImage: string;
+  church: string;
+  department: string;
+  isAccepted: boolean;
+  isRejected: boolean;
+  rejectedReason: string;
+}
 
 export interface FetchSingleParams {
   uid: string;
@@ -73,8 +98,4 @@ export interface FetchMultipleByChurchAndDepartment {
 export interface ModifySingle {
   uid: string;
   [key: string]: any;
-}
-
-export interface DeleteSingleParams {
-  uid: string;
 }
