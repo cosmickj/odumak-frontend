@@ -10,7 +10,7 @@
     <div class="flex flex-col gap-3">
       <a
         class="flex gap-2 p-2 rounded bg-[#fee500] items-center justify-center cursor-pointer select-none"
-        href="http://localhost:5050/oauth/kakao"
+        :href="`${odumakApiUrl}/oauth/kakao`"
       >
         <Image :src="loginKakao" image-class="w-8" />
         <span class="leading-8 text-lg">카카오톡으로 시작하기</span>
@@ -18,7 +18,7 @@
 
       <a
         class="flex gap-2 p-2 rounded bg-[#03c75a] items-center justify-center cursor-pointer select-none"
-        href="http://localhost:5050/oauth/naver"
+        :href="`${odumakApiUrl}/oauth/naver`"
       >
         <Image :src="loginNaver" image-class="w-8" />
         <span class="leading-8 text-white text-lg">네이버로 시작하기</span>
@@ -31,6 +31,8 @@
 import logoTransparent from '@/assets/images/logo-transparent.png';
 import loginKakao from '@/assets/images/login-kakao.png';
 import loginNaver from '@/assets/images/login-naver.png';
+
+const odumakApiUrl = import.meta.env.VITE_ODUMAK_API_URL;
 </script>
 
 <style scoped>
