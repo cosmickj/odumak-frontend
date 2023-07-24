@@ -133,33 +133,40 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
+  const userStore = useUserStore();
   const currentUser = await getCurrentUser();
 
-  const needAuth = to.matched.some((record) => record.meta.requiresAuth);
-  const needAdmin = to.matched.some((record) => record.meta.requiresAdmin);
-  const needAccept = to.matched.some((record) => record.meta.requiresAccept);
+  try {
+    const needAuth = to.matched.some((record) => record.meta.requiresAuth);
+    const needAdmin = to.matched.some((record) => record.meta.requiresAdmin);
+    const needAccept = to.matched.some((record) => record.meta.requiresAccept);
 
-  if (!currentUser && needAuth) {
-    return next({ name: 'LoginView' });
+    if (!currentUser && needAuth) {
+      return next({ name: 'LoginView' });
+    }
+
+    if (currentUser) {
+      if (!userStore.userData) {
+        await userStore.fetchSingle({ uid: currentUser.uid });
+      }
+
+      if (!needAuth) {
+        return next({ name: 'HomeView' });
+      }
+      if (needAccept && !userStore.userData?.isAccepted) {
+        userStore.$patch({ isAcceptDialogVisible: true });
+        return next({ name: 'HomeView' });
+      }
+      if (needAdmin && userStore.userData?.role.system !== 'admin') {
+        return next({ name: 'HomeView' });
+      }
+    }
+    return next();
+  } catch (error) {
+    console.log(error);
+  } finally {
+    userStore.isAuthReady = true;
   }
-
-  if (currentUser) {
-    const userStore = useUserStore();
-    const user = await userStore.fetchSingle({ uid: currentUser.uid });
-
-    if (!needAuth) {
-      return next({ name: 'HomeView' });
-    }
-    if (needAccept && !user?.isAccepted) {
-      userStore.$patch({ isAcceptDialogVisible: true });
-      return next({ name: 'HomeView' });
-    }
-    if (needAdmin && user?.role.system !== 'admin') {
-      return next({ name: 'HomeView' });
-    }
-  }
-
-  return next();
 });
 
 // Router Auth Checker
