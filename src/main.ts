@@ -13,28 +13,10 @@ import { createApp } from 'vue';
 import PrimeVue from 'primevue/config';
 import ToastService from 'primevue/toastservice';
 
-import { getCurrentUser } from '@/router';
-import { useUserStore } from '@/store/user';
-
 const app = createApp(App);
 
 app.use(router);
 app.use(createPinia());
-
-// Waiting for Auth to be Ready
-(async () => {
-  try {
-    const currentUser = await getCurrentUser();
-    const userStore = useUserStore();
-
-    if (currentUser) {
-      await userStore.fetchSingle({ uid: currentUser.uid });
-    }
-    userStore.isAuthReady = true;
-  } catch (error) {
-    console.log(error);
-  }
-})();
 
 app.use(PrimeVue);
 app.use(ToastService);
