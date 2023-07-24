@@ -69,6 +69,12 @@ export const useUserStore = defineStore('user', {
             church: user.church,
             department: user.department,
           });
+
+          // FIXME: 관리자 페이지에서 system 값도 넣을 수 있게하여 기존 데이터를 수정하자.
+          if (!member.role.system) {
+            member.role.system = 'user';
+          }
+
           user = mergeUserWithMemberData(user, member);
         } else {
           const defaultParams: MemberData = {
