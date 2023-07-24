@@ -3,13 +3,13 @@
     <div
       class="overflow-hidden relative w-full sm:w-[360px] h-full sm:max-h-[640px] bg-slate-100 shadow-lg"
     >
-      <div v-if="isAuthReady" class="flex flex-col h-full">
+      <div class="flex flex-col h-full">
         <RouterView class="overflow-auto flex-1" />
         <RouterView name="GlobalNavbar" />
       </div>
 
       <div
-        v-if="envMode === 'development'"
+        v-if="mode === 'development'"
         class="z-10 opacity-30 absolute inset-0 flex justify-center items-center pointer-events-none"
       >
         <p class="px-4 py-2 rounded text-4xl -rotate-[24deg]">
@@ -50,12 +50,12 @@ import { storeToRefs } from 'pinia';
 import { useUserStore } from '@/store/user';
 
 const router = useRouter();
-const { isAcceptDialogVisible, isAuthReady } = storeToRefs(useUserStore());
+const { isAcceptDialogVisible } = storeToRefs(useUserStore());
 
 const enterWaypoint = () => {
   isAcceptDialogVisible.value = false;
   router.push({ name: 'GroupCheck' });
 };
 
-const envMode = import.meta.env.MODE;
+const mode = import.meta.env.MODE;
 </script>
