@@ -43,7 +43,7 @@
           <Button
             class="w-full rounded-none rounded-bl-lg p-button-blue"
             label="일일 현황"
-            @click="move('AttendanceTrackerDaily', 'student')"
+            @click="move('AttendanceTrackerStudentDaily')"
           />
           <Button
             class="w-full rounded-none rounded-br-lg p-button-yellow"
@@ -96,7 +96,10 @@ import type { Job } from '@/types';
 const userStore = useUserStore();
 
 const router = useRouter();
-const move = (routeName: string, job: Job) => {
-  return router.push({ name: routeName, params: { job } });
+const move = (routeName: string, job?: Job) => {
+  if (job) {
+    return router.push({ name: routeName, params: { job } });
+  }
+  return router.push({ name: routeName });
 };
 </script>

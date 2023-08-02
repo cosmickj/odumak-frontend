@@ -84,8 +84,9 @@ export const useAttendanceStore = defineStore('attendance', {
           };
         });
 
-      this.attendancesRecord.daily = [];
-      this.attendancesRecord.daily = attendances;
+      // this.attendancesRecord.daily = [];
+      // this.attendancesRecord.daily = attendances;
+      return attendances;
     },
 
     async fetchAttendancesByGradeGroup(p: Required<FetchAttendancesParams>) {
