@@ -13,6 +13,10 @@ import { createApp } from 'vue';
 import PrimeVue from 'primevue/config';
 import ToastService from 'primevue/toastservice';
 
+import { Chart as _Chart } from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+_Chart.register(ChartDataLabels);
+
 const app = createApp(App);
 
 app.use(router);
