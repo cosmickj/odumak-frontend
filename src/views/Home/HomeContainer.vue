@@ -43,7 +43,7 @@
           <Button
             class="w-full rounded-none rounded-bl-lg p-button-blue"
             label="일일 현황"
-            @click="move('AttendanceTrackerStudentDaily')"
+            @click="move('AttendanceTrackerDailyStudent')"
           />
           <Button
             class="w-full rounded-none rounded-br-lg p-button-yellow"

@@ -11,7 +11,7 @@
     @date-select="onAttendanceDateSelect"
   />
 
-  <div class="mt-4 text-center">
+  <div class="mt-2 text-center">
     <SelectButton
       unselectable
       v-model="selectedOption"
@@ -21,7 +21,7 @@
     />
   </div>
 
-  <table v-if="selectedOption === 'all'" class="mt-6">
+  <table v-if="selectedOption === 'all'" class="mt-2">
     <thead>
       <tr>
         <th>학년반</th>
@@ -40,22 +40,30 @@
 
     <tbody v-else>
       <tr v-for="(key, i) in Object.keys(attdRecordsForTable)" :key="i">
-        <td>{{ key }}</td>
+        <template v-if="key.endsWith('T')">
+          <td class="col-span-3 px-4 py-2 bg-blue-300">
+            {{ formatTotal(key) }}
+          </td>
+        </template>
 
-        <td class="grid gap-1 xs:grid-cols-4 grid-cols-3 grid-rows-2">
-          <span
-            v-for="(attd, j) in attdRecordsForTable[key]"
-            class="whitespace-nowrap text-sm text-center"
-            :class="paintAttendance(attd.attendance.status)"
-            :key="j"
-          >
-            {{ attd.name }}
-          </span>
-        </td>
+        <template v-else>
+          <td>{{ key }}</td>
 
-        <td class="text-pink-500">
-          {{ countAttendance(attdRecordsForTable[key]) }}
-        </td>
+          <td class="grid gap-1 xs:grid-cols-4 grid-cols-3 grid-rows-2">
+            <span
+              v-for="(attd, j) in attdRecordsForTable[key]"
+              class="whitespace-nowrap text-sm text-center"
+              :class="paintAttendance(attd.attendance.status)"
+              :key="j"
+            >
+              {{ attd.name }}
+            </span>
+          </td>
+
+          <td class="text-pink-500">
+            {{ countAttendance(attdRecordsForTable[key]) }}
+          </td>
+        </template>
       </tr>
     </tbody>
   </table>
@@ -68,6 +76,26 @@
       :options="chartOptions"
     />
   </div>
+
+  <div v-else-if="selectedOption === 'detail'" class="mt-6">
+    <DataTable
+      class="p-datatable-sm"
+      paginator
+      paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
+      currentPageReportTemplate="{first} to {last} of {totalRecords}"
+      :rows="6"
+      :value="rawAttdRecords"
+    >
+      <Column header="이름" field="name" style="width: 25%" />
+      <Column header="학년" field="grade" style="width: 25%" />
+      <Column header="학급" field="group" style="width: 25%" />
+      <Column header="출석" style="width: 25%">
+        <template #body="slotProps">
+          {{ formatAttendanceStatus(slotProps.data.attendance.status) }}
+        </template>
+      </Column>
+    </DataTable>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -75,6 +103,7 @@ import { computed, onMounted, ref } from 'vue';
 import { useAttendanceStore } from '@/store/attendance';
 import { useUserStore } from '@/store/user';
 import { getPreviousSunday } from '@/utils/useCalendar';
+import { formatAttendanceStatus } from '@/utils/useFormat';
 import type { Attendance } from '@/models';
 import type { Status } from '@/types';
 
@@ -89,7 +118,7 @@ const options = [
   { label: '차트 보기', value: 'chart' },
   { label: '개별 보기', value: 'detail' },
 ];
-const selectedOption = ref(options[1].value);
+const selectedOption = ref(options[0].value);
 
 interface StudentAttendanceRecord {
   [key: string]: Attendance[];
@@ -115,14 +144,20 @@ const getAttendanceRecords = async () => {
 };
 
 const convertAttdRecordsForTable = (attdRecords: Attendance[]) => {
-  return attdRecords.reduce((acc, attd) => {
-    const key = `${attd.grade}-${attd.group}`;
-    if (!acc[key]) {
-      acc[key] = [];
-    }
-    acc[key].push(attd);
+  const organizedRecords = attdRecords.reduce((acc, attd) => {
+    const classKey = `${attd.grade}-${attd.group}`;
+    const totalKey = `${attd.grade}-T`;
+
+    acc[classKey] = acc[classKey] || [];
+    acc[classKey].push(attd);
+
+    acc[totalKey] = acc[totalKey] || [];
+    acc[totalKey].push(attd);
+
     return acc;
   }, {} as { [key: string]: Attendance[] });
+
+  return Object.fromEntries(Object.entries(organizedRecords).sort());
 };
 
 const convertAttdRecordsForChart = (attdRecords: Attendance[]) => {
@@ -171,8 +206,19 @@ const countAttendance = (records: Attendance[]) => {
   ).length;
 };
 
+const formatTotal = (key: string) => {
+  const [grade, _] = key.split('-');
+
+  const total = attdRecordsForTable.value[key].length;
+  const whoAttd = countAttendance(attdRecordsForTable.value[key]);
+
+  return `${grade}학년 - 재적: ${total} 출석: ${whoAttd}`;
+};
+
 const paintAttendance = (status: Status) => {
-  return status === 'offline' || status === 'online' ? 'text-sky-700' : '';
+  return status === 'offline' || status === 'online'
+    ? 'text-sky-700 font-semibold'
+    : '';
 };
 
 const chartOptions = {
@@ -221,8 +267,8 @@ tr {
   display: contents;
 }
 
-th,
-td {
+thead th,
+tbody td {
   display: flex;
   align-items: center;
   justify-content: center;
