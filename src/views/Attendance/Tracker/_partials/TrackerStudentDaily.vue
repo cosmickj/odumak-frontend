@@ -21,52 +21,67 @@
     />
   </div>
 
-  <table v-if="selectedOption === 'all'" class="mt-2">
-    <thead>
-      <tr>
-        <th>학년반</th>
-        <th>우리 반 친구들</th>
-        <th>출석</th>
-      </tr>
-    </thead>
+  <div v-if="selectedOption === 'all'" class="mt-2">
+    <!-- <p class="text-sm"><sup>*</sup> 각 학년반을 클릭해보세요</p> -->
+    <table>
+      <thead>
+        <tr>
+          <th>학년반</th>
+          <th>우리 반 친구들</th>
+          <th>출석</th>
+        </tr>
+      </thead>
 
-    <tbody v-if="isReady">
-      <tr v-for="i in 10" :key="i">
-        <td class="p-2"><Skeleton /></td>
-        <td class="p-2"><Skeleton /></td>
-        <td class="p-2"><Skeleton /></td>
-      </tr>
-    </tbody>
+      <tbody v-if="isReady">
+        <tr v-for="i in 10" :key="i">
+          <td class="p-2"><Skeleton /></td>
+          <td class="p-2"><Skeleton /></td>
+          <td class="p-2"><Skeleton /></td>
+        </tr>
+      </tbody>
 
-    <tbody v-else>
-      <tr v-for="(key, i) in Object.keys(attdRecordsForTable)" :key="i">
-        <template v-if="key.endsWith('T')">
-          <td class="col-span-3 px-4 py-2 bg-blue-300">
-            {{ formatTotal(key) }}
-          </td>
-        </template>
+      <tbody v-else>
+        <tr v-for="(key, i) in Object.keys(attdRecordsForTable)" :key="i">
+          <template v-if="key.endsWith('T')">
+            <td class="col-span-3 px-4 py-2 bg-blue-300">
+              {{ formatTotal(key) }}
+            </td>
+          </template>
 
-        <template v-else>
-          <td>{{ key }}</td>
+          <template v-else>
+            <td class="text-sm">
+              <p class="min-w-[36px]">{{ formatGrade(key) }}</p>
+              <p class="min-w-[36px]">{{ formatGroup(key) }}</p>
+            </td>
 
-          <td class="grid gap-1 xs:grid-cols-4 grid-cols-3 grid-rows-2">
-            <span
-              v-for="(attd, j) in attdRecordsForTable[key]"
-              class="whitespace-nowrap text-sm text-center"
-              :class="paintAttendance(attd.attendance.status)"
-              :key="j"
-            >
-              {{ attd.name }}
-            </span>
-          </td>
+            <td class="grid gap-1 xs:grid-cols-4 grid-cols-3 grid-rows-2">
+              <span
+                v-for="(attd, j) in attdRecordsForTable[key]"
+                class="whitespace-nowrap text-sm text-center"
+                :class="paintAttendance(attd.attendance.status)"
+                :key="j"
+              >
+                {{ attd.name }}
+              </span>
+            </td>
 
-          <td class="text-pink-500">
-            {{ countAttendance(attdRecordsForTable[key]) }}
-          </td>
-        </template>
-      </tr>
-    </tbody>
-  </table>
+            <td class="relative">
+              <span
+                v-if="isChecked(attdRecordsForTable[key])"
+                class="text-sm text-red-500"
+              >
+                미입력
+              </span>
+
+              <span v-else class="text-green-600">
+                {{ countAttendance(attdRecordsForTable[key]) }}
+              </span>
+            </td>
+          </template>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
   <div v-else-if="selectedOption === 'chart'" class="mt-6">
     <Chart
@@ -215,6 +230,19 @@ const formatTotal = (key: string) => {
   return `${grade}학년 - 재적: ${total} 출석: ${whoAttd}`;
 };
 
+const formatGrade = (key: string) => key.split('-').at(0) + '학년';
+const formatGroup = (key: string) => {
+  const group = key.split('-').at(1);
+  if (group === '0') {
+    return '새친구';
+  }
+  return group + '반';
+};
+
+const isChecked = (records: Attendance[]) => {
+  return records.every((record) => !record.attendance.status);
+};
+
 const paintAttendance = (status: Status) => {
   return status === 'offline' || status === 'online'
     ? 'text-sky-700 font-semibold'
@@ -270,11 +298,13 @@ tr {
 thead th,
 tbody td {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
 }
 
 th {
+  z-index: 2;
   position: sticky;
   top: 0;
   padding: 10px 8px;
