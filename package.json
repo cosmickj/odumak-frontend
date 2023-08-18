@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "scripts": {
     "dev": "vite",
+    "staging": "vite --mode staging",
     "build": "vue-tsc --noEmit && vite build",
     "build-only": "vite build",
     "type-check": "vue-tsc --noEmit",
