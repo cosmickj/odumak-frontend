@@ -56,7 +56,7 @@
         header="담임이 아닙니다"
         v-model:visible="visible"
         :breakpoints="{ '450px': '85vw' }"
-        @hide="navigateHome"
+        @hide="router.push({ name: 'HomeView' })"
       >
         <p>출석 체크는 담임, 부담임 선생님만 이용할 수 있습니다.</p>
 
@@ -65,7 +65,7 @@
             label="알겠습니다"
             class="p-button-info"
             icon="pi pi-check"
-            @click="navigateHome"
+            @click="router.push({ name: 'HomeView' })"
           />
         </template>
       </Dialog>
@@ -113,14 +113,14 @@ const getAttendances = async () => {
 
     const { system, executive } = userData.value.role;
     if (system === 'admin' || executive === 'secretary') {
-      await attendanceStore.fetchAttendances({
+      attendances.value = await attendanceStore.fetchAttendances({
         attendanceDate: attendanceDate.value,
         church: userData.value.church,
         department: userData.value.department,
         job: 'teacher',
       });
     } else if (system === 'user') {
-      await attendanceStore.fetchAttendancesByGradeGroup({
+      attendances.value = await attendanceStore.fetchAttendancesByGradeGroup({
         attendanceDate: attendanceDate.value,
         church: userData.value.church,
         department: userData.value.department,
@@ -129,13 +129,11 @@ const getAttendances = async () => {
         job: 'student',
       });
     }
-
-    attendances.value = attendanceStore.attendancesRecord.daily;
-    attendancesClone.value = structuredClone(toRaw(attendances.value));
   } catch (error) {
     console.log(error);
   } finally {
     isLoading.value = false;
+    attendancesClone.value = structuredClone(toRaw(attendances.value));
   }
 };
 
@@ -167,16 +165,15 @@ const saveAttendances = () => {
       });
     });
 
-    if (confirm('저장되었습니다! 확인하러 가시겠습니까?')) {
-      router.push({
-        name: 'AttendanceTrackerDaily',
-        params: { job: attendances.value[0].job },
-      });
-    }
+    alert('저장되었습니다!');
+    // if (confirm('저장되었습니다! 확인하러 가시겠습니까?')) {
+    //   router.push({
+    //     name: 'AttendanceTrackerDaily',
+    //     params: { job: attendances.value[0].job },
+    //   });
+    // }
   } catch (error) {
     console.log(error);
   }
 };
-
-const navigateHome = () => router.push({ name: 'HomeView' });
 </script>

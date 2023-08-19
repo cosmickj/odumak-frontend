@@ -1,13 +1,13 @@
-import { Gender, MemberData, Role } from '@/types';
+import { Gender, MemberData, Role, Status } from '@/types';
 
-const formatClassName = (grade: string, group: string) => {
+export const formatClassName = (grade: string, group: string) => {
   if (grade === '0' || group === '0') {
     return '새친구 학급';
   }
   return `${grade}학년 ${group}반`;
 };
 
-const formatDate = (date: Date | null) => {
+export const formatDate = (date: Date | null) => {
   if (date) {
     const yyyy = date.getFullYear();
     const mm = date.getMonth() + 1;
@@ -22,9 +22,9 @@ const GenderMap = {
   male: '남',
   female: '여',
 };
-const formatGender = (g: Gender) => GenderMap[g];
+export const formatGender = (g: Gender) => GenderMap[g];
 
-const formatGroupHeader = ({ grade, group, job, role }: MemberData) => {
+export const formatGroupHeader = ({ grade, group, job, role }: MemberData) => {
   if (job === 'student') {
     return `${grade}학년 ${group !== '0' ? group + '반' : '새친구'}`;
   }
@@ -47,7 +47,7 @@ const TeacherMap = {
   assistant: '부담임',
   common: '비담임',
 };
-const formatTeacher = (t: Role['teacher']) => (t ? TeacherMap[t] : '');
+export const formatTeacher = (t: Role['teacher']) => (t ? TeacherMap[t] : '');
 
 const TeacherColorMap = {
   admin: '#6A2C70',
@@ -55,14 +55,14 @@ const TeacherColorMap = {
   assistant: '#B4846C',
   common: '#B7C4CF',
 };
-const formatTeacherColor = (t: Role['teacher']) =>
+export const formatTeacherColor = (t: Role['teacher']) =>
   t ? TeacherColorMap[t] : '';
 
-export {
-  formatClassName,
-  formatDate,
-  formatGender,
-  formatGroupHeader,
-  formatTeacher,
-  formatTeacherColor,
+const AttendanceStatusMap = {
+  offline: '현장',
+  online: '온라인',
+  absence: '결석',
 };
+
+export const formatAttendanceStatus = (s: Status) =>
+  s ? AttendanceStatusMap[s] : '-';

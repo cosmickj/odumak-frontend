@@ -50,12 +50,17 @@ const routes: Array<RouteRecordRaw> = [
         },
         children: [
           {
-            path: '/:job/daily',
-            name: 'AttendanceTrackerDaily',
-            component: () => import('@/views/Attendance/Tracker/TrackerDaily.vue'),
+            path: 'daily/student',
+            name: 'AttendanceTrackerDailyStudent',
+            component: () => import('@/views/Attendance/Tracker/_partials/TrackerDailyStudent.vue'),
           },
           {
-            path: '/:job/total',
+            path: 'daily/teacher',
+            name: 'AttendanceTrackerDailyTeacher',
+            component: () => import('@/views/Attendance/Tracker/_partials/TrackerDailyTeacher.vue'),
+          },
+          {
+            path: 'total/:job',
             name: 'AttendanceTrackerTotal',
             component: () => import('@/views/Attendance/Tracker/TrackerTotal.vue'),
           },
