@@ -52,12 +52,12 @@ const routes: Array<RouteRecordRaw> = [
           {
             path: 'daily/student',
             name: 'AttendanceTrackerDailyStudent',
-            component: () => import('@/views/Attendance/Tracker/_partials/TrackerStudentDaily.vue'),
+            component: () => import('@/views/Attendance/Tracker/_partials/TrackerDailyStudent.vue'),
           },
           {
-            path: 'daily/:job',
-            name: 'AttendanceTrackerDaily',
-            component: () => import('@/views/Attendance/Tracker/TrackerDaily.vue'),
+            path: 'daily/teacher',
+            name: 'AttendanceTrackerDailyTeacher',
+            component: () => import('@/views/Attendance/Tracker/_partials/TrackerDailyTeacher.vue'),
           },
           {
             path: 'total/:job',
