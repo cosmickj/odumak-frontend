@@ -63,10 +63,12 @@ export const useAttendanceStore = defineStore('attendance', {
 
           const registeredAttendance = registeredAttendances.find((attd) => {
             return (
-              attd.job === mem.job &&
               attd.name === mem.name &&
               attd.church === mem.church &&
-              attd.department === mem.department
+              attd.department === mem.department &&
+              attd.grade === mem.grade &&
+              attd.group === mem.group &&
+              attd.job === mem.job
             );
           });
 
@@ -84,8 +86,7 @@ export const useAttendanceStore = defineStore('attendance', {
           };
         });
 
-      this.attendancesRecord.daily = [];
-      this.attendancesRecord.daily = attendances;
+      return attendances;
     },
 
     async fetchAttendancesByGradeGroup(p: Required<FetchAttendancesParams>) {
@@ -146,8 +147,7 @@ export const useAttendanceStore = defineStore('attendance', {
           };
         });
 
-      this.attendancesRecord.daily = [];
-      this.attendancesRecord.daily = attendances;
+      return attendances;
     },
 
     async modifyAttendance(params: ModifyAttendanceParams) {
