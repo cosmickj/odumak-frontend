@@ -104,7 +104,7 @@ const getSubAttendances = async (attd: Attendance) => {
   try {
     isLoading.value = true;
 
-    await attendanceStore.fetchAttendancesByGradeGroup({
+    subAttendances.value = await attendanceStore.fetchAttendancesByGradeGroup({
       attendanceDate: props.attendanceDate,
       church: attd.church!,
       department: attd.department!,
@@ -112,8 +112,6 @@ const getSubAttendances = async (attd: Attendance) => {
       group: attd.group,
       job: 'student',
     });
-
-    subAttendances.value = attendanceStore.attendancesRecord.daily;
     subAttendancesClone.value = structuredClone(toRaw(subAttendances.value));
 
     visible.value = true;

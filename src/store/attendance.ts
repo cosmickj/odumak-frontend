@@ -56,6 +56,9 @@ export const useAttendanceStore = defineStore('attendance', {
 
       const attendances = members
         .filter((mem) => {
+          mem.registeredAt.setHours(0, 0, 0);
+          attendanceDate.setHours(0, 0, 0);
+
           return mem.registeredAt <= attendanceDate && !mem.role.officer;
         })
         .map((mem) => {
@@ -120,16 +123,23 @@ export const useAttendanceStore = defineStore('attendance', {
       }));
 
       const attendances = members
-        .filter((mem) => mem.registeredAt <= attendanceDate)
+        .filter((mem) => {
+          mem.registeredAt.setHours(0, 0, 0);
+          attendanceDate.setHours(0, 0, 0);
+
+          return mem.registeredAt <= attendanceDate && !mem.role.officer;
+        })
         .map((mem) => {
           const attendanceTemp = { date: attendanceDate, status: null };
 
           const registeredAttendance = registeredAttendances.find((attd) => {
             return (
-              mem.job == attd.job &&
               mem.name == attd.name &&
               mem.church == attd.church &&
-              mem.department == attd.department
+              mem.department == attd.department &&
+              attd.grade === mem.grade &&
+              attd.group === mem.group &&
+              attd.job === mem.job
             );
           });
 
