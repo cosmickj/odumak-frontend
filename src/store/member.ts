@@ -4,7 +4,6 @@ import { db, membersColl } from '@/firebase/config';
 import {
   addDoc,
   collection,
-  deleteDoc,
   doc,
   getDocs,
   query,
@@ -48,7 +47,8 @@ export const useMemberStore = defineStore('member', {
         membersColl,
         where('job', '==', job),
         where('church', '==', church),
-        where('department', '==', department)
+        where('department', '==', department),
+        where('status', '==', 'active')
       );
       const qSnapshot = await getDocs(q);
 
@@ -71,7 +71,8 @@ export const useMemberStore = defineStore('member', {
         where('department', '==', department),
         ...whereGrade,
         where('group', '==', group),
-        where('job', '==', job)
+        where('job', '==', job),
+        where('status', '==', 'active')
       );
       const qSnapshot = await getDocs(q);
 
@@ -105,11 +106,21 @@ export const useMemberStore = defineStore('member', {
     },
 
     async removeMultiple(params: RemoveMultipleParams) {
-      return await Promise.all(
-        params.uids.map(async (uid) => {
-          if (uid) await deleteDoc(doc(db, COLLECTION.MEMBERS, uid));
-        })
-      );
+      try {
+        await Promise.all(
+          params.uids.map(async (uid) => {
+            if (uid) {
+              await updateDoc(doc(db, COLLECTION.MEMBERS, uid), {
+                status: 'inactive',
+              });
+            }
+          })
+        );
+        return 'Success';
+      } catch (error) {
+        console.error('Error removing documents:', error);
+        throw error;
+      }
     },
   },
 });

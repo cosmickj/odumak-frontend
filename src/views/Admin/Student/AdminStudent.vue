@@ -3,6 +3,7 @@
     :loading="isLoading"
     :data-source="members"
     :data-target="'student'"
+    :column-state="{ birth: true }"
     @add="addStudents"
     @edit="editStudent"
     @delete="deleteStudents"
