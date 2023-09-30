@@ -3,7 +3,7 @@
     :loading="isLoading"
     :data-source="members"
     :data-target="'teacher'"
-    :column-state="{ role: true }"
+    :column-state="{ role: true, birth: false }"
     @add="addMembers"
     @edit="editMember"
     @delete="deleteMembers"

@@ -87,7 +87,13 @@
 
       <Column field="group" header="학급" style="min-width: 4.2rem" />
 
-      <Column field="birth" header="생일" style="min-width: 9rem">
+      <!-- FIXME: 생일 형식이 달라 에러 발생-->
+      <Column
+        v-if="columnState?.birth"
+        field="birth"
+        header="생일"
+        style="min-width: 9rem"
+      >
         <template #body="slotProps">
           <span>{{ formatDate(slotProps.data.birth) }}</span>
         </template>

@@ -1,3 +1,4 @@
+import arraySort from 'array-sort';
 import { db, attendancesColl } from '@/firebase/config';
 import {
   addDoc,
@@ -34,12 +35,18 @@ export const useAttendanceStore = defineStore('attendance', {
       });
     },
 
+    /**
+     * @description 학생 일일 출석현황, 관리자 출석 입력
+     */
     async fetchAttendances(params: FetchAttendancesParams) {
       const { attendanceDate, church, department, job } = params;
 
       const memberStore = useMemberStore();
+
+      // 해당하는 교회와 부서의 모든 멤버를 읽어온다.
       const members = await memberStore.fetchAll({ job, church, department });
 
+      // 해당 날짜에 교회와 부서를 기준으로 기입력된 출석 데이터를 읽어온다.
       const attendanceQuery = query(
         attendancesColl,
         where('church', '==', church),
@@ -54,6 +61,7 @@ export const useAttendanceStore = defineStore('attendance', {
         uid: doc.id,
       }));
 
+      // 읽어온 모든 맴버와 기입력된 출석 데이터를 대조하여 최종 출석 데이터를 가공한다.
       const attendances = members
         .filter((mem) => {
           mem.registeredAt.setHours(0, 0, 0);
@@ -89,9 +97,19 @@ export const useAttendanceStore = defineStore('attendance', {
           };
         });
 
-      return attendances;
+      // FIXME:
+      const memberNames = members.map(({ name }) => name);
+      const needToAdd = registeredAttendances.filter(({ name }) => {
+        return !memberNames.includes(name);
+      });
+
+      const result = [...attendances, ...needToAdd];
+      return arraySort(result, ['grade', 'group', 'name']);
     },
 
+    /**
+     * @description 담임/부담임이 출석을 입력할 때 사용
+     */
     async fetchAttendancesByGradeGroup(p: Required<FetchAttendancesParams>) {
       const { attendanceDate, church, department, grade, group, job } = p;
 
