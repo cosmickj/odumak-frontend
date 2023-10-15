@@ -120,7 +120,7 @@ import { useUserStore } from '@/store/user';
 import { getPreviousSunday } from '@/utils/useCalendar';
 import { formatAttendanceStatus } from '@/utils/useFormat';
 import type { Attendance } from '@/models';
-import type { Status } from '@/types';
+import type { AttendanceStatus } from '@/types';
 
 const attendanceStore = useAttendanceStore();
 const userStore = useUserStore();
@@ -243,7 +243,7 @@ const isChecked = (records: Attendance[]) => {
   return records.every((record) => !record.attendance.status);
 };
 
-const paintAttendance = (status: Status) => {
+const paintAttendance = (status: AttendanceStatus) => {
   return status === 'offline' || status === 'online'
     ? 'text-sky-700 font-semibold'
     : '';

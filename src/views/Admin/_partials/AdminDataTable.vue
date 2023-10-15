@@ -170,10 +170,7 @@ const exportDataTable = () => {
   if (dataTableRef.value) dataTableRef.value.exportCSV();
 };
 
-const groupRowsBy = ({ grade, group }: Member) => {
-  return `${grade} ${group}`;
-};
-
+const groupRowsBy = ({ grade, group }: Member) => `${grade} ${group}`;
 const selectedMembers = ref<Member[]>([]);
 
 /*---------- ADD ----------*/
@@ -183,7 +180,7 @@ const MemberRoleMap: { student: {}; teacher: Member['role'] } = {
 };
 
 // CONTINUE
-const addingMemberTemp: Member = {
+const addingMemberTemp: Omit<Member, 'uid' | 'createdAt'> = {
   name: '',
   birth: null,
   birthLater: true,
@@ -197,6 +194,7 @@ const addingMemberTemp: Member = {
   isNewFriendClass: false,
   registeredAt: new Date(),
   remark: '',
+  status: 'active',
 };
 const addingMembers = ref({ body: [structuredClone(addingMemberTemp)] });
 const addingVisible = ref(false);
@@ -227,7 +225,9 @@ const resetAllMembers = () => {
   addingMembers.value.body.push(structuredClone(addingMemberTemp));
 };
 
-const handleAddingTeacherChange = (newValue: Member) => {
+const handleAddingTeacherChange = (
+  newValue: Omit<Member, 'uid' | 'createdAt'>
+) => {
   if (newValue.isNewFriendClass) {
     newValue.grade = '0';
     newValue.group = '0';
@@ -243,7 +243,9 @@ const handleAddingTeacherChange = (newValue: Member) => {
   }
 };
 
-const handleAddingStudentChange = (newValue: Member) => {
+const handleAddingStudentChange = (
+  newValue: Omit<Member, 'uid' | 'createdAt'>
+) => {
   if (newValue.isNewFriendClass) {
     newValue.group = '0';
   } else if (newValue.group === '0') {

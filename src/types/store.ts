@@ -1,5 +1,5 @@
 import type { Member, User } from '@/models';
-import { Job, Status, MemberData, UserData } from './index';
+import { Job, AttendanceStatus, MemberData, UserData } from './index';
 
 /*---------- attendace.ts ----------*/
 export interface AddAttendanceParams {
@@ -10,7 +10,7 @@ export interface AddAttendanceParams {
   grade: string;
   group: string;
   job: Job;
-  attendance: { date: Date; status: Status };
+  attendance: { date: Date; status: AttendanceStatus };
   createdBy: string;
   createdAt?: Date;
 }
@@ -26,7 +26,7 @@ export interface FetchAttendancesParams {
 
 export interface ModifyAttendanceParams {
   uid: string;
-  attendance: { status: Status | null };
+  attendance: { status: AttendanceStatus | null };
 }
 
 /*---------- memberStore ----------*/

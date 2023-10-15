@@ -1,4 +1,4 @@
-import { Gender, MemberData, Role, Status } from '@/types';
+import { Gender, MemberData, Role, AttendanceStatus } from '@/types';
 
 export const formatClassName = (grade: string, group: string) => {
   if (grade === '0' || group === '0') {
@@ -64,5 +64,5 @@ const AttendanceStatusMap = {
   absence: '결석',
 };
 
-export const formatAttendanceStatus = (s: Status) =>
+export const formatAttendanceStatus = (s: AttendanceStatus) =>
   s ? AttendanceStatusMap[s] : '-';

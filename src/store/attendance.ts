@@ -93,6 +93,7 @@ export const useAttendanceStore = defineStore('attendance', {
             group: mem.group,
             role: mem.role,
             job: mem.job,
+            status: mem.status,
             attendance: registeredAttendance?.attendance || attendanceTemp,
           };
         });
@@ -171,6 +172,7 @@ export const useAttendanceStore = defineStore('attendance', {
             group: mem.group,
             role: mem.role,
             job: mem.job,
+            status: mem.status,
             attendance: registeredAttendance?.attendance || attendanceTemp,
           };
         });
