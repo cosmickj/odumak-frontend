@@ -91,6 +91,7 @@ export const useUserStore = defineStore('user', {
             birthLater: true,
             isNewFriendClass: false,
             remark: '',
+            status: 'active',
           };
           user = mergeUserWithMemberData(user, new Member(defaultParams));
         }

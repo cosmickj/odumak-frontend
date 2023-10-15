@@ -4,7 +4,9 @@ export type Gender = 'male' | 'female';
 
 export type Job = 'student' | 'teacher';
 
-export type Status = 'offline' | 'online' | 'absence' | null;
+export type AttendanceStatus = 'offline' | 'online' | 'absence' | null;
+
+export type MemberStatus = 'active' | 'inactive';
 
 export type System = 'admin' | 'user';
 
@@ -53,6 +55,7 @@ export interface BaseData {
   role: Role;
   grade: string;
   group: string;
+  status: MemberStatus;
 }
 
 export interface MemberData extends BaseData {
@@ -78,7 +81,7 @@ export interface AttendanceData extends Omit<BaseData, 'role'> {
   uid: string;
   memberUid: string;
   role?: Role;
-  attendance: { date: Date; status: Status };
+  attendance: { date: Date; status: AttendanceStatus };
   createdAt?: Timestamp;
   createdBy?: string;
 }

@@ -2,10 +2,11 @@ import type {
   Gender,
   Job,
   Role,
-  Status,
+  AttendanceStatus,
   AttendanceData,
   MemberData,
   UserData,
+  MemberStatus,
 } from '@/types';
 
 export class Member implements Omit<MemberData, 'registeredAt' | 'createdAt'> {
@@ -22,6 +23,7 @@ export class Member implements Omit<MemberData, 'registeredAt' | 'createdAt'> {
   birthLater: boolean;
   isNewFriendClass: boolean;
   remark: string;
+  status: MemberStatus;
   registeredAt: Date;
   createdAt: Date;
 
@@ -39,6 +41,7 @@ export class Member implements Omit<MemberData, 'registeredAt' | 'createdAt'> {
     this.birthLater = data.birthLater;
     this.isNewFriendClass = data.isNewFriendClass;
     this.remark = data.remark;
+    this.status = data.status;
     this.registeredAt = !data.registeredAt
       ? new Date()
       : new Date(data.registeredAt.seconds * 1000);
@@ -68,6 +71,7 @@ export class User implements Omit<UserData, 'registeredAt' | 'createdAt'> {
   isRejected: boolean;
   rejectedReason: string;
   remark: string;
+  status: MemberStatus;
   registeredAt: Date;
   createdAt: Date;
 
@@ -91,6 +95,7 @@ export class User implements Omit<UserData, 'registeredAt' | 'createdAt'> {
     this.isRejected = data.isRejected;
     this.rejectedReason = data.rejectedReason;
     this.remark = data.remark;
+    this.status = data.status;
     this.registeredAt = !data.registeredAt
       ? new Date()
       : new Date(data.registeredAt.seconds * 1000);
@@ -104,13 +109,14 @@ export class Attendance implements Omit<AttendanceData, 'createdAt'> {
   uid: string;
   memberUid: string;
   name: string;
-  attendance: { date: Date; status: Status };
+  attendance: { date: Date; status: AttendanceStatus };
   church: string;
   department: string;
   grade: string;
   group: string;
   job: Job;
   role?: Role;
+  status: MemberStatus;
   createdAt?: Date;
   createdBy?: string;
 
@@ -125,6 +131,7 @@ export class Attendance implements Omit<AttendanceData, 'createdAt'> {
     this.grade = data.grade;
     this.group = data.group;
     this.job = data.job;
+    this.status = data.status;
     this.createdBy = data.createdBy;
     this.createdAt = !data.createdAt
       ? new Date()

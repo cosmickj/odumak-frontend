@@ -234,7 +234,7 @@ import type { Member } from '@/models';
 const props = defineProps<{
   v: any;
   visible: boolean;
-  members: Member[];
+  members: Omit<Member, 'uid' | 'createdAt'>[];
 }>();
 
 const emit = defineEmits(['add', 'copy', 'delete', 'submit', 'close']);
