@@ -17,18 +17,15 @@ import { Chart as _Chart } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 _Chart.register(ChartDataLabels);
 
-import VCalendar from 'v-calendar';
-import 'v-calendar/style.css';
+import { setupCalendar } from 'v-calendar';
 
 const app = createApp(App);
 
 app.use(router);
 app.use(createPinia());
-
 app.use(PrimeVue);
 app.use(ToastService);
-
-app.use(VCalendar);
+app.use(setupCalendar, {});
 
 import Avatar from 'primevue/avatar';
 import Button from 'primevue/button';

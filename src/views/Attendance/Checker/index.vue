@@ -9,7 +9,7 @@
         @click="changeDate('prev')"
       />
 
-      <VDatePicker
+      <DatePicker
         v-model="attendanceDate"
         locale="ko"
         :popover="popover"
@@ -37,13 +37,13 @@
           <div class="w-full px-3 pb-3">
             <button
               class="bg-blue-600 text-white font-bold w-full px-3 py-1 rounded-md"
-              @click="setToday"
+              @click="setPreviousSunday"
             >
-              최근 주일 출석체크
+              최근 주일로 이동하기
             </button>
           </div>
         </template>
-      </VDatePicker>
+      </DatePicker>
 
       <Button
         class="text-blue-600"
@@ -126,6 +126,9 @@ import CheckerStudents from './_partials/CheckerStudents.vue';
 import CheckerTeachers from './_partials/CheckerTeachers.vue';
 
 import dayjs from 'dayjs';
+import { DatePicker } from 'v-calendar';
+import 'v-calendar/style.css';
+
 import { computed, ref, onMounted, toRaw } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/store/user';
@@ -143,7 +146,7 @@ const attendanceDate = ref<Date>(getPreviousSunday());
 const popover = ref({
   visibility: 'click',
   placement: 'auto',
-});
+} as const);
 const masks = ref({
   input: 'YYYY년 MM월 DD일',
 });
@@ -153,7 +156,10 @@ const disabledDates = ref([
   },
 ]);
 
-const setToday = () => {
+const maxDate = getPreviousSunday();
+const attendanceDate = ref<Date>(getPreviousSunday());
+
+const setPreviousSunday = () => {
   attendanceDate.value = getPreviousSunday();
 };
 
