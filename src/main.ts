@@ -1,9 +1,9 @@
 import '@/styles/normalize.css';
 import '@/styles/global.css';
-import '@/index.css'; // Tailwind CSS
 import 'primevue/resources/primevue.min.css';
 import 'primevue/resources/themes/saga-blue/theme.css';
 import 'primeicons/primeicons.css';
+import '@/index.css'; // Tailwind CSS
 
 import App from '@/App.vue';
 import router from '@/router';
@@ -17,6 +17,9 @@ import { Chart as _Chart } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 _Chart.register(ChartDataLabels);
 
+import VCalendar from 'v-calendar';
+import 'v-calendar/style.css';
+
 const app = createApp(App);
 
 app.use(router);
@@ -24,6 +27,8 @@ app.use(createPinia());
 
 app.use(PrimeVue);
 app.use(ToastService);
+
+app.use(VCalendar);
 
 import Avatar from 'primevue/avatar';
 import Button from 'primevue/button';

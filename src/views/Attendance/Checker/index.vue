@@ -1,19 +1,59 @@
 <template>
-  <main class="overflow-auto flex flex-col h-full p-4">
-    <CheckerHeader :is-changed="isChanged" @submit="saveAttendances" />
+  <main class="overflow-auto flex flex-col h-full mb-9">
+    <CheckerHeader />
 
-    <Calendar
-      touchUI
-      class="my-4"
-      input-class="text-center"
-      placeholder="날짜를 선택해주세요"
-      v-model="attendanceDate"
-      :max-date="maxDate"
-      :disabledDays="[1, 2, 3, 4, 5, 6]"
-      @date-select="getAttendances"
-    />
+    <div class="flex items-stretch justify-center my-4 gap-2 px-2">
+      <Button
+        class="text-blue-600"
+        icon="pi pi-chevron-left"
+        @click="changeDate('prev')"
+      />
 
-    <div class="flex gap-2 mb-2 text-lg">
+      <VDatePicker
+        v-model="attendanceDate"
+        locale="ko"
+        :popover="popover"
+        :masks="masks"
+        :disabled-dates="disabledDates"
+        :max-date="maxDate"
+        @update:modelValue="getAttendances"
+      >
+        <template #default="{ inputValue, inputEvents }">
+          <div class="relative w-full">
+            <InputText
+              class="w-full pl-10"
+              v-on="inputEvents"
+              :value="inputValue"
+            />
+            <div
+              class="absolute top-3 left-3 flex items-center justify-center pointer-events-none"
+            >
+              <i class="pi pi-calendar text-black" />
+            </div>
+          </div>
+        </template>
+
+        <template #footer>
+          <div class="w-full px-3 pb-3">
+            <button
+              class="bg-blue-600 text-white font-bold w-full px-3 py-1 rounded-md"
+              @click="setToday"
+            >
+              최근 주일 출석체크
+            </button>
+          </div>
+        </template>
+      </VDatePicker>
+
+      <Button
+        class="text-blue-600"
+        icon="pi pi-chevron-right"
+        :disabled="maxDate.toString() === attendanceDate.toString()"
+        @click="changeDate('next')"
+      />
+    </div>
+
+    <div class="flex gap-2 px-4 ml-auto">
       <span
         v-if="
           userData.role.system === 'admin' ||
@@ -32,7 +72,7 @@
 
     <ProgressSpinner v-if="isLoading" />
 
-    <template v-else>
+    <div v-else class="px-4 pt-2 pb-4">
       <CheckerTeachers
         v-if="
           userData.role.system === 'admin' ||
@@ -69,7 +109,14 @@
           />
         </template>
       </Dialog>
-    </template>
+    </div>
+
+    <Button
+      class="absolute left-1 right-1 bottom-1 bg-yellow-300 py-2"
+      label="저장하기"
+      :disabled="!isChanged"
+      @click="saveAttendances"
+    />
   </main>
 </template>
 
@@ -78,6 +125,7 @@ import CheckerHeader from './_partials/CheckerHeader.vue';
 import CheckerStudents from './_partials/CheckerStudents.vue';
 import CheckerTeachers from './_partials/CheckerTeachers.vue';
 
+import dayjs from 'dayjs';
 import { computed, ref, onMounted, toRaw } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/store/user';
@@ -92,6 +140,22 @@ const attendanceStore = useAttendanceStore();
 
 const maxDate = getPreviousSunday();
 const attendanceDate = ref<Date>(getPreviousSunday());
+const popover = ref({
+  visibility: 'click',
+  placement: 'auto',
+});
+const masks = ref({
+  input: 'YYYY년 MM월 DD일',
+});
+const disabledDates = ref([
+  {
+    repeat: { weekdays: [2, 3, 4, 5, 6, 7] },
+  },
+]);
+
+const setToday = () => {
+  attendanceDate.value = getPreviousSunday();
+};
 
 const isLoading = ref(false);
 const attendances = ref<Attendance[]>([]);
@@ -139,7 +203,19 @@ const getAttendances = async () => {
 
 onMounted(async () => await getAttendances());
 
-const saveAttendances = () => {
+const changeDate = async (dir: 'prev' | 'next') => {
+  const date = dayjs(attendanceDate.value);
+
+  if (dir === 'prev') {
+    attendanceDate.value = date.subtract(7, 'd').toDate();
+  } else if (dir === 'next') {
+    attendanceDate.value = date.add(7, 'd').toDate();
+  }
+
+  await getAttendances();
+};
+
+const saveAttendances = async () => {
   try {
     attendances.value.forEach(async (attd) => {
       if (attd.uid) {
@@ -166,14 +242,16 @@ const saveAttendances = () => {
     });
 
     alert('저장되었습니다!');
-    // if (confirm('저장되었습니다! 확인하러 가시겠습니까?')) {
-    //   router.push({
-    //     name: 'AttendanceTrackerDaily',
-    //     params: { job: attendances.value[0].job },
-    //   });
-    // }
+
+    await getAttendances();
   } catch (error) {
     console.log(error);
   }
 };
 </script>
+
+<style>
+.p-inputtext.p-component {
+  @apply p-2;
+}
+</style>

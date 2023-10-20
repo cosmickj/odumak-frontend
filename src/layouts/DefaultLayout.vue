@@ -9,12 +9,10 @@
       </div>
 
       <div
-        v-if="mode === 'development'"
-        class="z-10 opacity-30 absolute inset-0 flex justify-center items-center pointer-events-none"
+        v-if="mode !== 'production'"
+        class="z-10 opacity-30 fixed bottom-4 right-4 pointer-events-none text-4xl"
       >
-        <p class="px-4 py-2 rounded text-4xl -rotate-[24deg]">
-          &copy; app.odumak.xyz
-        </p>
+        {{ mode }}
       </div>
     </div>
   </main>
