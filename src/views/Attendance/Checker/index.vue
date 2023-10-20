@@ -1,6 +1,6 @@
 <template>
   <main class="overflow-auto flex flex-col h-full mb-9">
-    <CheckerHeader />
+    <AppHeader header="출석체크" route-name="HomeView" />
 
     <div class="flex items-stretch justify-center my-4 gap-2 px-2">
       <Button
@@ -121,7 +121,7 @@
 </template>
 
 <script setup lang="ts">
-import CheckerHeader from './_partials/CheckerHeader.vue';
+import AppHeader from '@/components/AppHeader.vue';
 import CheckerStudents from './_partials/CheckerStudents.vue';
 import CheckerTeachers from './_partials/CheckerTeachers.vue';
 
@@ -141,8 +141,6 @@ const router = useRouter();
 const userStore = useUserStore();
 const attendanceStore = useAttendanceStore();
 
-const maxDate = getPreviousSunday();
-const attendanceDate = ref<Date>(getPreviousSunday());
 const popover = ref({
   visibility: 'click',
   placement: 'auto',
@@ -182,6 +180,7 @@ const getAttendances = async () => {
     isLoading.value = true;
 
     const { system, executive } = userData.value.role;
+
     if (system === 'admin' || executive === 'secretary') {
       attendances.value = await attendanceStore.fetchAttendances({
         attendanceDate: attendanceDate.value,
@@ -189,7 +188,10 @@ const getAttendances = async () => {
         department: userData.value.department,
         job: 'teacher',
       });
-    } else if (system === 'user') {
+      return;
+    }
+
+    if (system === 'user') {
       attendances.value = await attendanceStore.fetchAttendancesByGradeGroup({
         attendanceDate: attendanceDate.value,
         church: userData.value.church,
@@ -198,12 +200,13 @@ const getAttendances = async () => {
         group: userData.value.group,
         job: 'student',
       });
+      return;
     }
   } catch (error) {
     console.log(error);
   } finally {
-    isLoading.value = false;
     attendancesClone.value = structuredClone(toRaw(attendances.value));
+    isLoading.value = false;
   }
 };
 

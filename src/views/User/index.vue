@@ -1,27 +1,11 @@
 <template>
   <section v-if="userStore.isAuthReady" class="overflow-auto bg-slate-200">
-    <header class="sticky top-0 left-0 px-1 pt-1 bg-slate-100">
-      <div class="relative flex items-center justify-between">
-        <RouterLink :to="{ name: 'HomeView' }">
-          <Button
-            icon="pi pi-angle-left"
-            class="p-button-text p-button-secondary"
-          />
-        </RouterLink>
+    <AppHeader
+      :header="`${userStore.userData?.name}님의 정보`"
+      route-name="HomeView"
+    />
 
-        <p
-          class="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%]"
-        >
-          {{ userStore.userData?.name }}님의 정보
-        </p>
-
-        <!-- <RouterLink :to="{ name: 'UserEditView' }">
-          <Button class="p-button-text p-button-secondary" label="수정" />
-        </RouterLink> -->
-      </div>
-    </header>
-
-    <div class="bg-slate-100">
+    <div class="bg-slate-100 mt-2">
       <div class="flex flex-col gap-2 px-4 py-3 items-center text-xs">
         <Avatar
           :image="userStore.userData?.profileImage || odumakLogo"
@@ -140,6 +124,8 @@
 </template>
 
 <script setup lang="ts">
+import AppHeader from '@/components/AppHeader.vue';
+
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/store/user';

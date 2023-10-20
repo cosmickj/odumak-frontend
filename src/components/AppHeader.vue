@@ -4,13 +4,18 @@
   >
     <RouterLink
       class="absolute top-1/2 left-2 -translate-y-1/2"
-      :to="{ name: 'HomeView' }"
+      :to="{ name: routeName }"
     >
       <Button rounded icon="pi pi-angle-left" severity="secondary" />
     </RouterLink>
 
-    <span class="text-xl">출석 체크</span>
+    <span class="text-xl">{{ header }}</span>
   </header>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+defineProps<{
+  header: string;
+  routeName: string;
+}>();
+</script>
