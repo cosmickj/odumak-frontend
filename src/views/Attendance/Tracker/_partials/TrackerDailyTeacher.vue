@@ -1,159 +1,169 @@
 <template>
-  <p class="text-xl text-center">교사 일일 출석현황</p>
+  <AppHeader header="교사 일일 출석현황" route-name="HomeView" />
 
-  <Calendar
-    v-model="attendanceDate"
-    class="mt-5"
-    input-class="text-center"
-    placeholder="날짜를 선택해주세요"
-    :max-date="maxDate"
-    :disabled-days="[1, 2, 3, 4, 5, 6]"
-    @date-select="onAttendanceDateSelect"
-  />
+  <div class="p-4">
+    <Calendar
+      v-model="attendanceDate"
+      input-class="text-center"
+      placeholder="날짜를 선택해주세요"
+      :max-date="maxDate"
+      :disabled-days="[1, 2, 3, 4, 5, 6]"
+      @date-select="onAttendanceDateSelect"
+    />
 
-  <div class="flex gap-x-4 py-2 items-center">
-    <div class="flex-2">
-      <SelectButton
-        v-model="layout"
-        unselectable
-        option-label="icon"
-        option-value="value"
-        :options="[
-          { icon: 'pi pi-chart-pie', value: 'chart' },
-          { icon: 'pi pi-bars', value: 'list' },
-          { icon: 'pi pi-table', value: 'grid' },
-        ]"
-      >
-        <template #option="slotProps">
-          <i :class="slotProps.option.icon"></i>
-        </template>
-      </SelectButton>
+    <div class="flex gap-x-4 py-2 items-center">
+      <div class="flex-2">
+        <SelectButton
+          v-model="layout"
+          unselectable
+          option-label="icon"
+          option-value="value"
+          :options="[
+            { icon: 'pi pi-chart-pie', value: 'chart' },
+            { icon: 'pi pi-bars', value: 'list' },
+            { icon: 'pi pi-table', value: 'grid' },
+          ]"
+        >
+          <template #option="slotProps">
+            <i :class="slotProps.option.icon"></i>
+          </template>
+        </SelectButton>
+      </div>
+
+      <div class="flex-1">
+        <InputText
+          v-model="filterKeyword"
+          class="w-full"
+          :disabled="layout === 'chart'"
+          placeholder="검색하기"
+        />
+      </div>
     </div>
 
-    <div class="flex-1">
-      <InputText
-        v-model="filterKeyword"
+    <div class="flex gap-x-2 mb-2">
+      <Dropdown
         class="w-full"
-        :disabled="layout === 'chart'"
-        placeholder="검색하기"
+        show-clear
+        v-model="filterGrade"
+        :options="GRADE_OPTIONS"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="학년"
+      />
+
+      <Dropdown
+        class="w-full"
+        show-clear
+        v-model="filterGroup"
+        :options="GROUP_WITH_NEW_CLASS_OPTIONS"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="학급"
       />
     </div>
-  </div>
 
-  <div class="flex gap-x-2 mb-2">
-    <Dropdown
-      class="w-full"
-      show-clear
-      v-model="filterGrade"
-      :options="GRADE_OPTIONS"
-      optionLabel="label"
-      optionValue="value"
-      placeholder="학년"
-    />
+    <DataView
+      v-if="layout !== 'chart'"
+      data-key="memberUid"
+      paginator
+      paginator-template="PrevPageLink PageLinks NextPageLink RowsPerPageDropdown"
+      :rows="6"
+      :page-link-size="3"
+      :layout="layout"
+      :value="filteredAttendanceData"
+    >
+      <template #empty>
+        <div>해당되는 내용이 없습니다</div>
+      </template>
 
-    <Dropdown
-      class="w-full"
-      show-clear
-      v-model="filterGroup"
-      :options="GROUP_WITH_NEW_CLASS_OPTIONS"
-      optionLabel="label"
-      optionValue="value"
-      placeholder="학급"
-    />
-  </div>
+      <template #list="{ data }">
+        <Card>
+          <template #content>
+            <div class="flex gap-2 items-center justify-between">
+              <div class="text-center">
+                <p class="font-bold">{{ data.name }}</p>
+                <Tag
+                  v-if="data.role.teacher"
+                  :value="formatTeacher(data.role.teacher)"
+                  :style="`background: ${formatTeacherColor(
+                    data.role.teacher
+                  )}`"
+                />
+              </div>
 
-  <DataView
-    v-if="layout !== 'chart'"
-    data-key="memberUid"
-    paginator
-    paginator-template="PrevPageLink PageLinks NextPageLink RowsPerPageDropdown"
-    :rows="6"
-    :page-link-size="3"
-    :layout="layout"
-    :value="filteredAttendanceData"
-  >
-    <template #empty>
-      <div>해당되는 내용이 없습니다</div>
-    </template>
+              <p>{{ data.grade }} - {{ data.group }}</p>
 
-    <template #list="{ data }">
-      <Card>
-        <template #content>
-          <div class="flex gap-2 items-center justify-between">
-            <div class="text-center">
+              <div class="flex gap-2">
+                <Avatar
+                  label="현"
+                  shape="circle"
+                  :class="statusOffline(data.attendance.status)"
+                />
+                <Avatar
+                  label="온"
+                  shape="circle"
+                  :class="statusOnline(data.attendance.status)"
+                />
+                <Avatar
+                  label="결"
+                  shape="circle"
+                  :class="statusAbsence(data.attendance.status)"
+                />
+              </div>
+            </div>
+          </template>
+        </Card>
+      </template>
+
+      <template #grid="{ data }">
+        <Card class="col-span-1">
+          <template #content>
+            <div class="flex flex-col gap-2 items-center justify-between">
+              <Avatar icon="pi pi-user" size="large" shape="circle" />
               <p class="font-bold">{{ data.name }}</p>
+
               <Tag
                 v-if="data.role.teacher"
                 :value="formatTeacher(data.role.teacher)"
                 :style="`background: ${formatTeacherColor(data.role.teacher)}`"
               />
+
+              <span> {{ data.grade }} - {{ data.group }} </span>
+
+              <div class="flex mt-2">
+                <Avatar
+                  label="현"
+                  :class="statusOffline(data.attendance.status)"
+                />
+                <Avatar
+                  label="온"
+                  :class="statusOnline(data.attendance.status)"
+                />
+                <Avatar
+                  label="결"
+                  :class="statusAbsence(data.attendance.status)"
+                />
+              </div>
             </div>
+          </template>
+        </Card>
+      </template>
+    </DataView>
 
-            <p>{{ data.grade }} - {{ data.group }}</p>
-
-            <div class="flex gap-2">
-              <Avatar
-                label="현"
-                shape="circle"
-                :class="statusOffline(data.attendance.status)"
-              />
-              <Avatar
-                label="온"
-                shape="circle"
-                :class="statusOnline(data.attendance.status)"
-              />
-              <Avatar
-                label="결"
-                shape="circle"
-                :class="statusAbsence(data.attendance.status)"
-              />
-            </div>
-          </div>
-        </template>
-      </Card>
-    </template>
-
-    <template #grid="{ data }">
-      <Card class="col-span-1">
-        <template #content>
-          <div class="flex flex-col gap-2 items-center justify-between">
-            <Avatar icon="pi pi-user" size="large" shape="circle" />
-            <p class="font-bold">{{ data.name }}</p>
-
-            <Tag
-              v-if="data.role.teacher"
-              :value="formatTeacher(data.role.teacher)"
-              :style="`background: ${formatTeacherColor(data.role.teacher)}`"
-            />
-
-            <span> {{ data.grade }} - {{ data.group }} </span>
-
-            <div class="flex mt-2">
-              <Avatar
-                label="현"
-                :class="statusOffline(data.attendance.status)"
-              />
-              <Avatar
-                label="온"
-                :class="statusOnline(data.attendance.status)"
-              />
-              <Avatar
-                label="결"
-                :class="statusAbsence(data.attendance.status)"
-              />
-            </div>
-          </div>
-        </template>
-      </Card>
-    </template>
-  </DataView>
-
-  <div v-else>
-    <Chart type="bar" :height="250" :data="chartData" :options="chartOptions" />
+    <div v-else>
+      <Chart
+        type="bar"
+        :height="250"
+        :data="chartData"
+        :options="chartOptions"
+      />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import AppHeader from '@/components/AppHeader.vue';
+
 import { computed, ref, onMounted, watch } from 'vue';
 import { useUserStore } from '@/store/user';
 import { useAttendanceStore } from '@/store/attendance';

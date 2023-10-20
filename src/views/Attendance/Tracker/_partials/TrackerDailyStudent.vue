@@ -1,119 +1,122 @@
 <template>
-  <p class="text-xl text-center">학생 일일 출석현황</p>
+  <AppHeader header="학생 일일 출석현황" route-name="HomeView" />
 
-  <Calendar
-    v-model="attendanceDate"
-    class="mt-5"
-    input-class="text-center"
-    placeholder="날짜를 선택해주세요"
-    :max-date="maxDate"
-    :disabled-days="[1, 2, 3, 4, 5, 6]"
-    @date-select="onAttendanceDateSelect"
-  />
-
-  <div class="mt-2 text-center">
-    <SelectButton
-      unselectable
-      v-model="selectedOption"
-      option-label="label"
-      option-value="value"
-      :options="options"
+  <div class="p-4">
+    <Calendar
+      v-model="attendanceDate"
+      input-class="text-center"
+      placeholder="날짜를 선택해주세요"
+      :max-date="maxDate"
+      :disabled-days="[1, 2, 3, 4, 5, 6]"
+      @date-select="onAttendanceDateSelect"
     />
-  </div>
 
-  <div v-if="selectedOption === 'all'" class="mt-2">
-    <!-- <p class="text-sm"><sup>*</sup> 각 학년반을 클릭해보세요</p> -->
-    <table>
-      <thead>
-        <tr>
-          <th>학년반</th>
-          <th>우리 반 친구들</th>
-          <th>출석</th>
-        </tr>
-      </thead>
+    <div class="mt-2 text-center">
+      <SelectButton
+        unselectable
+        v-model="selectedOption"
+        option-label="label"
+        option-value="value"
+        :options="options"
+      />
+    </div>
 
-      <tbody v-if="isReady">
-        <tr v-for="i in 10" :key="i">
-          <td class="p-2"><Skeleton /></td>
-          <td class="p-2"><Skeleton /></td>
-          <td class="p-2"><Skeleton /></td>
-        </tr>
-      </tbody>
+    <div v-if="selectedOption === 'all'" class="mt-2 pb-12">
+      <!-- <p class="text-sm"><sup>*</sup> 각 학년반을 클릭해보세요</p> -->
+      <table>
+        <thead>
+          <tr>
+            <th>학년반</th>
+            <th>우리 반 친구들</th>
+            <th>출석</th>
+          </tr>
+        </thead>
 
-      <tbody v-else>
-        <tr v-for="(key, i) in Object.keys(attdRecordsForTable)" :key="i">
-          <template v-if="key.endsWith('T')">
-            <td class="col-span-3 px-4 py-2 bg-blue-300">
-              {{ formatTotal(key) }}
-            </td>
+        <tbody v-if="isReady">
+          <tr v-for="i in 10" :key="i">
+            <td class="p-2"><Skeleton /></td>
+            <td class="p-2"><Skeleton /></td>
+            <td class="p-2"><Skeleton /></td>
+          </tr>
+        </tbody>
+
+        <tbody v-else>
+          <tr v-for="(key, i) in Object.keys(attdRecordsForTable)" :key="i">
+            <template v-if="key.endsWith('T')">
+              <td class="col-span-3 px-4 py-2 bg-blue-300">
+                {{ formatTotal(key) }}
+              </td>
+            </template>
+
+            <template v-else>
+              <td class="text-sm">
+                <p class="min-w-[36px]">{{ formatGrade(key) }}</p>
+                <p class="min-w-[36px]">{{ formatGroup(key) }}</p>
+              </td>
+
+              <td class="grid gap-1 xs:grid-cols-4 grid-cols-3 grid-rows-2">
+                <span
+                  v-for="(attd, j) in attdRecordsForTable[key]"
+                  class="whitespace-nowrap text-sm text-center"
+                  :class="paintAttendance(attd.attendance.status)"
+                  :key="j"
+                >
+                  {{ attd.name }}
+                </span>
+              </td>
+
+              <td class="relative">
+                <span
+                  v-if="isChecked(attdRecordsForTable[key])"
+                  class="text-sm text-red-500"
+                >
+                  미입력
+                </span>
+
+                <span v-else class="text-green-600">
+                  {{ countAttendance(attdRecordsForTable[key]) }}
+                </span>
+              </td>
+            </template>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div v-else-if="selectedOption === 'chart'" class="mt-6">
+      <Chart
+        type="bar"
+        :height="250"
+        :data="attdRecordsForChart"
+        :options="chartOptions"
+      />
+    </div>
+
+    <div v-else-if="selectedOption === 'detail'" class="mt-6">
+      <DataTable
+        class="p-datatable-sm"
+        paginator
+        paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
+        currentPageReportTemplate="{first} to {last} of {totalRecords}"
+        :rows="6"
+        :value="rawAttdRecords"
+      >
+        <Column header="이름" field="name" style="width: 25%" />
+        <Column header="학년" field="grade" style="width: 25%" />
+        <Column header="학급" field="group" style="width: 25%" />
+        <Column header="출석" style="width: 25%">
+          <template #body="slotProps">
+            {{ formatAttendanceStatus(slotProps.data.attendance.status) }}
           </template>
-
-          <template v-else>
-            <td class="text-sm">
-              <p class="min-w-[36px]">{{ formatGrade(key) }}</p>
-              <p class="min-w-[36px]">{{ formatGroup(key) }}</p>
-            </td>
-
-            <td class="grid gap-1 xs:grid-cols-4 grid-cols-3 grid-rows-2">
-              <span
-                v-for="(attd, j) in attdRecordsForTable[key]"
-                class="whitespace-nowrap text-sm text-center"
-                :class="paintAttendance(attd.attendance.status)"
-                :key="j"
-              >
-                {{ attd.name }}
-              </span>
-            </td>
-
-            <td class="relative">
-              <span
-                v-if="isChecked(attdRecordsForTable[key])"
-                class="text-sm text-red-500"
-              >
-                미입력
-              </span>
-
-              <span v-else class="text-green-600">
-                {{ countAttendance(attdRecordsForTable[key]) }}
-              </span>
-            </td>
-          </template>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div v-else-if="selectedOption === 'chart'" class="mt-6">
-    <Chart
-      type="bar"
-      :height="250"
-      :data="attdRecordsForChart"
-      :options="chartOptions"
-    />
-  </div>
-
-  <div v-else-if="selectedOption === 'detail'" class="mt-6">
-    <DataTable
-      class="p-datatable-sm"
-      paginator
-      paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
-      currentPageReportTemplate="{first} to {last} of {totalRecords}"
-      :rows="6"
-      :value="rawAttdRecords"
-    >
-      <Column header="이름" field="name" style="width: 25%" />
-      <Column header="학년" field="grade" style="width: 25%" />
-      <Column header="학급" field="group" style="width: 25%" />
-      <Column header="출석" style="width: 25%">
-        <template #body="slotProps">
-          {{ formatAttendanceStatus(slotProps.data.attendance.status) }}
-        </template>
-      </Column>
-    </DataTable>
+        </Column>
+      </DataTable>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import AppHeader from '@/components/AppHeader.vue';
+
 import { computed, onMounted, ref } from 'vue';
 import { useAttendanceStore } from '@/store/attendance';
 import { useUserStore } from '@/store/user';
