@@ -1,97 +1,54 @@
 <template>
   <div class="relative flex py-2 bg-white rounded-lg items-end justify-around">
     <TheNavbarItem icon="pi pi-home" label="홈화면" route-name="HomeView" />
+
     <TheNavbarItem
-      icon="pi pi-plus"
-      label="출석입력"
-      route-name="AttendanceChecker"
-      :class-name="coreBtnState"
+      icon="pi pi-map"
+      label="학생 출석"
+      route-name="AttendanceTrackerDailyStudent"
     />
+
+    <TheNavbarItem
+      icon="pi pi-compass"
+      label="교사 출석"
+      route-name="AttendanceTrackerDailyTeacher"
+    />
+
     <TheNavbarItem icon="pi pi-user" label="내정보" route-name="UserView" />
+
+    <RouterLink class="core" :to="{ name: 'AttendanceChecker' }">
+      <div>출석 체크하기</div>
+    </RouterLink>
   </div>
 </template>
 
 <script setup lang="ts">
 import TheNavbarItem from '@/components/TheNavbarItem.vue';
-import { computed } from 'vue';
-import { useRoute } from 'vue-router';
-
-const route = useRoute();
-
-const coreBtnState = computed(() => {
-  return route.name === 'HomeView' ? 'core' : 'core core--hidden';
-});
 </script>
 
 <style scoped>
 :deep(.core) {
+  @apply text-xl py-2;
   position: absolute;
-  top: -3rem;
-  left: 50%;
+  top: calc((44px + 4px) * -1);
+  left: 8px;
   display: flex;
-  width: 5rem;
-  height: 5rem;
-  border-radius: 9999px;
-  border: 8px solid rgb(241, 245, 249);
-  background: rgb(37 99 235);
-  color: rgb(255 255 255);
   align-items: center;
   justify-content: center;
-  transform: translate(-50%, 0);
+  width: calc(100% - 16px);
+  border-radius: 8px;
+  background: rgb(37 99 235);
+  color: rgb(255 255 255);
   transition: all 0.5s ease;
-  animation: grow 0.8s;
-}
-:deep(.core::before) {
-  content: '';
-  position: absolute;
-  top: 38px;
-  left: -22px;
-  width: 20px;
-  height: 20px;
-  border-top-right-radius: 20px;
-  background: transparent;
-  box-shadow: 0 -10px 0 0 rgba(241 245 249);
-  transition: all 0.5s ease;
-  transition-delay: 0.3s;
-}
-:deep(.core::after) {
-  content: '';
-  position: absolute;
-  top: 38px;
-  right: -22px;
-  width: 20px;
-  height: 20px;
-  border-top-left-radius: 20px;
-  background: transparent;
-  box-shadow: 0 -10px 0 0 rgb(241 245 249);
-  transition: all 0.5s ease;
-  transition-delay: 0.3s;
+  animation: soaring 0.8s ease-in-out;
 }
 
-:deep(.core--hidden) {
-  top: 0.5rem;
-  width: 3.5rem;
-  height: 3.5rem;
-  border: 2px solid rgb(96, 165, 250);
-}
-:deep(.core--hidden + *) {
-  display: none;
-}
-:deep(.core--hidden::before),
-:deep(.core--hidden::after) {
-  box-shadow: unset;
-  transition: none;
-}
-
-@keyframes grow {
+@keyframes soaring {
   0% {
-    transform: translate(-50%, 0) scale(0);
+    transform: translate(0, 100%);
   }
   50% {
-    transform: translate(-50%, 0) scale(1.3);
-  }
-  100% {
-    transform: translate(-50%, 0) scale(1);
+    transform: translate(0, -20%);
   }
 }
 </style>

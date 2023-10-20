@@ -1,5 +1,5 @@
 <template>
-  <section class="pb-10">
+  <section class="pb-12">
     <div class="flex items-center justify-between p-4">
       <div>
         <p class="text-sm">{{ todayString }}</p>
