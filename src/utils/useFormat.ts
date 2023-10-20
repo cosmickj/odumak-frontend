@@ -66,3 +66,13 @@ const AttendanceStatusMap = {
 
 export const formatAttendanceStatus = (s: AttendanceStatus) =>
   s ? AttendanceStatusMap[s] : '-';
+
+export const formatDDay = (remainedHours: number) => {
+  if (remainedHours < 0) return '-';
+
+  const hours = Math.ceil(remainedHours);
+  if (hours === 0) {
+    return 'D-day';
+  }
+  return `D-${hours}`;
+};

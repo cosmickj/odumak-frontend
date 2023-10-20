@@ -50,6 +50,7 @@ import Password from 'primevue/password';
 import ProgressSpinner from 'primevue/progressspinner';
 import RadioButton from 'primevue/radiobutton';
 import SelectButton from 'primevue/selectbutton';
+import Sidebar from 'primevue/sidebar';
 import Skeleton from 'primevue/skeleton';
 import Steps from 'primevue/steps';
 import Tag from 'primevue/tag';
@@ -82,6 +83,7 @@ app
   .component('ProgressSpinner', ProgressSpinner)
   .component('RadioButton', RadioButton)
   .component('SelectButton', SelectButton)
+  .component('Sidebar', Sidebar)
   .component('Skeleton', Skeleton)
   .component('Steps', Steps)
   .component('Tag', Tag)
