@@ -1,5 +1,5 @@
 <template>
-  <div class="flex-1 flex flex-col justify-between">
+  <div class="flex flex-1 flex-col justify-between">
     <div class="flex flex-col gap-6">
       <div class="flex flex-col">
         <label for="church" class="mb-1">교회 이름</label>
@@ -26,7 +26,7 @@
       </div>
     </div>
 
-    <div class="flex gap-2 justify-between">
+    <div class="flex justify-between gap-2">
       <Button
         raised
         rounded
@@ -37,24 +37,17 @@
         @click="prevPage"
       />
 
-      <Button
-        raised
-        rounded
-        icon="pi pi-chevron-right"
-        iconPos="right"
-        label="다음으로"
-        @click="nextPage"
-      />
+      <Button raised rounded icon="pi pi-chevron-right" iconPos="right" label="다음으로" @click="nextPage" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { storeToRefs } from 'pinia';
-import { useWaypointStore } from '@/store/waypoint';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
+import { storeToRefs } from 'pinia';
+import { computed } from 'vue';
+import { useWaypointStore } from '@/store/waypoint';
 import { CHURCH_OPTIONS, DEPARTMENT_OPTIONS } from '@/constants/common';
 
 const emit = defineEmits(['prev', 'next']);

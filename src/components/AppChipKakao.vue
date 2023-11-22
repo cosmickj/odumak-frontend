@@ -1,5 +1,3 @@
 <template>
-  <span class="px-2 py-1 bg-[#fee500] text-white text-sm rounded">
-    KAKAO 계정
-  </span>
+  <span class="rounded bg-[#fee500] px-2 py-1 text-sm text-white"> KAKAO 계정 </span>
 </template>

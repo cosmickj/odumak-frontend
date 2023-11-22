@@ -1,5 +1,5 @@
 <template>
-  <div class="flex mb-6 justify-between">
+  <div class="mb-6 flex justify-between">
     <div class="flex gap-x-3">
       <Button
         class="p-button-success p-button-sm"
@@ -17,11 +17,7 @@
       />
     </div>
 
-    <Button
-      class="p-button-help p-button-sm"
-      icon="pi pi-external-link"
-      label="내보내기"
-    />
+    <Button class="p-button-help p-button-sm" icon="pi pi-external-link" label="내보내기" />
   </div>
 
   <DataTable
@@ -59,11 +55,7 @@
           label="승인 완료"
           class="p-button-text p-button-sm p-button-success"
         />
-        <Button
-          v-else
-          label="승인 대기중"
-          class="p-button-text p-button-sm p-button-help"
-        />
+        <Button v-else label="승인 대기중" class="p-button-text p-button-sm p-button-help" />
       </template>
     </Column>
     <Column header="가입 거절 사유" field="rejectedReason" />

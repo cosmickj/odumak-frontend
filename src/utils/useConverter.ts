@@ -1,12 +1,12 @@
 // https://firebase.google.com/docs/reference/js/firestore_.firestoredataconverter.md
-import { Attendance, Member, User } from '@/models';
-import type { AttendanceData, MemberData, UserData } from '@/types';
 import type {
   DocumentData,
   FirestoreDataConverter,
   QueryDocumentSnapshot,
   WithFieldValue,
 } from 'firebase/firestore';
+import type { AttendanceData, MemberData, UserData } from '@/types';
+import { Attendance, Member, User } from '@/models';
 
 const attendanceConverter: FirestoreDataConverter<Attendance> = {
   toFirestore: (attd: WithFieldValue<Attendance>): DocumentData => {

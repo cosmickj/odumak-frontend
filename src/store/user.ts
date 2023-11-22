@@ -1,6 +1,4 @@
-import { defineStore } from 'pinia';
-
-import { auth, db } from '@/firebase/config';
+import { deleteUser, signOut } from 'firebase/auth';
 import {
   deleteDoc,
   doc,
@@ -12,18 +10,14 @@ import {
   updateDoc,
   where,
 } from 'firebase/firestore';
-import { deleteUser, signOut } from 'firebase/auth';
-
-import { useMemberStore } from './member';
+import { defineStore } from 'pinia';
+import type { MemberData } from '@/types';
+import type { CreateSingleParams, FetchSingleParams, ModifySingle } from '@/types/store';
+import { Member, User } from '@/models';
+import { auth, db } from '@/firebase/config';
 import { userConverter } from '@/utils/useConverter';
 import { COLLECTION } from '@/constants/common';
-import { Member, User } from '@/models';
-import type { MemberData } from '@/types';
-import type {
-  CreateSingleParams,
-  FetchSingleParams,
-  ModifySingle,
-} from '@/types/store';
+import { useMemberStore } from './member';
 
 interface UserStoreState {
   userData: User | null;

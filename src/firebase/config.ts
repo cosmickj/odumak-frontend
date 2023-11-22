@@ -1,8 +1,7 @@
-import { COLLECTION } from '@/constants/common';
-
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { collection, getFirestore } from 'firebase/firestore';
+import { COLLECTION } from '@/constants/common';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,

@@ -1,5 +1,3 @@
 <template>
-  <span class="px-2 py-1 bg-[#2db400] text-white text-sm rounded">
-    NAVER 계정
-  </span>
+  <span class="rounded bg-[#2db400] px-2 py-1 text-sm text-white"> NAVER 계정 </span>
 </template>

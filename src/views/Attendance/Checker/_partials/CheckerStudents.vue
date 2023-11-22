@@ -1,7 +1,7 @@
 <template>
   <div
     v-for="(member, i) in attendances"
-    class="flex mt-[-1px] p-2 border border-slate-300 items-center justify-around checker-students-cont"
+    class="checker-students-cont mt-[-1px] flex items-center justify-around border border-slate-300 p-2"
     :key="i"
   >
     <span>{{ member.name }}</span>

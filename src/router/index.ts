@@ -1,7 +1,7 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-import { useUserStore } from '@/store/user';
-import { auth } from '@/firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
+import { RouteRecordRaw, createRouter, createWebHistory } from 'vue-router';
+import { auth } from '@/firebase/config';
+import { useUserStore } from '@/store/user';
 
 // prettier-ignore
 const routes: Array<RouteRecordRaw> = [

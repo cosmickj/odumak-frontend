@@ -1,5 +1,5 @@
 <template>
-  <div class="flex-1 flex flex-col justify-between">
+  <div class="flex flex-1 flex-col justify-between">
     <div class="flex flex-col gap-6">
       <div class="flex flex-col">
         <label for="role" class="mb-1">담임 여부</label>
@@ -16,19 +16,14 @@
       <div v-if="role.teacher !== 'common'">
         <p class="mb-1">새친구 학급이신가요?</p>
 
-        <div
-          class="flex gap-4 p-2 bg-white border border-[#ced4da] rounded-[3px] items-center"
-        >
+        <div class="flex items-center gap-4 rounded-[3px] border border-[#ced4da] bg-white p-2">
           <InputSwitch v-model="isNewFriendClassTeacher" />
           <p v-if="isNewFriendClassTeacher" class="text-[#2196f3]">맞아요</p>
           <p v-else class="text-[#ced4da]">아니요</p>
         </div>
       </div>
 
-      <div
-        v-if="role.teacher !== 'common' && !isNewFriendClassTeacher"
-        class="flex flex-col"
-      >
+      <div v-if="role.teacher !== 'common' && !isNewFriendClassTeacher" class="flex flex-col">
         <p class="mb-1">담당 학년</p>
         <Dropdown
           v-model="grade"
@@ -40,10 +35,7 @@
         />
       </div>
 
-      <div
-        v-if="role.teacher !== 'common' && !isNewFriendClassTeacher"
-        class="flex flex-col"
-      >
+      <div v-if="role.teacher !== 'common' && !isNewFriendClassTeacher" class="flex flex-col">
         <p class="mb-1">담당 학급</p>
         <Dropdown
           v-model="group"
@@ -67,27 +59,20 @@
         @click="prevPage"
       />
 
-      <Button
-        raised
-        rounded
-        icon="pi pi-chevron-right"
-        iconPos="right"
-        label="다음으로"
-        @click="nextPage"
-      />
+      <Button raised rounded icon="pi pi-chevron-right" iconPos="right" label="다음으로" @click="nextPage" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import useVuelidate from '@vuelidate/core';
+import { required, requiredIf } from '@vuelidate/validators';
+import { storeToRefs } from 'pinia';
 import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useMemberStore } from '@/store/member';
-import useVuelidate from '@vuelidate/core';
-import { required, requiredIf } from '@vuelidate/validators';
-import { GRADE_OPTIONS, GROUP_OPTIONS, TEACHER_ROLE } from '@/constants/common';
-import { storeToRefs } from 'pinia';
 import { useWaypointStore } from '@/store/waypoint';
+import { GRADE_OPTIONS, GROUP_OPTIONS, TEACHER_ROLE } from '@/constants/common';
 
 const emit = defineEmits(['prev', 'next']);
 

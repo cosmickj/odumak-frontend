@@ -1,5 +1,5 @@
 <template>
-  <div class="flex-1 flex flex-col justify-between">
+  <div class="flex flex-1 flex-col justify-between">
     <div>
       <div class="text-lg">
         <p v-if="role.teacher === 'common'">
@@ -10,31 +10,20 @@
 
         <p v-else>
           아래 이름 중
-          <span class="text-orange-400">
-            {{ church }} {{ department }} {{ grade }}학년 {{ group }}반
-          </span>
+          <span class="text-orange-400"> {{ church }} {{ department }} {{ grade }}학년 {{ group }}반 </span>
           어린이를 모두 선택 후 제출하기를 눌러주세요. (최대 3명)
         </p>
       </div>
 
       <div class="grid grid-cols-3 gap-3 py-4">
         <template v-if="!candidates.length">
-          <Skeleton
-            v-for="i in 9"
-            class="aspect-square"
-            style="height: unset"
-            :key="i"
-          />
+          <Skeleton v-for="i in 9" class="aspect-square" style="height: unset" :key="i" />
         </template>
 
         <template v-else>
-          <div
-            v-for="(candidate, i) in candidates"
-            ref="toggleButtonRefs"
-            :key="i"
-          >
+          <div v-for="(candidate, i) in candidates" ref="toggleButtonRefs" :key="i">
             <ToggleButton
-              class="flex aspect-square rounded-md text-xs xs:text-base items-center justify-center shadow"
+              class="flex aspect-square items-center justify-center rounded-md text-xs shadow xs:text-base"
               v-model="candidate.checked"
               :on-label="candidate.name"
               :off-label="candidate.name"
@@ -77,15 +66,15 @@
 </template>
 
 <script setup lang="ts">
+import { faker } from '@faker-js/faker/locale/ko';
+import { storeToRefs } from 'pinia';
 import { onActivated, onDeactivated, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { getCurrentUser } from '@/router';
-import { storeToRefs } from 'pinia';
-import { useUserStore } from '@/store/user';
-import { useMemberStore } from '@/store/member';
-import { useWaypointStore } from '@/store/waypoint';
-import { faker } from '@faker-js/faker/locale/ko';
 import type { Member } from '@/models';
+import { useMemberStore } from '@/store/member';
+import { useUserStore } from '@/store/user';
+import { useWaypointStore } from '@/store/waypoint';
+import { getCurrentUser } from '@/router';
 
 const router = useRouter();
 const userStore = useUserStore();

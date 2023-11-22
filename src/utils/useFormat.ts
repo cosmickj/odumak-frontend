@@ -1,4 +1,4 @@
-import { Gender, MemberData, Role, AttendanceStatus } from '@/types';
+import { AttendanceStatus, Gender, MemberData, Role } from '@/types';
 
 export const formatClassName = (grade: string, group: string) => {
   if (grade === '0' || group === '0') {
@@ -32,10 +32,7 @@ export const formatGroupHeader = ({ grade, group, job, role }: MemberData) => {
     if (role.teacher === 'common') {
       return '비담임교사';
     } else {
-      return (
-        `${grade !== '0' ? grade + '학년 ' : ''}` +
-        `${group !== '0' ? group + '반' : '새친구 학급'}`
-      );
+      return `${grade !== '0' ? grade + '학년 ' : ''}` + `${group !== '0' ? group + '반' : '새친구 학급'}`;
     }
   }
   return;
@@ -55,8 +52,7 @@ const TeacherColorMap = {
   assistant: '#B4846C',
   common: '#B7C4CF',
 };
-export const formatTeacherColor = (t: Role['teacher']) =>
-  t ? TeacherColorMap[t] : '';
+export const formatTeacherColor = (t: Role['teacher']) => (t ? TeacherColorMap[t] : '');
 
 const AttendanceStatusMap = {
   offline: '현장',
@@ -64,8 +60,7 @@ const AttendanceStatusMap = {
   absence: '결석',
 };
 
-export const formatAttendanceStatus = (s: AttendanceStatus) =>
-  s ? AttendanceStatusMap[s] : '-';
+export const formatAttendanceStatus = (s: AttendanceStatus) => (s ? AttendanceStatusMap[s] : '-');
 
 export const formatDDay = (remainedHours: number) => {
   if (remainedHours < 0) return '-';

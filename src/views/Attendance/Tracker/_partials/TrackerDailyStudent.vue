@@ -43,7 +43,7 @@
         <tbody v-else>
           <tr v-for="(key, i) in Object.keys(attdRecordsForTable)" :key="i">
             <template v-if="key.endsWith('T')">
-              <td class="col-span-3 px-4 py-2 bg-blue-300">
+              <td class="col-span-3 bg-blue-300 px-4 py-2">
                 {{ formatTotal(key) }}
               </td>
             </template>
@@ -54,10 +54,10 @@
                 <p class="min-w-[36px]">{{ formatGroup(key) }}</p>
               </td>
 
-              <td class="grid gap-1 xs:grid-cols-4 grid-cols-3 grid-rows-2">
+              <td class="grid grid-cols-3 grid-rows-2 gap-1 xs:grid-cols-4">
                 <span
                   v-for="(attd, j) in attdRecordsForTable[key]"
-                  class="whitespace-nowrap text-sm text-center"
+                  class="whitespace-nowrap text-center text-sm"
                   :class="paintAttendance(attd.attendance.status)"
                   :key="j"
                 >
@@ -66,12 +66,7 @@
               </td>
 
               <td class="relative">
-                <span
-                  v-if="isChecked(attdRecordsForTable[key])"
-                  class="text-sm text-red-500"
-                >
-                  미입력
-                </span>
+                <span v-if="isChecked(attdRecordsForTable[key])" class="text-sm text-red-500"> 미입력 </span>
 
                 <span v-else class="text-green-600">
                   {{ countAttendance(attdRecordsForTable[key]) }}
@@ -84,12 +79,7 @@
     </div>
 
     <div v-else-if="selectedOption === 'chart'" class="mt-6">
-      <Chart
-        type="bar"
-        :height="250"
-        :data="attdRecordsForChart"
-        :options="chartOptions"
-      />
+      <Chart type="bar" :height="250" :data="attdRecordsForChart" :options="chartOptions" />
     </div>
 
     <div v-else-if="selectedOption === 'detail'" class="mt-6">
@@ -115,15 +105,14 @@
 </template>
 
 <script setup lang="ts">
-import AppHeader from '@/components/AppHeader.vue';
-
 import { computed, onMounted, ref } from 'vue';
+import type { AttendanceStatus } from '@/types';
+import type { Attendance } from '@/models';
 import { useAttendanceStore } from '@/store/attendance';
 import { useUserStore } from '@/store/user';
 import { getPreviousSunday } from '@/utils/useCalendar';
 import { formatAttendanceStatus } from '@/utils/useFormat';
-import type { Attendance } from '@/models';
-import type { AttendanceStatus } from '@/types';
+import AppHeader from '@/components/AppHeader.vue';
 
 const attendanceStore = useAttendanceStore();
 const userStore = useUserStore();
@@ -162,18 +151,21 @@ const getAttendanceRecords = async () => {
 };
 
 const convertAttdRecordsForTable = (attdRecords: Attendance[]) => {
-  const organizedRecords = attdRecords.reduce((acc, attd) => {
-    const classKey = `${attd.grade}-${attd.group}`;
-    const totalKey = `${attd.grade}-T`;
+  const organizedRecords = attdRecords.reduce(
+    (acc, attd) => {
+      const classKey = `${attd.grade}-${attd.group}`;
+      const totalKey = `${attd.grade}-T`;
 
-    acc[classKey] = acc[classKey] || [];
-    acc[classKey].push(attd);
+      acc[classKey] = acc[classKey] || [];
+      acc[classKey].push(attd);
 
-    acc[totalKey] = acc[totalKey] || [];
-    acc[totalKey].push(attd);
+      acc[totalKey] = acc[totalKey] || [];
+      acc[totalKey].push(attd);
 
-    return acc;
-  }, {} as { [key: string]: Attendance[] });
+      return acc;
+    },
+    {} as { [key: string]: Attendance[] }
+  );
 
   return Object.fromEntries(Object.entries(organizedRecords).sort());
 };
@@ -181,9 +173,7 @@ const convertAttdRecordsForTable = (attdRecords: Attendance[]) => {
 const convertAttdRecordsForChart = (attdRecords: Attendance[]) => {
   const rawData = attdRecords.reduce(
     (total, record) => {
-      const status = record.attendance.status
-        ? record.attendance.status
-        : 'empty';
+      const status = record.attendance.status ? record.attendance.status : 'empty';
       const currCount = total[status] ?? 0;
 
       return { ...total, [status]: currCount + 1 };
@@ -203,12 +193,7 @@ const convertAttdRecordsForChart = (attdRecords: Attendance[]) => {
           'rgba(255, 64, 50, 0.2)',
           'rgba(158, 158, 158, 0.2)',
         ],
-        borderColor: [
-          'rgb(76, 175, 80)',
-          'rgb(251, 192, 45)',
-          'rgb(255, 64, 50)',
-          'rgb(158, 158, 158)',
-        ],
+        borderColor: ['rgb(76, 175, 80)', 'rgb(251, 192, 45)', 'rgb(255, 64, 50)', 'rgb(158, 158, 158)'],
         borderWidth: 1,
         borderRadius: 3,
       },
@@ -218,9 +203,7 @@ const convertAttdRecordsForChart = (attdRecords: Attendance[]) => {
 
 const countAttendance = (records: Attendance[]) => {
   return records.filter(
-    (record) =>
-      record.attendance.status === 'offline' ||
-      record.attendance.status === 'online'
+    (record) => record.attendance.status === 'offline' || record.attendance.status === 'online'
   ).length;
 };
 
@@ -247,9 +230,7 @@ const isChecked = (records: Attendance[]) => {
 };
 
 const paintAttendance = (status: AttendanceStatus) => {
-  return status === 'offline' || status === 'online'
-    ? 'text-sky-700 font-semibold'
-    : '';
+  return status === 'offline' || status === 'online' ? 'text-sky-700 font-semibold' : '';
 };
 
 const chartOptions = {

@@ -15,13 +15,13 @@
     <div class="flex flex-col gap-2">
       <div
         v-if="userStore.userData?.role.system === 'admin'"
-        class="cursor-pointer rounded-lg shadow-sm bg-gradient-to-r from-blue-400 to-emerald-400"
+        class="cursor-pointer rounded-lg bg-gradient-to-r from-blue-400 to-emerald-400 shadow-sm"
         @click="router.push({ name: 'AdminStudent' })"
       >
-        <div class="z-10 relative flex px-4 py-2 items-center justify-between">
+        <div class="relative z-10 flex items-center justify-between px-4 py-2">
           <div>
             <p class="text-lg">관리자 페이지 이동하기</p>
-            <p class="text-gray-800 text-sm">
+            <p class="text-sm text-gray-800">
               {{ userStore.userData?.church }}
               {{ userStore.userData?.department }}
             </p>
@@ -32,28 +32,26 @@
       </div>
 
       <div>
-        <div
-          class="z-10 relative flex p-2 rounded-lg bg-white items-center shadow-lg"
-        >
+        <div class="relative z-10 flex items-center rounded-lg bg-white p-2 shadow-lg">
           <Avatar :image="bgChild" size="xlarge" shape="circle" />
 
           <div class="ml-6">
             <p class="text-xl">학생 출석부</p>
-            <p class="text-gray-500 text-sm">
+            <p class="text-sm text-gray-500">
               {{ userStore.userData?.church }}
               {{ userStore.userData?.department }}
             </p>
           </div>
         </div>
 
-        <div class="flex justify-center translate-y-[-5px]">
+        <div class="flex translate-y-[-5px] justify-center">
           <Button
-            class="w-full rounded-none rounded-bl-lg p-button-blue"
+            class="p-button-blue w-full rounded-none rounded-bl-lg"
             label="일일 현황"
             @click="move('AttendanceTrackerDailyStudent')"
           />
           <Button
-            class="w-full rounded-none rounded-br-lg p-button-yellow"
+            class="p-button-yellow w-full rounded-none rounded-br-lg"
             label="누적 현황"
             @click="move('AttendanceTrackerTotal', 'student')"
           />
@@ -61,28 +59,26 @@
       </div>
 
       <div>
-        <div
-          class="z-10 relative flex p-2 rounded-lg bg-white items-center shadow-lg"
-        >
+        <div class="relative z-10 flex items-center rounded-lg bg-white p-2 shadow-lg">
           <Avatar :image="bgMan" size="xlarge" shape="circle" />
 
           <div class="ml-6">
             <p class="text-xl">교사 출석부</p>
-            <p class="text-gray-500 text-sm">
+            <p class="text-sm text-gray-500">
               {{ userStore.userData?.church }}
               {{ userStore.userData?.department }}
             </p>
           </div>
         </div>
 
-        <div class="flex justify-center translate-y-[-5px]">
+        <div class="flex translate-y-[-5px] justify-center">
           <Button
-            class="w-full rounded-none rounded-bl-lg p-button-blue"
+            class="p-button-blue w-full rounded-none rounded-bl-lg"
             label="일일 현황"
             @click="move('AttendanceTrackerDailyTeacher')"
           />
           <Button
-            class="w-full rounded-none rounded-br-lg p-button-yellow"
+            class="p-button-yellow w-full rounded-none rounded-br-lg"
             label="누적 현황"
             @click="move('AttendanceTrackerTotal', 'teacher')"
           />
@@ -93,14 +89,13 @@
 </template>
 
 <script setup lang="ts">
+import { useRouter } from 'vue-router';
+import type { Job } from '@/types';
+import { useUserStore } from '@/store/user';
 import AppChipKakao from '@/components/AppChipKakao.vue';
 import AppChipNaver from '@/components/AppChipNaver.vue';
 import bgChild from '@/assets/images/bg-home-child.png';
 import bgMan from '@/assets/images/bg-home-man.png';
-
-import { useRouter } from 'vue-router';
-import { useUserStore } from '@/store/user';
-import type { Job } from '@/types';
 
 const userStore = useUserStore();
 

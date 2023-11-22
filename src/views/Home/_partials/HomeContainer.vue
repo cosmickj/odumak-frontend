@@ -9,14 +9,14 @@
 
         <span
           v-if="userStore.userData?.provider === 'naver'"
-          class="px-2 py-1 bg-[#2db400] text-white uppercase text-sm rounded"
+          class="rounded bg-[#2db400] px-2 py-1 text-sm uppercase text-white"
         >
           {{ userStore.userData?.provider }} 연동
         </span>
 
         <span
           v-else-if="userStore.userData?.provider === 'kakao'"
-          class="px-2 py-1 bg-[#fee500] text-black uppercase text-sm rounded"
+          class="rounded bg-[#fee500] px-2 py-1 text-sm uppercase text-black"
         >
           {{ userStore.userData?.provider }} 연동
         </span>
@@ -54,13 +54,13 @@
 
       <RouterLink
         v-if="userStore.userData?.role.system === 'admin'"
-        class="bg-purple-300 text-purple-700 rounded-lg"
+        class="rounded-lg bg-purple-300 text-purple-700"
         :to="{ name: 'AdminStudent' }"
       >
-        <div class="relative w-full h-full px-4 py-6 text-lg">
+        <div class="relative h-full w-full px-4 py-6 text-lg">
           <p class="text-sm">이동하기</p>
           <p class="font-bold">관리자 페이지</p>
-          <span class="absolute top-6 right-4">
+          <span class="absolute right-4 top-6">
             <i class="pi pi-angle-right"></i>
           </span>
         </div>
@@ -95,12 +95,12 @@
         <TransitionGroup name="list">
           <div
             v-for="(student, idx) in newStudents.body"
-            class="m-3 first:mt-0 p-3 rounded-lg bg-slate-100"
+            class="m-3 rounded-lg bg-slate-100 p-3 first:mt-0"
             :key="student.id"
           >
             <p class="mb-4 font-bold">{{ idx + 1 }}.</p>
 
-            <div class="flex gap-x-5 mb-2">
+            <div class="mb-2 flex gap-x-5">
               <div class="flex-1">
                 <InputText
                   v-model="student.name"
@@ -110,14 +110,9 @@
                 />
               </div>
 
-              <div class="flex-1 flex flex-col">
-                <div class="flex-1 flex gap-1 items-center">
-                  <RadioButton
-                    v-model="student.gender"
-                    input-id="male"
-                    name="gender"
-                    value="male"
-                  />
+              <div class="flex flex-1 flex-col">
+                <div class="flex flex-1 items-center gap-1">
+                  <RadioButton v-model="student.gender" input-id="male" name="gender" value="male" />
                   <label for="male">남</label>
 
                   <RadioButton
@@ -132,7 +127,7 @@
               </div>
             </div>
 
-            <div class="flex gap-x-5 mb-2">
+            <div class="mb-2 flex gap-x-5">
               <div class="flex-1">
                 <Dropdown
                   v-model="student.grade"
@@ -158,16 +153,13 @@
               </div>
             </div>
 
-            <div class="flex mb-2">
+            <div class="mb-2 flex">
               <div class="flex-1">
                 <div class="flex items-center justify-between">
                   <span>생년월일</span>
-                  <div class="flex gap-2 items-center justify-between">
+                  <div class="flex items-center justify-between gap-2">
                     <span>나중에 입력</span>
-                    <InputSwitch
-                      v-model="student.birthLater"
-                      @change="toggleBirth(idx)"
-                    />
+                    <InputSwitch v-model="student.birthLater" @change="toggleBirth(idx)" />
                   </div>
                 </div>
 
@@ -183,7 +175,7 @@
               </div>
             </div>
 
-            <div class="flex mb-2">
+            <div class="mb-2 flex">
               <div class="flex-1">
                 <p>초등부 첫 출석 주일</p>
                 <Calendar
@@ -198,30 +190,14 @@
               </div>
             </div>
 
-            <div class="flex gap-x-5 mb-2">
+            <div class="mb-2 flex gap-x-5">
               <div class="flex-1">
-                <InputText
-                  v-model="student.remark"
-                  class="w-full"
-                  placeholder="비고"
-                />
+                <InputText v-model="student.remark" class="w-full" placeholder="비고" />
               </div>
             </div>
-            <div class="flex gap-2 mt-6 justify-center">
-              <Button
-                outlined
-                size="small"
-                severity="help"
-                label="복사"
-                @click="copyNewStudent(idx)"
-              />
-              <Button
-                outlined
-                size="small"
-                severity="success"
-                label="추가"
-                @click="addNewStudent"
-              />
+            <div class="mt-6 flex justify-center gap-2">
+              <Button outlined size="small" severity="help" label="복사" @click="copyNewStudent(idx)" />
+              <Button outlined size="small" severity="success" label="추가" @click="addNewStudent" />
               <Button
                 outlined
                 size="small"
@@ -236,14 +212,8 @@
       </template>
 
       <template #footer>
-        <div class="flex flex-wrap gap-2 justify-end">
-          <Button
-            raised
-            size="small"
-            severity="warning"
-            label="제출하기"
-            @click="submitNewStudents"
-          />
+        <div class="flex flex-wrap justify-end gap-2">
+          <Button raised size="small" severity="warning" label="제출하기" @click="submitNewStudents" />
         </div>
       </template>
     </Dialog>
@@ -251,16 +221,16 @@
 </template>
 
 <script setup lang="ts">
-import HomeMenu from './HomeMenu.vue';
-
+import { useVuelidate } from '@vuelidate/core';
+import { helpers, required } from '@vuelidate/validators';
 import { computed, reactive, ref } from 'vue';
+import { Member } from '@/models';
 import { useMemberStore } from '@/store/member';
 import { useUserStore } from '@/store/user';
-import { useVuelidate } from '@vuelidate/core';
-import { required, helpers } from '@vuelidate/validators';
 import { getPreviousSunday } from '@/utils/useCalendar';
 import { GRADE_OPTIONS, GROUP_OPTIONS } from '@/constants/common';
-import { Member } from '@/models';
+import HomeMenu from './HomeMenu.vue';
+
 // import type { NewStudent } from '@/types';
 
 const memberStore = useMemberStore();

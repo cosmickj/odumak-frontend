@@ -7,6 +7,22 @@
   "trailingComma": "es5",
   "bracketSpacing": true,
   "jsxBracketSameLine": false,
+  "importOrder": [
+    "^@/types/?(.*)$",
+    "^@/models/?(.*)$",
+    "^@/api/?(.*)$",
+    "^@/firebase/?(.*)$",
+    "^@/store/?(.*)$",
+    "^@/utils/?(.*)$",
+    "^@/constants/?(.*)$",
+    "^@/components/?(.*)$",
+    "^@/views/?(.*)$",
+    "^@/assets/?(.*)$",
+    "^@/layouts/?(.*)$",
+    "^@/router/?(.*)$",
+    "^@/styles/?(.*)$",
+    "^[./]"
+  ],
   "plugins": [
     "@trivago/prettier-plugin-sort-imports",
     "prettier-plugin-tailwindcss"

@@ -41,9 +41,9 @@
 </template>
 
 <script setup lang="ts">
-import { useUserStore } from '@/store/user';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
+import { useUserStore } from '@/store/user';
 
 const router = useRouter();
 const { isAcceptDialogVisible } = storeToRefs(useUserStore());

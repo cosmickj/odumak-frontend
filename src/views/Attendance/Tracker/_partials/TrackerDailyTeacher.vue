@@ -11,7 +11,7 @@
       @date-select="onAttendanceDateSelect"
     />
 
-    <div class="flex gap-x-4 py-2 items-center">
+    <div class="flex items-center gap-x-4 py-2">
       <div class="flex-2">
         <SelectButton
           v-model="layout"
@@ -40,7 +40,7 @@
       </div>
     </div>
 
-    <div class="flex gap-x-2 mb-2">
+    <div class="mb-2 flex gap-x-2">
       <Dropdown
         class="w-full"
         show-clear
@@ -79,36 +79,22 @@
       <template #list="{ data }">
         <Card>
           <template #content>
-            <div class="flex gap-2 items-center justify-between">
+            <div class="flex items-center justify-between gap-2">
               <div class="text-center">
                 <p class="font-bold">{{ data.name }}</p>
                 <Tag
                   v-if="data.role.teacher"
                   :value="formatTeacher(data.role.teacher)"
-                  :style="`background: ${formatTeacherColor(
-                    data.role.teacher
-                  )}`"
+                  :style="`background: ${formatTeacherColor(data.role.teacher)}`"
                 />
               </div>
 
               <p>{{ data.grade }} - {{ data.group }}</p>
 
               <div class="flex gap-2">
-                <Avatar
-                  label="현"
-                  shape="circle"
-                  :class="statusOffline(data.attendance.status)"
-                />
-                <Avatar
-                  label="온"
-                  shape="circle"
-                  :class="statusOnline(data.attendance.status)"
-                />
-                <Avatar
-                  label="결"
-                  shape="circle"
-                  :class="statusAbsence(data.attendance.status)"
-                />
+                <Avatar label="현" shape="circle" :class="statusOffline(data.attendance.status)" />
+                <Avatar label="온" shape="circle" :class="statusOnline(data.attendance.status)" />
+                <Avatar label="결" shape="circle" :class="statusAbsence(data.attendance.status)" />
               </div>
             </div>
           </template>
@@ -118,7 +104,7 @@
       <template #grid="{ data }">
         <Card class="col-span-1">
           <template #content>
-            <div class="flex flex-col gap-2 items-center justify-between">
+            <div class="flex flex-col items-center justify-between gap-2">
               <Avatar icon="pi pi-user" size="large" shape="circle" />
               <p class="font-bold">{{ data.name }}</p>
 
@@ -130,19 +116,10 @@
 
               <span> {{ data.grade }} - {{ data.group }} </span>
 
-              <div class="flex mt-2">
-                <Avatar
-                  label="현"
-                  :class="statusOffline(data.attendance.status)"
-                />
-                <Avatar
-                  label="온"
-                  :class="statusOnline(data.attendance.status)"
-                />
-                <Avatar
-                  label="결"
-                  :class="statusAbsence(data.attendance.status)"
-                />
+              <div class="mt-2 flex">
+                <Avatar label="현" :class="statusOffline(data.attendance.status)" />
+                <Avatar label="온" :class="statusOnline(data.attendance.status)" />
+                <Avatar label="결" :class="statusAbsence(data.attendance.status)" />
               </div>
             </div>
           </template>
@@ -151,28 +128,19 @@
     </DataView>
 
     <div v-else>
-      <Chart
-        type="bar"
-        :height="250"
-        :data="chartData"
-        :options="chartOptions"
-      />
+      <Chart type="bar" :height="250" :data="chartData" :options="chartOptions" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import AppHeader from '@/components/AppHeader.vue';
-
-import { computed, ref, onMounted, watch } from 'vue';
-import { useUserStore } from '@/store/user';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useAttendanceStore } from '@/store/attendance';
+import { useUserStore } from '@/store/user';
 import { getPreviousSunday } from '@/utils/useCalendar';
 import { formatTeacher, formatTeacherColor } from '@/utils/useFormat';
-import {
-  GRADE_OPTIONS,
-  GROUP_WITH_NEW_CLASS_OPTIONS,
-} from '@/constants/common';
+import { GRADE_OPTIONS, GROUP_WITH_NEW_CLASS_OPTIONS } from '@/constants/common';
+import AppHeader from '@/components/AppHeader.vue';
 
 const userStore = useUserStore();
 const attendanceStore = useAttendanceStore();
@@ -218,10 +186,7 @@ const filteredAttendanceData = computed(() => {
   }
   if (filterKeyword.value) {
     _attendanceData = _attendanceData.filter((d) => {
-      return (
-        d.name.startsWith(filterKeyword.value) ||
-        d.name.includes(filterKeyword.value)
-      );
+      return d.name.startsWith(filterKeyword.value) || d.name.includes(filterKeyword.value);
     });
   }
 
@@ -235,9 +200,7 @@ const totalCount = ref(0);
 const setChartData = () => {
   const rawData = filteredAttendanceData.value.reduce(
     (total, record) => {
-      const status = record.attendance.status
-        ? record.attendance.status
-        : 'empty';
+      const status = record.attendance.status ? record.attendance.status : 'empty';
       const currCount = total[status] ?? 0;
 
       return { ...total, [status]: currCount + 1 };
@@ -260,12 +223,7 @@ const setChartData = () => {
           'rgba(255, 64, 50, 0.2)',
           'rgba(158, 158, 158, 0.2)',
         ],
-        borderColor: [
-          'rgb(76, 175, 80)',
-          'rgb(251, 192, 45)',
-          'rgb(255, 64, 50)',
-          'rgb(158, 158, 158)',
-        ],
+        borderColor: ['rgb(76, 175, 80)', 'rgb(251, 192, 45)', 'rgb(255, 64, 50)', 'rgb(158, 158, 158)'],
         borderWidth: 1,
         borderRadius: 3,
       },

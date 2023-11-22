@@ -2,7 +2,7 @@
   <Teleport to="#modal">
     <div
       v-if="isMobile"
-      class="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-slate-600/50"
+      class="fixed left-0 top-0 flex h-full w-full items-center justify-center bg-slate-600/50"
     >
       <Card style="width: 90vw">
         <template #content>
@@ -14,16 +14,8 @@
 
         <template #footer>
           <div class="text-right">
-            <Button
-              class="p-button-secondary p-button-text"
-              label="홈화면으로 돌아가기"
-              @click="moveToHome"
-            />
-            <Button
-              class="p-button-info"
-              label="계속 이용하기"
-              @click="keepGoing"
-            />
+            <Button class="p-button-secondary p-button-text" label="홈화면으로 돌아가기" @click="moveToHome" />
+            <Button class="p-button-info" label="계속 이용하기" @click="keepGoing" />
           </div>
         </template>
       </Card>

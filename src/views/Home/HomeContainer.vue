@@ -3,17 +3,13 @@
     <div class="flex items-center justify-between p-4">
       <div>
         <p class="text-sm">{{ todayString }}</p>
-        <p class="text-lg break-keep">
+        <p class="break-keep text-lg">
           안녕하세요, <strong>{{ userData?.name }}</strong
           >&nbsp;선생님
         </p>
       </div>
 
-      <Avatar
-        :image="userData?.profileImage"
-        class="bg-slate-200 rounded-lg"
-        size="xlarge"
-      />
+      <Avatar :image="userData?.profileImage" class="rounded-lg bg-slate-200" size="xlarge" />
     </div>
 
     <div class="px-4">
@@ -28,15 +24,13 @@
     </div>
 
     <div class="py-2">
-      <p class="bg-slate-200 px-2 py-1">
-        {{ targetMonth }}월 {{ userData?.department }} 생일자
-      </p>
+      <p class="bg-slate-200 px-2 py-1">{{ targetMonth }}월 {{ userData?.department }} 생일자</p>
 
-      <div class="flex flex-col p-2 items-center">
+      <div class="flex flex-col items-center p-2">
         <template v-if="upcomingBirthday.length">
           <div
             v-for="({ customData }, i) in upcomingBirthday"
-            class="px-4 py-3 bg-white rounded-2xl shadow w-full mb-2 flex items-center"
+            class="mb-2 flex w-full items-center rounded-2xl bg-white px-4 py-3 shadow"
             :class="[
               { 'opacity-30': customData.isBirthdayPassed },
               { 'bg-yellow-400': customData.hoursUntilBirthday === 0 },
@@ -45,7 +39,7 @@
           >
             <Avatar
               icon="pi pi-user"
-              class="text-white mr-4"
+              class="mr-4 text-white"
               :class="[
                 { 'bg-blue-500': customData.gender === 'male' },
                 { 'bg-pink-500': customData.gender === 'female' },
@@ -53,8 +47,8 @@
               shape="circle"
             />
 
-            <div class="flex-1 flex items-center">
-              <p class="text-gray-600 min-w-[74px]">
+            <div class="flex flex-1 items-center">
+              <p class="min-w-[74px] text-gray-600">
                 {{ formatClassName(customData.grade, customData.group) }}
               </p>
 
@@ -62,7 +56,7 @@
                 {{ customData.name }}
               </p>
 
-              <div class="font-bold min-w-[46px] ml-auto">
+              <div class="ml-auto min-w-[46px] font-bold">
                 {{ formatDDay(customData.hoursUntilBirthday) }}
               </div>
             </div>
@@ -70,26 +64,17 @@
         </template>
 
         <template v-else>
-          <div class="px-4 py-3 bg-white w-full mb-2 rounded-2xl text-center">
+          <div class="mb-2 w-full rounded-2xl bg-white px-4 py-3 text-center">
             올해 {{ targetMonth }}월 생일은 이미 지났어요!
           </div>
         </template>
 
-        <span
-          class="underline text-center cursor-pointer"
-          @click="visibleBottom = true"
-        >
-          모두 보기
-        </span>
+        <span class="cursor-pointer text-center underline" @click="visibleBottom = true"> 모두 보기 </span>
       </div>
     </div>
 
-    <Sidebar
-      v-model:visible="visibleBottom"
-      position="bottom"
-      class="h-[80svh] max-w-sm bg-slate-100"
-    >
-      <h3 class="text-xl font-semibold mb-4 absolute top-5 left-4">
+    <Sidebar v-model:visible="visibleBottom" position="bottom" class="h-[80svh] max-w-sm bg-slate-100">
+      <h3 class="absolute left-4 top-5 mb-4 text-xl font-semibold">
         전체 {{ targetMonth }}월 생일자 - {{ attributes?.length }}명
       </h3>
 
@@ -98,7 +83,7 @@
 
         <div
           v-for="(member, i) in aggregatedByBirthday[birthday]"
-          class="px-4 py-3 bg-white rounded-2xl shadow w-full mb-2 flex items-center"
+          class="mb-2 flex w-full items-center rounded-2xl bg-white px-4 py-3 shadow"
           :class="[
             { 'opacity-30': member.isBirthdayPassed },
             { 'bg-yellow-400': member.hoursUntilBirthday === 0 },
@@ -107,7 +92,7 @@
         >
           <Avatar
             icon="pi pi-user"
-            class="text-white mr-4"
+            class="mr-4 text-white"
             :class="[
               { 'bg-blue-500': member.gender === 'male' },
               { 'bg-pink-500': member.gender === 'female' },
@@ -115,7 +100,7 @@
             shape="circle"
           />
 
-          <div class="flex-1 flex items-center justify-between">
+          <div class="flex flex-1 items-center justify-between">
             <div>
               <p>{{ member.name }}</p>
               <p class="text-sm">
@@ -134,14 +119,13 @@
 </template>
 
 <script setup lang="ts">
+import { faker } from '@faker-js/faker/locale/ko';
+import dayjs from 'dayjs';
+import { Calendar } from 'v-calendar';
+import 'v-calendar/style.css';
 import { computed, ref } from 'vue';
 import { useUserStore } from '@/store/user';
 import { formatClassName, formatDDay } from '@/utils/useFormat';
-
-import dayjs from 'dayjs';
-import { faker } from '@faker-js/faker/locale/ko';
-import { Calendar } from 'v-calendar';
-import 'v-calendar/style.css';
 
 type Attributes = InstanceType<typeof Calendar>['$props']['attributes'];
 
@@ -197,21 +181,20 @@ const attributes = ref<Attributes>(setFakeAttrs(targetMonth.value));
 const upcomingBirthday = computed(() => {
   if (!attributes.value) return [];
 
-  return attributes.value
-    .filter((attr) => !attr.customData.isBirthdayPassed)
-    .slice(0, 3);
+  return attributes.value.filter((attr) => !attr.customData.isBirthdayPassed).slice(0, 3);
 });
 
 const aggregatedByBirthday = computed(() => {
   if (!attributes.value) return {};
 
-  const result = attributes.value.reduce((acc, { customData }) => {
-    const { birthday } = customData;
-    acc[birthday]
-      ? acc[birthday].push(customData)
-      : (acc[birthday] = [customData]);
-    return acc;
-  }, {} as { [key: string]: any[] });
+  const result = attributes.value.reduce(
+    (acc, { customData }) => {
+      const { birthday } = customData;
+      acc[birthday] ? acc[birthday].push(customData) : (acc[birthday] = [customData]);
+      return acc;
+    },
+    {} as { [key: string]: any[] }
+  );
 
   return result;
 });

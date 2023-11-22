@@ -8,7 +8,8 @@
     "build": "vue-tsc --noEmit && vite build",
     "build-only": "vite build",
     "type-check": "vue-tsc --noEmit",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "format": "prettier --write src/**/*.{js,ts,vue}"
   },
   "dependencies": {
     "@faker-js/faker": "^8.2.0",

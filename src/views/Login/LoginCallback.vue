@@ -1,16 +1,16 @@
 <template>
-  <div class="h-screen flex items-center justify-center">
+  <div class="flex h-screen items-center justify-center">
     <ProgressSpinner stroke-width="3" animation-duration="1.5s" />
   </div>
 </template>
 
 <script setup lang="ts">
+import { signInWithCustomToken } from '@firebase/auth';
+import { useCookies } from '@vueuse/integrations/useCookies';
 import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { useUserStore } from '@/store/user';
-import { useCookies } from '@vueuse/integrations/useCookies';
 import { auth } from '@/firebase/config';
-import { signInWithCustomToken } from '@firebase/auth';
+import { useUserStore } from '@/store/user';
 
 const cookies = useCookies(['odumak_key']);
 const router = useRouter();

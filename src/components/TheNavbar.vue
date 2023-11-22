@@ -1,18 +1,10 @@
 <template>
-  <div class="relative flex py-2 bg-white rounded-lg items-end justify-around">
+  <div class="relative flex items-end justify-around rounded-lg bg-white py-2">
     <TheNavbarItem icon="pi pi-home" label="홈화면" route-name="HomeView" />
 
-    <TheNavbarItem
-      icon="pi pi-map"
-      label="학생 출석"
-      route-name="AttendanceTrackerDailyStudent"
-    />
+    <TheNavbarItem icon="pi pi-map" label="학생 출석" route-name="AttendanceTrackerDailyStudent" />
 
-    <TheNavbarItem
-      icon="pi pi-compass"
-      label="교사 출석"
-      route-name="AttendanceTrackerDailyTeacher"
-    />
+    <TheNavbarItem icon="pi pi-compass" label="교사 출석" route-name="AttendanceTrackerDailyTeacher" />
 
     <TheNavbarItem icon="pi pi-user" label="내정보" route-name="UserView" />
 
@@ -28,7 +20,7 @@ import TheNavbarItem from '@/components/TheNavbarItem.vue';
 
 <style scoped>
 :deep(.core) {
-  @apply text-xl py-2;
+  @apply py-2 text-xl;
   position: absolute;
   top: calc((44px + 4px) * -1);
   left: 8px;

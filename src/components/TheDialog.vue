@@ -1,9 +1,6 @@
 <template>
-  <div
-    v-if="visible"
-    class="z-10 fixed inset-0 flex flex-col bg-gray-100 text-black"
-  >
-    <div class="flex px-4 pt-4 justify-between">
+  <div v-if="visible" class="fixed inset-0 z-10 flex flex-col bg-gray-100 text-black">
+    <div class="flex justify-between px-4 pt-4">
       <slot name="header"></slot>
 
       <Button
@@ -13,7 +10,7 @@
       />
     </div>
 
-    <div class="overflow-auto flex-1 gap-4 p-4 items-start">
+    <div class="flex-1 items-start gap-4 overflow-auto p-4">
       <slot></slot>
     </div>
   </div>

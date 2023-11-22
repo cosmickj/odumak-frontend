@@ -1,8 +1,8 @@
 <template>
-  <main class="overflow-auto flex flex-col h-full mb-9">
+  <main class="mb-9 flex h-full flex-col overflow-auto">
     <AppHeader header="출석체크" route-name="HomeView" />
 
-    <div class="flex items-stretch justify-center my-4 gap-2 px-2">
+    <div class="my-4 flex items-stretch justify-center gap-2 px-2">
       <!-- class="text-blue-600" -->
       <Button rounded icon="pi pi-chevron-left" @click="changeDate('prev')" />
 
@@ -17,14 +17,8 @@
       >
         <template #default="{ inputValue, inputEvents }">
           <div class="relative flex-1">
-            <InputText
-              class="w-full pl-10"
-              v-on="inputEvents"
-              :value="inputValue"
-            />
-            <div
-              class="absolute top-3 left-3 flex items-center justify-center pointer-events-none"
-            >
+            <InputText class="w-full pl-10" v-on="inputEvents" :value="inputValue" />
+            <div class="pointer-events-none absolute left-3 top-3 flex items-center justify-center">
               <i class="pi pi-calendar text-black" />
             </div>
           </div>
@@ -33,7 +27,7 @@
         <template #footer>
           <div class="w-full px-3 pb-3">
             <button
-              class="bg-blue-600 text-white font-bold w-full px-3 py-1 rounded-md"
+              class="w-full rounded-md bg-blue-600 px-3 py-1 font-bold text-white"
               @click="setPreviousSunday"
             >
               최근 주일로 이동하기
@@ -50,13 +44,8 @@
       />
     </div>
 
-    <div class="flex gap-2 px-4 ml-auto">
-      <span
-        v-if="
-          userData.role.system === 'admin' ||
-          userData.role.executive === 'secretary'
-        "
-      >
+    <div class="ml-auto flex gap-2 px-4">
+      <span v-if="userData.role.system === 'admin' || userData.role.executive === 'secretary'">
         {{ userData.church }} {{ userData.department }} 교사
       </span>
 
@@ -69,21 +58,15 @@
 
     <ProgressSpinner v-if="isLoading" />
 
-    <div v-else class="px-4 pt-2 pb-4">
+    <div v-else class="px-4 pb-4 pt-2">
       <CheckerTeachers
-        v-if="
-          userData.role.system === 'admin' ||
-          userData.role.executive === 'secretary'
-        "
+        v-if="userData.role.system === 'admin' || userData.role.executive === 'secretary'"
         :attendances="attendances"
         :attendance-date="attendanceDate"
       />
 
       <CheckerStudents
-        v-else-if="
-          userData.role.teacher === 'head' ||
-          userData.role.teacher === 'assistant'
-        "
+        v-else-if="userData.role.teacher === 'head' || userData.role.teacher === 'assistant'"
         :attendances="attendances"
       />
 
@@ -109,7 +92,7 @@
     </div>
 
     <Button
-      class="absolute left-1 right-1 bottom-1 bg-yellow-300 py-2"
+      class="absolute bottom-1 left-1 right-1 bg-yellow-300 py-2"
       label="저장하기"
       :disabled="!isChanged"
       @click="saveAttendances"
@@ -118,21 +101,19 @@
 </template>
 
 <script setup lang="ts">
-import AppHeader from '@/components/AppHeader.vue';
-import CheckerStudents from './_partials/CheckerStudents.vue';
-import CheckerTeachers from './_partials/CheckerTeachers.vue';
-
 import dayjs from 'dayjs';
 import { DatePicker } from 'v-calendar';
 import 'v-calendar/style.css';
-
-import { computed, ref, onMounted, toRaw } from 'vue';
+import { computed, onMounted, ref, toRaw } from 'vue';
 import { useRouter } from 'vue-router';
-import { useUserStore } from '@/store/user';
+import type { Attendance } from '@/models';
 import { useAttendanceStore } from '@/store/attendance';
+import { useUserStore } from '@/store/user';
 import { getPreviousSunday } from '@/utils/useCalendar';
 import { formatClassName } from '@/utils/useFormat';
-import type { Attendance } from '@/models';
+import AppHeader from '@/components/AppHeader.vue';
+import CheckerStudents from './_partials/CheckerStudents.vue';
+import CheckerTeachers from './_partials/CheckerTeachers.vue';
 
 const router = useRouter();
 const userStore = useUserStore();

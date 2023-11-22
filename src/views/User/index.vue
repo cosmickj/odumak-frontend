@@ -1,23 +1,16 @@
 <template>
   <section v-if="userStore.isAuthReady" class="overflow-auto bg-slate-200">
-    <AppHeader
-      :header="`${userStore.userData?.name}님의 정보`"
-      route-name="HomeView"
-    />
+    <AppHeader :header="`${userStore.userData?.name}님의 정보`" route-name="HomeView" />
 
-    <div class="bg-slate-100 mt-2">
-      <div class="flex flex-col gap-2 px-4 py-3 items-center text-xs">
-        <Avatar
-          :image="userStore.userData?.profileImage || odumakLogo"
-          size="xlarge"
-          shape="circle"
-        />
+    <div class="mt-2 bg-slate-100">
+      <div class="flex flex-col items-center gap-2 px-4 py-3 text-xs">
+        <Avatar :image="userStore.userData?.profileImage || odumakLogo" size="xlarge" shape="circle" />
 
         <span v-if="userStore.userData?.isAccepted">승인 완료</span>
         <span v-else class="text-red-600">승인 대기</span>
       </div>
 
-      <div class="flex px-4 py-2 items-center justify-between">
+      <div class="flex items-center justify-between px-4 py-2">
         <span class="mr-3">이름</span>
 
         <span>{{ userStore.userData?.name }}</span>
@@ -33,23 +26,23 @@
         <span>{{ userStore.userData?.phone || '없음' }}</span>
       </div> -->
 
-      <div class="flex px-4 py-2 items-center justify-between">
+      <div class="flex items-center justify-between px-4 py-2">
         <span>이메일</span>
         <span>{{ userStore.userData?.email }}</span>
       </div>
 
-      <div class="flex px-4 py-2 items-center justify-between">
+      <div class="flex items-center justify-between px-4 py-2">
         <span>가입 방식</span>
         <span
           v-if="userStore.userData?.provider === 'naver'"
-          class="px-2 py-1 bg-[#2db400] text-white uppercase text-sm rounded"
+          class="rounded bg-[#2db400] px-2 py-1 text-sm uppercase text-white"
         >
           {{ userStore.userData?.provider }} 연동
         </span>
 
         <span
           v-else-if="userStore.userData?.provider === 'kakao'"
-          class="px-2 py-1 bg-[#fee500] text-black uppercase text-sm rounded"
+          class="rounded bg-[#fee500] px-2 py-1 text-sm uppercase text-black"
         >
           {{ userStore.userData?.provider }} 연동
         </span>
@@ -57,18 +50,18 @@
     </div>
 
     <div class="mt-3 bg-slate-100">
-      <div class="flex px-4 py-2 font-semibold items-center justify-between">
+      <div class="flex items-center justify-between px-4 py-2 font-semibold">
         <span>소속 정보</span>
       </div>
 
-      <div class="flex px-4 py-2 items-center justify-between">
+      <div class="flex items-center justify-between px-4 py-2">
         <span>교회 이름</span>
         <span :class="{ 'text-gray-400': isNan(church) }">
           {{ church }}
         </span>
       </div>
 
-      <div class="flex px-4 py-2 items-center justify-between">
+      <div class="flex items-center justify-between px-4 py-2">
         <span>봉사 부서</span>
         <span :class="{ 'text-gray-400': isNan(department) }">
           {{ department }}
@@ -79,7 +72,7 @@
         <p class="h-[1px] bg-slate-200"></p>
       </div>
 
-      <div class="flex px-4 py-2 items-center justify-between">
+      <div class="flex items-center justify-between px-4 py-2">
         <span>담임 여부</span>
         <Tag
           :value="formatTeacher(userData?.role.teacher)"
@@ -88,14 +81,14 @@
       </div>
 
       <template v-if="userData?.role.teacher !== 'common'">
-        <div class="flex px-4 py-2 items-center justify-between">
+        <div class="flex items-center justify-between px-4 py-2">
           <span>담당 학년</span>
           <span :class="{ 'text-gray-400': isNan(grade) }">
             {{ grade }}
           </span>
         </div>
 
-        <div class="flex px-4 py-2 items-center justify-between">
+        <div class="flex items-center justify-between px-4 py-2">
           <span>담당 학급</span>
           <span :class="{ 'text-gray-400': isNan(group) }">
             {{ group }}
@@ -105,17 +98,14 @@
     </div>
 
     <div class="mt-3 bg-slate-100 text-red-500">
-      <div
-        class="flex px-4 py-2 items-center justify-between cursor-pointer"
-        @click="logoutUser"
-      >
+      <div class="flex cursor-pointer items-center justify-between px-4 py-2" @click="logoutUser">
         <span>로그아웃</span>
         <i class="pi pi-sign-out"></i>
       </div>
     </div>
 
-    <div class="mt-3 mb-6 bg-slate-100">
-      <div class="flex px-4 py-2 items-center justify-between">
+    <div class="mb-6 mt-3 bg-slate-100">
+      <div class="flex items-center justify-between px-4 py-2">
         <span>탈퇴하기</span>
         <i class="pi pi-angle-right cursor-pointer" @click="deleteUser"></i>
       </div>
@@ -124,14 +114,12 @@
 </template>
 
 <script setup lang="ts">
-import AppHeader from '@/components/AppHeader.vue';
-
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/store/user';
 import { formatTeacher, formatTeacherColor } from '@/utils/useFormat';
 import { NAN_TEXT } from '@/constants/common';
-
+import AppHeader from '@/components/AppHeader.vue';
 import odumakLogo from '@/assets/images/logo-transparent.png';
 
 const router = useRouter();

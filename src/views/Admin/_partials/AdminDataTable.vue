@@ -62,19 +62,11 @@
 
       <Column field="gender" header="성별" style="min-width: 4.2rem">
         <template #body="{ data: { gender } }">
-          <Tag
-            :value="formatGender(gender)"
-            :severity="gender === 'male' ? 'primary' : 'danger'"
-          />
+          <Tag :value="formatGender(gender)" :severity="gender === 'male' ? 'primary' : 'danger'" />
         </template>
       </Column>
 
-      <Column
-        v-if="columnState?.role"
-        field="role"
-        header="직무"
-        style="min-width: 6rem"
-      >
+      <Column v-if="columnState?.role" field="role" header="직무" style="min-width: 6rem">
         <template #body="{ data: { role } }">
           <Tag
             :value="formatTeacher(role.teacher)"
@@ -88,12 +80,7 @@
       <Column field="group" header="학급" style="min-width: 4.2rem" />
 
       <!-- FIXME: 생일 형식이 달라 에러 발생-->
-      <Column
-        v-if="columnState?.birth"
-        field="birth"
-        header="생일"
-        style="min-width: 9rem"
-      >
+      <Column v-if="columnState?.birth" field="birth" header="생일" style="min-width: 9rem">
         <template #body="slotProps">
           <span>{{ formatDate(slotProps.data.birth) }}</span>
         </template>
@@ -113,7 +100,7 @@
             text
             severity="info"
             icon="pi pi-pencil"
-            class="w-6 aspect-square"
+            class="aspect-square w-6"
             @click="showEditDialog(slotProps.data)"
           />
         </template>
@@ -125,14 +112,11 @@
 </template>
 
 <script setup lang="ts">
-import AdminDataTableHeader from './AdminDataTableHeader.vue';
-import AdminDataTableAdd from './AdminDataTableAdd.vue';
-import AdminDataTableDelete from './AdminDataTableDelete.vue';
-import AdminDataTableEdit from './AdminDataTableEdit.vue';
-
-import { computed, onMounted, ref, toRaw, watch } from 'vue';
 import { useVuelidate } from '@vuelidate/core';
 import { helpers, required, requiredIf } from '@vuelidate/validators';
+import type DataTable from 'primevue/datatable';
+import { computed, onMounted, ref, toRaw, watch } from 'vue';
+import type { Member } from '@/models';
 import {
   formatDate,
   formatGender,
@@ -140,8 +124,10 @@ import {
   formatTeacher,
   formatTeacherColor,
 } from '@/utils/useFormat';
-import type { Member } from '@/models';
-import type DataTable from 'primevue/datatable';
+import AdminDataTableAdd from './AdminDataTableAdd.vue';
+import AdminDataTableDelete from './AdminDataTableDelete.vue';
+import AdminDataTableEdit from './AdminDataTableEdit.vue';
+import AdminDataTableHeader from './AdminDataTableHeader.vue';
 
 const emit = defineEmits(['add', 'edit', 'delete']);
 
@@ -204,9 +190,7 @@ const addOneMember = () => {
 };
 
 const copyOneMember = (i: number) => {
-  addingMembers.value.body.push(
-    structuredClone(toRaw(addingMembers.value.body[i]))
-  );
+  addingMembers.value.body.push(structuredClone(toRaw(addingMembers.value.body[i])));
 };
 
 const deleteOneMember = (i: number) => {
@@ -225,9 +209,7 @@ const resetAllMembers = () => {
   addingMembers.value.body.push(structuredClone(addingMemberTemp));
 };
 
-const handleAddingTeacherChange = (
-  newValue: Omit<Member, 'uid' | 'createdAt'>
-) => {
+const handleAddingTeacherChange = (newValue: Omit<Member, 'uid' | 'createdAt'>) => {
   if (newValue.isNewFriendClass) {
     newValue.grade = '0';
     newValue.group = '0';
@@ -243,9 +225,7 @@ const handleAddingTeacherChange = (
   }
 };
 
-const handleAddingStudentChange = (
-  newValue: Omit<Member, 'uid' | 'createdAt'>
-) => {
+const handleAddingStudentChange = (newValue: Omit<Member, 'uid' | 'createdAt'>) => {
   if (newValue.isNewFriendClass) {
     newValue.group = '0';
   } else if (newValue.group === '0') {
