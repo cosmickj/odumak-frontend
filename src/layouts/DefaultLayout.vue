@@ -1,16 +1,14 @@
 <template>
-  <main class="h-[100svh] flex items-center justify-center sm:bg-gray-200">
-    <div
-      class="overflow-hidden relative w-full sm:w-[360px] h-full sm:max-h-[640px] bg-slate-100 shadow-lg"
-    >
-      <div class="flex flex-col h-full">
-        <RouterView class="overflow-auto flex-1" />
+  <main class="flex h-[100svh] items-center justify-center sm:bg-gray-200">
+    <div class="relative h-full w-full overflow-hidden sm:max-h-[932px] sm:max-w-[430px] sm:shadow-lg">
+      <div class="flex h-full flex-col">
+        <RouterView class="flex-1 overflow-auto" />
         <RouterView name="GlobalNavbar" />
       </div>
 
       <div
         v-if="mode !== 'production'"
-        class="z-10 opacity-30 fixed bottom-4 right-4 pointer-events-none text-4xl"
+        class="pointer-events-none fixed bottom-4 right-4 z-10 text-4xl opacity-30"
       >
         {{ mode }}
       </div>
@@ -43,9 +41,9 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
-import { storeToRefs } from 'pinia';
 import { useUserStore } from '@/store/user';
+import { storeToRefs } from 'pinia';
+import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const { isAcceptDialogVisible } = storeToRefs(useUserStore());
