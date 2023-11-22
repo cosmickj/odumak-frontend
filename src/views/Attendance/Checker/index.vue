@@ -3,11 +3,8 @@
     <AppHeader header="출석체크" route-name="HomeView" />
 
     <div class="flex items-stretch justify-center my-4 gap-2 px-2">
-      <Button
-        class="text-blue-600"
-        icon="pi pi-chevron-left"
-        @click="changeDate('prev')"
-      />
+      <!-- class="text-blue-600" -->
+      <Button rounded icon="pi pi-chevron-left" @click="changeDate('prev')" />
 
       <DatePicker
         v-model="attendanceDate"
@@ -19,7 +16,7 @@
         @update:modelValue="getAttendances"
       >
         <template #default="{ inputValue, inputEvents }">
-          <div class="relative w-full">
+          <div class="relative flex-1">
             <InputText
               class="w-full pl-10"
               v-on="inputEvents"
