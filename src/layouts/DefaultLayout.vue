@@ -1,6 +1,8 @@
 <template>
   <main class="flex h-[100svh] items-center justify-center sm:bg-gray-200">
-    <div class="relative h-full w-full overflow-hidden sm:max-h-[932px] sm:max-w-[430px] sm:shadow-lg">
+    <div
+      class="relative h-full w-full overflow-hidden bg-slate-100 sm:max-h-[740px] sm:max-w-[360px] sm:rounded-2xl sm:shadow-lg"
+    >
       <div class="flex h-full flex-col">
         <RouterView class="flex-1 overflow-auto" />
         <RouterView name="GlobalNavbar" />

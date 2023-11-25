@@ -1,18 +1,37 @@
 <template>
-  <section class="p-4">
-    <header class="mb-8 text-xl">
-      <p>안녕하세요!</p>
-      <div class="flex items-center justify-between">
-        <span>
-          <strong>{{ userStore.userData?.name }}</strong> 선생님
-        </span>
+  <section class="p-6">
+    <header class="mb-6 flex">
+      <Avatar :image="userStore.userData?.profileImage" size="large" shape="circle" />
 
-        <AppChipNaver v-if="userStore.userData?.provider === 'naver'" />
-        <AppChipKakao v-else-if="userStore.userData?.provider === 'kakao'" s />
+      <div class="ml-2 sm:ml-4">
+        <p class="text-sm text-gray-600">안녕하세요,</p>
+        <p class="text-lg">
+          <strong>{{ userStore.userData?.name }}</strong> 선생님!
+        </p>
       </div>
+
+      <Avatar
+        class="ml-auto cursor-pointer bg-slate-300"
+        icon="pi pi-bars"
+        size="large"
+        @click="menuVisible = true"
+      />
     </header>
 
-    <div class="flex flex-col gap-2">
+    <Sidebar class="p-sidebar-home" v-model:visible="menuVisible" position="right">
+      <Menu class="p-menu-home w-full text-lg" :model="items">
+        <template #item="{ item, props }">
+          <RouterLink v-slot="{ href, navigate }" :to="item.route">
+            <a v-bind="props.action" class="bg-slate-300" :href="href" @click="navigate">
+              <span :class="item.icon" />
+              <span class="ml-4">{{ item.label }}</span>
+            </a>
+          </RouterLink>
+        </template>
+      </Menu>
+    </Sidebar>
+
+    <div class="flex flex-col gap-4">
       <div
         v-if="userStore.userData?.role.system === 'admin'"
         class="cursor-pointer rounded-lg bg-gradient-to-r from-blue-400 to-emerald-400 shadow-sm"
@@ -31,8 +50,8 @@
         </div>
       </div>
 
-      <div>
-        <div class="relative z-10 flex items-center rounded-lg bg-white p-2 shadow-lg">
+      <div class="rounded-lg bg-white p-4 shadow-lg">
+        <div class="flex items-center pb-2">
           <Avatar :image="bgChild" size="xlarge" shape="circle" />
 
           <div class="ml-6">
@@ -44,22 +63,23 @@
           </div>
         </div>
 
-        <div class="flex translate-y-[-5px] justify-center">
+        <div class="flex gap-3">
           <Button
-            class="p-button-blue w-full rounded-none rounded-bl-lg"
+            class="p-button-blue flex-1 rounded-md py-1 text-white"
             label="일일 현황"
             @click="move('AttendanceTrackerDailyStudent')"
           />
           <Button
-            class="p-button-yellow w-full rounded-none rounded-br-lg"
+            disabled
+            class="p-button-yellow flex-1 rounded-md py-1"
             label="누적 현황"
             @click="move('AttendanceTrackerTotal', 'student')"
           />
         </div>
       </div>
 
-      <div>
-        <div class="relative z-10 flex items-center rounded-lg bg-white p-2 shadow-lg">
+      <div class="rounded-lg bg-white p-4 shadow-lg">
+        <div class="flex items-center pb-2">
           <Avatar :image="bgMan" size="xlarge" shape="circle" />
 
           <div class="ml-6">
@@ -71,14 +91,15 @@
           </div>
         </div>
 
-        <div class="flex translate-y-[-5px] justify-center">
+        <div class="flex gap-3">
           <Button
-            class="p-button-blue w-full rounded-none rounded-bl-lg"
+            class="p-button-blue flex-1 rounded-md py-1 text-white"
             label="일일 현황"
             @click="move('AttendanceTrackerDailyTeacher')"
           />
           <Button
-            class="p-button-yellow w-full rounded-none rounded-br-lg"
+            disabled
+            class="p-button-yellow flex-1 rounded-md py-1"
             label="누적 현황"
             @click="move('AttendanceTrackerTotal', 'teacher')"
           />
@@ -89,17 +110,20 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import type { Job } from '@/types';
 import { useUserStore } from '@/store/user';
-import AppChipKakao from '@/components/AppChipKakao.vue';
-import AppChipNaver from '@/components/AppChipNaver.vue';
 import bgChild from '@/assets/images/bg-home-child.png';
 import bgMan from '@/assets/images/bg-home-man.png';
 
+const router = useRouter();
 const userStore = useUserStore();
 
-const router = useRouter();
+const menuVisible = ref(false);
+
+const items = ref([{ label: '내 정보 보기', icon: 'pi pi-user', route: '/user' }]);
+
 const move = (routeName: string, job?: Job) => {
   if (job) {
     return router.push({ name: routeName, params: { job } });
@@ -107,3 +131,18 @@ const move = (routeName: string, job?: Job) => {
   return router.push({ name: routeName });
 };
 </script>
+
+<style>
+.p-sidebar-home .p-sidebar-header {
+  @apply p-6 pb-2;
+}
+.p-sidebar-home .p-sidebar-header button {
+  @apply h-12 w-12;
+}
+.p-sidebar-home .p-sidebar-header button svg {
+  @apply h-6 w-6;
+}
+.p-menu-home .p-menuitem:not(:last-child) {
+  @apply border-b;
+}
+</style>

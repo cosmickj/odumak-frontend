@@ -3,7 +3,6 @@ import { RouteRecordRaw, createRouter, createWebHistory } from 'vue-router';
 import { auth } from '@/firebase/config';
 import { useUserStore } from '@/store/user';
 
-// prettier-ignore
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
@@ -14,7 +13,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'HomeView',
         meta: { requiresAuth: true },
         components: {
-          default: () => import('@/views/Home/HomeContainer.vue'),
+          default: () => import('@/views/Home/HomeContainer.old.vue'),
           GlobalNavbar: () => import('@/components/TheNavbar.vue'),
         },
       },

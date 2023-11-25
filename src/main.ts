@@ -44,6 +44,7 @@ import Image from 'primevue/image';
 import InputNumber from 'primevue/inputnumber';
 import InputSwitch from 'primevue/inputswitch';
 import InputText from 'primevue/inputtext';
+import Menu from 'primevue/menu';
 import MultiSelect from 'primevue/multiselect';
 import OverlayPanel from 'primevue/overlaypanel';
 import Password from 'primevue/password';
@@ -77,6 +78,7 @@ app
   .component('InputNumber', InputNumber)
   .component('InputSwitch', InputSwitch)
   .component('InputText', InputText)
+  .component('Menu', Menu)
   .component('MultiSelect', MultiSelect)
   .component('OverlayPanel', OverlayPanel)
   .component('Password', Password)
