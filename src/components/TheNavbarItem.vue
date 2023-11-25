@@ -1,7 +1,8 @@
 <template>
   <RouterLink class="w-16 text-center" :to="{ name: routeName }">
     <div :class="className">
-      <i class="text-xl" :class="icon"></i>
+      <i v-if="icon" class="text-xl" :class="icon"></i>
+      <slot></slot>
     </div>
     <p class="mt-1">{{ label }}</p>
   </RouterLink>
@@ -9,7 +10,7 @@
 
 <script setup lang="ts">
 defineProps<{
-  icon: string;
+  icon?: string;
   label: string;
   routeName: string;
   className?: string;

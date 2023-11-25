@@ -9,11 +9,10 @@
 </template>
 
 <script setup lang="ts">
-import AdminUserDataTable from './AdminUserDataTable.vue';
-
 import { onMounted, ref } from 'vue';
-import { useUserStore } from '@/store/user';
 import type { UserData } from '@/types';
+import { useUserStore } from '@/store/user';
+import AdminUserDataTable from './AdminUserDataTable.vue';
 
 const userStore = useUserStore();
 

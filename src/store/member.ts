@@ -1,19 +1,6 @@
 import arraySort from 'array-sort';
+import { addDoc, collection, doc, getDocs, query, serverTimestamp, updateDoc, where } from 'firebase/firestore';
 import { defineStore } from 'pinia';
-import { db, membersColl } from '@/firebase/config';
-import {
-  addDoc,
-  collection,
-  doc,
-  getDocs,
-  query,
-  serverTimestamp,
-  updateDoc,
-  where,
-} from 'firebase/firestore';
-import { memberConverter } from '@/utils/useConverter';
-import { COLLECTION } from '@/constants/common';
-
 import type {
   CreateMultipleParams,
   FetchAllParmas,
@@ -22,6 +9,9 @@ import type {
   ModifySingleParams,
   RemoveMultipleParams,
 } from '@/types/store';
+import { db, membersColl } from '@/firebase/config';
+import { memberConverter } from '@/utils/useConverter';
+import { COLLECTION } from '@/constants/common';
 
 export const useMemberStore = defineStore('member', {
   state: () => ({}),

@@ -1,12 +1,12 @@
 import type {
+  AttendanceData,
+  AttendanceStatus,
   Gender,
   Job,
-  Role,
-  AttendanceStatus,
-  AttendanceData,
   MemberData,
-  UserData,
   MemberStatus,
+  Role,
+  UserData,
 } from '@/types';
 
 export class Member implements Omit<MemberData, 'registeredAt' | 'createdAt'> {
@@ -42,12 +42,8 @@ export class Member implements Omit<MemberData, 'registeredAt' | 'createdAt'> {
     this.isNewFriendClass = data.isNewFriendClass;
     this.remark = data.remark;
     this.status = data.status;
-    this.registeredAt = !data.registeredAt
-      ? new Date()
-      : new Date(data.registeredAt.seconds * 1000);
-    this.createdAt = !data.createdAt
-      ? new Date()
-      : new Date(data.createdAt.seconds * 1000);
+    this.registeredAt = !data.registeredAt ? new Date() : new Date(data.registeredAt.seconds * 1000);
+    this.createdAt = !data.createdAt ? new Date() : new Date(data.createdAt.seconds * 1000);
   }
 }
 
@@ -96,12 +92,8 @@ export class User implements Omit<UserData, 'registeredAt' | 'createdAt'> {
     this.rejectedReason = data.rejectedReason;
     this.remark = data.remark;
     this.status = data.status;
-    this.registeredAt = !data.registeredAt
-      ? new Date()
-      : new Date(data.registeredAt.seconds * 1000);
-    this.createdAt = !data.createdAt
-      ? new Date()
-      : new Date(data.createdAt.seconds * 1000);
+    this.registeredAt = !data.registeredAt ? new Date() : new Date(data.registeredAt.seconds * 1000);
+    this.createdAt = !data.createdAt ? new Date() : new Date(data.createdAt.seconds * 1000);
   }
 }
 
@@ -133,8 +125,6 @@ export class Attendance implements Omit<AttendanceData, 'createdAt'> {
     this.job = data.job;
     this.status = data.status;
     this.createdBy = data.createdBy;
-    this.createdAt = !data.createdAt
-      ? new Date()
-      : new Date(data.createdAt.seconds * 1000);
+    this.createdAt = !data.createdAt ? new Date() : new Date(data.createdAt.seconds * 1000);
   }
 }

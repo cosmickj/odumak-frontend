@@ -1,7 +1,7 @@
 <template>
   <div
     v-for="(attendance, i) in attendances"
-    class="mt-[-1px] p-2 border border-slate-300 items-center justify-between"
+    class="mt-[-1px] items-center justify-between border border-slate-300 p-2"
     :key="i"
   >
     <div class="flex min-h-[40px] items-center justify-between">
@@ -46,37 +46,25 @@
     :style="{ width: '360px' }"
     :breakpoints="{ '641px': '95vw' }"
   >
-    <div v-if="!subAttendances.length" class="text-center text-base">
-      해당 날짜에 입력할 인원이 없습니다.
-    </div>
+    <div v-if="!subAttendances.length" class="text-center text-base">해당 날짜에 입력할 인원이 없습니다.</div>
 
     <CheckerStudents :attendances="subAttendances" />
 
     <template #footer>
       <Button text label="닫기" size="small" @click="visible = false" />
-      <Button
-        severity="warning"
-        label="저장"
-        size="small"
-        :disabled="!changed"
-        @click="saveSubAttendances"
-      />
+      <Button severity="warning" label="저장" size="small" :disabled="!changed" @click="saveSubAttendances" />
     </template>
   </Dialog>
 </template>
 
 <script setup lang="ts">
-import CheckerStudents from './CheckerStudents.vue';
+import { useToast } from 'primevue/usetoast';
 import { computed, ref, toRaw } from 'vue';
+import type { Attendance } from '@/models';
 import { useAttendanceStore } from '@/store/attendance';
 import { useUserStore } from '@/store/user';
-import { useToast } from 'primevue/usetoast';
-import {
-  formatClassName,
-  formatTeacher,
-  formatTeacherColor,
-} from '@/utils/useFormat';
-import type { Attendance } from '@/models';
+import { formatClassName, formatTeacher, formatTeacherColor } from '@/utils/useFormat';
+import CheckerStudents from './CheckerStudents.vue';
 
 const props = defineProps<{
   attendances: Attendance[];

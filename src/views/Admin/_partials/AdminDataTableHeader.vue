@@ -1,5 +1,5 @@
 <template>
-  <div class="flex mb-6 justify-between">
+  <div class="mb-6 flex justify-between">
     <div class="flex gap-x-3">
       <Button
         class="p-button-success p-button-sm"
@@ -27,8 +27,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
 import { breakpointsTailwind, useBreakpoints } from '@vueuse/core';
+import { computed } from 'vue';
 import type { Member } from '@/models';
 
 const props = defineProps<{

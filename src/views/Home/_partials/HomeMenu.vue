@@ -7,7 +7,7 @@
         <span class="ml-1">{{ what }}</span>
       </p>
 
-      <span class="absolute top-6 right-4">
+      <span class="absolute right-4 top-6">
         <i class="pi pi-angle-right"></i>
       </span>
     </div>

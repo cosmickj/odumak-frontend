@@ -1,25 +1,12 @@
 import arraySort from 'array-sort';
-import { db, attendancesColl } from '@/firebase/config';
-import {
-  addDoc,
-  doc,
-  getDocs,
-  query,
-  serverTimestamp,
-  updateDoc,
-  where,
-} from 'firebase/firestore';
-
+import { addDoc, doc, getDocs, query, serverTimestamp, updateDoc, where } from 'firebase/firestore';
 import { defineStore } from 'pinia';
-import { useMemberStore } from './member';
+import type { AddAttendanceParams, FetchAttendancesParams, ModifyAttendanceParams } from '@/types/store';
 import { Attendance } from '@/models';
-import { COLLECTION } from '@/constants/common';
+import { attendancesColl, db } from '@/firebase/config';
 import { attendanceConverter } from '@/utils/useConverter';
-import type {
-  AddAttendanceParams,
-  FetchAttendancesParams,
-  ModifyAttendanceParams,
-} from '@/types/store';
+import { COLLECTION } from '@/constants/common';
+import { useMemberStore } from './member';
 
 export const useAttendanceStore = defineStore('attendance', {
   state: () => ({

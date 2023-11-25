@@ -1,9 +1,9 @@
 import '@/styles/normalize.css';
 import '@/styles/global.css';
-import '@/index.css'; // Tailwind CSS
 import 'primevue/resources/primevue.min.css';
 import 'primevue/resources/themes/saga-blue/theme.css';
 import 'primeicons/primeicons.css';
+import '@/index.css'; // Tailwind CSS
 
 import App from '@/App.vue';
 import router from '@/router';
@@ -17,13 +17,15 @@ import { Chart as _Chart } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 _Chart.register(ChartDataLabels);
 
+import { setupCalendar } from 'v-calendar';
+
 const app = createApp(App);
 
 app.use(router);
 app.use(createPinia());
-
 app.use(PrimeVue);
 app.use(ToastService);
+app.use(setupCalendar, {});
 
 import Avatar from 'primevue/avatar';
 import Button from 'primevue/button';
@@ -42,12 +44,14 @@ import Image from 'primevue/image';
 import InputNumber from 'primevue/inputnumber';
 import InputSwitch from 'primevue/inputswitch';
 import InputText from 'primevue/inputtext';
+import Menu from 'primevue/menu';
 import MultiSelect from 'primevue/multiselect';
 import OverlayPanel from 'primevue/overlaypanel';
 import Password from 'primevue/password';
 import ProgressSpinner from 'primevue/progressspinner';
 import RadioButton from 'primevue/radiobutton';
 import SelectButton from 'primevue/selectbutton';
+import Sidebar from 'primevue/sidebar';
 import Skeleton from 'primevue/skeleton';
 import Steps from 'primevue/steps';
 import Tag from 'primevue/tag';
@@ -74,12 +78,14 @@ app
   .component('InputNumber', InputNumber)
   .component('InputSwitch', InputSwitch)
   .component('InputText', InputText)
+  .component('Menu', Menu)
   .component('MultiSelect', MultiSelect)
   .component('OverlayPanel', OverlayPanel)
   .component('Password', Password)
   .component('ProgressSpinner', ProgressSpinner)
   .component('RadioButton', RadioButton)
   .component('SelectButton', SelectButton)
+  .component('Sidebar', Sidebar)
   .component('Skeleton', Skeleton)
   .component('Steps', Steps)
   .component('Tag', Tag)

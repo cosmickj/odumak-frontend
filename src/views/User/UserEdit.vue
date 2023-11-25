@@ -1,18 +1,11 @@
 <template>
-  <section v-if="isAuthReady" class="overflow-auto flex flex-col bg-slate-200">
-    <header class="z-10 sticky top-0 left-0 px-1 pt-1 bg-slate-200">
+  <section v-if="isAuthReady" class="flex flex-col overflow-auto bg-slate-200">
+    <header class="sticky left-0 top-0 z-10 bg-slate-200 px-1 pt-1">
       <RouterLink :to="{ name: 'UserView' }">
-        <Button
-          icon="pi pi-angle-left"
-          class="p-button-text p-button-secondary"
-        />
+        <Button icon="pi pi-angle-left" class="p-button-text p-button-secondary" />
       </RouterLink>
 
-      <span
-        class="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%]"
-      >
-        내 정보 수정
-      </span>
+      <span class="absolute left-1/2 top-1/2 translate-x-[-50%] translate-y-[-50%]"> 내 정보 수정 </span>
     </header>
 
     <div class="flex-1 text-xs">
@@ -42,7 +35,7 @@
         />
       </div> -->
 
-      <p class="px-5 mt-7 mb-2 text-base font-semibold">소속 정보</p>
+      <p class="mb-2 mt-7 px-5 text-base font-semibold">소속 정보</p>
 
       <div class="flex flex-col px-5 py-2">
         <label for="church" class="mb-1">교회 이름</label>
@@ -106,29 +99,24 @@
       </div> -->
     </div>
 
-    <div class="sticky bottom-0 mt-10 px-5 pb-4 bg-slate-200">
-      <Button
-        class="w-full p-button-warning"
-        label="수정 완료"
-        :disabled="!isChanged"
-        @click="submitForm"
-      />
+    <div class="sticky bottom-0 mt-10 bg-slate-200 px-5 pb-4">
+      <Button class="p-button-warning w-full" label="수정 완료" :disabled="!isChanged" @click="submitForm" />
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
+import useVuelidate from '@vuelidate/core';
+import { helpers, required, requiredIf } from '@vuelidate/validators';
 import { computed, reactive, ref, watch } from 'vue';
 import { useUserStore } from '@/store/user';
 import {
+  CHURCH_OPTIONS,
+  DEPARTMENT_OPTIONS,
   GRADE_OPTIONS,
   GROUP_OPTIONS,
   TEACHER_ROLE,
-  CHURCH_OPTIONS,
-  DEPARTMENT_OPTIONS,
 } from '@/constants/common';
-import useVuelidate from '@vuelidate/core';
-import { helpers, required, requiredIf } from '@vuelidate/validators';
 
 const { isAuthReady, userData } = useUserStore();
 const userStore = useUserStore();

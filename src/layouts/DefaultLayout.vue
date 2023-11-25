@@ -1,20 +1,18 @@
 <template>
-  <main class="h-[100svh] flex items-center justify-center sm:bg-gray-200">
+  <main class="flex h-[100svh] items-center justify-center sm:bg-gray-200">
     <div
-      class="overflow-hidden relative w-full sm:w-[360px] h-full sm:max-h-[640px] bg-slate-100 shadow-lg"
+      class="relative h-full w-full overflow-hidden bg-slate-100 sm:max-h-[740px] sm:max-w-[360px] sm:rounded-2xl sm:shadow-lg"
     >
-      <div class="flex flex-col h-full">
-        <RouterView class="overflow-auto flex-1" />
+      <div class="flex h-full flex-col">
+        <RouterView class="flex-1 overflow-auto" />
         <RouterView name="GlobalNavbar" />
       </div>
 
       <div
-        v-if="mode === 'development'"
-        class="z-10 opacity-30 absolute inset-0 flex justify-center items-center pointer-events-none"
+        v-if="mode !== 'production'"
+        class="pointer-events-none fixed bottom-4 right-4 z-10 text-4xl opacity-30"
       >
-        <p class="px-4 py-2 rounded text-4xl -rotate-[24deg]">
-          &copy; app.odumak.xyz
-        </p>
+        {{ mode }}
       </div>
     </div>
   </main>
@@ -45,8 +43,8 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
+import { useRouter } from 'vue-router';
 import { useUserStore } from '@/store/user';
 
 const router = useRouter();

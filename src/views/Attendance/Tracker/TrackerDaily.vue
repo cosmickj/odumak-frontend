@@ -1,5 +1,5 @@
 <template>
-  <p class="text-xl text-center">{{ headerText }} 일일 출석현황</p>
+  <p class="text-center text-xl">{{ headerText }} 일일 출석현황</p>
 
   <Calendar
     v-model="attendanceDate"
@@ -11,7 +11,7 @@
     @date-select="onAttendanceDateSelect"
   />
 
-  <div class="flex gap-x-4 py-2 items-center">
+  <div class="flex items-center gap-x-4 py-2">
     <div class="flex-2">
       <SelectButton
         v-model="layout"
@@ -31,16 +31,11 @@
     </div>
 
     <div class="flex-1">
-      <InputText
-        v-model="filterKeyword"
-        class="w-full"
-        :disabled="layout === 'chart'"
-        placeholder="검색하기"
-      />
+      <InputText v-model="filterKeyword" class="w-full" :disabled="layout === 'chart'" placeholder="검색하기" />
     </div>
   </div>
 
-  <div class="flex gap-x-2 mb-2">
+  <div class="mb-2 flex gap-x-2">
     <Dropdown
       class="w-full"
       show-clear
@@ -79,7 +74,7 @@
     <template #list="{ data }">
       <Card>
         <template #content>
-          <div class="flex gap-2 items-center justify-between">
+          <div class="flex items-center justify-between gap-2">
             <div class="text-center">
               <p class="font-bold">{{ data.name }}</p>
               <Tag
@@ -92,21 +87,9 @@
             <p>{{ data.grade }} - {{ data.group }}</p>
 
             <div class="flex gap-2">
-              <Avatar
-                label="현"
-                shape="circle"
-                :class="statusOffline(data.attendance.status)"
-              />
-              <Avatar
-                label="온"
-                shape="circle"
-                :class="statusOnline(data.attendance.status)"
-              />
-              <Avatar
-                label="결"
-                shape="circle"
-                :class="statusAbsence(data.attendance.status)"
-              />
+              <Avatar label="현" shape="circle" :class="statusOffline(data.attendance.status)" />
+              <Avatar label="온" shape="circle" :class="statusOnline(data.attendance.status)" />
+              <Avatar label="결" shape="circle" :class="statusAbsence(data.attendance.status)" />
             </div>
           </div>
         </template>
@@ -116,7 +99,7 @@
     <template #grid="{ data }">
       <Card class="col-span-1">
         <template #content>
-          <div class="flex flex-col gap-2 items-center justify-between">
+          <div class="flex flex-col items-center justify-between gap-2">
             <Avatar icon="pi pi-user" size="large" shape="circle" />
             <p class="font-bold">{{ data.name }}</p>
 
@@ -128,19 +111,10 @@
 
             <span> {{ data.grade }} - {{ data.group }} </span>
 
-            <div class="flex mt-2">
-              <Avatar
-                label="현"
-                :class="statusOffline(data.attendance.status)"
-              />
-              <Avatar
-                label="온"
-                :class="statusOnline(data.attendance.status)"
-              />
-              <Avatar
-                label="결"
-                :class="statusAbsence(data.attendance.status)"
-              />
+            <div class="mt-2 flex">
+              <Avatar label="현" :class="statusOffline(data.attendance.status)" />
+              <Avatar label="온" :class="statusOnline(data.attendance.status)" />
+              <Avatar label="결" :class="statusAbsence(data.attendance.status)" />
             </div>
           </div>
         </template>
@@ -151,19 +125,19 @@
   <div v-else>
     <Chart
       v-if="chartData && totalCount !== emptyCount"
-      class="max-w-[300px] mx-auto"
+      class="mx-auto max-w-[300px]"
       type="doughnut"
       :data="chartData"
     />
 
     <div
       v-else-if="chartData && totalCount === emptyCount"
-      class="flex max-w-[300px] aspect-square mx-auto items-center justify-center"
+      class="mx-auto flex aspect-square max-w-[300px] items-center justify-center"
     >
       <p class="text-xl">입력된 출석이 없습니다.</p>
     </div>
 
-    <div v-if="chartData" class="flex mt-2 items-baseline justify-evenly">
+    <div v-if="chartData" class="mt-2 flex items-baseline justify-evenly">
       <p class="text-gray-500">
         총:
         <span class="text-xl">{{ totalCount }}</span>
@@ -176,7 +150,7 @@
         <span class="text-xs">명</span>
       </p>
 
-      <p class="text-green-700 text-bold text-lg">
+      <p class="text-bold text-lg text-green-700">
         입력:
         <span class="text-2xl">{{ totalCount - emptyCount }}</span>
         <span class="text-sm">명</span>
@@ -186,16 +160,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { useUserStore } from '@/store/user';
 import { useAttendanceStore } from '@/store/attendance';
+import { useUserStore } from '@/store/user';
 import { getPreviousSunday } from '@/utils/useCalendar';
 import { formatTeacher, formatTeacherColor } from '@/utils/useFormat';
-import {
-  GRADE_OPTIONS,
-  GROUP_WITH_NEW_CLASS_OPTIONS,
-} from '@/constants/common';
+import { GRADE_OPTIONS, GROUP_WITH_NEW_CLASS_OPTIONS } from '@/constants/common';
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -249,10 +220,7 @@ const filteredAttendanceData = computed(() => {
   }
   if (filterKeyword.value) {
     _attendanceData = _attendanceData.filter((d) => {
-      return (
-        d.name.startsWith(filterKeyword.value) ||
-        d.name.includes(filterKeyword.value)
-      );
+      return d.name.startsWith(filterKeyword.value) || d.name.includes(filterKeyword.value);
     });
   }
 
@@ -268,9 +236,7 @@ const setChartData = () => {
 
   const rawData = filteredAttendanceData.value.reduce(
     (total, record) => {
-      const status = record.attendance.status
-        ? record.attendance.status
-        : 'empty';
+      const status = record.attendance.status ? record.attendance.status : 'empty';
       const currCount = total[status] ?? 0;
 
       return { ...total, [status]: currCount + 1 };

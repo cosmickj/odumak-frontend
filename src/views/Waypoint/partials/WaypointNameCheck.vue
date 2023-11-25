@@ -1,16 +1,9 @@
 <template>
-  <div class="flex-1 flex flex-col justify-between">
+  <div class="flex flex-1 flex-col justify-between">
     <div class="flex flex-col gap-2">
       <label for="name">{{ church }}에 등록된 이름을 입력해주세요</label>
-      <InputText
-        v-model="name"
-        id="name"
-        class="w-full"
-        :class="{ 'p-invalid': v$.name.$error }"
-      />
-      <small class="text-red-500">
-        오타가 있을 경우 승인이 제한 될 수 있습니다.
-      </small>
+      <InputText v-model="name" id="name" class="w-full" :class="{ 'p-invalid': v$.name.$error }" />
+      <small class="text-red-500"> 오타가 있을 경우 승인이 제한 될 수 있습니다. </small>
     </div>
 
     <div class="flex justify-between">
@@ -24,26 +17,19 @@
         @click="prevPage"
       />
 
-      <Button
-        raised
-        rounded
-        icon="pi pi-chevron-right"
-        iconPos="right"
-        label="다음으로"
-        @click="nextPage"
-      />
+      <Button raised rounded icon="pi pi-chevron-right" iconPos="right" label="다음으로" @click="nextPage" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useRouter } from 'vue-router';
-import { storeToRefs } from 'pinia';
-import { useMemberStore } from '@/store/member';
-import { useWaypointStore } from '@/store/waypoint';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
+import { storeToRefs } from 'pinia';
+import { computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { useMemberStore } from '@/store/member';
+import { useWaypointStore } from '@/store/waypoint';
 
 const emit = defineEmits(['prev', 'next']);
 

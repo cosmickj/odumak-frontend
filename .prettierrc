@@ -1,10 +1,31 @@
 {
-  "printWidth": 80,
+  "printWidth": 112,
   "useTabs": false,
   "tabWidth": 2,
   "semi": true,
   "singleQuote": true,
   "trailingComma": "es5",
   "bracketSpacing": true,
-  "jsxBracketSameLine": false
+  "jsxBracketSameLine": false,
+  "importOrder": [
+    "^@/types/?(.*)$",
+    "^@/models/?(.*)$",
+    "^@/api/?(.*)$",
+    "^@/firebase/?(.*)$",
+    "^@/store/?(.*)$",
+    "^@/utils/?(.*)$",
+    "^@/constants/?(.*)$",
+    "^@/components/?(.*)$",
+    "^@/views/?(.*)$",
+    "^@/assets/?(.*)$",
+    "^@/layouts/?(.*)$",
+    "^@/router/?(.*)$",
+    "^@/styles/?(.*)$",
+    "^[./]"
+  ],
+  "plugins": [
+    "@trivago/prettier-plugin-sort-imports",
+    "prettier-plugin-css-order",
+    "prettier-plugin-tailwindcss"
+  ]
 }
