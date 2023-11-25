@@ -1,5 +1,5 @@
 <template>
-  <main class="flex h-full flex-col overflow-auto">
+  <section class="overflow-auto">
     <AppHeader header="출석체크" route-name="HomeView" />
 
     <div class="flex gap-2 px-6 py-4">
@@ -41,7 +41,7 @@
       />
     </div>
 
-    <div class="mx-6 ml-auto flex gap-2">
+    <div class="flex justify-end px-6">
       <span v-if="userData.role.system === 'admin' || userData.role.executive === 'secretary'">
         {{ userData.church }} {{ userData.department }} 교사
       </span>
@@ -55,7 +55,7 @@
 
     <ProgressSpinner v-if="isLoading" />
 
-    <div v-else class="px-6 pt-4">
+    <div v-else class="px-6">
       <CheckerTeachers
         v-if="userData.role.system === 'admin' || userData.role.executive === 'secretary'"
         :attendances="attendances"
@@ -87,14 +87,16 @@
         </template>
       </Dialog>
     </div>
+  </section>
 
+  <section class="mt-auto px-6 pb-8 pt-4">
     <Button
-      class="absolute bottom-8 left-6 right-6 z-10 bg-yellow-300 py-2 text-lg"
+      class="z-10 w-full bg-yellow-300 py-2 text-lg"
       label="출석 저장하기"
       :disabled="!isChanged"
       @click="saveAttendances"
     />
-  </main>
+  </section>
 </template>
 
 <script setup lang="ts">
