@@ -1,3 +1,19 @@
+.p-button-blue {
+  border-color: rgba(37, 99, 235, 0.9);
+  background: rgba(37, 99, 235, 0.9);
+}
+.p-button-blue:focus {
+  box-shadow: 0 0 0 0.2rem rgb(147 197 253);
+}
+.p-button-yellow {
+  border-color: rgba(250, 204, 21, 0.9);
+  background: rgba(250, 204, 21, 0.9);
+  color: rgb(0 0 0);
+}
+.p-button-yellow:focus {
+  box-shadow: 0 0 0 0.2rem rgb(254 240 138);
+}
+
 /* @keyframes jelly {
   from { transform: scale(1, 1); }
   30%  { transform: scale(1.25, 0.75); }
@@ -7,19 +23,3 @@
   75%  { transform: scale(1.05, 0.95); }
   to   { transform: scale(1, 1); }
 } */
-
-.p-button-blue {
-  background: rgb(37 99 235) !important;
-  border-color: rgb(37 99 235) !important;
-}
-.p-button-blue:focus {
-  box-shadow: 0 0 0 0.2rem rgb(147 197 253) !important;
-}
-.p-button-yellow {
-  background: rgb(250 204 21) !important;
-  border-color: rgb(250 204 21) !important;
-  color: rgb(0 0 0) !important;
-}
-.p-button-yellow:focus {
-  box-shadow: 0 0 0 0.2rem rgb(254 240 138) !important;
-}
