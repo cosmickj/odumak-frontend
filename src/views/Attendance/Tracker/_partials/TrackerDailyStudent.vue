@@ -52,7 +52,7 @@
     </div>
 
     <div v-if="selectedOption === 'all'" class="px-6">
-      <!-- <p class="text-sm"><sup>*</sup> 각 학년반을 클릭해보세요</p> -->
+      <!-- <p class=""><sup>*</sup> 각 학년반을 클릭해보세요</p> -->
       <table>
         <thead>
           <tr>
@@ -79,15 +79,15 @@
             </template>
 
             <template v-else>
-              <td class="text-sm">
+              <td>
                 <p class="min-w-[36px]">{{ formatGrade(key) }}</p>
                 <p class="min-w-[36px]">{{ formatGroup(key) }}</p>
               </td>
 
-              <td class="grid grid-cols-3 grid-rows-2 gap-1 xs:grid-cols-4">
+              <td class="grid grid-cols-3 grid-rows-2 gap-1 sm:grid-cols-4">
                 <span
                   v-for="(attd, j) in attdRecordsForTable[key]"
-                  class="whitespace-nowrap text-center text-sm"
+                  class="whitespace-nowrap text-center"
                   :class="paintAttendance(attd.attendance.status)"
                   :key="j"
                 >
@@ -95,8 +95,8 @@
                 </span>
               </td>
 
-              <td class="relative">
-                <span v-if="isChecked(attdRecordsForTable[key])" class="text-sm text-red-500"> 미입력 </span>
+              <td class="text-center">
+                <span v-if="isChecked(attdRecordsForTable[key])" class="text-red-500"> 미입력 </span>
 
                 <span v-else class="text-green-600">
                   {{ countAttendance(attdRecordsForTable[key]) }}
@@ -339,13 +339,13 @@ tr {
   display: contents;
 }
 
-thead th,
+/* thead th,
 tbody td {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-}
+} */
 
 th {
   position: sticky;
