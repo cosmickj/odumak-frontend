@@ -1,27 +1,57 @@
 <template>
-  <AppHeader header="학생 일일 출석현황" route-name="HomeView" />
+  <section class="flex h-full flex-col overflow-auto">
+    <AppHeader header="학생 일일 출석현황" route-name="HomeView" />
 
-  <div class="p-4">
-    <Calendar
-      v-model="attendanceDate"
-      input-class="text-center"
-      placeholder="날짜를 선택해주세요"
-      :max-date="maxDate"
-      :disabled-days="[1, 2, 3, 4, 5, 6]"
-      @date-select="onAttendanceDateSelect"
-    />
+    <div class="flex gap-2 px-6 py-4">
+      <Button rounded class="p-button-blue" icon="pi pi-chevron-left" @click="changeDate('prev')" />
 
-    <div class="mt-2 text-center">
+      <DatePicker
+        v-model="attendanceDate"
+        locale="ko"
+        :popover="popover"
+        :masks="masks"
+        :disabled-dates="disabledDates"
+        :max-date="maxDate"
+        @update:modelValue="onAttendanceDateSelect"
+      >
+        <template #default="{ inputValue, inputEvents }">
+          <div class="relative flex-1">
+            <InputText class="w-full" v-on="inputEvents" :value="inputValue" />
+          </div>
+        </template>
+
+        <template #footer>
+          <div class="w-full px-3 pb-3">
+            <button
+              class="w-full rounded-md bg-blue-600 px-3 py-1 font-bold text-white"
+              @click="setPreviousSunday"
+            >
+              최근 주일로 이동하기
+            </button>
+          </div>
+        </template>
+      </DatePicker>
+
+      <Button
+        rounded
+        class="p-button-blue"
+        icon="pi pi-chevron-right"
+        :disabled="maxDate.toString() === attendanceDate.toString()"
+        @click="changeDate('next')"
+      />
+    </div>
+
+    <div class="px-6 pb-4 text-center">
       <SelectButton
-        unselectable
         v-model="selectedOption"
         option-label="label"
         option-value="value"
         :options="options"
+        :unselectable="false"
       />
     </div>
 
-    <div v-if="selectedOption === 'all'" class="mt-2 pb-12">
+    <div v-if="selectedOption === 'all'" class="px-6">
       <!-- <p class="text-sm"><sup>*</sup> 각 학년반을 클릭해보세요</p> -->
       <table>
         <thead>
@@ -78,11 +108,11 @@
       </table>
     </div>
 
-    <div v-else-if="selectedOption === 'chart'" class="mt-6">
+    <div v-else-if="selectedOption === 'chart'" class="px-6">
       <Chart type="bar" :height="250" :data="attdRecordsForChart" :options="chartOptions" />
     </div>
 
-    <div v-else-if="selectedOption === 'detail'" class="mt-6">
+    <div v-else-if="selectedOption === 'detail'" class="px-6">
       <DataTable
         class="p-datatable-sm"
         paginator
@@ -101,10 +131,13 @@
         </Column>
       </DataTable>
     </div>
-  </div>
+  </section>
 </template>
 
 <script setup lang="ts">
+import dayjs from 'dayjs';
+import { DatePicker } from 'v-calendar';
+import 'v-calendar/style.css';
 import { computed, onMounted, ref } from 'vue';
 import type { AttendanceStatus } from '@/types';
 import type { Attendance } from '@/models';
@@ -117,13 +150,28 @@ import AppHeader from '@/components/AppHeader.vue';
 const attendanceStore = useAttendanceStore();
 const userStore = useUserStore();
 
+const setPreviousSunday = () => {
+  attendanceDate.value = getPreviousSunday();
+};
+
+const popover = ref({
+  visibility: 'click',
+  placement: 'auto',
+} as const);
+
+const masks = ref({
+  input: 'YYYY년 MM월 DD일',
+});
+
+const disabledDates = [{ repeat: { weekdays: [2, 3, 4, 5, 6, 7] } }];
+
 const maxDate = getPreviousSunday();
 const attendanceDate = ref<Date>(getPreviousSunday());
 
 const options = [
-  { label: '전체 보기', value: 'all' },
-  { label: '차트 보기', value: 'chart' },
-  { label: '개별 보기', value: 'detail' },
+  { label: '전체', value: 'all' },
+  { label: '차트', value: 'chart' },
+  { label: '개별', value: 'detail' },
 ];
 const selectedOption = ref(options[0].value);
 
@@ -264,13 +312,25 @@ const onAttendanceDateSelect = async () => {
   attdRecordsForTable.value = convertAttdRecordsForTable(rawAttdRecords.value);
   attdRecordsForChart.value = convertAttdRecordsForChart(rawAttdRecords.value);
 };
+
+const changeDate = async (dir: 'prev' | 'next') => {
+  const date = dayjs(attendanceDate.value);
+
+  if (dir === 'prev') {
+    attendanceDate.value = date.subtract(7, 'd').toDate();
+  } else if (dir === 'next') {
+    attendanceDate.value = date.add(7, 'd').toDate();
+  }
+
+  await onAttendanceDateSelect();
+};
 </script>
 
 <style scoped>
 table {
-  overflow: auto;
   display: grid;
   grid-template-columns: minmax(60px, 1fr) 3fr minmax(50px, 1fr);
+  overflow: auto;
 }
 
 thead,
@@ -283,38 +343,28 @@ thead th,
 tbody td {
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
+  align-items: center;
 }
 
 th {
-  z-index: 2;
   position: sticky;
   top: 0;
-  padding: 10px 8px;
+  z-index: 2;
   background: #bae6fd; /* sky 200 */
+  padding: 10px 8px;
   color: #333;
   font-weight: normal;
   text-align: center;
 }
 
 td {
-  padding: 4px;
   background: #f0f9ff; /* sky 100 */
+  padding: 4px;
   color: #333;
 }
 
 tr:nth-child(even) td {
   background: #e0f2fe; /* sky 50 */
-}
-
-:deep(.p-selectbutton) .p-button {
-  padding: 4px 8px;
-}
-:deep(.p-selectbutton) .p-button:first-of-type {
-  border-radius: 999px 0 0 999px;
-}
-:deep(.p-selectbutton) .p-button:last-of-type {
-  border-radius: 0 999px 999px 0;
 }
 </style>

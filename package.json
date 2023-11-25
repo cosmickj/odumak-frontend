@@ -20,6 +20,7 @@
     "@vueuse/integrations": "^9.13.0",
     "array-sort": "1.0.0",
     "axios": "^1.6.2",
+    "canvas-confetti": "^1.9.2",
     "chart.js": "4.2.1",
     "chartjs-plugin-datalabels": "^2.2.0",
     "crypto-js": "^4.1.1",
@@ -36,6 +37,7 @@
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@types/array-sort": "1.0.0",
+    "@types/canvas-confetti": "^1.6.3",
     "@types/crypto-js": "^4.1.1",
     "@types/node": "18.15.11",
     "@vitejs/plugin-vue": "4.1.0",

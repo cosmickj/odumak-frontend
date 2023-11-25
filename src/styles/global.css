@@ -1,10 +1,12 @@
 .p-button-blue {
   border-color: rgba(37, 99, 235, 0.9);
   background: rgba(37, 99, 235, 0.9);
+  color: white;
 }
 .p-button-blue:focus {
   box-shadow: 0 0 0 0.2rem rgb(147 197 253);
 }
+
 .p-button-yellow {
   border-color: rgba(250, 204, 21, 0.9);
   background: rgba(250, 204, 21, 0.9);
@@ -12,6 +14,14 @@
 }
 .p-button-yellow:focus {
   box-shadow: 0 0 0 0.2rem rgb(254 240 138);
+}
+
+.p-inputtext.p-component {
+  @apply p-2;
+}
+
+.vc-highlight-content-solid {
+  @apply pointer-events-none;
 }
 
 /* @keyframes jelly {

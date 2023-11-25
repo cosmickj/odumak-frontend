@@ -1,10 +1,9 @@
 <template>
-  <main class="mb-9 flex h-full flex-col overflow-auto">
+  <main class="flex h-full flex-col overflow-auto">
     <AppHeader header="출석체크" route-name="HomeView" />
 
-    <div class="my-4 flex items-stretch justify-center gap-2 px-2">
-      <!-- class="text-blue-600" -->
-      <Button rounded icon="pi pi-chevron-left" @click="changeDate('prev')" />
+    <div class="flex gap-2 px-6 py-4">
+      <Button rounded class="p-button-blue" icon="pi pi-chevron-left" @click="changeDate('prev')" />
 
       <DatePicker
         v-model="attendanceDate"
@@ -17,10 +16,7 @@
       >
         <template #default="{ inputValue, inputEvents }">
           <div class="relative flex-1">
-            <InputText class="w-full pl-10" v-on="inputEvents" :value="inputValue" />
-            <div class="pointer-events-none absolute left-3 top-3 flex items-center justify-center">
-              <i class="pi pi-calendar text-black" />
-            </div>
+            <InputText class="w-full" v-on="inputEvents" :value="inputValue" />
           </div>
         </template>
 
@@ -37,14 +33,15 @@
       </DatePicker>
 
       <Button
-        class="text-blue-600"
+        rounded
+        class="p-button-blue"
         icon="pi pi-chevron-right"
         :disabled="maxDate.toString() === attendanceDate.toString()"
         @click="changeDate('next')"
       />
     </div>
 
-    <div class="ml-auto flex gap-2 px-4">
+    <div class="mx-6 ml-auto flex gap-2">
       <span v-if="userData.role.system === 'admin' || userData.role.executive === 'secretary'">
         {{ userData.church }} {{ userData.department }} 교사
       </span>
@@ -58,7 +55,7 @@
 
     <ProgressSpinner v-if="isLoading" />
 
-    <div v-else class="px-4 pb-4 pt-2">
+    <div v-else class="px-6 pt-4">
       <CheckerTeachers
         v-if="userData.role.system === 'admin' || userData.role.executive === 'secretary'"
         :attendances="attendances"
@@ -92,8 +89,8 @@
     </div>
 
     <Button
-      class="absolute bottom-1 left-1 right-1 bg-yellow-300 py-2"
-      label="저장하기"
+      class="absolute bottom-8 left-6 right-6 z-10 bg-yellow-300 py-2 text-lg"
+      label="출석 저장하기"
       :disabled="!isChanged"
       @click="saveAttendances"
     />
@@ -101,6 +98,7 @@
 </template>
 
 <script setup lang="ts">
+import confetti from 'canvas-confetti';
 import dayjs from 'dayjs';
 import { DatePicker } from 'v-calendar';
 import 'v-calendar/style.css';
@@ -119,25 +117,23 @@ const router = useRouter();
 const userStore = useUserStore();
 const attendanceStore = useAttendanceStore();
 
-const popover = ref({
-  visibility: 'click',
-  placement: 'auto',
-} as const);
-const masks = ref({
-  input: 'YYYY년 MM월 DD일',
-});
-const disabledDates = ref([
-  {
-    repeat: { weekdays: [2, 3, 4, 5, 6, 7] },
-  },
-]);
-
 const maxDate = getPreviousSunday();
 const attendanceDate = ref<Date>(getPreviousSunday());
 
 const setPreviousSunday = () => {
   attendanceDate.value = getPreviousSunday();
 };
+
+const popover = ref({
+  visibility: 'click',
+  placement: 'auto',
+} as const);
+
+const masks = ref({
+  input: 'YYYY년 MM월 DD일',
+});
+
+const disabledDates = [{ repeat: { weekdays: [2, 3, 4, 5, 6, 7] } }];
 
 const isLoading = ref(false);
 const attendances = ref<Attendance[]>([]);
@@ -188,8 +184,6 @@ const getAttendances = async () => {
   }
 };
 
-onMounted(async () => await getAttendances());
-
 const changeDate = async (dir: 'prev' | 'next') => {
   const date = dayjs(attendanceDate.value);
 
@@ -201,6 +195,10 @@ const changeDate = async (dir: 'prev' | 'next') => {
 
   await getAttendances();
 };
+
+onMounted(async () => {
+  await getAttendances();
+});
 
 const saveAttendances = async () => {
   try {
@@ -228,17 +226,16 @@ const saveAttendances = async () => {
       });
     });
 
-    alert('저장되었습니다!');
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
+    });
 
-    await getAttendances();
+    alert('저장되었습니다!');
+    // await getAttendances();
   } catch (error) {
     console.log(error);
   }
 };
 </script>
-
-<style>
-.p-inputtext.p-component {
-  @apply p-2;
-}
-</style>

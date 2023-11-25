@@ -1,21 +1,50 @@
 <template>
-  <AppHeader header="교사 일일 출석현황" route-name="HomeView" />
+  <section class="flex h-full flex-col overflow-auto">
+    <AppHeader header="교사 일일 출석현황" route-name="HomeView" />
 
-  <div class="p-4">
-    <Calendar
-      v-model="attendanceDate"
-      input-class="text-center"
-      placeholder="날짜를 선택해주세요"
-      :max-date="maxDate"
-      :disabled-days="[1, 2, 3, 4, 5, 6]"
-      @date-select="onAttendanceDateSelect"
-    />
+    <div class="flex gap-2 px-6 py-4">
+      <Button rounded class="p-button-blue" icon="pi pi-chevron-left" @click="changeDate('prev')" />
 
-    <div class="flex items-center gap-x-4 py-2">
+      <DatePicker
+        v-model="attendanceDate"
+        locale="ko"
+        :popover="popover"
+        :masks="masks"
+        :disabled-dates="disabledDates"
+        :max-date="maxDate"
+        @update:modelValue="onAttendanceDateSelect"
+      >
+        <template #default="{ inputValue, inputEvents }">
+          <div class="relative flex-1">
+            <InputText class="w-full" v-on="inputEvents" :value="inputValue" />
+          </div>
+        </template>
+
+        <template #footer>
+          <div class="w-full px-3 pb-3">
+            <button
+              class="w-full rounded-md bg-blue-600 px-3 py-1 font-bold text-white"
+              @click="setPreviousSunday"
+            >
+              최근 주일로 이동하기
+            </button>
+          </div>
+        </template>
+      </DatePicker>
+
+      <Button
+        rounded
+        class="p-button-blue"
+        icon="pi pi-chevron-right"
+        :disabled="maxDate.toString() === attendanceDate.toString()"
+        @click="changeDate('next')"
+      />
+    </div>
+
+    <div class="flex items-center px-6 pb-4">
       <div class="flex-2">
         <SelectButton
           v-model="layout"
-          unselectable
           option-label="icon"
           option-value="value"
           :options="[
@@ -23,6 +52,7 @@
             { icon: 'pi pi-bars', value: 'list' },
             { icon: 'pi pi-table', value: 'grid' },
           ]"
+          :unselectable="false"
         >
           <template #option="slotProps">
             <i :class="slotProps.option.icon"></i>
@@ -40,7 +70,7 @@
       </div>
     </div>
 
-    <div class="mb-2 flex gap-x-2">
+    <div class="flex gap-x-2 px-6 pb-4">
       <Dropdown
         class="w-full"
         show-clear
@@ -62,78 +92,82 @@
       />
     </div>
 
-    <DataView
-      v-if="layout !== 'chart'"
-      data-key="memberUid"
-      paginator
-      paginator-template="PrevPageLink PageLinks NextPageLink RowsPerPageDropdown"
-      :rows="6"
-      :page-link-size="3"
-      :layout="layout"
-      :value="filteredAttendanceData"
-    >
-      <template #empty>
-        <div>해당되는 내용이 없습니다</div>
-      </template>
+    <div v-if="layout !== 'chart'" class="px-6">
+      <DataView
+        data-key="memberUid"
+        paginator
+        paginator-template="PrevPageLink PageLinks NextPageLink RowsPerPageDropdown"
+        :rows="6"
+        :page-link-size="3"
+        :layout="layout"
+        :value="filteredAttendanceData"
+      >
+        <template #empty>
+          <div>해당되는 내용이 없습니다</div>
+        </template>
 
-      <template #list="{ data }">
-        <Card>
-          <template #content>
-            <div class="flex items-center justify-between gap-2">
-              <div class="text-center">
+        <template #list="{ data }">
+          <Card>
+            <template #content>
+              <div class="flex items-center justify-between gap-2">
+                <div class="text-center">
+                  <p class="font-bold">{{ data.name }}</p>
+                  <Tag
+                    v-if="data.role.teacher"
+                    :value="formatTeacher(data.role.teacher)"
+                    :style="`background: ${formatTeacherColor(data.role.teacher)}`"
+                  />
+                </div>
+
+                <p>{{ data.grade }} - {{ data.group }}</p>
+
+                <div class="flex gap-2">
+                  <Avatar label="현" shape="circle" :class="statusOffline(data.attendance.status)" />
+                  <Avatar label="온" shape="circle" :class="statusOnline(data.attendance.status)" />
+                  <Avatar label="결" shape="circle" :class="statusAbsence(data.attendance.status)" />
+                </div>
+              </div>
+            </template>
+          </Card>
+        </template>
+
+        <template #grid="{ data }">
+          <Card class="col-span-1">
+            <template #content>
+              <div class="flex flex-col items-center justify-between gap-2">
+                <Avatar icon="pi pi-user" size="large" shape="circle" />
                 <p class="font-bold">{{ data.name }}</p>
+
                 <Tag
                   v-if="data.role.teacher"
                   :value="formatTeacher(data.role.teacher)"
                   :style="`background: ${formatTeacherColor(data.role.teacher)}`"
                 />
+
+                <span> {{ data.grade }} - {{ data.group }} </span>
+
+                <div class="mt-2 flex">
+                  <Avatar label="현" :class="statusOffline(data.attendance.status)" />
+                  <Avatar label="온" :class="statusOnline(data.attendance.status)" />
+                  <Avatar label="결" :class="statusAbsence(data.attendance.status)" />
+                </div>
               </div>
+            </template>
+          </Card>
+        </template>
+      </DataView>
+    </div>
 
-              <p>{{ data.grade }} - {{ data.group }}</p>
-
-              <div class="flex gap-2">
-                <Avatar label="현" shape="circle" :class="statusOffline(data.attendance.status)" />
-                <Avatar label="온" shape="circle" :class="statusOnline(data.attendance.status)" />
-                <Avatar label="결" shape="circle" :class="statusAbsence(data.attendance.status)" />
-              </div>
-            </div>
-          </template>
-        </Card>
-      </template>
-
-      <template #grid="{ data }">
-        <Card class="col-span-1">
-          <template #content>
-            <div class="flex flex-col items-center justify-between gap-2">
-              <Avatar icon="pi pi-user" size="large" shape="circle" />
-              <p class="font-bold">{{ data.name }}</p>
-
-              <Tag
-                v-if="data.role.teacher"
-                :value="formatTeacher(data.role.teacher)"
-                :style="`background: ${formatTeacherColor(data.role.teacher)}`"
-              />
-
-              <span> {{ data.grade }} - {{ data.group }} </span>
-
-              <div class="mt-2 flex">
-                <Avatar label="현" :class="statusOffline(data.attendance.status)" />
-                <Avatar label="온" :class="statusOnline(data.attendance.status)" />
-                <Avatar label="결" :class="statusAbsence(data.attendance.status)" />
-              </div>
-            </div>
-          </template>
-        </Card>
-      </template>
-    </DataView>
-
-    <div v-else>
+    <div v-else class="px-6">
       <Chart type="bar" :height="250" :data="chartData" :options="chartOptions" />
     </div>
-  </div>
+  </section>
 </template>
 
 <script setup lang="ts">
+import dayjs from 'dayjs';
+import { DatePicker } from 'v-calendar';
+import 'v-calendar/style.css';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useAttendanceStore } from '@/store/attendance';
 import { useUserStore } from '@/store/user';
@@ -144,6 +178,21 @@ import AppHeader from '@/components/AppHeader.vue';
 
 const userStore = useUserStore();
 const attendanceStore = useAttendanceStore();
+
+const setPreviousSunday = () => {
+  attendanceDate.value = getPreviousSunday();
+};
+
+const popover = ref({
+  visibility: 'click',
+  placement: 'auto',
+} as const);
+
+const masks = ref({
+  input: 'YYYY년 MM월 DD일',
+});
+
+const disabledDates = [{ repeat: { weekdays: [2, 3, 4, 5, 6, 7] } }];
 
 const maxDate = getPreviousSunday();
 const attendanceDate = ref<Date>(getPreviousSunday());
@@ -261,6 +310,18 @@ const onAttendanceDateSelect = async () => {
   chartData.value = setChartData();
 };
 
+const changeDate = async (dir: 'prev' | 'next') => {
+  const date = dayjs(attendanceDate.value);
+
+  if (dir === 'prev') {
+    attendanceDate.value = date.subtract(7, 'd').toDate();
+  } else if (dir === 'next') {
+    attendanceDate.value = date.add(7, 'd').toDate();
+  }
+
+  await onAttendanceDateSelect();
+};
+
 watch(
   () => filteredAttendanceData.value,
   () => {
@@ -292,8 +353,8 @@ const statusAbsence = (attd: string) => {
   border: unset;
 }
 .p-dataview .p-dataview-header {
-  background: unset;
   border: unset;
+  background: unset;
 }
 .p-dataview .p-dataview-content {
   background: unset;
