@@ -33,7 +33,7 @@
     @confirm="handleDelete"
   />
 
-  <div class="bg-[#dadde2]">
+  <div class="overflow-hidden rounded-lg bg-[#dadde2] shadow-lg">
     <DataTable
       ref="dataTableRef"
       v-model:selection="selectedMembers"

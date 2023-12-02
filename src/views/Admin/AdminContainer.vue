@@ -1,29 +1,28 @@
 <template>
   <div class="flex h-[100svh] flex-col sm:flex-row">
-    <div class="hidden w-52 shrink-0 flex-col justify-center bg-black py-6 sm:flex sm:justify-between">
-      <div class="flex flex-col gap-1 text-white">
+    <div class="hidden bg-black sm:!block">
+      <RouterLink class="my-4 inline-block w-52 border-b border-blue-100" :to="{ name: 'HomeView' }">
         <Image :src="logoSidebar" />
-
-        <RouterLink class="px-8 py-2" :to="{ name: 'AdminStudent' }">
-          <i class="pi pi-home mr-1"></i>
-          <span>학생 관리하기</span>
-        </RouterLink>
-
-        <RouterLink class="px-8 py-2" :to="{ name: 'AdminTeacher' }">
-          <i class="pi pi-heart mr-1"></i>
-          <span>교사 관리하기</span>
-        </RouterLink>
-
-        <RouterLink class="px-8 py-2" :to="{ name: 'AdminUser' }">
-          <i class="pi pi-users mr-1"></i>
-          <span>가입자 관리하기</span>
-        </RouterLink>
-      </div>
-
-      <RouterLink class="px-8 py-2 text-center text-white" :to="{ name: 'HomeView' }">
-        <i class="pi pi-home mr-1"></i>
-        <span>홈으로 돌아가기</span>
       </RouterLink>
+
+      <div class="flex flex-col gap-2 pl-4 text-white">
+        <div class="flex flex-col gap-2">
+          <RouterLink class="px-4 py-2 hover:rounded-s-3xl hover:bg-blue-100/60" :to="{ name: 'AdminStudent' }">
+            <i class="pi pi-home mr-4"></i>
+            <span>학생 관리하기</span>
+          </RouterLink>
+
+          <RouterLink class="px-4 py-2 hover:rounded-s-3xl hover:bg-blue-100/60" :to="{ name: 'AdminTeacher' }">
+            <i class="pi pi-heart mr-4"></i>
+            <span>교사 관리하기</span>
+          </RouterLink>
+
+          <RouterLink class="px-4 py-2 hover:rounded-s-3xl hover:bg-blue-100/60" :to="{ name: 'AdminUser' }">
+            <i class="pi pi-users mr-4"></i>
+            <span>가입자 관리하기</span>
+          </RouterLink>
+        </div>
+      </div>
     </div>
 
     <div class="sm:hidden">
@@ -32,16 +31,16 @@
           <Button
             outlined
             class="aspect-square"
-            severity="warning"
             icon="pi pi-align-justify"
+            severity="warning"
             @click="toggle"
           />
         </template>
 
         <template #center>
           <Image
-            :src="logoSidebar"
             class="absolute left-1/2 top-1/2 w-24 translate-x-[-50%] translate-y-[-50%]"
+            :src="logoSidebar"
           />
         </template>
       </Toolbar>
@@ -71,7 +70,7 @@
       </OverlayPanel>
     </div>
 
-    <div class="flex-1 overflow-auto bg-zinc-700 px-8 py-4 text-white">
+    <div class="h-full w-full bg-blue-100 px-8 py-4">
       <RouterView />
     </div>
   </div>
@@ -88,8 +87,6 @@ const toggle = (event: Event) => op.value.toggle(event);
 <style scoped>
 .router-link-active,
 .router-link-exact-active {
-  background: white;
-  font-weight: bold;
-  color: black;
+  @apply rounded-3xl bg-blue-100 text-black sm:rounded-none sm:rounded-s-3xl;
 }
 </style>
