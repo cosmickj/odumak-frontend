@@ -1,9 +1,9 @@
+import '@/index.css'; // Tailwind CSS
 import '@/styles/normalize.css';
 import '@/styles/global.css';
 import 'primevue/resources/primevue.min.css';
 import 'primevue/resources/themes/saga-blue/theme.css';
 import 'primeicons/primeicons.css';
-import '@/index.css'; // Tailwind CSS
 
 import App from '@/App.vue';
 import router from '@/router';

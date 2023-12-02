@@ -10,25 +10,27 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import type { UserData } from '@/types';
+// import type { UserData } from '@/types';
 import { useUserStore } from '@/store/user';
 import AdminUserDataTable from './AdminUserDataTable.vue';
 
 const userStore = useUserStore();
 
 const loading = ref(true);
-const users = ref<UserData[]>([]);
-const usersSelection = ref<UserData[]>([]);
+// const users = ref<UserData[]>([]);
+// const usersSelection = ref<UserData[]>([]);
+const users = ref<any[]>([]);
+const usersSelection = ref<any[]>([]);
 
 const fetchUsers = async () => {
   if (!userStore.userData) {
     return;
   }
 
-  // users.value = await userStore.fetchMultipleByChurchAndDepartment({
-  //   church: userStore.userData.church!,
-  //   department: userStore.userData.department!,
-  // });
+  users.value = await userStore.fetchByChuchDepartment({
+    church: userStore.userData.church,
+    department: userStore.userData.department,
+  });
 };
 
 onMounted(async () => {
