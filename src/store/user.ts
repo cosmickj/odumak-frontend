@@ -14,7 +14,7 @@ import { defineStore } from 'pinia';
 import type { MemberData } from '@/types';
 import type { CreateSingleParams, FetchSingleParams, ModifySingle } from '@/types/store';
 import { Member, User } from '@/models';
-import { auth, db } from '@/firebase/config';
+import { auth, db, usersColl } from '@/firebase/config';
 import { userConverter } from '@/utils/useConverter';
 import { COLLECTION } from '@/constants/common';
 import { useMemberStore } from './member';
@@ -97,21 +97,18 @@ export const useUserStore = defineStore('user', {
       }
     },
 
-    // async fetchMultipleByChurchAndDepartment(params: FetchMultipleByChurchAndDepartment) {
-    //   const { church, department } = params;
-    //   const q = query(
-    //     usersColl,
-    //     where('church', '==', church),
-    //     where('department', '==', department),
-    //     where('role', '!=', 'admin')
-    //   );
-    //   const qSnapshot = await getDocs(q);
-    //   const result = qSnapshot.docs.map((doc) => ({
-    //     uid: doc.id,
-    //     ...doc.data(),
-    //   }));
-    //   return result as unknown as User[];
-    // },
+    async fetchByChuchDepartment(params: any) {
+      const { church, department } = params;
+
+      const q = query(usersColl, where('church', '==', church), where('department', '==', department));
+      const qSnapshot = await getDocs(q);
+
+      const users = qSnapshot.docs.map((doc) => ({
+        uid: doc.id,
+        ...doc.data(),
+      }));
+      return users;
+    },
 
     async modifySingle(params: ModifySingle) {
       const { uid, keyName, keyValue } = params;
