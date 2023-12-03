@@ -7,7 +7,7 @@
       </div>
     </template>
 
-    <section class="flex flex-col gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6">
+    <section class="flex flex-col gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
       <div v-for="(member, i) in members" class="rounded bg-stone-500 p-4 text-white" :key="i">
         <div>
           <p class="text-lg font-bold">기본 정보</p>
@@ -50,60 +50,56 @@
 
         <hr class="my-4 h-[1px] bg-slate-200" />
 
-        <div v-if="member.job === 'teacher'" class="flex items-start">
-          <div class="flex-1">
-            <p class="text-lg font-bold">담임 정보</p>
-          </div>
+        <div v-if="member.job === 'teacher'">
+          <p class="text-lg font-bold">담임 정보</p>
 
-          <div class="flex-2">
-            <SelectButton
-              unselectable
-              class="flex"
-              optionLabel="label"
-              optionValue="value"
-              :options="TEACHER_ROLE"
-              v-model="member.role!.teacher"
-            />
+          <SelectButton
+            unselectable
+            class="flex"
+            optionLabel="label"
+            optionValue="value"
+            :options="TEACHER_ROLE"
+            v-model="member.role!.teacher"
+          />
 
-            <Transition>
-              <div v-if="member.role!.teacher !== 'common'" class="my-2 flex items-center justify-between">
-                <p>새친구 학급이신가요?</p>
+          <Transition>
+            <div v-if="member.role!.teacher !== 'common'" class="my-2 flex items-center justify-between">
+              <p>새친구 학급이신가요?</p>
 
-                <div class="flex items-center gap-2">
-                  <p>
-                    {{ member.isNewFriendClass ? '네' : '아니요' }}
-                  </p>
-                  <InputSwitch v-model="member.isNewFriendClass" />
-                </div>
+              <div class="flex items-center gap-2">
+                <p>
+                  {{ member.isNewFriendClass ? '네' : '아니요' }}
+                </p>
+                <InputSwitch v-model="member.isNewFriendClass" />
               </div>
-            </Transition>
+            </div>
+          </Transition>
 
-            <Transition>
-              <div v-if="member.role!.teacher !== 'common'" class="flex gap-4">
-                <Dropdown
-                  class="flex-1"
-                  :class="{ 'p-invalid': isInvalid(i, 'grade') }"
-                  v-model="member.grade"
-                  placeholder="학년 선택"
-                  optionLabel="label"
-                  optionValue="value"
-                  :options="GRADE_OPTIONS"
-                  :disabled="member.isNewFriendClass"
-                />
+          <Transition>
+            <div v-if="member.role!.teacher !== 'common'" class="flex gap-4">
+              <Dropdown
+                class="flex-1"
+                :class="{ 'p-invalid': isInvalid(i, 'grade') }"
+                v-model="member.grade"
+                placeholder="학년"
+                optionLabel="label"
+                optionValue="value"
+                :options="GRADE_OPTIONS"
+                :disabled="member.isNewFriendClass"
+              />
 
-                <Dropdown
-                  class="flex-1"
-                  :class="{ 'p-invalid': isInvalid(i, 'group') }"
-                  v-model="member.group"
-                  placeholder="학급 선택"
-                  optionLabel="label"
-                  optionValue="value"
-                  :options="GROUP_OPTIONS"
-                  :disabled="member.isNewFriendClass"
-                />
-              </div>
-            </Transition>
-          </div>
+              <Dropdown
+                class="flex-1"
+                :class="{ 'p-invalid': isInvalid(i, 'group') }"
+                v-model="member.group"
+                placeholder="학급"
+                optionLabel="label"
+                optionValue="value"
+                :options="GROUP_OPTIONS"
+                :disabled="member.isNewFriendClass"
+              />
+            </div>
+          </Transition>
         </div>
 
         <div v-else class="">
