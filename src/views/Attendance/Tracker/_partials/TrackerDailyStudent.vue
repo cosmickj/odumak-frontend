@@ -51,8 +51,13 @@
       />
     </div>
 
-    <div v-if="selectedOption === 'all'" class="px-6">
-      <!-- <p class=""><sup>*</sup> 각 학년반을 클릭해보세요</p> -->
+    <div v-if="selectedOption === 'all'" class="px-6 pb-8">
+      <div class="text-sm">
+        <sup>*</sup>
+        <span class="text-sky-700">현장</span>, <span class="text-yellow-600">온라인</span>,
+        <span class="text-gray-500">결석</span>
+      </div>
+
       <table>
         <thead>
           <tr>
@@ -62,7 +67,7 @@
           </tr>
         </thead>
 
-        <tbody v-if="isReady">
+        <tbody v-if="isLoading">
           <tr v-for="i in 10" :key="i">
             <td class="p-2"><Skeleton /></td>
             <td class="p-2"><Skeleton /></td>
@@ -73,7 +78,7 @@
         <tbody v-else>
           <tr v-for="(key, i) in Object.keys(attdRecordsForTable)" :key="i">
             <template v-if="key.endsWith('T')">
-              <td class="col-span-3 bg-blue-300 px-4 py-2">
+              <td class="col-span-3 !bg-blue-300 !py-2 text-center">
                 {{ formatTotal(key) }}
               </td>
             </template>
@@ -84,7 +89,7 @@
                 <p class="min-w-[36px]">{{ formatGroup(key) }}</p>
               </td>
 
-              <td class="grid grid-cols-3 grid-rows-2 gap-1 sm:grid-cols-4">
+              <td class="grid grid-cols-2 grid-rows-2 gap-1 xs:grid-cols-4">
                 <span
                   v-for="(attd, j) in attdRecordsForTable[key]"
                   class="whitespace-nowrap text-center"
@@ -138,7 +143,7 @@
 import dayjs from 'dayjs';
 import { DatePicker } from 'v-calendar';
 import 'v-calendar/style.css';
-import { computed, onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import type { AttendanceStatus } from '@/types';
 import type { Attendance } from '@/models';
 import { useAttendanceStore } from '@/store/attendance';
@@ -179,14 +184,15 @@ interface StudentAttendanceRecord {
   [key: string]: Attendance[];
 }
 
-const isReady = computed(() => !Object.keys(attdRecordsForTable.value).length);
-
+const isLoading = ref(false);
 const rawAttdRecords = ref<Attendance[]>([]);
 const attdRecordsForTable = ref<StudentAttendanceRecord>({});
 const attdRecordsForChart = ref();
 
 const getAttendanceRecords = async () => {
   try {
+    isLoading.value = true;
+
     return await attendanceStore.fetchAttendances({
       church: userStore.userData?.church ?? '',
       department: userStore.userData?.department ?? '',
@@ -195,6 +201,8 @@ const getAttendanceRecords = async () => {
     });
   } catch (error) {
     return [];
+  } finally {
+    isLoading.value = false;
   }
 };
 
@@ -278,7 +286,15 @@ const isChecked = (records: Attendance[]) => {
 };
 
 const paintAttendance = (status: AttendanceStatus) => {
-  return status === 'offline' || status === 'online' ? 'text-sky-700 font-semibold' : '';
+  if (status === 'offline') {
+    return 'text-sky-700 font-semibold';
+  }
+  if (status === 'online') {
+    return 'text-yellow-600 font-semibold';
+  }
+  if (status === 'absence') {
+    return 'text-gray-500';
+  }
 };
 
 const chartOptions = {
