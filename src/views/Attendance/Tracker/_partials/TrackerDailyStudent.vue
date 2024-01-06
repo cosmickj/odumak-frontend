@@ -75,7 +75,7 @@
           </tr>
         </tbody>
 
-        <tbody v-else>
+        <tbody v-else class="text-sm">
           <tr v-for="(key, i) in Object.keys(attdRecordsForTable)" :key="i">
             <template v-if="key.endsWith('T')">
               <td class="col-span-3 !bg-blue-300 !py-2 text-center">
