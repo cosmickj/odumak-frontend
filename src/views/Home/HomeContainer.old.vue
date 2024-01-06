@@ -126,7 +126,8 @@ const items = ref([{ label: '내 정보 보기', icon: 'pi pi-user', route: '/us
 
 const move = (routeName: string, job?: Job) => {
   if (job) {
-    return router.push({ name: routeName, params: { job } });
+    // return router.push({ name: routeName, params: { job } });
+    return router.push({ name: routeName });
   }
   return router.push({ name: routeName });
 };

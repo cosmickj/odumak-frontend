@@ -117,6 +117,7 @@ export const useUserStore = defineStore('user', {
       });
     },
 
+    // FIXME: payload 타입 재정의
     async modifyMultiple(payload: ModifySingle) {
       const { uid, ...params } = payload;
       return await updateDoc(doc(db, COLLECTION.USERS, uid), {

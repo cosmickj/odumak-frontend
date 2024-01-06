@@ -1,102 +1,104 @@
 <template>
-  <section class="overflow-auto">
-    <AppHeader header="출석체크" route-name="HomeView" />
+  <div>
+    <section class="overflow-auto">
+      <AppHeader header="출석체크" route-name="HomeView" />
 
-    <div class="flex gap-2 px-6 py-4">
-      <Button rounded class="p-button-blue" icon="pi pi-chevron-left" @click="changeDate('prev')" />
+      <div class="flex gap-2 px-6 py-4">
+        <Button rounded class="p-button-blue" icon="pi pi-chevron-left" @click="changeDate('prev')" />
 
-      <DatePicker
-        v-model="attendanceDate"
-        locale="ko"
-        :popover="popover"
-        :masks="masks"
-        :disabled-dates="disabledDates"
-        :max-date="maxDate"
-        @update:modelValue="getAttendances"
-      >
-        <template #default="{ inputValue, inputEvents }">
-          <div class="relative flex-1">
-            <InputText class="w-full" v-on="inputEvents" :value="inputValue" />
-          </div>
-        </template>
+        <DatePicker
+          v-model="attendanceDate"
+          locale="ko"
+          :popover="popover"
+          :masks="masks"
+          :disabled-dates="disabledDates"
+          :max-date="maxDate"
+          @update:modelValue="getAttendances"
+        >
+          <template #default="{ inputValue, inputEvents }">
+            <div class="relative flex-1">
+              <InputText class="w-full" v-on="inputEvents" :value="inputValue" />
+            </div>
+          </template>
 
-        <template #footer>
-          <div class="w-full px-3 pb-3">
-            <button
-              class="w-full rounded-md bg-blue-600 px-3 py-1 font-bold text-white"
-              @click="setPreviousSunday"
-            >
-              최근 주일로 이동하기
-            </button>
-          </div>
-        </template>
-      </DatePicker>
+          <template #footer>
+            <div class="w-full px-3 pb-3">
+              <button
+                class="w-full rounded-md bg-blue-600 px-3 py-1 font-bold text-white"
+                @click="setPreviousSunday"
+              >
+                최근 주일로 이동하기
+              </button>
+            </div>
+          </template>
+        </DatePicker>
 
+        <Button
+          rounded
+          class="p-button-blue"
+          icon="pi pi-chevron-right"
+          :disabled="maxDate.toString() === attendanceDate.toString()"
+          @click="changeDate('next')"
+        />
+      </div>
+
+      <div class="flex justify-end px-6">
+        <span v-if="userData.role.system === 'admin' || userData.role.executive === 'secretary'">
+          {{ userData.church }} {{ userData.department }} 교사
+        </span>
+
+        <span v-else-if="userData.role.system === 'user'">
+          {{ formatClassName(userData.grade, userData.group) }}
+        </span>
+
+        <span>(총 {{ attendances.length }}명)</span>
+      </div>
+
+      <ProgressSpinner v-if="isLoading" />
+
+      <div v-else class="px-6">
+        <CheckerTeachers
+          v-if="userData.role.system === 'admin' || userData.role.executive === 'secretary'"
+          :attendances="attendances"
+          :attendance-date="attendanceDate"
+        />
+
+        <CheckerStudents
+          v-else-if="userData.role.teacher === 'head' || userData.role.teacher === 'assistant'"
+          :attendances="attendances"
+        />
+
+        <Dialog
+          v-else
+          modal
+          header="담임이 아닙니다"
+          v-model:visible="visible"
+          :breakpoints="{ '450px': '85vw' }"
+          @hide="router.push({ name: 'HomeView' })"
+        >
+          <p>출석 체크는 담임, 부담임 선생님만 이용할 수 있습니다.</p>
+
+          <template #footer>
+            <Button
+              label="알겠습니다"
+              class="p-button-info"
+              icon="pi pi-check"
+              @click="router.push({ name: 'HomeView' })"
+            />
+          </template>
+        </Dialog>
+      </div>
+    </section>
+
+    <section class="mt-auto px-6 pb-8 pt-4">
       <Button
-        rounded
-        class="p-button-blue"
-        icon="pi pi-chevron-right"
-        :disabled="maxDate.toString() === attendanceDate.toString()"
-        @click="changeDate('next')"
+        class="z-10 w-full bg-yellow-300 py-2 text-lg"
+        label="출석 저장하기"
+        :disabled="!isChanged"
+        @click="saveAttendances"
       />
-    </div>
-
-    <div class="flex justify-end px-6">
-      <span v-if="userData.role.system === 'admin' || userData.role.executive === 'secretary'">
-        {{ userData.church }} {{ userData.department }} 교사
-      </span>
-
-      <span v-else-if="userData.role.system === 'user'">
-        {{ formatClassName(userData.grade, userData.group) }}
-      </span>
-
-      <span>(총 {{ attendances.length }}명)</span>
-    </div>
-
-    <ProgressSpinner v-if="isLoading" />
-
-    <div v-else class="px-6">
-      <CheckerTeachers
-        v-if="userData.role.system === 'admin' || userData.role.executive === 'secretary'"
-        :attendances="attendances"
-        :attendance-date="attendanceDate"
-      />
-
-      <CheckerStudents
-        v-else-if="userData.role.teacher === 'head' || userData.role.teacher === 'assistant'"
-        :attendances="attendances"
-      />
-
-      <Dialog
-        v-else
-        modal
-        header="담임이 아닙니다"
-        v-model:visible="visible"
-        :breakpoints="{ '450px': '85vw' }"
-        @hide="router.push({ name: 'HomeView' })"
-      >
-        <p>출석 체크는 담임, 부담임 선생님만 이용할 수 있습니다.</p>
-
-        <template #footer>
-          <Button
-            label="알겠습니다"
-            class="p-button-info"
-            icon="pi pi-check"
-            @click="router.push({ name: 'HomeView' })"
-          />
-        </template>
-      </Dialog>
-    </div>
-  </section>
-
-  <section class="mt-auto px-6 pb-8 pt-4">
-    <Button
-      class="z-10 w-full bg-yellow-300 py-2 text-lg"
-      label="출석 저장하기"
-      :disabled="!isChanged"
-      @click="saveAttendances"
-    />
-  </section>
+    </section>
+  </div>
 </template>
 
 <script setup lang="ts">
