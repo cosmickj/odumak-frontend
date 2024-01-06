@@ -89,7 +89,7 @@ const deleteMembers = async (members: Member[]) => {
   try {
     const uids = members.map((member) => member.uid);
 
-    await memberStore.removeMultiple({ uids });
+    await memberStore.modifyMultiple({ uids, data: { status: 'inactive' } });
     await fetchMembers();
 
     toast.add({

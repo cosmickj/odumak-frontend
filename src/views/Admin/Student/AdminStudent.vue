@@ -7,6 +7,7 @@
     @add="addStudents"
     @edit="editStudent"
     @delete="deleteStudents"
+    @promotion="promoteStudents"
   />
 </template>
 
@@ -89,12 +90,65 @@ const deleteStudents = async (members: Member[]) => {
   try {
     const uids = members.map((member) => member.uid);
 
-    await memberStore.removeMultiple({ uids });
+    await memberStore.modifyMultiple({
+      uids,
+      data: { status: 'inactive' },
+    });
     await fetchStudents();
 
     toast.add({
       severity: 'error',
       detail: '삭제되었습니다',
+      life: 1000,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const getDepartmentByGrade = (grade: string) => {
+  var department = '';
+
+  switch (grade) {
+    case '1':
+    case '2':
+      department = '유년부';
+      break;
+    case '3':
+    case '4':
+      department = '초등부';
+      break;
+    case '5':
+    case '6':
+      department = '소년부';
+      break;
+    default:
+      break;
+  }
+
+  return department;
+};
+
+const promoteStudents = async (members: Member[]) => {
+  try {
+    await Promise.all(
+      members.map((member) => {
+        const new_grade = (~~member.grade + 1).toString();
+        const new_department = getDepartmentByGrade(new_grade);
+
+        memberStore.modifySingle({
+          uid: member.uid,
+          grade: new_grade,
+          department: new_department,
+        });
+      })
+    );
+
+    await fetchStudents();
+
+    toast.add({
+      severity: 'info',
+      detail: '반영되었습니다',
       life: 1000,
     });
   } catch (error) {

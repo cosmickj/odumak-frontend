@@ -7,7 +7,7 @@ import type {
   FetchByGradeGroupParams,
   FetchByNameParams,
   ModifySingleParams,
-  RemoveMultipleParams,
+  ModifyMultipleParams,
 } from '@/types/store';
 import { db, membersColl } from '@/firebase/config';
 import { memberConverter } from '@/utils/useConverter';
@@ -95,14 +95,12 @@ export const useMemberStore = defineStore('member', {
       return await updateDoc(doc(db, COLLECTION.MEMBERS, uid), { ...data });
     },
 
-    async removeMultiple(params: RemoveMultipleParams) {
+    async modifyMultiple(params: ModifyMultipleParams) {
       try {
         await Promise.all(
           params.uids.map(async (uid) => {
             if (uid) {
-              await updateDoc(doc(db, COLLECTION.MEMBERS, uid), {
-                status: 'inactive',
-              });
+              await updateDoc(doc(db, COLLECTION.MEMBERS, uid), params.data);
             }
           })
         );

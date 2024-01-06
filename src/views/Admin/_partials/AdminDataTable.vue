@@ -3,6 +3,7 @@
     :selection="selectedMembers"
     @add="addingVisible = true"
     @delete="deletingVisible = true"
+    @promotion="promotionVisible = true"
     @export="exportDataTable"
   />
 
@@ -31,6 +32,13 @@
     :members="selectedMembers"
     @cancel="deletingVisible = false"
     @confirm="handleDelete"
+  />
+
+  <AdminDataTablePromotion
+    :visible="promotionVisible"
+    :members="selectedMembers"
+    @cancel="promotionVisible = false"
+    @confirm="handlePromotion"
   />
 
   <div class="overflow-hidden rounded-lg bg-[#dadde2] shadow-lg">
@@ -128,8 +136,9 @@ import AdminDataTableAdd from './AdminDataTableAdd.vue';
 import AdminDataTableDelete from './AdminDataTableDelete.vue';
 import AdminDataTableEdit from './AdminDataTableEdit.vue';
 import AdminDataTableHeader from './AdminDataTableHeader.vue';
+import AdminDataTablePromotion from './AdminDataTablePromotion.vue';
 
-const emit = defineEmits(['add', 'edit', 'delete']);
+const emit = defineEmits(['add', 'edit', 'delete', 'promotion']);
 
 const props = defineProps<{
   loading: boolean;
@@ -384,6 +393,14 @@ const deletingVisible = ref(false);
 const handleDelete = () => {
   emit('delete', selectedMembers.value);
   deletingVisible.value = false;
+};
+
+/*---------- PROMOTION ----------*/
+const promotionVisible = ref(false);
+
+const handlePromotion = () => {
+  emit('promotion', selectedMembers.value);
+  promotionVisible.value = false;
 };
 </script>
 

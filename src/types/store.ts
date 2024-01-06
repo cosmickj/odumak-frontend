@@ -61,8 +61,9 @@ export interface ModifySingleParams {
   [key: string]: any;
 }
 
-export interface RemoveMultipleParams {
+export interface ModifyMultipleParams {
   uids: (string | undefined)[];
+  data: any;
 }
 
 /*---------- userStore ----------*/

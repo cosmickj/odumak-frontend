@@ -8,12 +8,21 @@
         @click="handleAdd"
       >
       </Button>
+
       <Button
         class="p-button-danger p-button-sm"
         icon="pi pi-trash"
         :label="isMobile ? '' : '삭제하기'"
         :disabled="!isDisabled"
         @click="handleDelete"
+      />
+
+      <Button
+        class="p-button- p-button-sm"
+        icon="pi pi-angle-double-up"
+        :label="isMobile ? '' : '학년 등반'"
+        :disabled="!isDisabled"
+        @click="handlePromotion"
       />
     </div>
 
@@ -35,11 +44,12 @@ const props = defineProps<{
   selection: Member[];
 }>();
 
-const emit = defineEmits(['export', 'add', 'delete']);
+const emit = defineEmits(['export', 'add', 'delete', 'promotion']);
 
 const handleAdd = () => emit('add');
 const handleDelete = () => emit('delete');
 const handleExport = () => emit('export');
+const handlePromotion = () => emit('promotion');
 
 const breakpoints = useBreakpoints(breakpointsTailwind);
 
