@@ -55,7 +55,7 @@
           <Avatar :image="bgChild" size="xlarge" shape="circle" />
 
           <div class="ml-6">
-            <p class="text-xl">학생 출석부</p>
+            <p class="text-xl">학생 정보</p>
             <p class="text-sm text-gray-500">
               {{ userStore.userData?.church }}
               {{ userStore.userData?.department }}
@@ -66,15 +66,15 @@
         <div class="flex gap-3">
           <Button
             class="p-button-blue flex-1 rounded-md py-1 text-white"
-            label="일일 현황"
+            label="일일 출석 현황"
             @click="move('AttendanceTrackerDailyStudent')"
           />
-          <Button
+          <!-- <Button
             disabled
             class="p-button-yellow flex-1 rounded-md py-1"
-            label="누적 현황"
+            label="누적 출석 현황"
             @click="move('AttendanceTrackerTotal', 'student')"
-          />
+          /> -->
         </div>
       </div>
 
@@ -83,7 +83,7 @@
           <Avatar :image="bgMan" size="xlarge" shape="circle" />
 
           <div class="ml-6">
-            <p class="text-xl">교사 출석부</p>
+            <p class="text-xl">교사 정보</p>
             <p class="text-sm text-gray-500">
               {{ userStore.userData?.church }}
               {{ userStore.userData?.department }}
@@ -93,6 +93,13 @@
 
         <div class="flex gap-3">
           <Button
+            disabled
+            class="p-button-blue flex-1 rounded-md py-1 text-white"
+            label="준비중입니다"
+            @click="move('AttendanceTrackerDailyTeacher')"
+          />
+          <!-- <Button
+            disabled
             class="p-button-blue flex-1 rounded-md py-1 text-white"
             label="일일 현황"
             @click="move('AttendanceTrackerDailyTeacher')"
@@ -102,7 +109,7 @@
             class="p-button-yellow flex-1 rounded-md py-1"
             label="누적 현황"
             @click="move('AttendanceTrackerTotal', 'teacher')"
-          />
+          /> -->
         </div>
       </div>
     </div>

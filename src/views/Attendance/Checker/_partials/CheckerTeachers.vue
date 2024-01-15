@@ -1,42 +1,41 @@
 <template>
-  <div
-    v-for="(attendance, i) in attendances"
-    class="mt-[-1px] items-center justify-between border border-slate-300 p-2"
-    :key="i"
-  >
-    <div class="flex min-h-[40px] items-center justify-between">
-      <p class="flex gap-2">
+  <template v-for="(attendance, i) in attendances" :key="i">
+    <div
+      v-if="attendance.role?.teacher == 'head'"
+      class="mt-[-1px] flex items-center justify-around border border-slate-300 py-2"
+    >
+      <template v-if="attendance.role?.teacher == 'head'">
         <Tag
           :value="formatTeacher(attendance.role?.teacher)"
           :style="`background: ${formatTeacherColor(attendance.role?.teacher)}`"
         />
         <span>{{ attendance.name }}</span>
-        <span v-if="attendance.role?.teacher !== 'common'">
+        <span>
           {{ formatClassName(attendance.grade, attendance.group) }}
         </span>
-      </p>
 
-      <Button
-        v-if="attendance.role?.teacher === 'head'"
-        rounded
-        severity="secondary"
-        icon="pi pi-plus"
-        @click="getSubAttendances(attendance)"
-      />
+        <Button
+          v-if="attendance.role?.teacher === 'head'"
+          rounded
+          severity="secondary"
+          icon="pi pi-plus"
+          @click="getSubAttendances(attendance)"
+        />
+
+        <!-- <SelectButton
+          v-model="attendance.attendance.status"
+          class="flex [&>*:nth-child(1)]:flex-1 xs:[&>*:nth-child(2)]:flex-1 [&>*:nth-child(3)]:flex-1"
+          :options="[
+            { name: '현장', value: 'offline' },
+            { name: '온라인', value: 'online' },
+            { name: '결석', value: 'absence' },
+          ]"
+          option-label="name"
+          option-value="value"
+        /> -->
+      </template>
     </div>
-
-    <SelectButton
-      v-model="attendance.attendance.status"
-      class="flex [&>*:nth-child(1)]:flex-1 xs:[&>*:nth-child(2)]:flex-1 [&>*:nth-child(3)]:flex-1"
-      :options="[
-        { name: '현장', value: 'offline' },
-        { name: '온라인', value: 'online' },
-        { name: '결석', value: 'absence' },
-      ]"
-      option-label="name"
-      option-value="value"
-    />
-  </div>
+  </template>
 
   <Dialog
     modal
