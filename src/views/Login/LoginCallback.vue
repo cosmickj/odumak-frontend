@@ -10,7 +10,7 @@ import { useCookies } from '@vueuse/integrations/useCookies';
 import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { auth } from '@/firebase/config';
-import { useUserStore } from '@/store/user';
+import { useUserStore } from '@/stores/user';
 
 const cookies = useCookies(['odumak_key']);
 const router = useRouter();

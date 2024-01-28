@@ -1,7 +1,7 @@
 import { onAuthStateChanged } from 'firebase/auth';
 import { RouteRecordRaw, createRouter, createWebHistory } from 'vue-router';
 import { auth } from '@/firebase/config';
-import { useUserStore } from '@/store/user';
+import { useUserStore } from '@/stores/user';
 
 const routes: Array<RouteRecordRaw> = [
   {

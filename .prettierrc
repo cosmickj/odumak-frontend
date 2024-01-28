@@ -12,7 +12,7 @@
     "^@/models/?(.*)$",
     "^@/api/?(.*)$",
     "^@/firebase/?(.*)$",
-    "^@/store/?(.*)$",
+    "^@/stores/?(.*)$",
     "^@/utils/?(.*)$",
     "^@/constants/?(.*)$",
     "^@/components/?(.*)$",

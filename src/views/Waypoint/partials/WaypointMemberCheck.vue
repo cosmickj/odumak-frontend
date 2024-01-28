@@ -71,9 +71,9 @@ import { storeToRefs } from 'pinia';
 import { onActivated, onDeactivated, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import type { Member } from '@/models';
-import { useMemberStore } from '@/store/member';
-import { useUserStore } from '@/store/user';
-import { useWaypointStore } from '@/store/waypoint';
+import { useMemberStore } from '@/stores/member';
+import { useUserStore } from '@/stores/user';
+import { useWaypointStore } from '@/stores/waypoint';
 import { getCurrentUser } from '@/router';
 
 const router = useRouter();
@@ -213,8 +213,8 @@ const complete = async () => {
 <style scoped>
 .wrong {
   animation: shake 0.3s 3;
-  border-radius: 6px;
   box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.5);
+  border-radius: 6px;
 }
 
 @keyframes shake {

@@ -60,8 +60,8 @@
 import { useToast } from 'primevue/usetoast';
 import { computed, ref, toRaw } from 'vue';
 import type { Attendance } from '@/models';
-import { useAttendanceStore } from '@/store/attendance';
-import { useUserStore } from '@/store/user';
+import { useAttendanceStore } from '@/stores/attendance';
+import { useUserStore } from '@/stores/user';
 import { formatClassName, formatTeacher, formatTeacherColor } from '@/utils/useFormat';
 import CheckerStudents from './CheckerStudents.vue';
 

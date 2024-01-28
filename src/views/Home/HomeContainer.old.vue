@@ -120,7 +120,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import type { Job } from '@/types';
-import { useUserStore } from '@/store/user';
+import { useUserStore } from '@/stores/user';
 import bgChild from '@/assets/images/bg-home-child.png';
 import bgMan from '@/assets/images/bg-home-man.png';
 

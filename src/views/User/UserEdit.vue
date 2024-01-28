@@ -109,7 +109,7 @@
 import useVuelidate from '@vuelidate/core';
 import { helpers, required, requiredIf } from '@vuelidate/validators';
 import { computed, reactive, ref, watch } from 'vue';
-import { useUserStore } from '@/store/user';
+import { useUserStore } from '@/stores/user';
 import {
   CHURCH_OPTIONS,
   DEPARTMENT_OPTIONS,
