@@ -1,12 +1,15 @@
 // Keep it simple, stupid
-type Status = 'active' | 'pending' | 'inactive';
 type Authority = 'superadmin' | 'admin' | 'manager' | 'common' | 'guest';
+type Presence = 'offline' | 'online' | 'absence' | undefined;
+type Status = 'active' | 'pending' | 'inactive';
 
 // 1번 조직을 등록한다.
 interface organizations {
   uid: string;
   originName: string; // 영은교회
   systemName: string; // 영은교회A
+  address: string;
+  contact: string;
   status: Status;
   createdAt: Date;
   updatedAt: Date;
@@ -23,6 +26,7 @@ interface tenants {
   originName: string; // 이경준
   systemName: string; // 이경준A, 이미 부여 받은것이 있다면 그것으로, 없다면 새로히
   birth: string;
+  contact: string;
   status: Status;
   createdAt: Date;
   updatedAt: Date;
@@ -107,7 +111,7 @@ interface followers {
       suffix: string;
     };
   };
-  status: Status;
+  joinedAt: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -138,7 +142,7 @@ interface leaders {
     aliasEn: string; // ex) mainTeacher, subTeacher, commonTeacher
     authority: Authority;
   }[];
-  status: Status;
+  joinedAt: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -155,5 +159,38 @@ interface users {
 }
 
 // *** 각 기능들을 플러그인 형식으로 만들자!
+// 리더들에 대한 출석 체크 가능 또한 플러그인으로 하자
 // 예를 들어 달란트 기능을 만들고 해당 기능은 등록된 팀만 사용할 수 있게 하자.
 // 또한 기목제목 기능도 그렇다! 더 나아가 기도제목 기능은 디폴트로 다 넣는 것이다.
+
+interface attendances {
+  uid: string;
+  date: Date;
+  presence: Presence;
+  team: {
+    uid: string;
+    name: string;
+    domain: {
+      granted: string;
+      suffix: string;
+    };
+    cluster: {
+      granted: string;
+      suffix: string;
+    };
+  };
+  donor: {
+    uid: string;
+    name: string;
+  };
+  recipient: {
+    uid: string;
+    name: string;
+    joinedAt: Date;
+  };
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// 참고 자료
+// - https://cloud.google.com/firestore/docs/best-practices
