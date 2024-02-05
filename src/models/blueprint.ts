@@ -26,6 +26,7 @@ interface tenants {
   originName: string; // 이경준
   systemName: string; // 이경준A, 이미 부여 받은것이 있다면 그것으로, 없다면 새로히
   birth: string;
+  address: string;
   contact: string;
   status: Status;
   createdAt: Date;
