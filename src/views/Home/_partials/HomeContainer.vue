@@ -225,8 +225,8 @@ import { useVuelidate } from '@vuelidate/core';
 import { helpers, required } from '@vuelidate/validators';
 import { computed, reactive, ref } from 'vue';
 import { Member } from '@/models';
-import { useMemberStore } from '@/store/member';
-import { useUserStore } from '@/store/user';
+import { useMemberStore } from '@/stores/member';
+import { useUserStore } from '@/stores/user';
 import { getPreviousSunday } from '@/utils/useCalendar';
 import { GRADE_OPTIONS, GROUP_OPTIONS } from '@/constants/common';
 import HomeMenu from './HomeMenu.vue';
@@ -371,7 +371,7 @@ const maxDate = getPreviousSunday();
 }
 .list-enter-from,
 .list-leave-to {
-  opacity: 0;
   transform: translateX(30px);
+  opacity: 0;
 }
 </style>

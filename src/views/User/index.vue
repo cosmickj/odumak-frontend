@@ -116,7 +116,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { useUserStore } from '@/store/user';
+import { useUserStore } from '@/stores/user';
 import { formatTeacher, formatTeacherColor } from '@/utils/useFormat';
 import { NAN_TEXT } from '@/constants/common';
 import AppHeader from '@/components/AppHeader.vue';

@@ -47,7 +47,7 @@ import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
-import { useWaypointStore } from '@/store/waypoint';
+import { useWaypointStore } from '@/stores/waypoint';
 import { CHURCH_OPTIONS, DEPARTMENT_OPTIONS } from '@/constants/common';
 
 const emit = defineEmits(['prev', 'next']);

@@ -162,8 +162,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAttendanceStore } from '@/store/attendance';
-import { useUserStore } from '@/store/user';
+import { useAttendanceStore } from '@/stores/attendance';
+import { useUserStore } from '@/stores/user';
 import { getPreviousSunday } from '@/utils/useCalendar';
 import { formatTeacher, formatTeacherColor } from '@/utils/useFormat';
 import { GRADE_OPTIONS, GROUP_WITH_NEW_CLASS_OPTIONS } from '@/constants/common';
@@ -310,8 +310,8 @@ const statusAbsence = (attd: string) => {
   border: unset;
 }
 .p-dataview .p-dataview-header {
-  background: unset;
   border: unset;
+  background: unset;
 }
 .p-dataview .p-dataview-content {
   background: unset;

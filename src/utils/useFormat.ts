@@ -1,4 +1,4 @@
-import { AttendanceStatus, Gender, MemberData, Role } from '@/types';
+import type { AttendanceStatus, Gender, MemberData, Role } from '@/types/index';
 
 export const formatClassName = (grade: string, group: string) => {
   if (grade === '0' || group === '0') {

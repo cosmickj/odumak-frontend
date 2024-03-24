@@ -1,5 +1,5 @@
+import type { AttendanceStatus, Job, MemberData, UserData } from '@/types/index';
 import type { Member, User } from '@/models';
-import { AttendanceStatus, Job, MemberData, UserData } from './index';
 
 /*---------- attendace.ts ----------*/
 export interface AddAttendanceParams {

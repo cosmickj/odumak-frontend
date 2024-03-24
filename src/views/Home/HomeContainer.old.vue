@@ -63,18 +63,19 @@
           </div>
         </div>
 
-        <div class="flex gap-3">
+        <div class="flex flex-col gap-2 sm:flex-row">
           <Button
             class="p-button-blue flex-1 rounded-md py-1 text-white"
             label="일일 출석 현황"
             @click="move('AttendanceTrackerDailyStudent')"
           />
-          <!-- <Button
-            disabled
+
+          <Button
+            v-if="true"
             class="p-button-yellow flex-1 rounded-md py-1"
-            label="누적 출석 현황"
-            @click="move('AttendanceTrackerTotal', 'student')"
-          /> -->
+            label="달란트 관리하기"
+            @click="move('TalentInput')"
+          />
         </div>
       </div>
 
@@ -120,7 +121,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import type { Job } from '@/types';
-import { useUserStore } from '@/store/user';
+import { useUserStore } from '@/stores/user';
 import bgChild from '@/assets/images/bg-home-child.png';
 import bgMan from '@/assets/images/bg-home-man.png';
 

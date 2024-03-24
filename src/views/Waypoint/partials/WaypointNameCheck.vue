@@ -28,8 +28,8 @@ import { required } from '@vuelidate/validators';
 import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { useMemberStore } from '@/store/member';
-import { useWaypointStore } from '@/store/waypoint';
+import { useMemberStore } from '@/stores/member';
+import { useWaypointStore } from '@/stores/waypoint';
 
 const emit = defineEmits(['prev', 'next']);
 

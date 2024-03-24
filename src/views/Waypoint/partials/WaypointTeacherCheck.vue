@@ -70,8 +70,8 @@ import { required, requiredIf } from '@vuelidate/validators';
 import { storeToRefs } from 'pinia';
 import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { useMemberStore } from '@/store/member';
-import { useWaypointStore } from '@/store/waypoint';
+import { useMemberStore } from '@/stores/member';
+import { useWaypointStore } from '@/stores/waypoint';
 import { GRADE_OPTIONS, GROUP_OPTIONS, TEACHER_ROLE } from '@/constants/common';
 
 const emit = defineEmits(['prev', 'next']);

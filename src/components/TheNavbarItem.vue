@@ -23,10 +23,10 @@ defineProps<{
   position: relative;
 }
 .router-link-exact-active::after {
-  content: '';
   position: absolute;
   inset: auto 0 -6px 0;
-  height: 3px;
   background: #1e293b;
+  height: 3px;
+  content: '';
 }
 </style>

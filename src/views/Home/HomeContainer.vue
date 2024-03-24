@@ -124,7 +124,7 @@ import dayjs from 'dayjs';
 import { Calendar } from 'v-calendar';
 import 'v-calendar/style.css';
 import { computed, ref } from 'vue';
-import { useUserStore } from '@/store/user';
+import { useUserStore } from '@/stores/user';
 import { formatClassName, formatDDay } from '@/utils/useFormat';
 
 type Attributes = InstanceType<typeof Calendar>['$props']['attributes'];

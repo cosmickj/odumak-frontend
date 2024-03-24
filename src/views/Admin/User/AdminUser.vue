@@ -11,7 +11,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 // import type { UserData } from '@/types';
-import { useUserStore } from '@/store/user';
+import { useUserStore } from '@/stores/user';
 import AdminUserDataTable from './AdminUserDataTable.vue';
 
 const userStore = useUserStore();

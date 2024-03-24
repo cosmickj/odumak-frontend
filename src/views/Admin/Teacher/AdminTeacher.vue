@@ -14,8 +14,8 @@
 import { useToast } from 'primevue/usetoast';
 import { onMounted, ref } from 'vue';
 import type { Member } from '@/models';
-import { useMemberStore } from '@/store/member';
-import { useUserStore } from '@/store/user';
+import { useMemberStore } from '@/stores/member';
+import { useUserStore } from '@/stores/user';
 import AdminDataTable from '../_partials/AdminDataTable.vue';
 
 const userStore = useUserStore();
