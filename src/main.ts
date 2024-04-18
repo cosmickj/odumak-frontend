@@ -27,7 +27,10 @@ app.use(PrimeVue);
 app.use(ToastService);
 app.use(setupCalendar, {});
 
+import Accordion from 'primevue/accordion';
+import AccordionTab from 'primevue/accordiontab';
 import Avatar from 'primevue/avatar';
+import Badge from 'primevue/badge';
 import Button from 'primevue/button';
 import Calendar from 'primevue/calendar';
 import Card from 'primevue/card';
@@ -40,7 +43,9 @@ import Dialog from 'primevue/dialog';
 import Divider from 'primevue/divider';
 import Dropdown from 'primevue/dropdown';
 import FileUpload from 'primevue/fileupload';
+import IconField from 'primevue/iconfield';
 import Image from 'primevue/image';
+import InputIcon from 'primevue/inputicon';
 import InputNumber from 'primevue/inputnumber';
 import InputSwitch from 'primevue/inputswitch';
 import InputText from 'primevue/inputtext';
@@ -61,7 +66,10 @@ import Toolbar from 'primevue/toolbar';
 import Tree from 'primevue/tree';
 
 app
+  .component('Accordion', Accordion)
+  .component('AccordionTab', AccordionTab)
   .component('Avatar', Avatar)
+  .component('Badge', Badge)
   .component('Button', Button)
   .component('Calendar', Calendar)
   .component('Card', Card)
@@ -74,7 +82,9 @@ app
   .component('Divider', Divider)
   .component('Dropdown', Dropdown)
   .component('FileUpload', FileUpload)
+  .component('IconField', IconField)
   .component('Image', Image)
+  .component('InputIcon', InputIcon)
   .component('InputNumber', InputNumber)
   .component('InputSwitch', InputSwitch)
   .component('InputText', InputText)
