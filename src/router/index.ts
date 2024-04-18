@@ -72,6 +72,25 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/Attendance/Checker/index.vue'),
       },
       {
+        path: 'talent',
+        redirect: 'talent/input',
+        component: () => import('@/views/Talent/TalentContainer.vue'),
+        children: [
+          {
+            path: 'input',
+            name: 'TalentInput',
+            meta: { requiresAuth: true, requiresAccept: true },
+            component: () => import('@/views/Talent/TalentInput.vue'),
+          },
+          {
+            path: 'status',
+            name: 'TalentStatus',
+            meta: { requiresAuth: true, requiresAccept: true },
+            component: () => import('@/views/Talent/TalentStatus.vue'),
+          },
+        ],
+      },
+      {
         path: '/waypoint',
         meta: { requiresAuth: true },
         beforeEnter: () => {
