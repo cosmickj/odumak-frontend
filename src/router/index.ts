@@ -92,6 +92,12 @@ const routes: Array<RouteRecordRaw> = [
           },
         ],
       },
+      {
+        path: '/pending',
+        meta: { requiresAuth: true },
+        name: 'PendingView',
+        component: () => import('@/views/PendingView.vue'),
+      },
     ],
   },
   {
