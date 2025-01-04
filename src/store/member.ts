@@ -26,6 +26,8 @@ export const useMemberStore = defineStore('member', {
           department,
           createdAt: serverTimestamp(),
         };
+
+        // TODO: 전에 있던 인원이 복귀하였을 경우에 대한 로직 추가하기
         return await addDoc(collection(db, COLLECTION.MEMBERS), param);
       });
     },

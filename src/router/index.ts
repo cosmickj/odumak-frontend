@@ -34,12 +34,6 @@ const routes: Array<RouteRecordRaw> = [
         meta: { requiresAuth: true },
         component: () => import('@/views/User/index.vue'),
       },
-      // {
-      //   path: 'user/edit',
-      //   name: 'UserEditView',
-      //   meta: { requiresAccept: true },
-      //   component: () => import('@/views/User/UserEdit.vue'),
-      // },
       {
         path: 'attendance/tracker',
         meta: { requiresAuth: true, requiresAccept: true },
@@ -74,13 +68,6 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: '/waypoint',
         meta: { requiresAuth: true },
-        beforeEnter: () => {
-          const { userData } = useUserStore();
-
-          if (userData?.isAccepted) {
-            return { name: 'HomeView' };
-          }
-        },
         component: () => import('@/views/Waypoint/WaypointContainer.vue'),
         children: [
           {
@@ -104,6 +91,12 @@ const routes: Array<RouteRecordRaw> = [
             component: () => import('@/views/Waypoint/partials/WaypointMemberCheck.vue'),
           },
         ],
+      },
+      {
+        path: '/pending',
+        meta: { requiresAuth: true },
+        name: 'PendingView',
+        component: () => import('@/views/PendingView.vue'),
       },
     ],
   },
@@ -136,35 +129,53 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to, _, next) => {
   const userStore = useUserStore();
-  const currentUser = await getCurrentUser();
 
   try {
-    const needAuth = to.matched.some((record) => record.meta.requiresAuth);
-    const needAdmin = to.matched.some((record) => record.meta.requiresAdmin);
-    const needAccept = to.matched.some((record) => record.meta.requiresAccept);
+    const firebaseUser = await getFirebaseUser();
 
-    if (!currentUser && needAuth) {
-      return next({ name: 'LoginView' });
+    const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+    const requiresAdmin = to.matched.some((record) => record.meta.requiresAdmin);
+    const requiresAccept = to.matched.some((record) => record.meta.requiresAccept);
+
+    // 🔓 로그인하지 않았고, 인증이 필요 없는 페이지일 경우 바로 이동
+    if (!firebaseUser && !requiresAuth) return next();
+
+    // 🔒 로그인하지 않았고, 인증이 필요한 페이지일 경우 로그인 페이지로 리다이렉트
+    if (!firebaseUser && requiresAuth) return next({ name: 'LoginView' });
+
+    // 🔄 로그인한 상태에서 로그인 페이지로 이동 시 홈으로 리다이렉트
+    if (firebaseUser && !requiresAuth) return next({ name: 'HomeView' });
+
+    // 💾 사용자 데이터가 없을 경우 불러오기
+    if (!userStore.userData) {
+      await userStore.fetchSingle({ uid: firebaseUser.uid });
     }
 
-    if (currentUser) {
-      if (!userStore.userData) {
-        await userStore.fetchSingle({ uid: currentUser.uid });
-      }
+    const { isAccepted } = userStore.userData!;
 
-      if (!needAuth) {
-        return next({ name: 'HomeView' });
-      }
-      if (needAccept && !userStore.userData?.isAccepted) {
-        userStore.$patch({ isAcceptDialogVisible: true });
-        return next({ name: 'HomeView' });
-      }
-      if (needAdmin && userStore.userData?.role.system !== 'admin') {
-        return next({ name: 'HomeView' });
-      }
+    // ✅ 조건 검사 시작
+
+    // if (!isAccepted && !isApprovalRequested && !to.fullPath.startsWith('/waypoint')) {
+    //   return next({ name: 'GroupCheck' });
+    // }
+
+    // ================================================================
+    // XXX: 임시로 해둔 상태
+    if (!isAccepted && !to.fullPath.startsWith('/pending')) {
+      return next({ name: 'PendingView' });
     }
+    // if (!isAccepted && isApprovalRequested && !to.fullPath.startsWith('/pending')) {
+    //   return next({ name: 'PendingView' });
+    // }
+    // ================================================================
+
+    // if (requiresAdmin && userStore.userData?.role.system !== 'admin') {
+    //   return next({ name: 'HomeView' });
+    // }
+
+    // 🚀 모든 조건을 통과한 경우 페이지로 이동
     return next();
   } catch (error) {
     console.log(error);
@@ -174,7 +185,7 @@ router.beforeEach(async (to, from, next) => {
 });
 
 // Router Auth Checker
-export const getCurrentUser = (): any => {
+export const getFirebaseUser = (): any => {
   return new Promise((resolve, reject) => {
     const removeListener = onAuthStateChanged(
       auth,
