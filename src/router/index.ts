@@ -34,12 +34,6 @@ const routes: Array<RouteRecordRaw> = [
         meta: { requiresAuth: true },
         component: () => import('@/views/User/index.vue'),
       },
-      // {
-      //   path: 'user/edit',
-      //   name: 'UserEditView',
-      //   meta: { requiresAccept: true },
-      //   component: () => import('@/views/User/UserEdit.vue'),
-      // },
       {
         path: 'attendance/tracker',
         meta: { requiresAuth: true, requiresAccept: true },
@@ -74,13 +68,6 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: '/waypoint',
         meta: { requiresAuth: true },
-        beforeEnter: () => {
-          const { userData } = useUserStore();
-
-          if (userData?.isAccepted) {
-            return { name: 'HomeView' };
-          }
-        },
         component: () => import('@/views/Waypoint/WaypointContainer.vue'),
         children: [
           {
