@@ -24,7 +24,7 @@ onMounted(async () => {
 
     await userStore.fetchSingle({ uid });
 
-    router.replace({ name: 'HomeView' });
+    return router.replace({ name: 'HomeView' });
   } catch (error) {
     throw Error((error as Error).message);
   } finally {
